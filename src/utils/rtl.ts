@@ -144,3 +144,103 @@ export function getLogicalProperty(
 ): string {
   return `${property}-${side}: ${value}`
 }
+
+/**
+ * Get directional class names for Tailwind CSS
+ * Automatically handles RTL/LTR based on locale
+ */
+export function getDirectionalClasses(locale: string) {
+  const rtl = isRTL(locale);
+  
+  return {
+    // Text alignment
+    textStart: rtl ? 'text-right' : 'text-left',
+    textEnd: rtl ? 'text-left' : 'text-right',
+    
+    // Margins
+    marginStart: rtl ? 'mr' : 'ml',
+    marginEnd: rtl ? 'ml' : 'mr',
+    
+    // Padding
+    paddingStart: rtl ? 'pr' : 'pl',
+    paddingEnd: rtl ? 'pl' : 'pr',
+    
+    // Borders
+    borderStart: rtl ? 'border-r' : 'border-l',
+    borderEnd: rtl ? 'border-l' : 'border-r',
+    
+    // Rounded corners
+    roundedStart: rtl ? 'rounded-r' : 'rounded-l',
+    roundedEnd: rtl ? 'rounded-l' : 'rounded-r',
+    roundedTopStart: rtl ? 'rounded-tr' : 'rounded-tl',
+    roundedTopEnd: rtl ? 'rounded-tl' : 'rounded-tr',
+    roundedBottomStart: rtl ? 'rounded-br' : 'rounded-bl',
+    roundedBottomEnd: rtl ? 'rounded-bl' : 'rounded-br',
+    
+    // Flex direction
+    flexRow: rtl ? 'flex-row-reverse' : 'flex-row',
+    
+    // Positioning
+    left: rtl ? 'right' : 'left',
+    right: rtl ? 'left' : 'right',
+    
+    // Transforms
+    translateX: (value: number) => rtl ? -value : value,
+  };
+}
+
+/**
+ * Apply RTL-aware inline styles
+ */
+export function getDirectionalStyle(
+  property: 'marginLeft' | 'marginRight' | 'paddingLeft' | 'paddingRight' | 'left' | 'right' | 'textAlign',
+  value: string | number,
+  locale: string
+): Record<string, string | number> {
+  const rtl = isRTL(locale);
+  
+  const propertyMap: Record<string, string> = {
+    marginLeft: rtl ? 'marginRight' : 'marginLeft',
+    marginRight: rtl ? 'marginLeft' : 'marginRight',
+    paddingLeft: rtl ? 'paddingRight' : 'paddingLeft',
+    paddingRight: rtl ? 'paddingLeft' : 'paddingRight',
+    left: rtl ? 'right' : 'left',
+    right: rtl ? 'left' : 'right',
+    textAlign: value === 'left' ? (rtl ? 'right' : 'left') : value === 'right' ? (rtl ? 'left' : 'right') : value as string,
+  };
+  
+  const mappedProperty = propertyMap[property] || property;
+  const mappedValue = property === 'textAlign' ? propertyMap[property] : value;
+  
+  return { [mappedProperty]: mappedValue };
+}
+
+/**
+ * Get icon transform for RTL (useful for directional icons like arrows)
+ */
+export function getIconTransform(locale: string, shouldFlip = true): React.CSSProperties {
+  if (!shouldFlip) return {};
+  
+  return {
+    transform: getMirrorTransform(locale),
+  };
+}
+
+/**
+ * Check if a number or date should remain LTR in RTL context
+ */
+export function shouldRemainLTR(content: string): boolean {
+  // Check if content is primarily numbers or dates
+  const numberPattern = /^[\d\s.,:/\-]+$/;
+  return numberPattern.test(content);
+}
+
+/**
+ * Wrap content with LTR direction if needed (for numbers/dates in RTL)
+ */
+export function wrapLTRIfNeeded(content: string, locale: string): string {
+  if (isRTL(locale) && shouldRemainLTR(content)) {
+    return `<span dir="ltr">${content}</span>`;
+  }
+  return content;
+}

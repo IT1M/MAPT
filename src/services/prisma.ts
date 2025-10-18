@@ -6,24 +6,66 @@ declare global {
 }
 
 /**
+ * Get database URL with production optimizations
+ * 
+ * In production, adds connection pooling parameters for optimal performance:
+ * - pgbouncer=true: Enables PgBouncer compatibility mode
+ * - connection_limit: Limits concurrent connections per instance
+ * - pool_timeout: Maximum time to wait for a connection from the pool
+ */
+function getDatabaseUrl(): string {
+  const baseUrl = process.env.DATABASE_URL || ''
+  
+  // In production, add connection pooling parameters if not already present
+  if (process.env.NODE_ENV === 'production' && !baseUrl.includes('pgbouncer')) {
+    const separator = baseUrl.includes('?') ? '&' : '?'
+    return `${baseUrl}${separator}pgbouncer=true&connection_limit=10&pool_timeout=20`
+  }
+  
+  return baseUrl
+}
+
+/**
  * Create Prisma Client with enhanced configuration
+ * 
+ * Production optimizations:
+ * - Connection pooling via PgBouncer
+ * - Limited connection pool size (10 connections)
+ * - Error-only logging to reduce overhead
+ * - Query timeout configuration
  */
 const prismaClientSingleton = () => {
+  const isProduction = process.env.NODE_ENV === 'production'
+  
   const client = new PrismaClient({
-    log: process.env.NODE_ENV === 'development' 
-      ? ['query', 'error', 'warn'] 
-      : ['error'],
+    log: isProduction 
+      ? ['error'] 
+      : ['query', 'error', 'warn'],
     datasources: {
       db: {
-        url: process.env.DATABASE_URL
+        url: getDatabaseUrl()
       }
-    }
+    },
+    // Add query timeout in production to prevent long-running queries
+    ...(isProduction && {
+      // @ts-ignore - Prisma doesn't expose this in types but it's supported
+      __internal: {
+        engine: {
+          queryTimeout: 30000 // 30 seconds
+        }
+      }
+    })
   })
 
   // Add error event listener for Prisma client
   client.$on('error' as never, (e: any) => {
     console.error('Prisma Client Error:', e)
   })
+
+  // Log connection info in development
+  if (!isProduction) {
+    console.log('🔌 Prisma Client initialized with URL:', getDatabaseUrl().replace(/:[^:@]+@/, ':****@'))
+  }
 
   return client
 }

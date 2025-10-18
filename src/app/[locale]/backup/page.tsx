@@ -2,7 +2,24 @@ import { Metadata } from 'next';
 import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
 import { authOptions } from '@/auth.config';
-import BackupManagementPage from '@/components/backup/BackupManagementPage';
+import dynamic from 'next/dynamic';
+import { Suspense } from 'react';
+
+// Lazy load the backup management page for better performance
+const BackupManagementPage = dynamic(
+  () => import('@/components/backup/BackupManagementPage'),
+  {
+    loading: () => (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400">Loading backup management...</p>
+        </div>
+      </div>
+    ),
+    ssr: false,
+  }
+);
 
 export const metadata: Metadata = {
   title: 'Backup Management | Saudi Mais Co.',
@@ -27,5 +44,18 @@ export default async function BackupPage({
     redirect(`/${locale}/dashboard`);
   }
 
-  return <BackupManagementPage locale={locale} userRole={userRole} />;
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600 dark:text-gray-400">Loading backup management...</p>
+          </div>
+        </div>
+      }
+    >
+      <BackupManagementPage locale={locale} userRole={userRole} />
+    </Suspense>
+  );
 }

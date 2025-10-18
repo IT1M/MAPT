@@ -1,0 +1,332 @@
+/**
+ * RTL (Right-to-Left) Layout Styles
+ * Global styles for Arabic and other RTL languages
+ */
+
+/* RTL-specific body styles */
+body.rtl {
+  direction: rtl;
+  text-align: right;
+}
+
+body.ltr {
+  direction: ltr;
+  text-align: left;
+}
+
+/* Ensure numbers and dates remain LTR in RTL context */
+.rtl .ltr-content,
+.rtl [data-ltr="true"],
+.rtl .number,
+.rtl .date,
+.rtl .time,
+.rtl input[type="number"],
+.rtl input[type="date"],
+.rtl input[type="time"] {
+  direction: ltr;
+  text-align: left;
+  unicode-bidi: embed;
+}
+
+/* RTL-aware flex layouts */
+.rtl .flex-row {
+  flex-direction: row-reverse;
+}
+
+.rtl .flex-row-reverse {
+  flex-direction: row;
+}
+
+/* RTL-aware grid layouts */
+.rtl .grid {
+  direction: rtl;
+}
+
+/* RTL-aware text alignment */
+.rtl .text-left {
+  text-align: right;
+}
+
+.rtl .text-right {
+  text-align: left;
+}
+
+/* RTL-aware margins */
+.rtl .ml-auto {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+.rtl .mr-auto {
+  margin-right: 0;
+  margin-left: auto;
+}
+
+/* RTL-aware padding */
+.rtl .pl-0 { padding-left: 0; padding-right: 0; }
+.rtl .pr-0 { padding-right: 0; padding-left: 0; }
+
+/* RTL-aware borders */
+.rtl .border-l {
+  border-left: none;
+  border-right: 1px solid;
+}
+
+.rtl .border-r {
+  border-right: none;
+  border-left: 1px solid;
+}
+
+/* RTL-aware rounded corners */
+.rtl .rounded-l {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border-top-right-radius: 0.375rem;
+  border-bottom-right-radius: 0.375rem;
+}
+
+.rtl .rounded-r {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-top-left-radius: 0.375rem;
+  border-bottom-left-radius: 0.375rem;
+}
+
+.rtl .rounded-tl {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0.375rem;
+}
+
+.rtl .rounded-tr {
+  border-top-right-radius: 0;
+  border-top-left-radius: 0.375rem;
+}
+
+.rtl .rounded-bl {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0.375rem;
+}
+
+.rtl .rounded-br {
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0.375rem;
+}
+
+/* RTL-aware positioning */
+.rtl .left-0 {
+  left: auto;
+  right: 0;
+}
+
+.rtl .right-0 {
+  right: auto;
+  left: 0;
+}
+
+/* RTL-aware transforms for icons */
+.rtl .flip-icon,
+.rtl [data-flip-rtl="true"] {
+  transform: scaleX(-1);
+}
+
+/* Prevent flipping for certain icons */
+.rtl .no-flip,
+.rtl [data-flip-rtl="false"] {
+  transform: none;
+}
+
+/* RTL-aware navigation */
+.rtl nav ul {
+  padding-right: 0;
+  padding-left: 0;
+}
+
+.rtl nav li {
+  text-align: right;
+}
+
+/* RTL-aware forms */
+.rtl input,
+.rtl textarea,
+.rtl select {
+  text-align: right;
+}
+
+.rtl input[type="email"],
+.rtl input[type="url"],
+.rtl input[type="tel"] {
+  direction: ltr;
+  text-align: left;
+}
+
+/* RTL-aware checkboxes and radio buttons */
+.rtl input[type="checkbox"],
+.rtl input[type="radio"] {
+  margin-right: 0;
+  margin-left: 0.5rem;
+}
+
+/* RTL-aware lists */
+.rtl ul,
+.rtl ol {
+  padding-right: 1.5rem;
+  padding-left: 0;
+}
+
+.rtl li {
+  text-align: right;
+}
+
+/* RTL-aware tables */
+.rtl table {
+  direction: rtl;
+}
+
+.rtl th,
+.rtl td {
+  text-align: right;
+}
+
+.rtl th:first-child,
+.rtl td:first-child {
+  text-align: right;
+}
+
+/* RTL-aware dropdowns */
+.rtl .dropdown-menu {
+  right: 0;
+  left: auto;
+}
+
+/* RTL-aware tooltips */
+.rtl .tooltip {
+  direction: rtl;
+  text-align: right;
+}
+
+/* RTL-aware modals */
+.rtl .modal-header,
+.rtl .modal-body,
+.rtl .modal-footer {
+  text-align: right;
+}
+
+/* RTL-aware breadcrumbs */
+.rtl .breadcrumb {
+  direction: rtl;
+}
+
+.rtl .breadcrumb-item + .breadcrumb-item::before {
+  padding-right: 0.5rem;
+  padding-left: 0.5rem;
+  content: "/";
+}
+
+/* RTL-aware pagination */
+.rtl .pagination {
+  direction: rtl;
+}
+
+/* RTL-aware cards */
+.rtl .card {
+  text-align: right;
+}
+
+/* RTL-aware badges */
+.rtl .badge {
+  margin-right: 0;
+  margin-left: 0.25rem;
+}
+
+/* RTL-aware alerts */
+.rtl .alert {
+  text-align: right;
+}
+
+/* RTL-aware progress bars */
+.rtl .progress-bar {
+  direction: ltr;
+}
+
+/* Scrollbar adjustments for RTL */
+.rtl ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+/* RTL-aware sidebar */
+.rtl .sidebar {
+  right: 0;
+  left: auto;
+}
+
+.rtl .sidebar-left {
+  right: 0;
+  left: auto;
+}
+
+.rtl .sidebar-right {
+  left: 0;
+  right: auto;
+}
+
+/* RTL-aware drawer */
+.rtl .drawer-left {
+  right: 0;
+  left: auto;
+}
+
+.rtl .drawer-right {
+  left: 0;
+  right: auto;
+}
+
+/* Utility classes for RTL */
+.rtl-only {
+  display: none;
+}
+
+.rtl .rtl-only {
+  display: block;
+}
+
+.ltr-only {
+  display: none;
+}
+
+.ltr .ltr-only {
+  display: block;
+}
+
+/* Ensure proper text rendering in RTL */
+.rtl {
+  font-feature-settings: normal;
+  font-variant-ligatures: normal;
+}
+
+/* RTL-aware animations */
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.rtl .slide-in-right {
+  animation: slideInLeft 0.3s ease-out;
+}
+
+.rtl .slide-in-left {
+  animation: slideInRight 0.3s ease-out;
+}

@@ -6,6 +6,8 @@ import { locales } from '@/i18n'
 import { Header } from '@/components/layout/header'
 import { Sidebar } from '@/components/layout/sidebar'
 import { Navigation } from '@/components/layout/navigation'
+import { RTLProvider } from '@/components/layout/RTLProvider'
+import '@/styles/rtl.css'
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }))
@@ -41,26 +43,28 @@ export default async function LocaleLayout({
   return (
     <SessionProvider>
       <NextIntlClientProvider messages={messages}>
-        <div className={`min-h-screen ${fontFamily}`} dir={dir}>
-          <div className="flex h-screen overflow-hidden">
-            {/* Sidebar */}
-            <Sidebar />
-            
-            {/* Main content area */}
-            <div className="flex flex-1 flex-col overflow-hidden">
-              {/* Header */}
-              <Header />
+        <RTLProvider>
+          <div className={`min-h-screen ${fontFamily}`} dir={dir}>
+            <div className="flex h-screen overflow-hidden">
+              {/* Sidebar */}
+              <Sidebar />
               
-              {/* Navigation */}
-              <Navigation />
-              
-              {/* Page content */}
-              <main className="flex-1 overflow-y-auto bg-muted/30 p-4 md:p-6 lg:p-8">
-                {children}
-              </main>
+              {/* Main content area */}
+              <div className="flex flex-1 flex-col overflow-hidden">
+                {/* Header */}
+                <Header />
+                
+                {/* Navigation */}
+                <Navigation />
+                
+                {/* Page content */}
+                <main className="flex-1 overflow-y-auto bg-muted/30 p-4 md:p-6 lg:p-8">
+                  {children}
+                </main>
+              </div>
             </div>
           </div>
-        </div>
+        </RTLProvider>
       </NextIntlClientProvider>
     </SessionProvider>
   )
