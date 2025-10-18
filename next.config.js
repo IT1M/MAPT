@@ -8,7 +8,6 @@ const nextConfig = {
   compress: true,
   poweredByHeader: false,
   generateEtags: true,
-  swcMinify: true,
   
   compiler: {
     // Remove console logs in production
@@ -34,7 +33,6 @@ const nextConfig = {
     optimizePackageImports: [
       'recharts',
       'react-icons',
-      'lucide-react',
       '@prisma/client',
       'date-fns',
     ],
@@ -56,8 +54,10 @@ const nextConfig = {
       }
     }
     
-    // Ignore node-pre-gyp issues
-    config.externals = [...(config.externals || []), 'bcrypt']
+    // Only externalize bcrypt on server-side
+    if (isServer) {
+      config.externals = [...(config.externals || []), 'bcrypt']
+    }
     
     // Optimize chunk splitting in production (Task 8.1)
     if (!dev && !isServer) {

@@ -1378,5 +1378,70 @@
       "processing": "Processing...",
       "iUnderstand": "I understand"
     }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "unread": "unread",
+    "markAllRead": "Mark all as read",
+    "clearAll": "Clear all",
+    "viewAll": "View all notifications",
+    "empty": {
+      "title": "You're all caught up!",
+      "description": "No new notifications"
+    }
+  },
+  "emptyState": {
+    "dataLog": {
+      "title": "No inventory items yet",
+      "description": "Start by adding your first inventory item",
+      "action": "Add First Item"
+    },
+    "analytics": {
+      "title": "Not enough data",
+      "description": "Add at least 10 items to see analytics"
+    },
+    "audit": {
+      "title": "No audit logs found",
+      "description": "No activity has been recorded yet",
+      "action": "Reset Filters"
+    },
+    "backup": {
+      "title": "No backups created",
+      "description": "Create your first backup to protect your data",
+      "action": "Create First Backup"
+    },
+    "reports": {
+      "title": "No reports generated",
+      "description": "Generate your first report to get started",
+      "action": "Generate Report"
+    },
+    "noResults": {
+      "title": "No results found",
+      "description": "Try adjusting your filters to find what you're looking for",
+      "action": "Reset Filters"
+    },
+    "noAccess": {
+      "title": "Access Denied",
+      "description": "You don't have permission to view this content",
+      "action": "Go to Dashboard"
+    },
+    "error": {
+      "title": "Something went wrong",
+      "description": "We encountered an error while loading this content",
+      "action": "Try Again"
+    },
+    "search": {
+      "title": "No results for \"{query}\"",
+      "description": "Try different keywords or check your spelling",
+      "action": "Clear Search"
+    }
+  },
+  "loading": {
+    "page": "Loading page...",
+    "data": "Loading data...",
+    "processing": "Processing...",
+    "generating": "Generating...",
+    "timeout": "This is taking longer than expected...",
+    "retry": "Retry"
   }
 }

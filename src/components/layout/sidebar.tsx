@@ -3,26 +3,26 @@
 import { useSession } from 'next-auth/react'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
-import { useLocale, useTranslations } from 'next-intl'
-import { useState, useEffect } from 'react'
-import { UserRole } from '.prisma/client'
-
-interface NavItem {
-  label: string
-  path: string
-  icon: React.ReactNode
-  roles: UserRole[]
-}
+import { useLocale } from 'next-intl'
+import { useState, useEffect, useRef, KeyboardEvent } from 'react'
+import { UserRole } from '@prisma/client'
+import {
+  navigationConfig,
+  filterNavigationByRole,
+  getNavigationLabel,
+  NavigationItem,
+} from '@/config/navigation'
 
 const SIDEBAR_STORAGE_KEY = 'sidebar-collapsed'
 
 export function Sidebar() {
   const { data: session } = useSession()
   const pathname = usePathname()
-  const locale = useLocale()
-  const t = useTranslations('navigation')
+  const locale = useLocale() as 'en' | 'ar'
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
+  const [focusedIndex, setFocusedIndex] = useState<number>(-1)
+  const navItemsRef = useRef<(HTMLAnchorElement | null)[]>([])
 
   // Load collapsed state from localStorage on mount
   useEffect(() => {
@@ -40,89 +40,57 @@ export function Sidebar() {
     localStorage.setItem(SIDEBAR_STORAGE_KEY, String(newState))
   }
 
-  // Define navigation items with role-based access
-  const navItems: NavItem[] = [
-    {
-      label: t('dashboard'),
-      path: `/${locale}/dashboard`,
-      roles: ['ADMIN', 'DATA_ENTRY', 'SUPERVISOR', 'MANAGER', 'AUDITOR'],
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-        </svg>
-      ),
-    },
-    {
-      label: t('dataEntry'),
-      path: `/${locale}/data-entry`,
-      roles: ['ADMIN', 'DATA_ENTRY', 'SUPERVISOR'],
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-        </svg>
-      ),
-    },
-    {
-      label: t('dataLog'),
-      path: `/${locale}/data-log`,
-      roles: ['ADMIN', 'DATA_ENTRY', 'SUPERVISOR', 'MANAGER', 'AUDITOR'],
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-        </svg>
-      ),
-    },
-    {
-      label: t('inventory'),
-      path: `/${locale}/inventory`,
-      roles: ['ADMIN', 'DATA_ENTRY', 'SUPERVISOR'],
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-        </svg>
-      ),
-    },
-    {
-      label: t('reports'),
-      path: `/${locale}/reports`,
-      roles: ['ADMIN', 'MANAGER', 'AUDITOR', 'SUPERVISOR'],
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-        </svg>
-      ),
-    },
-    {
-      label: t('settings'),
-      path: `/${locale}/settings`,
-      roles: ['ADMIN'],
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-        </svg>
-      ),
-    },
-    {
-      label: t('audit'),
-      path: `/${locale}/audit`,
-      roles: ['ADMIN', 'AUDITOR'],
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-        </svg>
-      ),
-    },
-  ]
+  // Sync collapsed state across tabs
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === SIDEBAR_STORAGE_KEY && e.newValue !== null) {
+        setIsCollapsed(e.newValue === 'true')
+      }
+    }
+    
+    window.addEventListener('storage', handleStorageChange)
+    return () => window.removeEventListener('storage', handleStorageChange)
+  }, [])
 
   // Filter navigation items based on user role
-  const filteredNavItems = navItems.filter((item) => {
-    if (!session?.user?.role) return false
-    return item.roles.includes(session.user.role as UserRole)
-  })
+  const filteredNavItems = filterNavigationByRole(session?.user?.role as UserRole)
 
-  const isActive = (path: string) => {
-    return pathname === path
+  // Add locale prefix to href
+  const getLocalizedHref = (item: NavigationItem) => `/${locale}${item.href}`
+
+  const isActive = (item: NavigationItem) => {
+    const itemPath = getLocalizedHref(item)
+    return pathname === itemPath || pathname.startsWith(itemPath + '/')
+  }
+
+  // Keyboard navigation handler
+  const handleKeyDown = (e: KeyboardEvent<HTMLAnchorElement>, index: number) => {
+    const totalItems = filteredNavItems.length
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault()
+        const nextIndex = (index + 1) % totalItems
+        navItemsRef.current[nextIndex]?.focus()
+        setFocusedIndex(nextIndex)
+        break
+      case 'ArrowUp':
+        e.preventDefault()
+        const prevIndex = (index - 1 + totalItems) % totalItems
+        navItemsRef.current[prevIndex]?.focus()
+        setFocusedIndex(prevIndex)
+        break
+      case 'Home':
+        e.preventDefault()
+        navItemsRef.current[0]?.focus()
+        setFocusedIndex(0)
+        break
+      case 'End':
+        e.preventDefault()
+        navItemsRef.current[totalItems - 1]?.focus()
+        setFocusedIndex(totalItems - 1)
+        break
+    }
   }
 
   // Prevent hydration mismatch
@@ -184,41 +152,86 @@ export function Sidebar() {
         </div>
 
         {/* Navigation Items */}
-        <nav className="flex-1 overflow-y-auto py-4">
-          <ul className={`space-y-1 ${isCollapsed ? 'px-2' : 'px-3'}`}>
-            {filteredNavItems.map((item) => {
-              const active = isActive(item.path)
+        <nav className="flex-1 overflow-y-auto py-4" role="navigation" aria-label="Main navigation">
+          <ul className={`space-y-1 ${isCollapsed ? 'px-2' : 'px-3'}`} role="list">
+            {filteredNavItems.map((item, index) => {
+              const active = isActive(item)
+              const Icon = item.icon
+              const label = getNavigationLabel(item, locale)
+              
               return (
-                <li key={item.path}>
+                <li key={item.id}>
                   <Link
-                    href={item.path}
+                    ref={(el) => {
+                      navItemsRef.current[index] = el
+                    }}
+                    href={getLocalizedHref(item)}
+                    onKeyDown={(e) => handleKeyDown(e, index)}
                     className={`
-                      group relative flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200
+                      group relative flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium
+                      transition-all duration-300 ease-in-out
+                      focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2
+                      dark:focus:ring-offset-gray-800
                       ${
                         active
-                          ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400'
-                          : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                          ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 border-l-4 rtl:border-l-0 rtl:border-r-4 border-primary-600 dark:border-primary-400'
+                          : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border-l-4 rtl:border-l-0 rtl:border-r-4 border-transparent'
                       }
                       ${isCollapsed ? 'justify-center' : ''}
                     `}
-                    title={isCollapsed ? item.label : undefined}
+                    title={isCollapsed ? label : undefined}
+                    aria-label={label}
+                    aria-current={active ? 'page' : undefined}
                   >
-                    <span className={active ? 'text-primary-600 dark:text-primary-400' : ''}>
-                      {item.icon}
+                    <span className={`flex-shrink-0 ${active ? 'text-primary-600 dark:text-primary-400' : ''}`}>
+                      <Icon className="w-5 h-5" />
                     </span>
                     {!isCollapsed && (
                       <>
-                        <span>{item.label}</span>
+                        <span className="flex-1">{label}</span>
+                        {item.badge && (
+                          <span
+                            className={`
+                              px-2 py-0.5 text-xs font-semibold rounded-full
+                              ${
+                                item.badge.variant === 'new'
+                                  ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
+                                  : item.badge.variant === 'info'
+                                  ? 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400'
+                                  : item.badge.variant === 'warning'
+                                  ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
+                                  : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                              }
+                            `}
+                          >
+                            {item.badge.count !== undefined ? item.badge.count : item.badge.text}
+                          </span>
+                        )}
                         {active && (
-                          <span className="ml-auto rtl:ml-0 rtl:mr-auto w-1.5 h-1.5 rounded-full bg-primary-600 dark:bg-primary-400" />
+                          <span className="w-1.5 h-1.5 rounded-full bg-primary-600 dark:bg-primary-400" />
                         )}
                       </>
                     )}
                     
                     {/* Tooltip for collapsed state */}
                     {isCollapsed && (
-                      <div className="absolute left-full rtl:left-auto rtl:right-full ml-2 rtl:ml-0 rtl:mr-2 px-2 py-1 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">
-                        {item.label}
+                      <div
+                        className={`
+                          absolute left-full rtl:left-auto rtl:right-full
+                          ml-2 rtl:ml-0 rtl:mr-2 px-3 py-1.5
+                          bg-gray-900 dark:bg-gray-700 text-white text-xs font-medium rounded-md
+                          opacity-0 group-hover:opacity-100 group-focus:opacity-100
+                          pointer-events-none transition-opacity duration-150
+                          whitespace-nowrap z-50 shadow-lg
+                        `}
+                        role="tooltip"
+                      >
+                        {label}
+                        {item.badge && (
+                          <span className="ml-2 rtl:ml-0 rtl:mr-2">
+                            {item.badge.count !== undefined ? `(${item.badge.count})` : item.badge.text}
+                          </span>
+                        )}
                       </div>
                     )}
                   </Link>

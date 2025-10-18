@@ -7,6 +7,7 @@ import { Header } from '@/components/layout/header'
 import { Sidebar } from '@/components/layout/sidebar'
 import { Navigation } from '@/components/layout/navigation'
 import { RTLProvider } from '@/components/layout/RTLProvider'
+import { NotificationProvider } from '@/context/NotificationContext'
 import '@/styles/rtl.css'
 
 export function generateStaticParams() {
@@ -44,26 +45,28 @@ export default async function LocaleLayout({
     <SessionProvider>
       <NextIntlClientProvider messages={messages}>
         <RTLProvider>
-          <div className={`min-h-screen ${fontFamily}`} dir={dir}>
-            <div className="flex h-screen overflow-hidden">
-              {/* Sidebar */}
-              <Sidebar />
-              
-              {/* Main content area */}
-              <div className="flex flex-1 flex-col overflow-hidden">
-                {/* Header */}
-                <Header />
+          <NotificationProvider>
+            <div className={`min-h-screen ${fontFamily}`} dir={dir}>
+              <div className="flex h-screen overflow-hidden">
+                {/* Sidebar */}
+                <Sidebar />
                 
-                {/* Navigation */}
-                <Navigation />
-                
-                {/* Page content */}
-                <main className="flex-1 overflow-y-auto bg-muted/30 p-4 md:p-6 lg:p-8">
-                  {children}
-                </main>
+                {/* Main content area */}
+                <div className="flex flex-1 flex-col overflow-hidden">
+                  {/* Header */}
+                  <Header />
+                  
+                  {/* Navigation */}
+                  <Navigation />
+                  
+                  {/* Page content */}
+                  <main className="flex-1 overflow-y-auto bg-muted/30 p-4 md:p-6 lg:p-8">
+                    {children}
+                  </main>
+                </div>
               </div>
             </div>
-          </div>
+          </NotificationProvider>
         </RTLProvider>
       </NextIntlClientProvider>
     </SessionProvider>

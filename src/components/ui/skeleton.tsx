@@ -230,3 +230,39 @@ export const SkeletonList: React.FC<SkeletonListProps> = ({
     </div>
   );
 };
+
+// Page Skeleton Component - Full page loading state
+export interface SkeletonPageProps {
+  className?: string;
+  hasHeader?: boolean;
+  hasSidebar?: boolean;
+}
+
+export const SkeletonPage: React.FC<SkeletonPageProps> = ({
+  className = '',
+  hasHeader = true,
+  hasSidebar = false,
+}) => {
+  return (
+    <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 ${className}`}>
+      {hasHeader && (
+        <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+          <Skeleton width="30%" height={32} />
+        </div>
+      )}
+      <div className="flex">
+        {hasSidebar && (
+          <div className="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 p-4 space-y-4">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <Skeleton key={i} width="100%" height={40} variant="rectangular" />
+            ))}
+          </div>
+        )}
+        <div className="flex-1 p-6 space-y-6">
+          <SkeletonStats count={4} />
+          <SkeletonTable rows={8} columns={5} />
+        </div>
+      </div>
+    </div>
+  );
+};

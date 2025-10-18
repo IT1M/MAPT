@@ -1,22 +1,23 @@
 // Re-export Prisma types
-export type { 
-  User, 
+export type {
+  User,
   Session,
-  Product, 
-  InventoryItem, 
-  Transaction, 
-  AuditLog 
+  Product,
+  InventoryItem,
+  Transaction,
+  AuditLog
 } from '@prisma/client'
 
-export { 
-  UserRole, 
+export {
+  UserRole,
   TransactionType,
   Destination,
-  AuditAction
+  ActionType,
+  EntityType
 } from '@prisma/client'
 
 // Permission type union
-export type Permission = 
+export type Permission =
   | 'inventory:read'
   | 'inventory:write'
   | 'inventory:delete'
@@ -204,7 +205,7 @@ export interface FieldChange {
 export interface AuditHistoryEntry {
   id: string
   timestamp: Date
-  action: import('@prisma/client').AuditAction
+  action: import('@prisma/client').ActionType
   user: {
     id: string
     name: string
