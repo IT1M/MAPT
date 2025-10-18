@@ -57,3 +57,14 @@ export type {
   SearchEmptyStateProps,
   ErrorEmptyStateProps,
 } from './EmptyState';
+
+// Error state components
+export {
+  ErrorState,
+  PageErrorState,
+  InlineErrorState,
+} from './ErrorState';
+export type {
+  ErrorStateProps,
+  InlineErrorStateProps,
+} from './ErrorState';

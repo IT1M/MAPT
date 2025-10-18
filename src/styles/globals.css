@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Import animation system */
+@import './animations.css';
+
 /* CSS Variables for Theme Colors */
 :root {
   /* Primary Colors (Teal) */
@@ -194,4 +197,44 @@
   .no-print {
     display: none !important;
   }
+}
+
+/* Error Handling Animations */
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  10%, 30%, 50%, 70%, 90% {
+    transform: translateX(-4px);
+  }
+  20%, 40%, 60%, 80% {
+    transform: translateX(4px);
+  }
+}
+
+.animate-shake {
+  animation: shake 0.5s ease-in-out;
+}
+
+/* Pulse animation for offline indicator */
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Error state styles */
+.error-field {
+  @apply border-red-500 dark:border-red-400 focus:ring-red-500 dark:focus:ring-red-400;
+}
+
+.error-message {
+  @apply text-sm text-red-600 dark:text-red-400 mt-1;
 }

@@ -1,329 +1,547 @@
 # Caching Strategy
 
-This document outlines the caching strategies implemented in the Saudi Mais Inventory Management Application.
+This document outlines the caching and state management strategies implemented in the application.
 
 ## Overview
 
 The application uses a multi-layered caching approach:
 
-1. **Browser Cache**: Client-side caching for static assets
-2. **CDN Cache**: Vercel Edge Network caching for API responses
-3. **Memory Cache**: Server-side in-memory caching for expensive operations
-4. **Database Query Cache**: Prisma query result caching
+1. **SWR (stale-while-revalidate)** - API data caching
+2. **localStorage** - Persistent user preferences
+3. **sessionStorage** - Temporary session data
+4. **Browser Cache** - Static assets (configured in next.config.js)
 
-## Cache Layers
+## SWR Data Caching
 
-### 1. Static Assets (Browser + CDN)
+### Configuration
 
-Static assets are cached with long TTL for optimal performance.
+Default SWR configuration (`src/hooks/useApiData.ts`):
 
-#### Configuration
-```javascript
-// next.config.js
+```typescript
 {
-  source: '/_next/static/:path*',
-  headers: [
+  revalidateOnFocus: false,      // Don't refetch on window focus
+  revalidateOnReconnect: true,   // Refetch when reconnecting
+  dedupingInterval: 5000,        // Dedupe requests within 5 seconds
+  errorRetryCount: 3,            // Retry failed requests 3 times
+  errorRetryInterval: 5000,      // Wait 5 seconds between retries
+  shouldRetryOnError: true,      // Retry on error
+  revalidateIfStale: true,       // Revalidate stale data
+  revalidateOnMount: true,       // Revalidate on component mount
+  refreshInterval: 0,            // No auto-refresh by default
+}
+```
+
+### Usage Examples
+
+#### Basic Data Fetching
+
+```typescript
+import { useApiData } from '@/hooks/useApiData'
+
+function UserList() {
+  const { data, error, isLoading } = useApiData<User[]>('/api/users')
+
+  if (isLoading) return <Loading />
+  if (error) return <Error error={error} />
+  return <UserList users={data} />
+}
+```
+
+#### Custom Cache Time
+
+```typescript
+import { useApiDataWithCache } from '@/hooks/useApiData'
+
+function Dashboard() {
+  // Cache for 10 minutes
+  const { data } = useApiDataWithCache('/api/dashboard', 600000)
+  
+  return <DashboardView data={data} />
+}
+```
+
+#### Auto-Refresh
+
+```typescript
+import { useApiDataWithRefresh } from '@/hooks/useApiData'
+
+function LiveStats() {
+  // Refresh every 30 seconds
+  const { data } = useApiDataWithRefresh('/api/stats', 30000)
+  
+  return <StatsView data={data} />
+}
+```
+
+#### Pagination
+
+```typescript
+import { usePaginatedApiData } from '@/hooks/useApiData'
+
+function InventoryTable() {
+  const { data, page, nextPage, prevPage } = usePaginatedApiData(
+    '/api/inventory',
+    1,
+    20
+  )
+
+  return (
+    <>
+      <Table data={data} />
+      <Pagination 
+        page={page}
+        onNext={nextPage}
+        onPrev={prevPage}
+      />
+    </>
+  )
+}
+```
+
+#### Manual Revalidation
+
+```typescript
+import { revalidateApiData } from '@/hooks/useApiData'
+
+async function createItem(data: ItemData) {
+  await fetch('/api/inventory', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  })
+
+  // Revalidate the inventory list
+  await revalidateApiData('/api/inventory')
+}
+```
+
+#### Prefetching
+
+```typescript
+import { preloadApiData } from '@/hooks/useApiData'
+
+function Navigation() {
+  return (
+    <Link 
+      href="/analytics"
+      onMouseEnter={() => preloadApiData('/api/analytics/summary')}
+    >
+      Analytics
+    </Link>
+  )
+}
+```
+
+## State Persistence
+
+### localStorage
+
+Used for long-term user preferences that should persist across sessions.
+
+#### Sidebar State
+
+```typescript
+import { useSidebarState } from '@/hooks/usePersistedState'
+
+function Layout() {
+  const [collapsed, setCollapsed, toggleSidebar] = useSidebarState()
+
+  return (
+    <div>
+      <Sidebar collapsed={collapsed} onToggle={toggleSidebar} />
+      <Main />
+    </div>
+  )
+}
+```
+
+#### Filter State
+
+```typescript
+import { useFilterState } from '@/hooks/usePersistedState'
+
+function DataLog() {
+  const [filters, setFilters, resetFilters] = useFilterState('inventory-filters', {
+    search: '',
+    category: '',
+    destination: null,
+  })
+
+  return (
+    <div>
+      <Filters 
+        filters={filters}
+        onChange={setFilters}
+        onReset={resetFilters}
+      />
+      <Table filters={filters} />
+    </div>
+  )
+}
+```
+
+#### Table Preferences
+
+```typescript
+import { useTablePreferences } from '@/hooks/usePersistedState'
+
+function InventoryTable() {
+  const [prefs, setPrefs] = useTablePreferences('inventory-table')
+
+  return (
+    <Table
+      pageSize={prefs.pageSize}
+      sortBy={prefs.sortBy}
+      sortOrder={prefs.sortOrder}
+      onPreferencesChange={setPrefs}
+    />
+  )
+}
+```
+
+#### User Preferences
+
+```typescript
+import { useUserPreferences } from '@/hooks/usePersistedState'
+
+function Settings() {
+  const [prefs, updatePref] = useUserPreferences()
+
+  return (
+    <div>
+      <Select
+        value={prefs.density}
+        onChange={(value) => updatePref('density', value)}
+      >
+        <option value="comfortable">Comfortable</option>
+        <option value="compact">Compact</option>
+        <option value="spacious">Spacious</option>
+      </Select>
+
+      <Checkbox
+        checked={prefs.notifications.sound}
+        onChange={(checked) => updatePref('notifications.sound', checked)}
+      >
+        Enable sound notifications
+      </Checkbox>
+    </div>
+  )
+}
+```
+
+### sessionStorage
+
+Used for temporary data that should only persist during the current session.
+
+#### Scroll Restoration
+
+```typescript
+import { useScrollRestoration } from '@/hooks/usePersistedState'
+
+function DataLog() {
+  useScrollRestoration('data-log-scroll')
+
+  return <DataLogContent />
+}
+```
+
+This automatically:
+1. Saves scroll position when navigating away
+2. Restores scroll position when navigating back
+3. Clears on session end
+
+## Browser Cache
+
+### Static Assets
+
+Configured in `next.config.js`:
+
+```javascript
+async headers() {
+  return [
+    // Static files - cache forever
     {
-      key: 'Cache-Control',
-      value: 'public, max-age=31536000, immutable',
+      source: '/_next/static/:path*',
+      headers: [
+        {
+          key: 'Cache-Control',
+          value: 'public, max-age=31536000, immutable',
+        },
+      ],
     },
-  ],
-}
-```
-
-#### Assets Covered
-- JavaScript bundles
-- CSS files
-- Images (via Next.js Image)
-- Fonts
-- Public uploads
-
-### 2. API Response Caching
-
-API responses are cached based on route patterns and data volatility.
-
-#### Cache TTL by Route
-
-| Route Pattern | TTL | Reason |
-|--------------|-----|--------|
-| `/api/products` | 1 hour | Static product data |
-| `/api/settings` | 5 minutes | Settings change infrequently |
-| `/api/analytics/*` | 5 minutes | Analytics can be slightly stale |
-| `/api/dashboard` | 5 minutes | Dashboard data updates frequently |
-| `/api/reports` | 15 minutes | Reports are expensive to generate |
-| `/api/inventory` | 1 minute | Inventory changes frequently |
-| `/api/auth/*` | No cache | Authentication must be fresh |
-| `/api/backup/*` | No cache | Backup operations are critical |
-| `/api/audit/*` | No cache | Audit logs must be accurate |
-
-#### Implementation
-
-```typescript
-import { CACHE_CONTROL, getCacheHeaders } from '@/utils/cache';
-
-export async function GET(request: Request) {
-  const data = await fetchData();
-  
-  return Response.json(data, {
-    headers: getCacheHeaders(CACHE_CONTROL.MEDIUM),
-  });
-}
-```
-
-### 3. Stale-While-Revalidate
-
-The application uses `stale-while-revalidate` for better user experience:
-
-```
-Cache-Control: public, max-age=300, s-maxage=300, stale-while-revalidate=600
-```
-
-This means:
-- Cache is fresh for 5 minutes
-- After 5 minutes, serve stale content while fetching fresh data
-- Stale content can be served for up to 10 minutes
-
-### 4. In-Memory Cache
-
-Server-side memory cache for expensive operations:
-
-```typescript
-import { withCache, CACHE_TTL } from '@/utils/cache';
-
-const data = await withCache(
-  'analytics:summary',
-  CACHE_TTL.MEDIUM,
-  async () => {
-    // Expensive operation
-    return await calculateAnalytics();
-  }
-);
-```
-
-#### Use Cases
-- Complex analytics calculations
-- Aggregated reports
-- AI-generated insights
-- Database query results
-
-### 5. Database Query Caching
-
-Prisma doesn't have built-in query caching, but we can implement it:
-
-```typescript
-import { memoryCache, CACHE_TTL } from '@/utils/cache';
-
-async function getProducts() {
-  const cacheKey = 'products:all';
-  const cached = memoryCache.get(cacheKey);
-  
-  if (cached) {
-    return cached;
-  }
-  
-  const products = await prisma.product.findMany();
-  memoryCache.set(cacheKey, products, CACHE_TTL.HOUR);
-  
-  return products;
+    // Images - cache for 1 hour, stale-while-revalidate for 24 hours
+    {
+      source: '/_next/image/:path*',
+      headers: [
+        {
+          key: 'Cache-Control',
+          value: 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=86400',
+        },
+      ],
+    },
+    // Uploads - cache forever
+    {
+      source: '/uploads/:path*',
+      headers: [
+        {
+          key: 'Cache-Control',
+          value: 'public, max-age=31536000, immutable',
+        },
+      ],
+    },
+  ]
 }
 ```
 
 ## Cache Invalidation
 
-### Manual Invalidation
+### When to Invalidate
 
-Invalidate cache when data changes:
+1. **After mutations** (create, update, delete):
+   ```typescript
+   await createItem(data)
+   revalidateApiData('/api/inventory')
+   ```
+
+2. **On user action** (manual refresh):
+   ```typescript
+   <Button onClick={() => revalidateApiData('/api/dashboard')}>
+     Refresh
+   </Button>
+   ```
+
+3. **On logout**:
+   ```typescript
+   import { clearAllCache } from '@/hooks/useApiData'
+   import { clearPersistedState } from '@/hooks/usePersistedState'
+
+   async function logout() {
+     await signOut()
+     clearAllCache()
+     clearPersistedState()
+     router.push('/login')
+   }
+   ```
+
+### Selective Invalidation
+
+Invalidate specific endpoints:
 
 ```typescript
-import { invalidateCachePattern } from '@/utils/cache';
+// After updating a user
+revalidateApiData('/api/users')
+revalidateApiData(`/api/users/${userId}`)
 
-// After updating inventory
-await prisma.inventoryItem.update({ ... });
-invalidateCachePattern('inventory:');
+// After creating an inventory item
+revalidateApiData('/api/inventory')
+revalidateApiData('/api/dashboard') // Update dashboard stats
 ```
 
-### Automatic Invalidation
+## Cache Keys
 
-Cache automatically expires based on TTL. No manual intervention needed.
+### Naming Convention
 
-### Revalidation
-
-Use Next.js revalidation for static pages:
+Use consistent, descriptive cache keys:
 
 ```typescript
-// app/[locale]/dashboard/page.tsx
-export const revalidate = 300; // Revalidate every 5 minutes
+// ✅ Good
+'sidebar-collapsed'
+'filters-inventory'
+'table-prefs-inventory'
+'scroll-data-log'
+
+// ❌ Bad
+'sc'
+'f1'
+'prefs'
+```
+
+### Namespacing
+
+Prefix keys by feature:
+
+```typescript
+// Filters
+'filters-inventory'
+'filters-analytics'
+'filters-audit'
+
+// Table preferences
+'table-prefs-inventory'
+'table-prefs-users'
+'table-prefs-audit'
+
+// Scroll positions
+'scroll-data-log'
+'scroll-analytics'
+'scroll-audit'
+```
+
+## Performance Considerations
+
+### Cache Size
+
+Monitor localStorage usage:
+
+```typescript
+function getLocalStorageSize() {
+  let total = 0
+  for (let key in localStorage) {
+    if (localStorage.hasOwnProperty(key)) {
+      total += localStorage[key].length + key.length
+    }
+  }
+  return (total / 1024).toFixed(2) + ' KB'
+}
+```
+
+Typical limits:
+- localStorage: 5-10 MB per domain
+- sessionStorage: 5-10 MB per domain
+- SWR cache: Memory-based, no hard limit
+
+### Cache Cleanup
+
+Implement periodic cleanup:
+
+```typescript
+// Clear old scroll positions (older than 1 hour)
+function cleanupScrollPositions() {
+  const keys = Object.keys(sessionStorage)
+  const scrollKeys = keys.filter(k => k.startsWith('scroll-'))
+  
+  scrollKeys.forEach(key => {
+    const timestamp = sessionStorage.getItem(`${key}-timestamp`)
+    if (timestamp && Date.now() - parseInt(timestamp) > 3600000) {
+      sessionStorage.removeItem(key)
+      sessionStorage.removeItem(`${key}-timestamp`)
+    }
+  })
+}
+```
+
+### Deduplication
+
+SWR automatically deduplicates requests within the `dedupingInterval` (5 seconds):
+
+```typescript
+// These will only make one request
+function ComponentA() {
+  const { data } = useApiData('/api/users')
+  return <div>{data}</div>
+}
+
+function ComponentB() {
+  const { data } = useApiData('/api/users') // Uses cached data
+  return <div>{data}</div>
+}
 ```
 
 ## Best Practices
 
-### 1. Cache Read-Heavy Operations
+### 1. Cache Appropriate Data
 
-✅ **Do cache:**
-- Analytics summaries
-- Report lists
-- Product catalogs
-- Settings
+✅ **Do cache**:
+- User preferences
+- Filter states
+- Table preferences
+- Dashboard summaries
+- Static reference data
 
-❌ **Don't cache:**
-- Authentication responses
-- Real-time inventory updates
-- Audit logs
-- Backup operations
+❌ **Don't cache**:
+- Sensitive data (passwords, tokens)
+- Real-time data (unless using auto-refresh)
+- Large datasets (> 1MB)
+- Temporary form data
 
-### 2. Use Appropriate TTL
-
-- **Short (1 min)**: Frequently changing data (inventory)
-- **Medium (5 min)**: Moderately changing data (analytics)
-- **Long (15 min)**: Slowly changing data (reports)
-- **Hour**: Static data (products, settings)
-- **Day**: Rarely changing data (system config)
-
-### 3. Implement Cache Warming
-
-Pre-populate cache for common queries:
+### 2. Set Appropriate Cache Times
 
 ```typescript
-// On application startup
-async function warmCache() {
-  await getProducts(); // Populates cache
-  await getSettings(); // Populates cache
+// Static data - cache for 1 hour
+useApiDataWithCache('/api/categories', 3600000)
+
+// Dashboard - cache for 5 minutes
+useApiDataWithCache('/api/dashboard', 300000)
+
+// Real-time data - auto-refresh every 30 seconds
+useApiDataWithRefresh('/api/live-stats', 30000)
+```
+
+### 3. Handle Stale Data
+
+```typescript
+const { data, isValidating } = useApiData('/api/inventory')
+
+return (
+  <div>
+    {isValidating && <RefreshIndicator />}
+    <Table data={data} />
+  </div>
+)
+```
+
+### 4. Optimize Revalidation
+
+```typescript
+// ✅ Good - revalidate related endpoints
+async function updateItem(id: string, data: ItemData) {
+  await fetch(`/api/inventory/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  })
+
+  revalidateApiData('/api/inventory')
+  revalidateApiData(`/api/inventory/${id}`)
+  revalidateApiData('/api/dashboard')
+}
+
+// ❌ Bad - revalidate everything
+async function updateItem(id: string, data: ItemData) {
+  await fetch(`/api/inventory/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  })
+
+  clearAllCache() // Too aggressive
 }
 ```
 
-### 4. Monitor Cache Hit Rate
+### 5. Cross-Tab Synchronization
 
-Track cache effectiveness:
-
-```typescript
-let hits = 0;
-let misses = 0;
-
-function getCacheStats() {
-  const total = hits + misses;
-  const hitRate = total > 0 ? (hits / total) * 100 : 0;
-  return { hits, misses, hitRate };
-}
-```
-
-### 5. Handle Cache Failures Gracefully
-
-Always have a fallback:
+localStorage changes are automatically synced across tabs:
 
 ```typescript
-async function getData() {
-  try {
-    const cached = memoryCache.get('key');
-    if (cached) return cached;
-  } catch (error) {
-    console.error('Cache error:', error);
-  }
-  
-  // Fallback to database
-  return await fetchFromDatabase();
-}
-```
+// Tab 1: User collapses sidebar
+setSidebarCollapsed(true)
 
-## CDN Caching (Vercel)
-
-Vercel Edge Network automatically caches responses based on `Cache-Control` headers.
-
-### Edge Caching
-
-```typescript
-// Cached at the edge
-export async function GET() {
-  return Response.json(data, {
-    headers: {
-      'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
-    },
-  });
-}
-```
-
-### Bypass Edge Cache
-
-```typescript
-// Not cached at the edge
-export async function GET() {
-  return Response.json(data, {
-    headers: {
-      'Cache-Control': 'private, no-cache',
-    },
-  });
-}
-```
-
-## Testing Cache
-
-### Test Cache Headers
-
-```bash
-# Check cache headers
-curl -I https://your-domain.com/api/products
-
-# Expected output:
-# Cache-Control: public, max-age=3600, s-maxage=3600, stale-while-revalidate=7200
-```
-
-### Test Cache Hit
-
-```bash
-# First request (cache miss)
-curl -w "%{time_total}\n" https://your-domain.com/api/products
-
-# Second request (cache hit - should be faster)
-curl -w "%{time_total}\n" https://your-domain.com/api/products
-```
-
-## Monitoring
-
-Monitor cache performance in production:
-
-```typescript
-import { logger } from '@/services/logger';
-
-function logCacheMetrics() {
-  const stats = getCacheStats();
-  logger.info('Cache metrics', {
-    hits: stats.hits,
-    misses: stats.misses,
-    hitRate: `${stats.hitRate.toFixed(2)}%`,
-  });
-}
-
-// Log every hour
-setInterval(logCacheMetrics, 3600000);
+// Tab 2: Sidebar automatically collapses
+// (handled by storage event listener in usePersistedState)
 ```
 
 ## Troubleshooting
 
-### Issue: Cache not working
+### Cache Not Updating
 
-**Check:**
-1. Cache-Control headers are set correctly
-2. Request method is GET (POST/PUT/DELETE are not cached)
-3. No authentication headers (authenticated requests may not be cached)
+1. Check if revalidation is called after mutations
+2. Verify cache key matches exactly
+3. Check network tab for actual requests
+4. Clear cache manually: `clearAllCache()`
 
-### Issue: Stale data
+### Data Not Persisting
 
-**Solutions:**
-1. Reduce TTL
-2. Implement cache invalidation
-3. Use shorter stale-while-revalidate window
+1. Check localStorage quota (5-10 MB limit)
+2. Verify JSON serialization works
+3. Check for private browsing mode
+4. Look for localStorage errors in console
 
-### Issue: High memory usage
+### Stale Data
 
-**Solutions:**
-1. Reduce cache TTL
-2. Implement cache size limits
-3. Run cleanup more frequently
-4. Consider Redis for production
+1. Reduce cache time
+2. Enable auto-refresh
+3. Add manual refresh button
+4. Use optimistic updates
 
-## Future Improvements
+## Resources
 
-1. **Redis Integration**: Replace in-memory cache with Redis for distributed caching
-2. **Cache Warming**: Implement automatic cache warming on deployment
-3. **Cache Analytics**: Track cache hit rates and optimize TTL
-4. **Conditional Requests**: Implement ETag-based conditional requests
-5. **Service Worker**: Add service worker for offline caching
+- [SWR Documentation](https://swr.vercel.app/)
+- [Web Storage API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API)
+- [HTTP Caching](https://developer.mozilla.org/en-US/docs/Web/HTTP/Caching)

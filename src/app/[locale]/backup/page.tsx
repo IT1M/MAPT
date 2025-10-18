@@ -1,7 +1,6 @@
 import { Metadata } from 'next';
-import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
-import { authOptions } from '@/auth.config';
+import { auth } from '@/services/auth';
 import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
 
@@ -31,7 +30,7 @@ export default async function BackupPage({
 }: {
   params: { locale: string };
 }) {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
 
   // Check if user is authenticated
   if (!session) {

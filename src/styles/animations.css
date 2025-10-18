@@ -1,0 +1,713 @@
+/* ============================================
+   Animation System
+   ============================================
+   
+   This file contains all animation definitions for the application.
+   Animations are optimized for 60fps performance using CSS transforms
+   and opacity. Respects user's prefers-reduced-motion preference.
+   
+   Duration Guidelines:
+   - Micro-interactions: 100-200ms (hover, focus)
+   - Component transitions: 200-300ms (dropdowns, modals)
+   - Page transitions: 300-500ms (route changes)
+   
+   ============================================ */
+
+/* ============================================
+   Reduced Motion Support
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================
+   Page Transitions
+   ============================================ */
+
+/* Fade transition for page changes (200ms) */
+@keyframes pageFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes pageFadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.page-transition-enter {
+  animation: pageFadeIn 200ms ease-in forwards;
+}
+
+.page-transition-exit {
+  animation: pageFadeOut 200ms ease-out forwards;
+}
+
+/* Slide fade for page transitions (alternative) */
+@keyframes pageSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-slide-up {
+  animation: pageSlideUp 300ms ease-out forwards;
+}
+
+/* ============================================
+   Dropdown Animations
+   ============================================ */
+
+/* Slide down animation for dropdowns (150ms) */
+@keyframes dropdownSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes dropdownSlideUp {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+.dropdown-enter {
+  animation: dropdownSlideDown 150ms ease-out forwards;
+}
+
+.dropdown-exit {
+  animation: dropdownSlideUp 150ms ease-in forwards;
+}
+
+/* Scale fade for dropdowns (alternative) */
+@keyframes dropdownScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.dropdown-scale-enter {
+  animation: dropdownScaleIn 150ms ease-out forwards;
+  transform-origin: top center;
+}
+
+/* RTL support for dropdown animations */
+[dir="rtl"] .dropdown-enter,
+[dir="rtl"] .dropdown-exit {
+  transform-origin: top right;
+}
+
+/* ============================================
+   Modal Animations
+   ============================================ */
+
+/* Scale and fade for modals (200ms) */
+@keyframes modalBackdropFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modalBackdropFadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes modalScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes modalScaleOut {
+  from {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95) translateY(-10px);
+  }
+}
+
+.modal-backdrop-enter {
+  animation: modalBackdropFadeIn 200ms ease-out forwards;
+}
+
+.modal-backdrop-exit {
+  animation: modalBackdropFadeOut 200ms ease-in forwards;
+}
+
+.modal-content-enter {
+  animation: modalScaleIn 200ms ease-out forwards;
+}
+
+.modal-content-exit {
+  animation: modalScaleOut 200ms ease-in forwards;
+}
+
+/* Slide up from bottom for mobile modals */
+@keyframes modalSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes modalSlideDown {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+}
+
+.modal-mobile-enter {
+  animation: modalSlideUp 300ms ease-out forwards;
+}
+
+.modal-mobile-exit {
+  animation: modalSlideDown 300ms ease-in forwards;
+}
+
+/* ============================================
+   Toast Notifications
+   ============================================ */
+
+/* Slide in from right (or left for RTL) */
+@keyframes toastSlideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes toastSlideOutRight {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+
+@keyframes toastSlideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes toastSlideOutLeft {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+}
+
+.toast-enter {
+  animation: toastSlideInRight 200ms ease-out forwards;
+}
+
+.toast-exit {
+  animation: toastSlideOutRight 200ms ease-in forwards;
+}
+
+[dir="rtl"] .toast-enter {
+  animation: toastSlideInLeft 200ms ease-out forwards;
+}
+
+[dir="rtl"] .toast-exit {
+  animation: toastSlideOutLeft 200ms ease-in forwards;
+}
+
+/* ============================================
+   Sidebar Animations
+   ============================================ */
+
+/* Smooth width transition for sidebar collapse/expand */
+.sidebar-transition {
+  transition: width 300ms ease-in-out, transform 300ms ease-in-out;
+}
+
+/* Sidebar overlay slide in (mobile) */
+@keyframes sidebarSlideInLeft {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes sidebarSlideOutLeft {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes sidebarSlideInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes sidebarSlideOutRight {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+.sidebar-enter {
+  animation: sidebarSlideInLeft 300ms ease-out forwards;
+}
+
+.sidebar-exit {
+  animation: sidebarSlideOutLeft 300ms ease-in forwards;
+}
+
+[dir="rtl"] .sidebar-enter {
+  animation: sidebarSlideInRight 300ms ease-out forwards;
+}
+
+[dir="rtl"] .sidebar-exit {
+  animation: sidebarSlideOutRight 300ms ease-in forwards;
+}
+
+/* ============================================
+   Loading Animations
+   ============================================ */
+
+/* Skeleton pulse animation */
+@keyframes skeletonPulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.skeleton-pulse {
+  animation: skeletonPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Spinner rotation */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Progress bar animation */
+@keyframes progressIndeterminate {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.progress-indeterminate {
+  animation: progressIndeterminate 1.5s ease-in-out infinite;
+}
+
+/* Dots loading animation */
+@keyframes dotsBounce {
+  0%, 80%, 100% {
+    transform: scale(0);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.dots-bounce span:nth-child(1) {
+  animation: dotsBounce 1.4s infinite ease-in-out;
+  animation-delay: -0.32s;
+}
+
+.dots-bounce span:nth-child(2) {
+  animation: dotsBounce 1.4s infinite ease-in-out;
+  animation-delay: -0.16s;
+}
+
+.dots-bounce span:nth-child(3) {
+  animation: dotsBounce 1.4s infinite ease-in-out;
+}
+
+/* ============================================
+   Micro-interactions
+   ============================================ */
+
+/* Button press effect */
+@keyframes buttonPress {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.button-press {
+  animation: buttonPress 150ms ease-out;
+}
+
+/* Hover lift effect */
+.hover-lift {
+  transition: transform 150ms ease-out, box-shadow 150ms ease-out;
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Focus ring animation */
+@keyframes focusRing {
+  0% {
+    box-shadow: 0 0 0 0 rgba(20, 184, 166, 0.4);
+  }
+  100% {
+    box-shadow: 0 0 0 4px rgba(20, 184, 166, 0);
+  }
+}
+
+.focus-ring-animate:focus-visible {
+  animation: focusRing 0.6s ease-out;
+}
+
+/* ============================================
+   Feedback Animations
+   ============================================ */
+
+/* Success checkmark animation */
+@keyframes checkmarkDraw {
+  0% {
+    stroke-dashoffset: 100;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+.checkmark-draw {
+  stroke-dasharray: 100;
+  animation: checkmarkDraw 0.5s ease-out forwards;
+}
+
+/* Error shake animation */
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  10%, 30%, 50%, 70%, 90% {
+    transform: translateX(-4px);
+  }
+  20%, 40%, 60%, 80% {
+    transform: translateX(4px);
+  }
+}
+
+.animate-shake {
+  animation: shake 0.5s ease-in-out;
+}
+
+/* Bounce animation for attention */
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-bounce {
+  animation: bounce 0.6s ease-in-out;
+}
+
+/* Wiggle animation for errors */
+@keyframes wiggle {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-3deg);
+  }
+  75% {
+    transform: rotate(3deg);
+  }
+}
+
+.animate-wiggle {
+  animation: wiggle 0.5s ease-in-out;
+}
+
+/* ============================================
+   Badge and Notification Animations
+   ============================================ */
+
+/* Badge pulse for new items */
+@keyframes badgePulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+}
+
+.badge-pulse {
+  animation: badgePulse 2s ease-in-out infinite;
+}
+
+/* Notification bell ring */
+@keyframes bellRing {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  10%, 30% {
+    transform: rotate(-10deg);
+  }
+  20%, 40% {
+    transform: rotate(10deg);
+  }
+}
+
+.bell-ring {
+  animation: bellRing 0.5s ease-in-out;
+  transform-origin: top center;
+}
+
+/* ============================================
+   List and Item Animations
+   ============================================ */
+
+/* Stagger animation for list items */
+@keyframes listItemFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.list-item-enter {
+  animation: listItemFadeIn 300ms ease-out forwards;
+}
+
+/* Stagger delays for sequential items */
+.list-item-enter:nth-child(1) { animation-delay: 0ms; }
+.list-item-enter:nth-child(2) { animation-delay: 50ms; }
+.list-item-enter:nth-child(3) { animation-delay: 100ms; }
+.list-item-enter:nth-child(4) { animation-delay: 150ms; }
+.list-item-enter:nth-child(5) { animation-delay: 200ms; }
+
+/* Collapse/expand animation */
+@keyframes expandHeight {
+  from {
+    max-height: 0;
+    opacity: 0;
+  }
+  to {
+    max-height: 1000px;
+    opacity: 1;
+  }
+}
+
+@keyframes collapseHeight {
+  from {
+    max-height: 1000px;
+    opacity: 1;
+  }
+  to {
+    max-height: 0;
+    opacity: 0;
+  }
+}
+
+.expand-height {
+  animation: expandHeight 300ms ease-out forwards;
+  overflow: hidden;
+}
+
+.collapse-height {
+  animation: collapseHeight 300ms ease-in forwards;
+  overflow: hidden;
+}
+
+/* ============================================
+   Utility Classes
+   ============================================ */
+
+/* Smooth transitions for common properties */
+.transition-smooth {
+  transition: all 200ms ease-in-out;
+}
+
+.transition-fast {
+  transition: all 150ms ease-out;
+}
+
+.transition-slow {
+  transition: all 300ms ease-in-out;
+}
+
+/* Transform GPU acceleration */
+.gpu-accelerated {
+  transform: translateZ(0);
+  will-change: transform, opacity;
+}
+
+/* Prevent animation on initial load */
+.no-animation {
+  animation: none !important;
+  transition: none !important;
+}
+
+/* ============================================
+   Performance Optimizations
+   ============================================ */
+
+/* Use will-change for animated elements */
+.will-animate {
+  will-change: transform, opacity;
+}
+
+/* Remove will-change after animation completes */
+.animation-complete {
+  will-change: auto;
+}
+
+/* Contain layout shifts during animations */
+.contain-layout {
+  contain: layout;
+}
+
+.contain-paint {
+  contain: paint;
+}
+
+/* ============================================
+   Dark Mode Adjustments
+   ============================================ */
+
+.dark .hover-lift:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* ============================================
+   Accessibility
+   ============================================ */
+
+/* Ensure focus is visible during animations */
+*:focus-visible {
+  outline: 2px solid rgb(var(--ring));
+  outline-offset: 2px;
+  z-index: 10;
+}
+
+/* Skip animations for keyboard users if they prefer */
+@media (prefers-reduced-motion: no-preference) {
+  .keyboard-user *:focus-visible {
+    transition: outline 0.1s ease-out;
+  }
+}

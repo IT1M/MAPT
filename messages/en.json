@@ -318,7 +318,20 @@
     "serverError": "An error occurred. Please try again later.",
     "validationError": "Please check your input and try again",
     "networkError": "Network error. Please check your connection.",
-    "sessionExpired": "Your session has expired. Please sign in again."
+    "sessionExpired": "Your session has expired. Please sign in again.",
+    "accessDenied": {
+      "title": "Access Denied",
+      "description": "You don't have permission to access this page or perform this action.",
+      "currentUser": "Current User",
+      "yourRole": "Your Role",
+      "requiredRole": "Required Role",
+      "attemptedPath": "Attempted Path",
+      "helpText": "If you believe you should have access to this page, please contact your system administrator.",
+      "goBack": "Go Back",
+      "goToDashboard": "Go to Dashboard",
+      "needAccess": "Need access to this page?",
+      "contactAdmin": "Contact Administrator"
+    }
   },
   "notFound": {
     "title": "Page Not Found",
