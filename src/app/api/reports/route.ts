@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server'
-import { prisma } from '@/services/prisma'
+import { reportService } from '@/services/report'
 import { checkAuth } from '@/middleware/auth'
 import { 
   successResponse, 
@@ -7,22 +7,22 @@ import {
   insufficientPermissionsError 
 } from '@/utils/api-response'
 import { z } from 'zod'
-import { stat } from 'fs/promises'
-import { join } from 'path'
+import { ReportType } from '@prisma/client'
 
 /**
- * GET /api/reports
+ * GET /api/reports/list
  * 
  * List all reports with filtering and pagination
  * 
  * Query Parameters:
  * - type: ReportType (optional)
- * - startDate: ISO date string (optional)
- * - endDate: ISO date string (optional)
+ * - search: string (optional)
+ * - dateFrom: ISO date string (optional)
+ * - dateTo: ISO date string (optional)
  * - page: number (default: 1)
- * - limit: number (default: 50, max: 200)
+ * - limit: number (default: 10, max: 50)
  * 
- * Requirements: 7.2
+ * Requirements: 25
  */
 export async function GET(request: NextRequest) {
   try {
@@ -34,8 +34,9 @@ export async function GET(request: NextRequest) {
 
     const { context } = authResult
 
-    // Check permissions (reports:view required)
-    if (!context.user.permissions.includes('reports:view')) {
+    // Check permissions (ADMIN, MANAGER, AUDITOR can view reports)
+    const allowedRoles = ['ADMIN', 'MANAGER', 'AUDITOR']
+    if (!allowedRoles.includes(context.user.role)) {
       return insufficientPermissionsError('Permission to view reports required')
     }
 
@@ -43,17 +44,19 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     
     const querySchema = z.object({
-      type: z.enum(['MONTHLY', 'YEARLY', 'CUSTOM', 'AUDIT']).optional(),
-      startDate: z.string().datetime().optional(),
-      endDate: z.string().datetime().optional(),
+      type: z.nativeEnum(ReportType).optional(),
+      search: z.string().optional(),
+      dateFrom: z.string().datetime().optional(),
+      dateTo: z.string().datetime().optional(),
       page: z.coerce.number().int().positive().optional().default(1),
-      limit: z.coerce.number().int().positive().max(200).optional().default(50),
+      limit: z.coerce.number().int().positive().max(50).optional().default(10),
     })
 
     const queryResult = querySchema.safeParse({
       type: searchParams.get('type'),
-      startDate: searchParams.get('startDate'),
-      endDate: searchParams.get('endDate'),
+      search: searchParams.get('search'),
+      dateFrom: searchParams.get('dateFrom'),
+      dateTo: searchParams.get('dateTo'),
       page: searchParams.get('page'),
       limit: searchParams.get('limit'),
     })
@@ -62,83 +65,32 @@ export async function GET(request: NextRequest) {
       return handleApiError(queryResult.error)
     }
 
-    const { type, startDate, endDate, page, limit } = queryResult.data
+    const { type, search, dateFrom, dateTo, page, limit } = queryResult.data
 
-    // Build where clause
-    const whereClause: any = {}
+    // Build filters
+    const filters: any = {
+      page,
+      limit,
+    }
 
     if (type) {
-      whereClause.type = type
+      filters.type = type
     }
 
-    if (startDate || endDate) {
-      whereClause.createdAt = {}
-      if (startDate) {
-        whereClause.createdAt.gte = new Date(startDate)
-      }
-      if (endDate) {
-        whereClause.createdAt.lte = new Date(endDate)
-      }
+    if (search) {
+      filters.search = search
     }
 
-    // Apply role-based filtering (DATA_ENTRY sees only their reports)
-    if (context.user.role === 'DATA_ENTRY') {
-      whereClause.generatedById = context.user.id
+    if (dateFrom) {
+      filters.dateFrom = new Date(dateFrom)
     }
 
-    // Get total count for pagination
-    const total = await prisma.report.count({
-      where: whereClause,
-    })
+    if (dateTo) {
+      filters.dateTo = new Date(dateTo)
+    }
 
-    // Fetch reports with pagination
-    const reports = await prisma.report.findMany({
-      where: whereClause,
-      include: {
-        generatedBy: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-      skip: (page - 1) * limit,
-      take: limit,
-    })
-
-    // Get file size metadata for each report
-    const reportsWithMetadata = await Promise.all(
-      reports.map(async (report) => {
-        let fileSize: number | null = null
-
-        if (report.fileUrl) {
-          try {
-            const filePath = join(process.cwd(), 'public', report.fileUrl)
-            const stats = await stat(filePath)
-            fileSize = stats.size
-          } catch (error) {
-            console.error(`Failed to get file size for report ${report.id}:`, error)
-          }
-        }
-
-        return {
-          id: report.id,
-          title: report.title,
-          type: report.type,
-          periodStart: report.periodStart.toISOString(),
-          periodEnd: report.periodEnd.toISOString(),
-          status: report.status,
-          fileUrl: report.fileUrl,
-          fileSize,
-          createdAt: report.createdAt.toISOString(),
-          generatedBy: report.generatedBy,
-        }
-      })
-    )
+    // Get reports from service
+    const { reports, total } = await reportService.listReports(filters)
 
     // Calculate pagination metadata
     const totalPages = Math.ceil(total / limit)
@@ -146,7 +98,7 @@ export async function GET(request: NextRequest) {
     const hasPrev = page > 1
 
     return successResponse({
-      reports: reportsWithMetadata,
+      reports,
       pagination: {
         total,
         page,

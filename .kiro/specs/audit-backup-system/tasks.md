@@ -80,7 +80,7 @@
     - _Requirements: 11, 12, 14, 15, 16, 17, 18, 19, 20, 27, 28_
 
 - [ ] 4. بناء نظام التقارير الكامل (Report System)
-  - [-] 4.1 تطوير ReportService مع تكامل AI
+  - [x] 4.1 تطوير ReportService مع تكامل AI
     - تنفيذ generateReport() للتنسيق
     - تنفيذ generatePDF() باستخدام react-pdf/renderer مع صفحة الغلاف، الملخص التنفيذي، الرسوم البيانية، الجداول، صفحة التوقيع
     - تنفيذ generateExcel() باستخدام exceljs
@@ -90,7 +90,7 @@
     - تنفيذ scheduleReport() و executeScheduledReport()
     - _Requirements: 21, 22, 23, 24, 26_
   
-  - [ ] 4.2 إنشاء Report API routes
+  - [x] 4.2 إنشاء Report API routes
     - GET /api/reports/list - قائمة التقارير
     - POST /api/reports/generate - إنشاء تقرير
     - GET /api/reports/download/:id - التحميل
@@ -101,7 +101,7 @@
     - إضافة role-based access control
     - _Requirements: 21, 22, 25, 26_
   
-  - [ ] 4.3 بناء واجهة المستخدم للتقارير
+  - [x] 4.3 بناء واجهة المستخدم للتقارير
     - إنشاء ReportsPage مع التحقق من الصلاحيات
     - إنشاء ReportGeneratorForm مع جميع الخيارات
     - إنشاء ReportHistoryTable مع الإجراءات
