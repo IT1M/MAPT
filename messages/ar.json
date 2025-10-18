@@ -1234,5 +1234,141 @@
       "noAutocompleteResults": "لم يتم العثور على اقتراحات",
       "selectedSuggestion": "المحدد: {value}"
     }
+  },
+  "auditExtended": {
+    "dashboard": {
+      "title": "لوحة تحكم المراجعة",
+      "stats": "الإحصائيات",
+      "totalActions": "إجمالي الإجراءات",
+      "mostActiveUser": "المستخدم الأكثر نشاطاً",
+      "mostCommonAction": "الإجراء الأكثر شيوعاً",
+      "criticalActions": "الإجراءات الحرجة",
+      "activityChart": "النشاط عبر الوقت",
+      "userLeaderboard": "قائمة نشاط المستخدمين"
+    },
+    "filters": {
+      "title": "التصفية",
+      "dateRange": "نطاق التاريخ",
+      "users": "المستخدمون",
+      "actionTypes": "أنواع الإجراءات",
+      "entityTypes": "أنواع الكيانات",
+      "search": "بحث",
+      "searchPlaceholder": "البحث بواسطة معرف الكيان أو التغييرات أو عنوان IP",
+      "apply": "تطبيق التصفية",
+      "reset": "إعادة تعيين التصفية",
+      "selectAll": "تحديد الكل",
+      "deselectAll": "إلغاء تحديد الكل",
+      "presets": {
+        "today": "اليوم",
+        "yesterday": "أمس",
+        "last7days": "آخر 7 أيام",
+        "last30days": "آخر 30 يوماً",
+        "custom": "مخصص"
+      }
+    },
+    "table": {
+      "timestamp": "الطابع الزمني",
+      "user": "المستخدم",
+      "action": "الإجراء",
+      "entityType": "نوع الكيان",
+      "entityId": "معرف الكيان",
+      "changes": "التغييرات",
+      "ipAddress": "عنوان IP",
+      "userAgent": "وكيل المستخدم",
+      "viewDetails": "عرض التفاصيل",
+      "revert": "التراجع",
+      "copy": "نسخ",
+      "expand": "توسيع",
+      "collapse": "طي"
+    },
+    "details": {
+      "title": "تفاصيل إدخال المراجعة",
+      "fullInformation": "المعلومات الكاملة",
+      "oldValue": "القيمة القديمة",
+      "newValue": "القيمة الجديدة",
+      "jsonView": "عرض JSON",
+      "relatedEntries": "الإدخالات ذات الصلة",
+      "noRelatedEntries": "لم يتم العثور على إدخالات ذات صلة",
+      "copyOld": "نسخ القيمة القديمة",
+      "copyNew": "نسخ القيمة الجديدة",
+      "close": "إغلاق"
+    },
+    "revert": {
+      "title": "التراجع عن التغيير",
+      "warning": "⚠️ تحذير: سيؤدي هذا الإجراء إلى التراجع عن التغييرات التالية",
+      "preview": "معاينة التغييرات المراد التراجع عنها",
+      "confirmation": "سيؤدي التراجع إلى إلغاء {count} تغييرات أجراها {user} في {date}",
+      "requireConfirmation": "أفهم أن هذا الإجراء سيتراجع عن التغييرات",
+      "confirm": "التراجع عن التغييرات",
+      "cancel": "إلغاء",
+      "success": "تم التراجع عن التغييرات بنجاح",
+      "error": "فشل التراجع عن التغييرات",
+      "unauthorized": "يمكن للمسؤولين فقط التراجع عن التغييرات"
+    },
+    "export": {
+      "title": "تصدير سجلات المراجعة",
+      "format": "تنسيق التصدير",
+      "csv": "CSV",
+      "excel": "Excel",
+      "pdf": "PDF",
+      "encrypted": "تشفير التصدير",
+      "encryptedDesc": "حماية التصدير بتشفير كلمة المرور",
+      "includeFilters": "تطبيق التصفية الحالية",
+      "estimatedSize": "الحجم المقدر",
+      "export": "تصدير",
+      "exporting": "جاري التصدير...",
+      "success": "تم تصدير سجلات المراجعة بنجاح",
+      "error": "فشل تصدير سجلات المراجعة"
+    },
+    "live": {
+      "indicator": "التحديثات المباشرة",
+      "connected": "متصل",
+      "disconnected": "غير متصل",
+      "newEntries": "{count} إدخالات جديدة",
+      "refresh": "تحديث",
+      "autoScroll": "التمرير التلقائي للإدخالات الجديدة"
+    },
+    "actions": {
+      "CREATE": "إنشاء",
+      "UPDATE": "تحديث",
+      "DELETE": "حذف",
+      "LOGIN": "تسجيل دخول",
+      "LOGOUT": "تسجيل خروج",
+      "EXPORT": "تصدير",
+      "VIEW": "عرض",
+      "REVERT": "تراجع",
+      "BACKUP": "نسخ احتياطي",
+      "RESTORE": "استعادة"
+    },
+    "entities": {
+      "InventoryItem": "عنصر المخزون",
+      "User": "مستخدم",
+      "Report": "تقرير",
+      "Backup": "نسخة احتياطية",
+      "Settings": "إعدادات",
+      "AuditLog": "سجل المراجعة"
+    }
+  },
+  "shared": {
+    "mobileCard": {
+      "viewMore": "عرض المزيد",
+      "viewLess": "عرض أقل"
+    },
+    "filterDrawer": {
+      "title": "التصفية",
+      "apply": "تطبيق التصفية",
+      "reset": "إعادة تعيين",
+      "close": "إغلاق"
+    },
+    "progressBar": {
+      "estimatedTime": "الوقت المتبقي المقدر",
+      "complete": "مكتمل"
+    },
+    "confirmDialog": {
+      "confirm": "تأكيد",
+      "cancel": "إلغاء",
+      "processing": "جاري المعالجة...",
+      "iUnderstand": "أفهم"
+    }
   }
 }

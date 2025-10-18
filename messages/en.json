@@ -1242,5 +1242,141 @@
       "noAutocompleteResults": "No suggestions found",
       "selectedSuggestion": "Selected: {value}"
     }
+  },
+  "auditExtended": {
+    "dashboard": {
+      "title": "Audit Dashboard",
+      "stats": "Statistics",
+      "totalActions": "Total Actions",
+      "mostActiveUser": "Most Active User",
+      "mostCommonAction": "Most Common Action",
+      "criticalActions": "Critical Actions",
+      "activityChart": "Activity Over Time",
+      "userLeaderboard": "User Activity Leaderboard"
+    },
+    "filters": {
+      "title": "Filters",
+      "dateRange": "Date Range",
+      "users": "Users",
+      "actionTypes": "Action Types",
+      "entityTypes": "Entity Types",
+      "search": "Search",
+      "searchPlaceholder": "Search by entity ID, changes, or IP address",
+      "apply": "Apply Filters",
+      "reset": "Reset Filters",
+      "selectAll": "Select All",
+      "deselectAll": "Deselect All",
+      "presets": {
+        "today": "Today",
+        "yesterday": "Yesterday",
+        "last7days": "Last 7 Days",
+        "last30days": "Last 30 Days",
+        "custom": "Custom"
+      }
+    },
+    "table": {
+      "timestamp": "Timestamp",
+      "user": "User",
+      "action": "Action",
+      "entityType": "Entity Type",
+      "entityId": "Entity ID",
+      "changes": "Changes",
+      "ipAddress": "IP Address",
+      "userAgent": "User Agent",
+      "viewDetails": "View Details",
+      "revert": "Revert",
+      "copy": "Copy",
+      "expand": "Expand",
+      "collapse": "Collapse"
+    },
+    "details": {
+      "title": "Audit Entry Details",
+      "fullInformation": "Full Information",
+      "oldValue": "Old Value",
+      "newValue": "New Value",
+      "jsonView": "JSON View",
+      "relatedEntries": "Related Entries",
+      "noRelatedEntries": "No related entries found",
+      "copyOld": "Copy Old Value",
+      "copyNew": "Copy New Value",
+      "close": "Close"
+    },
+    "revert": {
+      "title": "Revert Change",
+      "warning": "⚠️ Warning: This action will undo the following changes",
+      "preview": "Preview of Changes to Revert",
+      "confirmation": "Reverting will undo {count} changes made by {user} on {date}",
+      "requireConfirmation": "I understand this action will revert the changes",
+      "confirm": "Revert Changes",
+      "cancel": "Cancel",
+      "success": "Changes reverted successfully",
+      "error": "Failed to revert changes",
+      "unauthorized": "Only administrators can revert changes"
+    },
+    "export": {
+      "title": "Export Audit Logs",
+      "format": "Export Format",
+      "csv": "CSV",
+      "excel": "Excel",
+      "pdf": "PDF",
+      "encrypted": "Encrypt Export",
+      "encryptedDesc": "Protect export with password encryption",
+      "includeFilters": "Apply Current Filters",
+      "estimatedSize": "Estimated Size",
+      "export": "Export",
+      "exporting": "Exporting...",
+      "success": "Audit logs exported successfully",
+      "error": "Failed to export audit logs"
+    },
+    "live": {
+      "indicator": "Live Updates",
+      "connected": "Connected",
+      "disconnected": "Disconnected",
+      "newEntries": "{count} new entries",
+      "refresh": "Refresh",
+      "autoScroll": "Auto-scroll to new entries"
+    },
+    "actions": {
+      "CREATE": "Create",
+      "UPDATE": "Update",
+      "DELETE": "Delete",
+      "LOGIN": "Login",
+      "LOGOUT": "Logout",
+      "EXPORT": "Export",
+      "VIEW": "View",
+      "REVERT": "Revert",
+      "BACKUP": "Backup",
+      "RESTORE": "Restore"
+    },
+    "entities": {
+      "InventoryItem": "Inventory Item",
+      "User": "User",
+      "Report": "Report",
+      "Backup": "Backup",
+      "Settings": "Settings",
+      "AuditLog": "Audit Log"
+    }
+  },
+  "shared": {
+    "mobileCard": {
+      "viewMore": "View More",
+      "viewLess": "View Less"
+    },
+    "filterDrawer": {
+      "title": "Filters",
+      "apply": "Apply Filters",
+      "reset": "Reset",
+      "close": "Close"
+    },
+    "progressBar": {
+      "estimatedTime": "Estimated time remaining",
+      "complete": "Complete"
+    },
+    "confirmDialog": {
+      "confirm": "Confirm",
+      "cancel": "Cancel",
+      "processing": "Processing...",
+      "iUnderstand": "I understand"
+    }
   }
 }

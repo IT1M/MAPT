@@ -14,6 +14,7 @@
     "db:seed": "tsx prisma/seed.ts",
     "db:verify": "tsx scripts/verify-db.ts",
     "validate:env": "tsx scripts/validate-env.ts",
+    "validate:audit-backup": "tsx scripts/validate-audit-backup-config.ts",
     "test": "vitest --run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
