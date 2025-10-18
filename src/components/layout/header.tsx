@@ -67,13 +67,25 @@ export function Header() {
     <header className={`bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40 transition-shadow duration-200 ${
       isScrolled ? 'shadow-md' : 'shadow-sm'
     }`}>
-      <div className="px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Breadcrumb Navigation */}
-          <Breadcrumbs className="hidden sm:flex" />
+      <div className="px-3 sm:px-4 md:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-14 sm:h-16">
+          {/* Breadcrumb Navigation - Hidden on mobile */}
+          <Breadcrumbs className="hidden md:flex" />
+          
+          {/* Mobile: Show app name */}
+          <div className="flex md:hidden items-center gap-2">
+            <div className="w-7 h-7 bg-primary-500 rounded-lg flex items-center justify-center flex-shrink-0">
+              <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+              Saudi Mais
+            </span>
+          </div>
 
           {/* Right side controls */}
-          <div className="flex items-center gap-2 md:gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3">
             {/* Notifications */}
             {isMounted && session?.user && <NotificationBell />}
 
@@ -88,28 +100,29 @@ export function Header() {
               <div className="relative" ref={dropdownRef}>
                 <button
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                  className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 active:bg-gray-300 dark:active:bg-gray-500 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 touch-manipulation"
                   aria-expanded={isDropdownOpen}
                   aria-haspopup="true"
+                  aria-label="User menu"
                 >
                   {/* User Avatar */}
-                  <div className="w-8 h-8 rounded-full bg-primary-500 flex items-center justify-center text-white font-medium text-sm">
+                  <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-primary-500 flex items-center justify-center text-white font-medium text-xs sm:text-sm flex-shrink-0">
                     {session.user.name?.charAt(0).toUpperCase() || 'U'}
                   </div>
                   
-                  {/* User Info */}
-                  <div className="hidden md:block text-left rtl:text-right">
-                    <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                  {/* User Info - Hidden on small mobile */}
+                  <div className="hidden sm:block md:block text-left rtl:text-right">
+                    <div className="text-xs sm:text-sm font-medium text-gray-900 dark:text-gray-100 truncate max-w-[100px] md:max-w-none">
                       {session.user.name}
                     </div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                    <div className="hidden md:block text-xs text-gray-500 dark:text-gray-400">
                       {getRoleLabel(session.user.role)}
                     </div>
                   </div>
 
                   {/* Dropdown Arrow */}
                   <svg
-                    className={`w-4 h-4 text-gray-500 dark:text-gray-400 transition-transform ${
+                    className={`w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-500 dark:text-gray-400 transition-transform flex-shrink-0 ${
                       isDropdownOpen ? 'rotate-180' : ''
                     }`}
                     fill="none"
@@ -123,7 +136,7 @@ export function Header() {
 
                 {/* Dropdown Menu */}
                 {isDropdownOpen && (
-                  <div className="absolute right-0 rtl:right-auto rtl:left-0 mt-2 w-64 rounded-lg shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 animate-fade-in">
+                  <div className="absolute right-0 rtl:right-auto rtl:left-0 mt-2 w-56 sm:w-64 rounded-lg shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 animate-fade-in z-50">
                     <div className="py-1">
                       {/* User Info */}
                       <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
