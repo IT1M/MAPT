@@ -1,0 +1,232 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Enums
+enum UserRole {
+  ADMIN
+  DATA_ENTRY
+  SUPERVISOR
+  MANAGER
+  AUDITOR
+}
+
+enum ItemStatus {
+  AVAILABLE
+  RESERVED
+  EXPIRED
+  DAMAGED
+}
+
+enum TransactionType {
+  RECEIVE
+  ISSUE
+  ADJUST
+  TRANSFER
+  DISPOSE
+}
+
+enum Destination {
+  MAIS
+  FOZAN
+}
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  LOGIN
+  LOGOUT
+  EXPORT
+}
+
+enum ReportType {
+  MONTHLY
+  YEARLY
+  CUSTOM
+  AUDIT
+}
+
+enum ReportStatus {
+  GENERATING
+  COMPLETED
+  FAILED
+}
+
+enum BackupFileType {
+  CSV
+  JSON
+  SQL
+}
+
+enum BackupStatus {
+  IN_PROGRESS
+  COMPLETED
+  FAILED
+}
+
+// Models
+model User {
+  id              String           @id @default(cuid())
+  email           String           @unique
+  name            String
+  passwordHash    String
+  role            UserRole
+  isActive        Boolean          @default(true)
+  preferences     Json?            @default("{}")
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  sessions        Session[]
+  inventoryItems  InventoryItem[]
+  auditLogs       AuditLog[]
+  reports         Report[]
+  backups         Backup[]
+  settingsUpdates SystemSettings[]
+
+  @@index([email])
+  @@map("users")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model Product {
+  id            String   @id @default(cuid())
+  name          String
+  nameAr        String
+  sku           String   @unique
+  category      String
+  description   String?
+  descriptionAr String?
+  unit          String
+  minStockLevel Int
+  maxStockLevel Int
+  reorderPoint  Int
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("products")
+}
+
+model InventoryItem {
+  id          String      @id @default(cuid())
+  itemName    String
+  batch       String
+  quantity    Int
+  reject      Int         @default(0)
+  destination Destination
+  category    String?
+  notes       String?     @db.Text
+  enteredById String
+  deletedAt   DateTime?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  enteredBy   User        @relation(fields: [enteredById], references: [id])
+  auditLogs   AuditLog[]
+
+  @@index([itemName])
+  @@index([batch])
+  @@index([createdAt])
+  @@index([destination])
+  @@index([itemName, batch])
+  @@index([createdAt, destination])
+  @@map("inventory_items")
+}
+
+model Transaction {
+  id              String          @id @default(cuid())
+  inventoryItemId String
+  type            TransactionType
+  quantity        Int
+  reason          String?
+  performedBy     String
+  createdAt       DateTime        @default(now())
+
+  @@map("transactions")
+}
+
+model AuditLog {
+  id            String         @id @default(cuid())
+  userId        String
+  action        AuditAction
+  entityType    String
+  entityId      String?
+  oldValue      Json?
+  newValue      Json?
+  ipAddress     String?
+  userAgent     String?
+  timestamp     DateTime       @default(now())
+  user          User           @relation(fields: [userId], references: [id])
+  inventoryItem InventoryItem? @relation(fields: [entityId], references: [id])
+
+  @@index([userId, timestamp])
+  @@index([entityType, entityId])
+  @@index([timestamp])
+  @@map("audit_logs")
+}
+
+// New models for enhanced functionality
+model Report {
+  id            String       @id @default(cuid())
+  title         String
+  type          ReportType
+  periodStart   DateTime
+  periodEnd     DateTime
+  generatedById String
+  fileUrl       String?
+  dataSnapshot  Json
+  aiInsights    String?      @db.Text
+  status        ReportStatus
+  createdAt     DateTime     @default(now())
+  generatedBy   User         @relation(fields: [generatedById], references: [id])
+
+  @@index([type, periodStart])
+  @@index([createdAt])
+  @@index([status])
+  @@map("reports")
+}
+
+model Backup {
+  id          String         @id @default(cuid())
+  fileName    String
+  fileSize    Int
+  fileType    BackupFileType
+  recordCount Int
+  storagePath String
+  status      BackupStatus
+  createdAt   DateTime       @default(now())
+  createdById String
+  createdBy   User           @relation(fields: [createdById], references: [id])
+
+  @@index([createdAt])
+  @@index([status])
+  @@map("backups")
+}
+
+model SystemSettings {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       Json
+  category    String
+  updatedById String
+  updatedAt   DateTime @updatedAt
+  updatedBy   User     @relation(fields: [updatedById], references: [id])
+
+  @@index([category])
+  @@map("system_settings")
+}

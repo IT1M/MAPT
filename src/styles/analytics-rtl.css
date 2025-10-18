@@ -1,0 +1,304 @@
+/**
+ * RTL-specific styles for Analytics Dashboard
+ * Handles chart mirroring, text alignment, and layout adjustments for Arabic locale
+ */
+
+/* RTL Container */
+[dir="rtl"] .analytics-container {
+  direction: rtl;
+}
+
+/* Chart Containers */
+[dir="rtl"] .recharts-wrapper {
+  direction: ltr; /* Keep chart coordinate system LTR */
+}
+
+[dir="rtl"] .recharts-legend-wrapper {
+  direction: rtl !important;
+}
+
+[dir="rtl"] .recharts-legend-item {
+  margin-left: 0 !important;
+  margin-right: 10px !important;
+}
+
+/* Tooltip RTL */
+[dir="rtl"] .recharts-tooltip-wrapper {
+  direction: rtl;
+}
+
+[dir="rtl"] .recharts-default-tooltip {
+  text-align: right !important;
+}
+
+/* Axis Labels RTL */
+[dir="rtl"] .recharts-xAxis .recharts-text {
+  text-anchor: end !important;
+}
+
+[dir="rtl"] .recharts-yAxis .recharts-text {
+  text-anchor: start !important;
+}
+
+/* KPI Cards RTL */
+[dir="rtl"] .kpi-card {
+  direction: rtl;
+}
+
+[dir="rtl"] .kpi-card-header {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .kpi-card-trend {
+  flex-direction: row-reverse;
+}
+
+/* Filter Panel RTL */
+[dir="rtl"] .filter-panel {
+  direction: rtl;
+}
+
+[dir="rtl"] .filter-checkbox {
+  margin-left: 8px;
+  margin-right: 0;
+}
+
+/* AI Insights Panel RTL */
+[dir="rtl"] .ai-insights-panel {
+  direction: rtl;
+}
+
+[dir="rtl"] .ai-insight-card {
+  border-left: none;
+  border-right: 4px solid;
+}
+
+[dir="rtl"] .ai-insight-card.high-priority {
+  border-right-color: #ef4444;
+}
+
+[dir="rtl"] .ai-insight-card.medium-priority {
+  border-right-color: #f59e0b;
+}
+
+[dir="rtl"] .ai-insight-card.low-priority {
+  border-right-color: #3b82f6;
+}
+
+/* Export Button RTL */
+[dir="rtl"] .export-button-group {
+  flex-direction: row-reverse;
+}
+
+/* Grid Layout RTL */
+[dir="rtl"] .analytics-grid {
+  direction: rtl;
+}
+
+/* Heatmap RTL */
+[dir="rtl"] .heatmap-container {
+  direction: ltr; /* Keep heatmap coordinate system LTR */
+}
+
+[dir="rtl"] .heatmap-labels {
+  direction: rtl;
+}
+
+/* Bar Chart RTL */
+[dir="rtl"] .recharts-bar-rectangle {
+  /* Bars render correctly in RTL */
+}
+
+/* Pie Chart RTL */
+[dir="rtl"] .recharts-pie {
+  /* Pie charts are circular, no RTL adjustment needed */
+}
+
+/* Line Chart RTL */
+[dir="rtl"] .recharts-line {
+  /* Lines render correctly with reversed X-axis */
+}
+
+/* Area Chart RTL */
+[dir="rtl"] .recharts-area {
+  /* Areas render correctly with reversed X-axis */
+}
+
+/* Brush (Zoom) RTL */
+[dir="rtl"] .recharts-brush {
+  direction: ltr; /* Keep brush coordinate system LTR */
+}
+
+/* Legend RTL */
+[dir="rtl"] .recharts-legend-item-text {
+  margin-left: 0 !important;
+  margin-right: 4px !important;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  [dir="rtl"] .analytics-mobile-header {
+    flex-direction: row-reverse;
+  }
+  
+  [dir="rtl"] .analytics-mobile-controls {
+    flex-direction: row-reverse;
+  }
+}
+
+/* Dark Mode RTL Adjustments */
+.dark [dir="rtl"] .recharts-tooltip-wrapper {
+  /* Dark mode tooltip styles */
+}
+
+/* Custom Tooltip RTL */
+[dir="rtl"] .custom-tooltip {
+  text-align: right;
+  direction: rtl;
+}
+
+[dir="rtl"] .custom-tooltip-label {
+  text-align: right;
+}
+
+[dir="rtl"] .custom-tooltip-item {
+  justify-content: flex-end;
+}
+
+/* Chart Controls RTL */
+[dir="rtl"] .chart-controls {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .chart-control-button {
+  margin-left: 8px;
+  margin-right: 0;
+}
+
+/* Date Range Picker RTL */
+[dir="rtl"] .date-range-picker {
+  direction: rtl;
+}
+
+[dir="rtl"] .date-preset-button {
+  text-align: right;
+}
+
+/* Category Filter RTL */
+[dir="rtl"] .category-filter-list {
+  direction: rtl;
+}
+
+[dir="rtl"] .category-filter-item {
+  flex-direction: row-reverse;
+}
+
+/* User Filter RTL */
+[dir="rtl"] .user-filter-list {
+  direction: rtl;
+}
+
+[dir="rtl"] .user-filter-item {
+  flex-direction: row-reverse;
+}
+
+/* Preset Dialog RTL */
+[dir="rtl"] .preset-dialog {
+  direction: rtl;
+}
+
+[dir="rtl"] .preset-dialog-actions {
+  flex-direction: row-reverse;
+}
+
+/* Loading State RTL */
+[dir="rtl"] .analytics-loading {
+  direction: rtl;
+}
+
+/* Error State RTL */
+[dir="rtl"] .analytics-error {
+  direction: rtl;
+}
+
+/* Empty State RTL */
+[dir="rtl"] .analytics-empty {
+  direction: rtl;
+}
+
+/* Sparkline RTL */
+[dir="rtl"] .sparkline-container {
+  direction: ltr; /* Keep sparkline coordinate system LTR */
+}
+
+/* Trend Indicator RTL */
+[dir="rtl"] .trend-indicator {
+  flex-direction: row-reverse;
+}
+
+/* Number Formatting RTL */
+[dir="rtl"] .chart-number {
+  /* Arabic numerals are handled by Intl.NumberFormat */
+}
+
+/* Icon Mirroring RTL */
+[dir="rtl"] .mirror-icon {
+  transform: scaleX(-1);
+}
+
+/* Chevron Icons RTL */
+[dir="rtl"] .chevron-right {
+  transform: scaleX(-1);
+}
+
+[dir="rtl"] .chevron-left {
+  transform: scaleX(-1);
+}
+
+/* Arrow Icons RTL */
+[dir="rtl"] .arrow-right {
+  transform: scaleX(-1);
+}
+
+[dir="rtl"] .arrow-left {
+  transform: scaleX(-1);
+}
+
+/* Utility Classes */
+[dir="rtl"] .rtl-reverse {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .rtl-text-right {
+  text-align: right;
+}
+
+[dir="rtl"] .rtl-text-left {
+  text-align: left;
+}
+
+[dir="rtl"] .rtl-mr-auto {
+  margin-right: auto;
+  margin-left: 0;
+}
+
+[dir="rtl"] .rtl-ml-auto {
+  margin-left: auto;
+  margin-right: 0;
+}
+
+/* Accessibility */
+[dir="rtl"] .sr-only {
+  /* Screen reader text remains the same */
+}
+
+/* Print Styles RTL */
+@media print {
+  [dir="rtl"] .analytics-print {
+    direction: rtl;
+  }
+  
+  [dir="rtl"] .chart-print {
+    direction: ltr; /* Keep charts LTR for printing */
+  }
+}

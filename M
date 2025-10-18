@@ -1,0 +1,16 @@
+NAME : MAPT (MAIS ANALYSIS PROJECT TEST)
+
+
+Perfect! Your application is now running on http://localhost:3001 (port 3000 was already in use).
+
+The issue was that your database wasn't set up properly. I've fixed it by:
+
+Creating the medical_inventory database
+Updating your .env file with the correct PostgreSQL credentials (using your macOS username)
+Pushing the Prisma schema to create all tables
+Seeding the database with test data
+You can now log in with these credentials:
+
+Email: admin@saudimais.com
+Password: Password123!
+Open http://localhost:3001 in your browser and you should see the login page.

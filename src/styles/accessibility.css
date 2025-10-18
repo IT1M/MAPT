@@ -1,0 +1,405 @@
+/**
+ * Accessibility styles for settings interface
+ * Includes high contrast theme, focus indicators, and WCAG AA compliance
+ */
+
+/* Screen reader only class */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Screen reader only but visible on focus */
+.sr-only-focusable:focus,
+.sr-only-focusable:active {
+  position: static;
+  width: auto;
+  height: auto;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+
+/* Skip link styles */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: #000;
+  color: #fff;
+  padding: 8px 16px;
+  text-decoration: none;
+  z-index: 100;
+  border-radius: 0 0 4px 0;
+}
+
+.skip-link:focus {
+  top: 0;
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+/* Enhanced focus indicators for keyboard navigation */
+*:focus-visible {
+  outline: 2px solid var(--focus-ring-color, #3b82f6);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Remove default focus outline for mouse users */
+*:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --text-contrast: 1.2;
+    --border-width: 2px;
+  }
+
+  body {
+    font-weight: 500;
+  }
+
+  button,
+  a,
+  input,
+  select,
+  textarea {
+    border-width: var(--border-width);
+  }
+
+  /* Increase contrast for borders */
+  .border {
+    border-width: 2px !important;
+  }
+
+  /* Ensure sufficient contrast for text */
+  .text-gray-500 {
+    color: #4b5563 !important;
+  }
+
+  .dark .text-gray-500 {
+    color: #9ca3af !important;
+  }
+
+  /* High contrast focus indicators */
+  *:focus-visible {
+    outline-width: 3px;
+    outline-offset: 3px;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Minimum touch target size (44x44px for WCAG) */
+.touch-target {
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Ensure buttons meet touch target requirements */
+button,
+a[role="button"],
+input[type="button"],
+input[type="submit"],
+input[type="reset"] {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Text scaling support (up to 200%) */
+@media (min-width: 1px) {
+  html {
+    font-size: 16px;
+  }
+
+  /* Support for user font size preferences */
+  html[data-font-size="small"] {
+    font-size: 14px;
+  }
+
+  html[data-font-size="large"] {
+    font-size: 18px;
+  }
+
+  html[data-font-size="xlarge"] {
+    font-size: 20px;
+  }
+}
+
+/* Ensure text remains readable at 200% zoom */
+@media (min-width: 1px) {
+  body {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  /* Prevent horizontal scrolling */
+  * {
+    max-width: 100%;
+  }
+
+  img,
+  video {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* ARIA live region styles */
+[aria-live] {
+  position: relative;
+}
+
+/* Status indicators */
+[role="status"],
+[role="alert"] {
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+}
+
+[role="alert"] {
+  background-color: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fca5a5;
+}
+
+.dark [role="alert"] {
+  background-color: #7f1d1d;
+  color: #fca5a5;
+  border-color: #991b1b;
+}
+
+/* Keyboard navigation indicators */
+[data-keyboard-nav="true"] *:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Sticky elements accessibility */
+.sticky-save-button {
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  background: white;
+  border-top: 1px solid #e5e7eb;
+  padding: 1rem;
+  box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.dark .sticky-save-button {
+  background: #1f2937;
+  border-top-color: #374151;
+}
+
+@media (min-width: 768px) {
+  .sticky-save-button {
+    position: static;
+    box-shadow: none;
+    border-top: none;
+    padding: 0;
+  }
+}
+
+/* Mobile card view for tables */
+.mobile-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  background: white;
+}
+
+.dark .mobile-card {
+  border-color: #374151;
+  background: #1f2937;
+}
+
+/* Horizontal scroll indicator for tables */
+.table-scroll-container {
+  position: relative;
+  overflow-x: auto;
+}
+
+.table-scroll-container::before,
+.table-scroll-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 20px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.table-scroll-container::before {
+  left: 0;
+  background: linear-gradient(to right, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0));
+}
+
+.table-scroll-container::after {
+  right: 0;
+  background: linear-gradient(to left, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0));
+}
+
+.dark .table-scroll-container::before {
+  background: linear-gradient(to right, rgba(31, 41, 55, 1), rgba(31, 41, 55, 0));
+}
+
+.dark .table-scroll-container::after {
+  background: linear-gradient(to left, rgba(31, 41, 55, 1), rgba(31, 41, 55, 0));
+}
+
+/* Accordion animation for mobile navigation */
+.accordion-enter {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+}
+
+.accordion-enter-active {
+  max-height: 1000px;
+}
+
+.accordion-exit {
+  max-height: 1000px;
+  overflow: hidden;
+  transition: max-height 0.3s ease-in;
+}
+
+.accordion-exit-active {
+  max-height: 0;
+}
+
+/* Swipe gesture indicator */
+.swipe-indicator {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+  z-index: 100;
+}
+
+.swipe-indicator.visible {
+  opacity: 1;
+}
+
+/* Color contrast helpers */
+.contrast-aa {
+  /* Ensures WCAG AA contrast ratio of 4.5:1 for normal text */
+  color: #1f2937;
+}
+
+.dark .contrast-aa {
+  color: #f3f4f6;
+}
+
+.contrast-aaa {
+  /* Ensures WCAG AAA contrast ratio of 7:1 for normal text */
+  color: #111827;
+}
+
+.dark .contrast-aaa {
+  color: #ffffff;
+}
+
+/* Form validation states */
+input[aria-invalid="true"],
+textarea[aria-invalid="true"],
+select[aria-invalid="true"] {
+  border-color: #ef4444;
+  border-width: 2px;
+}
+
+input[aria-invalid="true"]:focus,
+textarea[aria-invalid="true"]:focus,
+select[aria-invalid="true"]:focus {
+  outline-color: #ef4444;
+  border-color: #ef4444;
+}
+
+/* Loading states */
+[aria-busy="true"] {
+  opacity: 0.6;
+  pointer-events: none;
+  cursor: wait;
+}
+
+/* Disabled states */
+[aria-disabled="true"],
+:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Modal focus trap */
+.modal-open {
+  overflow: hidden;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 40;
+}
+
+.modal-content {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 50;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* Responsive font sizes */
+@media (max-width: 640px) {
+  html {
+    font-size: 14px;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  html {
+    font-size: 15px;
+  }
+}
+
+@media (min-width: 1025px) {
+  html {
+    font-size: 16px;
+  }
+}
