@@ -20,7 +20,9 @@ export default function AuditDashboardPage() {
     if (status === 'loading') return;
     
     if (!session) {
-      router.push('/login');
+      const locale = typeof window !== 'undefined' ? 
+        document.documentElement.lang || 'en' : 'en'
+      router.push(`/${locale}/login`);
       return;
     }
 

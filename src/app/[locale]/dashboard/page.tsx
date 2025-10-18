@@ -32,12 +32,13 @@ async function getDashboardData() {
   }
 }
 
-export default async function DashboardPage() {
+export default async function DashboardPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params
   // Check authentication
   const session = await auth()
   
   if (!session) {
-    redirect('/login')
+    redirect(`/${locale}/login`)
   }
 
   // Get translations

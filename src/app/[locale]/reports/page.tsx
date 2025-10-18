@@ -22,18 +22,19 @@ const ReportsManagementPage = dynamic(
 export default async function ReportsPage({
   params,
 }: {
-  params: { locale: string }
+  params: Promise<{ locale: string }>
 }) {
+  const { locale } = await params
   const session = await auth()
   
   if (!session) {
-    redirect('/login')
+    redirect(`/${locale}/login`)
   }
 
   // Check if user has permission to view reports
   const allowedRoles = ['ADMIN', 'MANAGER', 'AUDITOR']
   if (!allowedRoles.includes(session.user.role)) {
-    redirect('/dashboard')
+    redirect(`/${locale}/dashboard`)
   }
 
   return (
@@ -47,7 +48,7 @@ export default async function ReportsPage({
         </div>
       }
     >
-      <ReportsManagementPage locale={params.locale} userRole={session.user.role} />
+      <ReportsManagementPage locale={locale} userRole={session.user.role} />
     </Suspense>
   )
 }

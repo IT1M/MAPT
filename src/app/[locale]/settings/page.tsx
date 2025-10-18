@@ -8,13 +8,9 @@ import type { SettingsSection } from '@/types/settings'
 import { UserRole } from '@prisma/client'
 
 // Lazy load all section components for code splitting
-const ProfileSettings = lazy(() => import('@/components/settings/ProfileSettings'))
-const SecuritySettings = lazy(() => import('@/components/settings/SecuritySettings'))
-const UserManagement = lazy(() => import('@/components/settings/UserManagement'))
-const AppearanceSettings = lazy(() => import('@/components/settings/AppearanceSettings'))
-const NotificationSettings = lazy(() => import('@/components/settings/NotificationSettings'))
-const APISettings = lazy(() => import('@/components/settings/APISettings'))
-const SystemPreferences = lazy(() => import('@/components/settings/SystemPreferences'))
+const AppearanceSettings = lazy(() => import('@/components/settings/AppearanceSettings').then(m => ({ default: m.AppearanceSettings })))
+const NotificationSettings = lazy(() => import('@/components/settings/NotificationSettings').then(m => ({ default: m.NotificationSettings })))
+const SystemPreferences = lazy(() => import('@/components/settings/SystemPreferences').then(m => ({ default: m.SystemPreferences })))
 
 // Loading skeleton component
 function SectionLoadingSkeleton() {
@@ -113,7 +109,9 @@ export default function SettingsPage() {
   // Redirect if not authenticated
   React.useEffect(() => {
     if (status === 'unauthenticated') {
-      router.push('/login')
+      const locale = typeof window !== 'undefined' ?
+        document.documentElement.lang || 'en' : 'en'
+      router.push(`/${locale}/login`)
     }
   }, [status, router])
 
@@ -136,17 +134,30 @@ export default function SettingsPage() {
 
   // Render section content with lazy loading and error boundary
   const renderSectionContent = useMemo(() => {
-    const userId = session?.user?.id
-
     switch (activeSection) {
       case 'profile':
-        return userId ? <ProfileSettings userId={userId} /> : null
+        return (
+          <div className="p-6">
+            <h2 className="text-2xl font-bold mb-4">Profile Settings</h2>
+            <p className="text-gray-600 dark:text-gray-400">Profile settings coming soon...</p>
+          </div>
+        )
 
       case 'security':
-        return userId ? <SecuritySettings userId={userId} /> : null
+        return (
+          <div className="p-6">
+            <h2 className="text-2xl font-bold mb-4">Security Settings</h2>
+            <p className="text-gray-600 dark:text-gray-400">Security settings coming soon...</p>
+          </div>
+        )
 
       case 'users':
-        return userRole === UserRole.ADMIN ? <UserManagement /> : null
+        return userRole === UserRole.ADMIN ? (
+          <div className="p-6">
+            <h2 className="text-2xl font-bold mb-4">User Management</h2>
+            <p className="text-gray-600 dark:text-gray-400">User management coming soon...</p>
+          </div>
+        ) : null
 
       case 'appearance':
         return <AppearanceSettings />
@@ -155,7 +166,12 @@ export default function SettingsPage() {
         return <NotificationSettings />
 
       case 'api':
-        return userRole === UserRole.ADMIN ? <APISettings /> : null
+        return userRole === UserRole.ADMIN ? (
+          <div className="p-6">
+            <h2 className="text-2xl font-bold mb-4">API Settings</h2>
+            <p className="text-gray-600 dark:text-gray-400">API settings coming soon...</p>
+          </div>
+        ) : null
 
       case 'system':
         return userRole === UserRole.ADMIN || userRole === UserRole.MANAGER ? (
@@ -165,7 +181,7 @@ export default function SettingsPage() {
       default:
         return null
     }
-  }, [activeSection, session?.user?.id, userRole])
+  }, [activeSection, userRole])
 
   // Show loading state while checking authentication
   if (status === 'loading') {

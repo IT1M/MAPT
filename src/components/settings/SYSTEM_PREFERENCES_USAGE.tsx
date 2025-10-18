@@ -118,11 +118,11 @@ export function SettingsPageExample4() {
 import { auth } from '@/services/auth'
 import { redirect } from 'next/navigation'
 
-export async function SystemPreferencesServerPage() {
+export async function SystemPreferencesServerPage({ params }: { params: { locale: string } }) {
   const session = await auth()
 
   if (!session) {
-    redirect('/login')
+    redirect(`/${params.locale}/login`)
   }
 
   // Check if user has access (Admin or Manager)

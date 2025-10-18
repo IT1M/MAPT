@@ -4,12 +4,13 @@ import { prisma } from '@/services/prisma'
 import { DataEntryFormWithStats } from '@/components/forms/DataEntryFormWithStats'
 import { Destination } from '@prisma/client'
 
-export default async function DataEntryPage() {
+export default async function DataEntryPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params
   // Get user session
   const session = await auth()
   
   if (!session?.user) {
-    redirect('/login')
+    redirect(`/${locale}/login`)
   }
 
   const userId = session.user.id

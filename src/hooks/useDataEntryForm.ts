@@ -132,15 +132,16 @@ export function useDataEntryForm(options: UseDataEntryFormOptions = {}) {
         // Handle authentication errors (401)
         if (response.status === 401) {
           console.error('Authentication error:', result)
-          setMeta((prev) => ({ 
-            ...prev, 
+          setMeta((prev) => ({
+            ...prev,
             lastError: 'Session expired. Please log in again.',
-            canRetry: false 
+            canRetry: false
           }))
           toast.error('Session expired. Please log in again.')
           // Redirect to login page after a short delay
           setTimeout(() => {
-            window.location.href = '/login'
+            const locale = window.location.pathname.split('/')[1] || 'en'
+            window.location.href = `/${locale}/login`
           }, 2000)
           return null
         }
@@ -148,10 +149,10 @@ export function useDataEntryForm(options: UseDataEntryFormOptions = {}) {
         // Handle authorization errors (403)
         if (response.status === 403) {
           console.error('Authorization error:', result)
-          setMeta((prev) => ({ 
-            ...prev, 
+          setMeta((prev) => ({
+            ...prev,
             lastError: 'You do not have permission to perform this action.',
-            canRetry: false 
+            canRetry: false
           }))
           toast.error('You do not have permission to perform this action.')
           return null
@@ -168,11 +169,11 @@ export function useDataEntryForm(options: UseDataEntryFormOptions = {}) {
               errors[field] = detail.message
             }
           })
-          setMeta((prev) => ({ 
-            ...prev, 
+          setMeta((prev) => ({
+            ...prev,
             errors,
             lastError: 'Please fix the validation errors and try again.',
-            canRetry: false 
+            canRetry: false
           }))
           toast.error('Please fix the validation errors and try again.')
           return null
@@ -182,10 +183,10 @@ export function useDataEntryForm(options: UseDataEntryFormOptions = {}) {
         if (response.status >= 500) {
           console.error('Server error:', result)
           const errorMsg = 'Server error occurred. Please try again later or contact support if the problem persists.'
-          setMeta((prev) => ({ 
-            ...prev, 
+          setMeta((prev) => ({
+            ...prev,
             lastError: errorMsg,
-            canRetry: true 
+            canRetry: true
           }))
           toast.error(errorMsg, { duration: 6000 })
           return null
@@ -194,10 +195,10 @@ export function useDataEntryForm(options: UseDataEntryFormOptions = {}) {
         // Handle other errors
         console.error('API error:', result)
         const errorMsg = result.error?.message || 'Failed to save item. Please try again.'
-        setMeta((prev) => ({ 
-          ...prev, 
+        setMeta((prev) => ({
+          ...prev,
           lastError: errorMsg,
-          canRetry: true 
+          canRetry: true
         }))
         toast.error(errorMsg)
         return null
@@ -208,59 +209,59 @@ export function useDataEntryForm(options: UseDataEntryFormOptions = {}) {
 
       if (result.success) {
         // Clear any previous errors on success
-        setMeta((prev) => ({ 
-          ...prev, 
+        setMeta((prev) => ({
+          ...prev,
           lastError: null,
-          canRetry: false 
+          canRetry: false
         }))
-        
+
         const lastDestination = formData.destination
         reset(lastDestination)
-        
+
         if (options.onSuccess) {
           options.onSuccess(result.data)
         }
-        
+
         return result.data
       }
 
       // Unexpected response format
       console.error('Unexpected response format:', result)
       const errorMsg = 'Unexpected response from server. Please try again.'
-      setMeta((prev) => ({ 
-        ...prev, 
+      setMeta((prev) => ({
+        ...prev,
         lastError: errorMsg,
-        canRetry: true 
+        canRetry: true
       }))
       toast.error(errorMsg)
       return null
     } catch (error) {
       // Handle network errors (fetch failed)
       console.error('Network error:', error)
-      
+
       // Check if it's a network error or timeout
       if (error instanceof TypeError && error.message.includes('fetch')) {
         const errorMsg = 'Network error. Please check your internet connection and try again.'
-        setMeta((prev) => ({ 
-          ...prev, 
+        setMeta((prev) => ({
+          ...prev,
           lastError: errorMsg,
-          canRetry: true 
+          canRetry: true
         }))
-        toast.error(errorMsg, { 
+        toast.error(errorMsg, {
           duration: 6000,
           icon: '🔌'
         })
       } else {
         // Generic error
         const errorMsg = 'An unexpected error occurred. Please try again.'
-        setMeta((prev) => ({ 
-          ...prev, 
+        setMeta((prev) => ({
+          ...prev,
           lastError: errorMsg,
-          canRetry: true 
+          canRetry: true
         }))
         toast.error(errorMsg)
       }
-      
+
       return null
     } finally {
       setMeta((prev) => ({ ...prev, isSubmitting: false }))

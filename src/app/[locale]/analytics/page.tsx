@@ -19,12 +19,13 @@ const AnalyticsDashboard = dynamic(
   }
 )
 
-export default async function AnalyticsPage() {
+export default async function AnalyticsPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params
   // Check authentication and role
   const session = await auth()
   
   if (!session) {
-    redirect('/login')
+    redirect(`/${locale}/login`)
   }
 
   // Check if user has SUPERVISOR or higher role

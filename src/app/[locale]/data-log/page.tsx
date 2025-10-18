@@ -378,7 +378,9 @@ export default function DataLogPage() {
   }
 
   if (!session) {
-    redirect('/login')
+    const locale = typeof window !== 'undefined' ? 
+      document.documentElement.lang || 'en' : 'en'
+    redirect(`/${locale}/login`)
   }
 
   return (
