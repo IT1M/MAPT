@@ -356,11 +356,12 @@ export const AnalyticsDashboard: React.FC = () => {
     t,
   ])
 
-  // Initial data fetch
-  useEffect(() => {
-    fetchAllData(filters)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []) // Only run on mount
+  // Initial data fetch - DISABLED
+  // Uncomment the following to enable automatic data loading on page load
+  // useEffect(() => {
+  //   fetchAllData(filters)
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, []) // Only run on mount
 
   // Update monthly comparison when trends change
   useEffect(() => {

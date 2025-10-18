@@ -1,8 +1,8 @@
 import { BrandingPanel } from '@/components/auth/BrandingPanel'
-import { LoginForm } from '@/components/auth/LoginForm'
+import { RegistrationForm } from '@/components/auth/RegistrationForm'
 import { useTranslations } from 'next-intl'
 
-export default async function LoginPage({ params }: { params: Promise<{ locale: string }> }) {
+export default async function RegisterPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params
 
   return (
@@ -10,7 +10,7 @@ export default async function LoginPage({ params }: { params: Promise<{ locale: 
       {/* Left Column - Branding Panel (Desktop Only) */}
       <BrandingPanel />
 
-      {/* Right Column - Login Form */}
+      {/* Right Column - Registration Form */}
       <div className="flex-1 flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8 bg-gray-50 dark:bg-gray-900">
         <div className="w-full max-w-md space-y-8">
           {/* Mobile Logo */}
@@ -23,16 +23,16 @@ export default async function LoginPage({ params }: { params: Promise<{ locale: 
           {/* Header */}
           <div className="text-center">
             <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-              <LoginPageTitle />
+              <RegisterPageTitle />
             </h2>
             <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-              <LoginPageSubtitle />
+              <RegisterPageSubtitle />
             </p>
           </div>
 
-          {/* Login Form Card */}
+          {/* Registration Form Card */}
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
-            <LoginForm locale={locale} />
+            <RegistrationForm locale={locale} />
           </div>
         </div>
       </div>
@@ -41,14 +41,13 @@ export default async function LoginPage({ params }: { params: Promise<{ locale: 
 }
 
 // Client components for translations
-function LoginPageTitle() {
+function RegisterPageTitle() {
   'use client'
   const t = useTranslations()
-  return <>{t('auth.welcomeBack')}</>
+  return <>{t('auth.signUp') || 'Create Account'}</>
 }
 
-function LoginPageSubtitle() {
+function RegisterPageSubtitle() {
   'use client'
-  const t = useTranslations()
-  return <>{t('auth.signInToContinue')}</>
+  return <>Join us to start managing your medical inventory</>
 }
