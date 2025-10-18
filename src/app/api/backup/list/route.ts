@@ -9,9 +9,16 @@ import {
 /**
  * GET /api/backup/list
  * 
- * List all backups sorted by creation date
+ * List all backups with pagination, filtering, and search
  * 
- * Requirements: 8.2
+ * Query Parameters:
+ * - page: number (default: 1)
+ * - limit: number (default: 25)
+ * - type: BackupType filter (MANUAL, AUTOMATIC, PRE_RESTORE)
+ * - status: BackupStatus filter (IN_PROGRESS, COMPLETED, FAILED, CORRUPTED)
+ * - search: string (search by filename)
+ * 
+ * Requirements: 14
  */
 export async function GET(request: NextRequest) {
   try {
@@ -23,16 +30,51 @@ export async function GET(request: NextRequest) {
 
     const { context } = authResult
 
-    // Check role (ADMIN only)
-    const roleCheck = checkRole('ADMIN', context)
-    if ('error' in roleCheck) {
-      return roleCheck.error
+    // Check role (ADMIN or MANAGER)
+    const isAdmin = context.user.role === 'ADMIN'
+    const isManager = context.user.role === 'MANAGER'
+    
+    if (!isAdmin && !isManager) {
+      const roleCheck = checkRole('MANAGER', context)
+      if ('error' in roleCheck) {
+        return roleCheck.error
+      }
     }
 
-    // Query all backups sorted by createdAt descending
+    // Parse query parameters
+    const searchParams = request.nextUrl.searchParams
+    const page = parseInt(searchParams.get('page') || '1')
+    const limit = parseInt(searchParams.get('limit') || '25')
+    const type = searchParams.get('type')
+    const status = searchParams.get('status')
+    const search = searchParams.get('search')
+
+    // Build where clause
+    const where: any = {}
+    
+    if (type) {
+      where.type = type
+    }
+    
+    if (status) {
+      where.status = status
+    }
+    
+    if (search) {
+      where.filename = {
+        contains: search,
+        mode: 'insensitive',
+      }
+    }
+
+    // Get total count
+    const total = await prisma.backup.count({ where })
+
+    // Query backups with pagination
     const backups = await prisma.backup.findMany({
+      where,
       include: {
-        createdBy: {
+        creator: {
           select: {
             id: true,
             name: true,
@@ -43,21 +85,38 @@ export async function GET(request: NextRequest) {
       orderBy: {
         createdAt: 'desc',
       },
+      skip: (page - 1) * limit,
+      take: limit,
     })
 
-    // Return backups array with file size and record count
+    // Return backups with pagination info
     return successResponse({
-      backups: backups.map((backup) => ({
+      backups: backups.map((backup: any) => ({
         id: backup.id,
-        fileName: backup.fileName,
-        fileSize: backup.fileSize,
-        fileType: backup.fileType,
+        filename: backup.filename,
+        type: backup.type,
+        format: backup.format,
+        fileSize: backup.fileSize.toString(),
         recordCount: backup.recordCount,
-        storagePath: backup.storagePath,
         status: backup.status,
         createdAt: backup.createdAt.toISOString(),
-        createdBy: backup.createdBy,
+        createdBy: backup.creator,
+        includeAuditLogs: backup.includeAuditLogs,
+        includeUserData: backup.includeUserData,
+        includeSettings: backup.includeSettings,
+        dateRangeFrom: backup.dateRangeFrom?.toISOString(),
+        dateRangeTo: backup.dateRangeTo?.toISOString(),
+        notes: backup.notes,
+        encrypted: backup.encrypted,
+        validated: backup.validated,
+        validatedAt: backup.validatedAt?.toISOString(),
       })),
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
     })
   } catch (error) {
     return handleApiError(error)

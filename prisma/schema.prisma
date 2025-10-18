@@ -139,7 +139,7 @@ model User {
   inventoryItems  InventoryItem[]
   auditLogs       AuditLog[]
   reports         Report[]
-  backups         Backup[]
+  backups         Backup[]         @relation("UserBackups")
   settingsUpdates SystemSettings[]
   reportSchedules ReportSchedule[]
   backupConfigs   BackupConfig[]
@@ -266,7 +266,7 @@ model Backup {
   status           BackupStatus
   createdAt        DateTime     @default(now())
   createdBy        String
-  creator          User         @relation(fields: [createdBy], references: [id])
+  creator          User         @relation("UserBackups", fields: [createdBy], references: [id])
   includeAuditLogs Boolean      @default(false)
   includeUserData  Boolean      @default(false)
   includeSettings  Boolean      @default(false)

@@ -44,7 +44,7 @@
     - _Requirements: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 28_
 
 - [-] 3. بناء نظام النسخ الاحتياطي الكامل (Backup System)
-  - [ ] 3.1 تطوير BackupService مع التشفير
+  - [x] 3.1 تطوير BackupService مع التشفير
     - تنفيذ createBackup() مع دعم صيغ متعددة
     - تنفيذ restoreBackup() مع دعم transactions
     - تنفيذ validateBackup() مع فحوصات السلامة
@@ -54,7 +54,7 @@
     - تنفيذ getHealthMetrics() لمراقبة الصحة
     - _Requirements: 11, 12, 13, 15, 17, 18, 19, 20, 29, 30_
   
-  - [ ] 3.2 إنشاء Backup API routes
+  - [x] 3.2 إنشاء Backup API routes
     - GET /api/backup/list - قائمة النسخ الاحتياطية
     - POST /api/backup/create - إنشاء نسخة احتياطية
     - POST /api/backup/restore - الاستعادة (ADMIN فقط)
@@ -66,7 +66,7 @@
     - إضافة role-based access control
     - _Requirements: 11, 12, 14, 15, 16, 17, 18, 19, 20_
   
-  - [ ] 3.3 بناء واجهة المستخدم للنسخ الاحتياطي
+  - [x] 3.3 بناء واجهة المستخدم للنسخ الاحتياطي
     - إنشاء BackupPage مع التحقق من الصلاحيات
     - إنشاء BackupConfigPanel لإعدادات النسخ التلقائي
     - إنشاء BackupHistoryTable مع جميع الأعمدة والإجراءات
@@ -80,7 +80,7 @@
     - _Requirements: 11, 12, 14, 15, 16, 17, 18, 19, 20, 27, 28_
 
 - [ ] 4. بناء نظام التقارير الكامل (Report System)
-  - [ ] 4.1 تطوير ReportService مع تكامل AI
+  - [-] 4.1 تطوير ReportService مع تكامل AI
     - تنفيذ generateReport() للتنسيق
     - تنفيذ generatePDF() باستخدام react-pdf/renderer مع صفحة الغلاف، الملخص التنفيذي، الرسوم البيانية، الجداول، صفحة التوقيع
     - تنفيذ generateExcel() باستخدام exceljs
