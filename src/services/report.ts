@@ -11,7 +11,7 @@ import path from 'path';
 import ExcelJS from 'exceljs';
 import pptxgen from 'pptxgenjs';
 import nodemailer from 'nodemailer';
-import * as cron from 'node-cron';
+import cron from 'node-cron';
 
 // ============================================================================
 // Type Definitions

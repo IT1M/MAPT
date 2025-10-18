@@ -30,6 +30,8 @@
     "migrate:status": "prisma migrate status",
     "backup:database": "bash scripts/backup-database.sh",
     "verify:backups": "tsx scripts/verify-backups.ts",
+    "analyze:bundle": "node scripts/analyze-bundle.js",
+    "analyze:db": "tsx scripts/analyze-db-performance.ts",
     "predev": "npm run validate:env",
     "prebuild": "npm run validate:env"
   },

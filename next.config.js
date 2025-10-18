@@ -112,9 +112,38 @@ const nextConfig = {
     return config
   },
   
-  // Security headers (Task 4.3)
+  // Security and caching headers (Task 4.3, 8.3)
   async headers() {
     return [
+      // Static assets caching (Task 8.3)
+      {
+        source: '/uploads/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        source: '/_next/static/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        source: '/_next/image/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=86400',
+          },
+        ],
+      },
+      // Security headers for all routes
       {
         source: '/:path*',
         headers: [
@@ -175,24 +204,6 @@ const nextConfig = {
       },
     ]
   },
-  
-  webpack: (config, { isServer }) => {
-    // Exclude bcrypt from client-side bundle
-    if (!isServer) {
-      config.resolve.fallback = {
-        ...config.resolve.fallback,
-        fs: false,
-        net: false,
-        tls: false,
-        crypto: false,
-      }
-    }
-    
-    // Ignore node-pre-gyp issues
-    config.externals = [...(config.externals || []), 'bcrypt']
-    
-    return config
-  }
 }
 
 module.exports = withNextIntl(nextConfig)
