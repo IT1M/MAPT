@@ -1534,9 +1534,15 @@
     "markAllRead": "Mark all as read",
     "clearAll": "Clear all",
     "viewAll": "View all notifications",
+    "tabs": {
+      "all": "All",
+      "unread": "Unread"
+    },
     "empty": {
       "title": "You're all caught up!",
-      "description": "No new notifications"
+      "description": "No new notifications",
+      "noUnread": "No unread notifications",
+      "noUnreadDescription": "All caught up! You have no unread notifications."
     }
   },
   "emptyState": {

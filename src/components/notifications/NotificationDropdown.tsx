@@ -3,6 +3,8 @@
 import { useNotifications } from '@/context/NotificationContext'
 import { NotificationItem } from './NotificationItem'
 import { useTranslations } from 'next-intl'
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 interface NotificationDropdownProps {
   onClose: () => void
@@ -11,15 +13,27 @@ interface NotificationDropdownProps {
 export function NotificationDropdown({ onClose }: NotificationDropdownProps) {
   const { notifications, unreadCount, markAsRead, markAllAsRead, removeNotification, clearAll } = useNotifications()
   const t = useTranslations()
+  const router = useRouter()
+  const [activeTab, setActiveTab] = useState<'all' | 'unread'>('all')
 
-  // Show only the most recent 10 notifications in dropdown
-  const recentNotifications = notifications.slice(0, 10)
+  // Filter notifications based on active tab
+  const filteredNotifications = activeTab === 'unread' 
+    ? notifications.filter(n => !n.read)
+    : notifications
+
+  // Show only the most recent 20 notifications in dropdown
+  const recentNotifications = filteredNotifications.slice(0, 20)
+
+  const handleViewAll = () => {
+    router.push('/notifications')
+    onClose()
+  }
 
   return (
     <div className="absolute right-0 rtl:right-auto rtl:left-0 mt-2 w-96 max-w-[calc(100vw-2rem)] rounded-lg shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-50 animate-fade-in">
       {/* Header */}
       <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mb-3">
           <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
             {t('notifications.title')}
             {unreadCount > 0 && (
@@ -33,19 +47,36 @@ export function NotificationDropdown({ onClose }: NotificationDropdownProps) {
               <button
                 onClick={markAllAsRead}
                 className="text-xs text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium"
+                title={t('notifications.markAllRead')}
               >
                 {t('notifications.markAllRead')}
               </button>
             )}
-            {notifications.length > 0 && (
-              <button
-                onClick={clearAll}
-                className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
-              >
-                {t('notifications.clearAll')}
-              </button>
-            )}
           </div>
+        </div>
+
+        {/* Tabs */}
+        <div className="flex gap-2">
+          <button
+            onClick={() => setActiveTab('all')}
+            className={`flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+              activeTab === 'all'
+                ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300'
+                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+            }`}
+          >
+            {t('notifications.tabs.all')} ({notifications.length})
+          </button>
+          <button
+            onClick={() => setActiveTab('unread')}
+            className={`flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+              activeTab === 'unread'
+                ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300'
+                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+            }`}
+          >
+            {t('notifications.tabs.unread')} ({unreadCount})
+          </button>
         </div>
       </div>
 
@@ -67,10 +98,14 @@ export function NotificationDropdown({ onClose }: NotificationDropdownProps) {
               />
             </svg>
             <p className="mt-2 text-sm font-medium text-gray-900 dark:text-gray-100">
-              {t('notifications.empty.title')}
+              {activeTab === 'unread' 
+                ? t('notifications.empty.noUnread')
+                : t('notifications.empty.title')}
             </p>
             <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-              {t('notifications.empty.description')}
+              {activeTab === 'unread'
+                ? t('notifications.empty.noUnreadDescription')
+                : t('notifications.empty.description')}
             </p>
           </div>
         ) : (
@@ -81,6 +116,7 @@ export function NotificationDropdown({ onClose }: NotificationDropdownProps) {
                 notification={notification}
                 onMarkAsRead={markAsRead}
                 onRemove={removeNotification}
+                onClose={onClose}
               />
             ))}
           </>
@@ -88,13 +124,13 @@ export function NotificationDropdown({ onClose }: NotificationDropdownProps) {
       </div>
 
       {/* Footer */}
-      {notifications.length > 10 && (
+      {filteredNotifications.length > 20 && (
         <div className="px-4 py-3 border-t border-gray-200 dark:border-gray-700 text-center">
           <button
-            onClick={onClose}
+            onClick={handleViewAll}
             className="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium"
           >
-            {t('notifications.viewAll')} ({notifications.length})
+            {t('notifications.viewAll')} ({filteredNotifications.length})
           </button>
         </div>
       )}
