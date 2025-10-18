@@ -10,13 +10,13 @@ datasource db {
 model ActivityLog {
   id        String   @id
   userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   event     String
   metadata  Json?
   ipAddress String
   userAgent String
   sessionId String?
   timestamp DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([timestamp])
@@ -26,17 +26,17 @@ model ActivityLog {
 
 model AuditLog {
   id            String        @id
-  userId        String
-  entityId      String
-  ipAddress     String
-  userAgent     String
   timestamp     DateTime      @default(now())
-  changes       Json?
-  signature     String
+  userId        String
+  user          User          @relation(fields: [userId], references: [id])
   action        ActionType
   entityType    EntityType
+  entityId      String
+  changes       Json?
+  ipAddress     String
+  userAgent     String
+  signature     String
   inventoryItem InventoryItem @relation(fields: [entityId], references: [id])
-  user          User          @relation(fields: [userId], references: [id])
 
   @@index([timestamp])
   @@index([userId])
@@ -45,7 +45,7 @@ model AuditLog {
   @@map("audit_logs")
 }
 
-model BackupConfig {
+model backup_configs {
   id                     String         @id
   enabled                Boolean        @default(false)
   scheduleTime           String         @default("02:00")
@@ -57,12 +57,10 @@ model BackupConfig {
   storagePath            String
   updatedAt              DateTime
   updatedBy              String
-  updater                User           @relation(fields: [updatedBy], references: [id])
-
-  @@map("backup_configs")
+  users                  users          @relation(fields: [updatedBy], references: [id])
 }
 
-model Backup {
+model backups {
   id               String       @id
   createdAt        DateTime     @default(now())
   fileSize         BigInt
@@ -82,17 +80,17 @@ model Backup {
   type             BackupType
   validated        Boolean      @default(false)
   validatedAt      DateTime?
-  creator          User         @relation("UserBackups", fields: [createdBy], references: [id])
+  users            users        @relation(fields: [createdBy], references: [id])
 
   @@index([createdAt])
   @@index([status])
   @@index([type])
-  @@map("backups")
 }
 
 model EmailLog {
   id           String      @id
   userId       String?
+  user         User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
   to           String
   from         String
   subject      String
@@ -104,7 +102,6 @@ model EmailLog {
   attempts     Int         @default(0)
   metadata     Json?
   createdAt    DateTime    @default(now())
-  user         User?       @relation(fields: [userId], references: [id])
 
   @@index([userId])
   @@index([status])
@@ -133,34 +130,34 @@ model HelpArticle {
   @@map("help_articles")
 }
 
-model InventoryItem {
-  id          String      @id
+model inventory_items {
+  id          String       @id
   itemName    String
   batch       String
   quantity    Int
-  reject      Int         @default(0)
+  reject      Int          @default(0)
   destination Destination
   category    String?
   notes       String?
   enteredById String
-  createdAt   DateTime    @default(now())
+  createdAt   DateTime     @default(now())
   updatedAt   DateTime
   deletedAt   DateTime?
-  auditLogs   AuditLog[]
-  enteredBy   User        @relation(fields: [enteredById], references: [id])
+  audit_logs  audit_logs[]
+  users       users        @relation(fields: [enteredById], references: [id])
 
-  @@index([itemName])
   @@index([batch])
+  @@index([createdAt, destination])
   @@index([createdAt])
   @@index([destination])
   @@index([itemName, batch])
-  @@index([createdAt, destination])
-  @@map("inventory_items")
+  @@index([itemName])
 }
 
 model Notification {
   id        String               @id
   userId    String
+  user      User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
   type      NotificationType
   title     String
   message   String
@@ -171,7 +168,6 @@ model Notification {
   metadata  Json?
   createdAt DateTime             @default(now())
   expiresAt DateTime?
-  user      User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, read])
   @@index([createdAt])
@@ -182,18 +178,18 @@ model PasswordResetToken {
   id        String    @id
   token     String    @unique
   userId    String    @unique
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   expiresAt DateTime
   used      Boolean   @default(false)
   usedAt    DateTime?
   createdAt DateTime  @default(now())
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([token])
   @@index([expiresAt])
   @@map("password_reset_tokens")
 }
 
-model Product {
+model products {
   id            String   @id
   name          String
   nameAr        String
@@ -207,11 +203,9 @@ model Product {
   reorderPoint  Int
   createdAt     DateTime @default(now())
   updatedAt     DateTime
-
-  @@map("products")
 }
 
-model ReportSchedule {
+model report_schedules {
   id         String            @id
   name       String
   reportType ReportType
@@ -224,14 +218,13 @@ model ReportSchedule {
   nextRun    DateTime
   createdAt  DateTime          @default(now())
   createdBy  String
-  creator    User              @relation(fields: [createdBy], references: [id])
+  users      users             @relation(fields: [createdBy], references: [id])
 
-  @@index([nextRun])
   @@index([enabled])
-  @@map("report_schedules")
+  @@index([nextRun])
 }
 
-model Report {
+model reports {
   id                String       @id
   title             String
   status            ReportStatus
@@ -244,24 +237,23 @@ model Report {
   includeAIInsights Boolean      @default(false)
   periodFrom        DateTime
   periodTo          DateTime
-  generator         User         @relation(fields: [generatedBy], references: [id])
+  users             users        @relation(fields: [generatedBy], references: [id])
 
   @@index([generatedAt])
-  @@index([type])
   @@index([status])
-  @@map("reports")
+  @@index([type])
 }
 
 model SavedFilter {
   id        String   @id
   userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   name      String
   filters   Json
   page      String
   isDefault Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([userId, page])
@@ -288,20 +280,19 @@ model Session {
   @@map("sessions")
 }
 
-model SystemSettings {
+model system_settings {
   id          String   @id
   key         String   @unique
   value       Json
   updatedById String
   updatedAt   DateTime
   category    String
-  updatedBy   User     @relation(fields: [updatedById], references: [id])
+  users       users    @relation(fields: [updatedById], references: [id])
 
   @@index([category])
-  @@map("system_settings")
 }
 
-model Transaction {
+model transactions {
   id              String          @id
   inventoryItemId String
   type            TransactionType
@@ -309,13 +300,12 @@ model Transaction {
   reason          String?
   performedBy     String
   createdAt       DateTime        @default(now())
-
-  @@map("transactions")
 }
 
 model TwoFactorAuth {
   id          String    @id
   userId      String    @unique
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   secret      String
   backupCodes String[]
   enabled     Boolean   @default(false)
@@ -323,7 +313,6 @@ model TwoFactorAuth {
   lastUsedAt  DateTime?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("two_factor_auth")
 }
@@ -347,7 +336,7 @@ model User {
   activityLogs       ActivityLog[]
   auditLogs          AuditLog[]
   backupConfigs      BackupConfig[]
-  backups            Backup[]            @relation("UserBackups")
+  backups            Backup[]
   emailLogs          EmailLog[]
   inventoryItems     InventoryItem[]
   notifications      Notification[]
