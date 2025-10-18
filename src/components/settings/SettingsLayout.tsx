@@ -5,6 +5,7 @@ import { UserRole } from '@prisma/client'
 import type { SettingsSection } from '@/types/settings'
 import { SettingsNavigation } from './SettingsNavigation'
 import { SettingsSearch } from './SettingsSearch'
+import { KeyboardShortcutsHelp } from './KeyboardShortcutsHelp'
 import { useSettingsKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts'
 import { ensureAriaLiveRegion, announceToScreenReader } from '@/utils/accessibility-settings'
 
@@ -273,6 +274,9 @@ export function SettingsLayout({
         aria-live="polite"
         aria-atomic="true"
       />
+
+      {/* Keyboard Shortcuts Help */}
+      <KeyboardShortcutsHelp />
     </div>
   )
 }
