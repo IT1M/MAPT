@@ -159,6 +159,8 @@
     "goodMorning": "Good morning",
     "goodAfternoon": "Good afternoon",
     "goodEvening": "Good evening",
+    "goodNight": "Good night",
+    "lastLogin": "Last login",
     "today": "Today",
     "thisWeek": "This Week",
     "thisMonth": "This Month",
@@ -190,6 +192,48 @@
       "activeUsers": "Active Users",
       "last7Days": "Last 7 days trend",
       "destinationDistribution": "Destination Distribution"
+    },
+    "welcome": {
+      "greeting": "Welcome",
+      "whatYouCanDo": "What you can do:",
+      "quickTip": "Quick Tip",
+      "keyboardShortcut": "Press Ctrl+K (or Cmd+K on Mac) to quickly search across the system",
+      "getStarted": "Get Started",
+      "admin": {
+        "title": "You have full system access",
+        "feature1": "Manage users and permissions",
+        "feature2": "Monitor system health and performance",
+        "feature3": "Configure system settings and backups",
+        "feature4": "View comprehensive analytics and reports"
+      },
+      "manager": {
+        "title": "You can view analytics and manage reports",
+        "feature1": "Access executive summaries and KPIs",
+        "feature2": "Generate and schedule reports",
+        "feature3": "View AI-powered insights",
+        "feature4": "Monitor team performance"
+      },
+      "supervisor": {
+        "title": "You can review and approve entries",
+        "feature1": "Review items requiring attention",
+        "feature2": "Monitor team activity in real-time",
+        "feature3": "Track quality control metrics",
+        "feature4": "View audit highlights"
+      },
+      "dataEntry": {
+        "title": "You can add and manage inventory items",
+        "feature1": "Add new inventory items quickly",
+        "feature2": "View your daily entries",
+        "feature3": "Track your personal statistics",
+        "feature4": "Access recent batches"
+      },
+      "auditor": {
+        "title": "You can audit system activities",
+        "feature1": "Search and filter audit logs",
+        "feature2": "Analyze user behavior patterns",
+        "feature3": "View activity heatmaps",
+        "feature4": "Investigate suspicious activities"
+      }
     }
   },
   "reports": {
@@ -402,6 +446,7 @@
     "required": "This field is required",
     "invalidEmail": "Invalid email address",
     "invalidPassword": "Password must be at least 8 characters",
+    "passwordRequired": "Password is required",
     "loginFailed": "Login failed. Please check your credentials.",
     "invalidCredentials": "Invalid credentials. Email or password is incorrect.",
     "unauthorized": "You are not authorized to access this page",

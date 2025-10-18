@@ -1,12 +1,7 @@
-import { NextRequest } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/services/auth'
 import { prisma } from '@/services/prisma'
 import { parseUserAgent } from '@/utils/user-agent'
-import {
-  successResponse,
-  handleApiError,
-  authRequiredError,
-} from '@/utils/api-response'
 
 /**
  * GET /api/auth/sessions
@@ -17,10 +12,17 @@ export async function GET(request: NextRequest) {
     const session = await auth()
 
     if (!session?.user?.id) {
-      return authRequiredError('You must be logged in to view sessions')
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      )
     }
 
-    // Get all sessions for the user
+    // Get current session token from cookies
+    const currentSessionToken = request.cookies.get('authjs.session-token')?.value ||
+                                request.cookies.get('__Secure-authjs.session-token')?.value
+
+    // Fetch all active sessions for the user
     const sessions = await prisma.session.findMany({
       where: {
         userId: session.user.id,
@@ -29,78 +31,38 @@ export async function GET(request: NextRequest) {
         },
       },
       orderBy: {
-        expires: 'desc',
+        lastActive: 'desc',
       },
     })
 
-    // Get current session token from request
-    const currentSessionToken = request.cookies.get('next-auth.session-token')?.value ||
-      request.cookies.get('__Secure-next-auth.session-token')?.value
-
-    // Transform sessions to include device info
-    const sessionsWithInfo = sessions.map((s) => {
+    // Parse user agent for each session and mark current session
+    const sessionsWithDetails = sessions.map((s) => {
+      const parsed = parseUserAgent(s.userAgent || '')
       const isCurrent = s.sessionToken === currentSessionToken
 
       return {
         id: s.id,
+        browser: s.browser || parsed.browser,
+        os: s.os || parsed.os,
+        deviceType: s.deviceType || parsed.deviceType,
+        device: parsed.device,
+        ipAddress: s.ipAddress,
+        location: s.location || 'Unknown',
+        lastActive: s.lastActive,
+        createdAt: s.createdAt,
         isCurrent,
-        lastActive: s.expires,
-        // Note: We don't have device/browser/IP info in the current Session model
-        // This would require extending the Session model with additional fields
-        device: 'Unknown Device',
-        browser: 'Unknown Browser',
-        ipAddress: null,
-        location: null,
-        userAgent: null,
       }
     })
 
-    return successResponse({
-      sessions: sessionsWithInfo,
-      currentSessionId: sessionsWithInfo.find((s) => s.isCurrent)?.id || null,
+    return NextResponse.json({
+      sessions: sessionsWithDetails,
+      total: sessionsWithDetails.length,
     })
   } catch (error) {
-    return handleApiError(error)
-  }
-}
-
-/**
- * DELETE /api/auth/sessions
- * Delete all sessions except the current one
- */
-export async function DELETE(request: NextRequest) {
-  try {
-    const session = await auth()
-
-    if (!session?.user?.id) {
-      return authRequiredError('You must be logged in to manage sessions')
-    }
-
-    // Get current session token
-    const currentSessionToken = request.cookies.get('next-auth.session-token')?.value ||
-      request.cookies.get('__Secure-next-auth.session-token')?.value
-
-    if (!currentSessionToken) {
-      return authRequiredError('No active session found')
-    }
-
-    // Delete all sessions except the current one
-    const result = await prisma.session.deleteMany({
-      where: {
-        userId: session.user.id,
-        sessionToken: {
-          not: currentSessionToken,
-        },
-      },
-    })
-
-    return successResponse(
-      {
-        deletedCount: result.count,
-      },
-      `Successfully signed out of ${result.count} other session(s)`
+    console.error('Error fetching sessions:', error)
+    return NextResponse.json(
+      { error: 'Failed to fetch sessions' },
+      { status: 500 }
     )
-  } catch (error) {
-    return handleApiError(error)
   }
 }

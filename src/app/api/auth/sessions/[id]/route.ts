@@ -1,67 +1,73 @@
-import { NextRequest } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/services/auth'
 import { prisma } from '@/services/prisma'
-import {
-  successResponse,
-  handleApiError,
-  authRequiredError,
-  notFoundError,
-} from '@/utils/api-response'
-
-interface RouteContext {
-  params: {
-    id: string
-  }
-}
 
 /**
- * DELETE /api/auth/sessions/:id
+ * DELETE /api/auth/sessions/[id]
  * Terminate a specific session
  */
-export async function DELETE(request: NextRequest, context: RouteContext) {
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
     const session = await auth()
 
     if (!session?.user?.id) {
-      return authRequiredError('You must be logged in to manage sessions')
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      )
     }
 
-    const { id } = context.params
+    const sessionId = params.id
 
-    // Find the session
-    const targetSession = await prisma.session.findUnique({
-      where: { id },
+    // Get current session token to prevent self-termination
+    const currentSessionToken = request.cookies.get('authjs.session-token')?.value ||
+                                request.cookies.get('__Secure-authjs.session-token')?.value
+
+    // Find the session to delete
+    const sessionToDelete = await prisma.session.findUnique({
+      where: { id: sessionId },
     })
 
-    if (!targetSession) {
-      return notFoundError('Session not found')
+    if (!sessionToDelete) {
+      return NextResponse.json(
+        { error: 'Session not found' },
+        { status: 404 }
+      )
     }
 
     // Verify the session belongs to the current user
-    if (targetSession.userId !== session.user.id) {
-      return authRequiredError('You can only terminate your own sessions')
+    if (sessionToDelete.userId !== session.user.id) {
+      return NextResponse.json(
+        { error: 'Forbidden' },
+        { status: 403 }
+      )
     }
 
-    // Get current session token to prevent self-termination
-    const currentSessionToken = request.cookies.get('next-auth.session-token')?.value ||
-      request.cookies.get('__Secure-next-auth.session-token')?.value
-
-    if (targetSession.sessionToken === currentSessionToken) {
-      return handleApiError(
-        new Error('Cannot terminate your current session. Please use sign out instead.')
+    // Prevent deleting current session
+    if (sessionToDelete.sessionToken === currentSessionToken) {
+      return NextResponse.json(
+        { error: 'Cannot terminate current session' },
+        { status: 400 }
       )
     }
 
     // Delete the session
     await prisma.session.delete({
-      where: { id },
+      where: { id: sessionId },
     })
 
-    return successResponse(
-      { sessionId: id },
-      'Session terminated successfully'
-    )
+    return NextResponse.json({
+      success: true,
+      message: 'Session terminated successfully',
+    })
   } catch (error) {
-    return handleApiError(error)
+    console.error('Error deleting session:', error)
+    return NextResponse.json(
+      { error: 'Failed to terminate session' },
+      { status: 500 }
+    )
   }
 }

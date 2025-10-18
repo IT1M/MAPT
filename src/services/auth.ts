@@ -4,6 +4,12 @@ import { compare } from 'bcrypt'
 import { prisma } from './prisma'
 import { UserRole } from '.prisma/client'
 import { authConfig } from '@/auth.config'
+import {
+  recordFailedLogin,
+  recordSuccessfulLogin,
+  isAccountLocked,
+  getLoginSecurityStatus,
+} from './login-security'
 
 /**
  * Permission types for role-based access control
@@ -28,6 +34,8 @@ declare module 'next-auth' {
       name: string
       role: UserRole
       permissions: Permission[]
+      lastLogin?: Date | null
+      lastLoginIp?: string | null
     } & DefaultSession['user']
   }
 
@@ -36,6 +44,8 @@ declare module 'next-auth' {
     email: string
     name: string
     role: UserRole
+    lastLogin?: Date | null
+    lastLoginIp?: string | null
   }
 }
 
@@ -44,6 +54,8 @@ declare module '@auth/core/jwt' {
     id: string
     role: UserRole
     permissions: Permission[]
+    lastLogin?: Date | null
+    lastLoginIp?: string | null
   }
 }
 
@@ -94,7 +106,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         email: { label: 'Email', type: 'email' },
         password: { label: 'Password', type: 'password' },
       },
-      async authorize(credentials) {
+      async authorize(credentials, req) {
         console.log('🔐 [AUTH] Starting authorization...')
         console.log('📧 [AUTH] Email:', credentials?.email)
         
@@ -103,35 +115,74 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           return null
         }
 
+        const email = credentials.email as string
+        const password = credentials.password as string
+        
+        // Get request metadata for security tracking
+        const ipAddress = (req?.headers?.get('x-forwarded-for') || 
+                          req?.headers?.get('x-real-ip') || 
+                          'unknown') as string
+        const userAgent = (req?.headers?.get('user-agent') || 'unknown') as string
+
         try {
+          // Check if account is locked
+          console.log('🔒 [AUTH] Checking account lock status...')
+          const locked = await isAccountLocked(email)
+          if (locked) {
+            console.log('❌ [AUTH] Account is locked')
+            const status = await getLoginSecurityStatus(email)
+            console.log('⏰ [AUTH] Lockout ends at:', status.lockoutEndsAt)
+            return null
+          }
+
           // Find user by email
           console.log('🔍 [AUTH] Looking up user in database...')
           const user = await prisma.user.findUnique({
             where: {
-              email: credentials.email as string,
+              email: email,
+            },
+            select: {
+              id: true,
+              email: true,
+              name: true,
+              role: true,
+              isActive: true,
+              passwordHash: true,
+              lastLogin: true,
+              lastLoginIp: true,
             },
           })
 
           if (!user) {
             console.log('❌ [AUTH] User not found')
+            // Record failed attempt even for non-existent users to prevent enumeration
+            await recordFailedLogin(email, ipAddress, userAgent)
             return null
           }
 
           console.log('✅ [AUTH] User found:', user.email, '- Role:', user.role)
 
+          // Check if user is active
+          if (!user.isActive) {
+            console.log('❌ [AUTH] User account is inactive')
+            return null
+          }
+
           // Verify password using bcrypt
           console.log('🔑 [AUTH] Verifying password...')
-          const isPasswordValid = await compare(
-            credentials.password as string,
-            user.passwordHash
-          )
+          const isPasswordValid = await compare(password, user.passwordHash)
 
           if (!isPasswordValid) {
             console.log('❌ [AUTH] Invalid password')
+            // Record failed login attempt
+            await recordFailedLogin(email, ipAddress, userAgent)
             return null
           }
 
           console.log('✅ [AUTH] Password valid - Login successful!')
+
+          // Record successful login
+          await recordSuccessfulLogin(user.id, email, ipAddress, userAgent)
 
           // Return user object (without password hash)
           return {
@@ -139,9 +190,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             email: user.email,
             name: user.name,
             role: user.role,
+            lastLogin: user.lastLogin,
+            lastLoginIp: user.lastLoginIp,
           }
         } catch (error) {
           console.error('❌ [AUTH] Authentication error:', error)
+          // Record failed attempt on error
+          await recordFailedLogin(email, ipAddress, userAgent).catch(err => 
+            console.error('Failed to record failed login:', err)
+          )
           return null
         }
       },
@@ -157,6 +214,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.id = user.id
         token.role = user.role
         token.permissions = ROLE_PERMISSIONS[user.role]
+        token.lastLogin = user.lastLogin
+        token.lastLoginIp = user.lastLoginIp
       }
       return token
     },
@@ -169,6 +228,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.id = token.id as string
         session.user.role = token.role as UserRole
         session.user.permissions = token.permissions as Permission[]
+        session.user.lastLogin = token.lastLogin as Date | null
+        session.user.lastLoginIp = token.lastLoginIp as string | null
       }
       return session
     },

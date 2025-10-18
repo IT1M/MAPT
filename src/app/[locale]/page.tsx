@@ -3,13 +3,16 @@ import { LocaleSwitcher } from '@/components/ui/locale-switcher'
 import { auth } from '@/services/auth'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import { getDashboardUrl } from '@/utils/dashboard-routing'
 
 type Props = {
   params: Promise<{ locale: string }>
+  searchParams: Promise<{ callbackUrl?: string }>
 }
 
-export default async function HomePage({ params }: Props) {
+export default async function HomePage({ params, searchParams }: Props) {
   const { locale } = await params
+  const { callbackUrl } = await searchParams
   
   // Enable static rendering
   setRequestLocale(locale)
@@ -17,9 +20,10 @@ export default async function HomePage({ params }: Props) {
   // Check authentication
   const session = await auth()
   
-  // If authenticated, redirect to dashboard
-  if (session) {
-    redirect(`/${locale}/dashboard`)
+  // If authenticated, redirect to role-based dashboard
+  if (session?.user) {
+    const dashboardUrl = getDashboardUrl(session.user.role, locale, callbackUrl)
+    redirect(dashboardUrl)
   }
   
   const t = await getTranslations('common')

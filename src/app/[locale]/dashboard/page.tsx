@@ -2,6 +2,7 @@ import { auth } from '@/services/auth'
 import { redirect } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
 import { RoleBasedDashboard } from '@/components/dashboard/RoleBasedDashboard'
+import { DashboardGreeting, WelcomeModal } from '@/components/dashboard'
 
 async function getDashboardData() {
   try {
@@ -68,5 +69,22 @@ export default async function DashboardPage({ params }: { params: Promise<{ loca
     recentActivities: dashboardData.recentItems
   }
 
-  return <RoleBasedDashboard data={data} />
+  // Check if this is first login (no lastLogin means first time)
+  const isFirstLogin = !session.user.lastLogin
+
+  return (
+    <>
+      <DashboardGreeting
+        userName={session.user.name || 'User'}
+        lastLogin={session.user.lastLogin}
+        lastLoginIp={session.user.lastLoginIp}
+      />
+      <WelcomeModal
+        userName={session.user.name || 'User'}
+        userRole={session.user.role}
+        isFirstLogin={isFirstLogin}
+      />
+      <RoleBasedDashboard data={data} />
+    </>
+  )
 }

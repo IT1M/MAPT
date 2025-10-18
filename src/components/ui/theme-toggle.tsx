@@ -18,8 +18,9 @@ export const ThemeToggle: React.FC = () => {
         className="p-2 rounded-lg bg-gray-200 dark:bg-gray-700 transition-colors duration-200"
         aria-label="Toggle theme"
         disabled
+        suppressHydrationWarning
       >
-        <div className="w-5 h-5" />
+        <div className="w-5 h-5" suppressHydrationWarning />
       </button>
     );
   }
