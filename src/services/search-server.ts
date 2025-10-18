@@ -108,12 +108,10 @@ async function searchReports(
   limit: number
 ): Promise<SearchResultItem[]> {
   try {
+    // Search only by title since type is an enum
     const reports = await prisma.report.findMany({
       where: {
-        OR: [
-          { title: { contains: searchTerm, mode: 'insensitive' } },
-          { type: { contains: searchTerm, mode: 'insensitive' } }
-        ]
+        title: { contains: searchTerm, mode: 'insensitive' }
       },
       take: limit,
       select: {
@@ -121,23 +119,26 @@ async function searchReports(
         title: true,
         type: true,
         status: true,
-        createdAt: true,
-        generatedBy: {
-          select: {
-            name: true
-          }
-        }
+        generatedBy: true
       },
       orderBy: {
-        createdAt: 'desc'
+        generatedAt: 'desc'
       }
     })
+
+    // Fetch user names separately
+    const userIds = [...new Set(reports.map(r => r.generatedBy))]
+    const users = await prisma.user.findMany({
+      where: { id: { in: userIds } },
+      select: { id: true, name: true }
+    })
+    const userMap = new Map(users.map(u => [u.id, u.name]))
 
     return reports.map(report => ({
       id: report.id,
       type: 'report' as const,
       title: report.title,
-      description: `Type: ${report.type} | Status: ${report.status} | By: ${report.generatedBy.name}`,
+      description: `Type: ${report.type} | Status: ${report.status} | By: ${userMap.get(report.generatedBy) || 'Unknown'}`,
       url: `/reports/${report.id}`,
       metadata: {
         type: report.type,
@@ -171,8 +172,7 @@ async function searchUsers(
         id: true,
         name: true,
         email: true,
-        role: true,
-        department: true
+        role: true
       },
       orderBy: {
         name: 'asc'
@@ -183,7 +183,7 @@ async function searchUsers(
       id: user.id,
       type: 'user' as const,
       title: user.name,
-      description: `${user.email} | ${user.role}${user.department ? ` | ${user.department}` : ''}`,
+      description: `${user.email} | ${user.role}`,
       url: `/settings/users/${user.id}`,
       metadata: {
         role: user.role,

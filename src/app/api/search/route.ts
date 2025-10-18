@@ -9,7 +9,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { z } from 'zod'
-import { globalSearch } from '@/services/search'
+import { globalSearch } from '@/services/search-server'
+import { searchSettings } from '@/services/search'
 import { apiResponse } from '@/utils/api-response'
 
 // Request validation schema
@@ -46,13 +47,22 @@ export async function POST(request: NextRequest) {
 
     const { query, limit } = validation.data
 
-    // Perform search
-    const results = await globalSearch(
+    // Perform search (database + settings)
+    const dbResults = await globalSearch(
       query,
       session.user.id,
       session.user.role,
       limit
     )
+
+    // Add settings search (client-side safe)
+    const settingsResults = searchSettings(query, session.user.role, limit)
+
+    const results = {
+      ...dbResults,
+      settings: settingsResults,
+      total: dbResults.total + settingsResults.length
+    }
 
     return NextResponse.json(
       apiResponse.success(results, 'Search completed successfully'),
