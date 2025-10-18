@@ -10,8 +10,8 @@
   - إنشاء وتشغيل database migration
   - _Requirements: 1-30 (جميع المتطلبات تعتمد على نماذج البيانات)_
 
-- [ ] 2. بناء نظام التدقيق الكامل (Audit System)
-  - [ ] 2.1 تطوير AuditService مع التوقيع الرقمي
+- [x] 2. بناء نظام التدقيق الكامل (Audit System)
+  - [x] 2.1 تطوير AuditService مع التوقيع الرقمي
     - تنفيذ logAction() مع دعم queue غير محظور
     - تنفيذ queryLogs() مع الفلترة والترقيم
     - تنفيذ getStatistics() للإحصائيات
@@ -21,7 +21,7 @@
     - إضافة signEntry() و verifyEntry() باستخدام HMAC-SHA256
     - _Requirements: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 30_
   
-  - [ ] 2.2 إنشاء Audit API routes
+  - [x] 2.2 إنشاء Audit API routes
     - GET /api/audit/logs - مع الفلترة والترقيم
     - GET /api/audit/stats - الإحصائيات
     - GET /api/audit/details/:id - التفاصيل الكاملة
@@ -31,7 +31,7 @@
     - إضافة role-based access control
     - _Requirements: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10_
   
-  - [ ] 2.3 بناء واجهة المستخدم للتدقيق
+  - [x] 2.3 بناء واجهة المستخدم للتدقيق
     - إنشاء AuditLogPage مع التحقق من الصلاحيات
     - إنشاء AuditLogTable مع الفرز والتوسيع
     - إنشاء AuditFilters مع جميع خيارات الفلترة
@@ -43,7 +43,7 @@
     - تطبيق التصميم المتجاوب للموبايل (MobileCardView, FilterDrawer)
     - _Requirements: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 28_
 
-- [ ] 3. بناء نظام النسخ الاحتياطي الكامل (Backup System)
+- [-] 3. بناء نظام النسخ الاحتياطي الكامل (Backup System)
   - [ ] 3.1 تطوير BackupService مع التشفير
     - تنفيذ createBackup() مع دعم صيغ متعددة
     - تنفيذ restoreBackup() مع دعم transactions
