@@ -74,7 +74,7 @@
   - Ensure WCAG AA contrast, high contrast theme, and 200% text scaling support
   - _Requirements: 22.1, 22.2, 22.3, 22.5, 23.1, 23.2, 23.3, 23.4, 23.5_
 
-- [ ] 10. Add internationalization and search
+- [-] 10. Add internationalization and search
   - Create translation keys in messages/en.json and messages/ar.json
   - Implement RTL support with mirrored layouts and flipped icons
   - Build search functionality with real-time filtering and highlighting
