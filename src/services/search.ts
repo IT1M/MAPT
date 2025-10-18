@@ -1,11 +1,10 @@
 /**
- * Global Search Service
- * Provides full-text search across inventory, reports, users, and settings
- * with role-based filtering
+ * Global Search Service - Client-Side Utilities
+ * Browser-safe functions for search functionality
+ * Server-side search logic is in /api/search route
  */
 
-import { prisma } from '@/services/prisma'
-import { UserRole } from '@prisma/client'
+import type { UserRole } from '@prisma/client'
 
 export interface SearchQuery {
   query: string
@@ -35,204 +34,13 @@ export interface SearchResult {
 }
 
 /**
- * Perform global search across all entities with role-based filtering
+ * Search settings pages (client-side only, no database access)
  */
-export async function globalSearch(
-  query: string,
-  userId: string,
+export function searchSettings(
+  searchTerm: string,
   userRole: UserRole,
   limit: number = 5
-): Promise<SearchResult> {
-  const searchTerm = query.toLowerCase().trim()
-  
-  if (!searchTerm) {
-    return {
-      items: [],
-      reports: [],
-      users: [],
-      settings: [],
-      total: 0
-    }
-  }
-
-  // Search inventory items (all roles)
-  const items = await searchInventoryItems(searchTerm, limit)
-  
-  // Search reports (exclude DATA_ENTRY)
-  const reports = userRole !== 'DATA_ENTRY' 
-    ? await searchReports(searchTerm, limit) 
-    : []
-  
-  // Search users (ADMIN, MANAGER, SUPERVISOR only)
-  const users = ['ADMIN', 'MANAGER', 'SUPERVISOR'].includes(userRole)
-    ? await searchUsers(searchTerm, limit)
-    : []
-  
-  // Search settings (all roles, filtered by access)
-  const settings = await searchSettings(searchTerm, userRole, limit)
-  
-  return {
-    items,
-    reports,
-    users,
-    settings,
-    total: items.length + reports.length + users.length + settings.length
-  }
-}
-
-/**
- * Search inventory items
- */
-async function searchInventoryItems(
-  searchTerm: string,
-  limit: number
-): Promise<SearchResultItem[]> {
-  try {
-    const items = await prisma.inventoryItem.findMany({
-      where: {
-        OR: [
-          { itemName: { contains: searchTerm, mode: 'insensitive' } },
-          { batch: { contains: searchTerm, mode: 'insensitive' } },
-          { category: { contains: searchTerm, mode: 'insensitive' } }
-        ],
-        deletedAt: null
-      },
-      take: limit,
-      select: {
-        id: true,
-        itemName: true,
-        batch: true,
-        category: true,
-        quantity: true,
-        destination: true,
-        createdAt: true
-      },
-      orderBy: {
-        createdAt: 'desc'
-      }
-    })
-
-    return items.map(item => ({
-      id: item.id,
-      type: 'item' as const,
-      title: item.itemName,
-      description: `Batch: ${item.batch} | Category: ${item.category} | Qty: ${item.quantity}`,
-      url: `/inventory/${item.id}`,
-      metadata: {
-        destination: item.destination,
-        quantity: item.quantity
-      }
-    }))
-  } catch (error) {
-    console.error('Error searching inventory items:', error)
-    return []
-  }
-}
-
-/**
- * Search reports
- */
-async function searchReports(
-  searchTerm: string,
-  limit: number
-): Promise<SearchResultItem[]> {
-  try {
-    const reports = await prisma.report.findMany({
-      where: {
-        OR: [
-          { title: { contains: searchTerm, mode: 'insensitive' } },
-          { type: { contains: searchTerm, mode: 'insensitive' } }
-        ]
-      },
-      take: limit,
-      select: {
-        id: true,
-        title: true,
-        type: true,
-        status: true,
-        createdAt: true,
-        generatedBy: {
-          select: {
-            name: true
-          }
-        }
-      },
-      orderBy: {
-        createdAt: 'desc'
-      }
-    })
-
-    return reports.map(report => ({
-      id: report.id,
-      type: 'report' as const,
-      title: report.title,
-      description: `Type: ${report.type} | Status: ${report.status} | By: ${report.generatedBy.name}`,
-      url: `/reports/${report.id}`,
-      metadata: {
-        type: report.type,
-        status: report.status
-      }
-    }))
-  } catch (error) {
-    console.error('Error searching reports:', error)
-    return []
-  }
-}
-
-/**
- * Search users
- */
-async function searchUsers(
-  searchTerm: string,
-  limit: number
-): Promise<SearchResultItem[]> {
-  try {
-    const users = await prisma.user.findMany({
-      where: {
-        OR: [
-          { name: { contains: searchTerm, mode: 'insensitive' } },
-          { email: { contains: searchTerm, mode: 'insensitive' } }
-        ],
-        isActive: true
-      },
-      take: limit,
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-        department: true
-      },
-      orderBy: {
-        name: 'asc'
-      }
-    })
-
-    return users.map(user => ({
-      id: user.id,
-      type: 'user' as const,
-      title: user.name,
-      description: `${user.email} | ${user.role}${user.department ? ` | ${user.department}` : ''}`,
-      url: `/settings/users/${user.id}`,
-      metadata: {
-        role: user.role,
-        email: user.email
-      }
-    }))
-  } catch (error) {
-    console.error('Error searching users:', error)
-    return []
-  }
-}
-
-/**
- * Search settings pages
- */
-async function searchSettings(
-  searchTerm: string,
-  userRole: UserRole,
-  limit: number
-): Promise<SearchResultItem[]> {
+): SearchResultItem[] {
   // Define searchable settings with role-based access
   const settingsPages = [
     {

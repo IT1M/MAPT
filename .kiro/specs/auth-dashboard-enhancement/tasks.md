@@ -145,8 +145,8 @@
   - Build help modal (categorized shortcuts, search, print, platform-specific keys)
   - _Requirements: 11.1, 11.2, 11.3, 11.4, 11.5_
 
-- [x] 10. Theme Customization System
-- [x] 10.1 Complete theme system with export/import
+- [] 10. Theme Customization System
+- [] 10.1 Complete theme system with export/import
   - Define theme interface and create 6 preset themes (Default, Ocean, Forest, Sunset, Royal, Monochrome)
   - Build customizer component (preset selector, color pickers, font family/size, layout density, animation controls)
   - Implement dynamic CSS variables application with localStorage persistence and cross-tab sync

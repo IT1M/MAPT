@@ -1627,5 +1627,103 @@
     "showing": "Showing",
     "shortcuts": "shortcuts",
     "toClose": "to close"
+  },
+  "theme": {
+    "title": "Theme Customization",
+    "description": "Personalize the appearance of your workspace",
+    "success": "Theme updated successfully!",
+    "tabs": {
+      "presets": "Presets",
+      "colors": "Colors",
+      "typography": "Typography",
+      "layout": "Layout",
+      "share": "Share"
+    },
+    "presets": {
+      "title": "Choose from our professionally designed themes",
+      "default": {
+        "name": "Medical Blue",
+        "description": "Professional medical theme with calming blue tones"
+      },
+      "ocean": {
+        "name": "Ocean",
+        "description": "Deep blue ocean-inspired theme"
+      },
+      "forest": {
+        "name": "Forest",
+        "description": "Natural green forest theme"
+      },
+      "sunset": {
+        "name": "Sunset",
+        "description": "Warm sunset colors with orange and pink tones"
+      },
+      "royal": {
+        "name": "Royal",
+        "description": "Elegant purple and gold royal theme"
+      },
+      "monochrome": {
+        "name": "Monochrome",
+        "description": "Clean black and white minimalist theme"
+      }
+    },
+    "colors": {
+      "title": "Customize individual colors to match your brand",
+      "primary": "Primary",
+      "secondary": "Secondary",
+      "accent": "Accent",
+      "background": "Background",
+      "foreground": "Foreground",
+      "muted": "Muted",
+      "mutedForeground": "Muted Foreground",
+      "border": "Border",
+      "card": "Card",
+      "cardForeground": "Card Foreground",
+      "success": "Success",
+      "warning": "Warning",
+      "error": "Error",
+      "info": "Info"
+    },
+    "typography": {
+      "title": "Adjust fonts and text sizes for better readability",
+      "fontFamily": "Font Family",
+      "fontSizes": "Font Sizes",
+      "preview": "Preview:",
+      "small": "Small text sample",
+      "base": "Base text sample",
+      "large": "Large text sample",
+      "extraLarge": "Extra large text sample"
+    },
+    "layout": {
+      "title": "Control spacing, density, and animations",
+      "density": "UI Density",
+      "compact": "Compact",
+      "comfortable": "Comfortable",
+      "spacious": "Spacious",
+      "animations": "Enable Animations",
+      "animationSpeed": "Animation Speed",
+      "slow": "Slow",
+      "normal": "Normal",
+      "fast": "Fast"
+    },
+    "share": {
+      "title": "Export, import, or share your custom theme",
+      "export": "Export Theme",
+      "downloadJson": "Download Theme JSON",
+      "importFile": "Import from File",
+      "shareCode": "Share Code",
+      "generateCode": "Generate Share Code",
+      "copyCode": "Copy to clipboard",
+      "shareCodeDescription": "Share this code with others to let them use your theme",
+      "importCode": "Import from Share Code",
+      "importPlaceholder": "Paste share code here",
+      "importButton": "Import",
+      "reset": "Reset to Default Theme",
+      "errors": {
+        "invalidFormat": "Invalid theme format",
+        "parseFailed": "Failed to parse theme JSON",
+        "invalidCode": "Invalid share code",
+        "enterCode": "Please enter a share code"
+      }
+    }
   }
 }
