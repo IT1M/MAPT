@@ -69,40 +69,62 @@ export async function POST(request: NextRequest) {
       return validationError('No valid items found to delete')
     }
 
-    // Soft delete items (set deletedAt timestamp)
-    const deleteResult = await prisma.inventoryItem.updateMany({
-      where: {
-        id: { in: itemsToDelete.map(item => item.id) },
-        deletedAt: null,
-      },
-      data: {
-        deletedAt: new Date(),
-      },
-    })
+    // Track results
+    const results = {
+      successful: 0,
+      failed: 0,
+      errors: [] as string[],
+    }
 
-    // Create audit log entries for each deleted item
+    // Extract request metadata for audit logging
     const metadata = extractRequestMetadata(request)
     const auditLogIds: string[] = []
 
+    // Delete items individually for proper error handling and audit logging
     for (const item of itemsToDelete) {
-      const auditLog = await auditInventoryAction(
-        session.user.id,
-        'DELETE',
-        item,
-        item, // previousData is the item itself for DELETE
-        metadata
-      )
-      if (auditLog) {
-        auditLogIds.push(auditLog.id)
+      try {
+        // Soft delete the item (set deletedAt timestamp)
+        await prisma.inventoryItem.update({
+          where: { id: item.id },
+          data: {
+            deletedAt: new Date(),
+            updatedAt: new Date(),
+          },
+        })
+
+        // Create audit log entry
+        const auditLog = await auditInventoryAction(
+          session.user.id,
+          'DELETE',
+          item,
+          item, // previousData is the item itself for DELETE
+          metadata
+        )
+        
+        if (auditLog) {
+          auditLogIds.push(auditLog.id)
+        }
+
+        results.successful++
+      } catch (error) {
+        console.error(`Failed to delete item ${item.id}:`, error)
+        results.failed++
+        results.errors.push(
+          `Failed to delete ${item.itemName} (${item.batch}): ${error instanceof Error ? error.message : 'Unknown error'}`
+        )
       }
     }
 
     return successResponse(
       {
-        deletedCount: deleteResult.count,
+        deletedCount: results.successful,
+        failedCount: results.failed,
+        errors: results.errors,
         auditLogIds,
       },
-      `Successfully deleted ${deleteResult.count} item(s)`,
+      results.failed === 0
+        ? `Successfully deleted ${results.successful} item(s)`
+        : `Deleted ${results.successful} item(s), ${results.failed} failed`,
       200
     )
   } catch (error) {

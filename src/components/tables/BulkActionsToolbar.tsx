@@ -8,6 +8,7 @@ interface BulkActionsToolbarProps {
   selectedCount: number
   onBulkDelete: () => void
   onBulkExport: () => void
+  onBulkEdit: () => void
   onBulkEditDestination: () => void
   onClearSelection: () => void
   userPermissions: string[]
@@ -17,6 +18,7 @@ export const BulkActionsToolbar: React.FC<BulkActionsToolbarProps> = ({
   selectedCount,
   onBulkDelete,
   onBulkExport,
+  onBulkEdit,
   onBulkEditDestination,
   onClearSelection,
   userPermissions,
@@ -92,12 +94,12 @@ export const BulkActionsToolbar: React.FC<BulkActionsToolbarProps> = ({
               Export
             </Button>
 
-            {/* Bulk Edit Destination */}
+            {/* Bulk Edit */}
             <Button
               variant="secondary"
               size="small"
-              onClick={onBulkEditDestination}
-              title="Edit destination for selected items"
+              onClick={onBulkEdit}
+              title="Edit selected items"
             >
               <svg
                 className="w-4 h-4 mr-1.5"
@@ -112,7 +114,7 @@ export const BulkActionsToolbar: React.FC<BulkActionsToolbarProps> = ({
                   d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
                 />
               </svg>
-              Edit Destination
+              Edit
             </Button>
 
             {/* Bulk Delete - Only for SUPERVISOR/ADMIN */}
@@ -189,10 +191,10 @@ export const BulkActionsToolbar: React.FC<BulkActionsToolbarProps> = ({
                     Export Selected
                   </button>
 
-                  {/* Bulk Edit Destination */}
+                  {/* Bulk Edit */}
                   <button
                     onClick={() => {
-                      onBulkEditDestination()
+                      onBulkEdit()
                       setShowActions(false)
                     }}
                     className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-3"
@@ -205,7 +207,7 @@ export const BulkActionsToolbar: React.FC<BulkActionsToolbarProps> = ({
                         d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
                       />
                     </svg>
-                    Edit Destination
+                    Edit Selected
                   </button>
 
                   {/* Bulk Delete - Only for SUPERVISOR/ADMIN */}
