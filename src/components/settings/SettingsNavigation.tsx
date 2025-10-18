@@ -98,17 +98,19 @@ const ICONS: Record<string, React.ReactNode> = {
   ),
 }
 
-export function SettingsNavigation({
+export const SettingsNavigation = React.memo<SettingsNavigationProps>(function SettingsNavigation({
   activeSection,
   onSectionChange,
   userRole,
   isMobile = false,
-}: SettingsNavigationProps) {
-  // Filter navigation items based on user role
-  const visibleItems = NAVIGATION_ITEMS.filter((item) => {
-    if (!item.requiredRoles) return true
-    return item.requiredRoles.includes(userRole)
-  })
+}) {
+  // Filter navigation items based on user role - memoized
+  const visibleItems = React.useMemo(() => {
+    return NAVIGATION_ITEMS.filter((item) => {
+      if (!item.requiredRoles) return true
+      return item.requiredRoles.includes(userRole)
+    })
+  }, [userRole])
 
   if (isMobile) {
     // Accordion layout for mobile
@@ -176,4 +178,4 @@ export function SettingsNavigation({
       ))}
     </nav>
   )
-}
+})
