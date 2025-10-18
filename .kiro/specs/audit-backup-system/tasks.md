@@ -4,7 +4,7 @@
 
 ## Task List
 
-- [ ] 1. إعداد قاعدة البيانات والنماذج الأساسية
+- [x] 1. إعداد قاعدة البيانات والنماذج الأساسية
   - توسيع Prisma schema بإضافة نماذج AuditLog, Backup, Report, ReportSchedule, BackupConfig
   - إضافة جميع الـ enums المطلوبة
   - إنشاء وتشغيل database migration

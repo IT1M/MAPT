@@ -39,29 +39,35 @@ enum Destination {
   FOZAN
 }
 
-enum AuditAction {
+enum ActionType {
   CREATE
   UPDATE
   DELETE
   LOGIN
   LOGOUT
   EXPORT
+  VIEW
+  REVERT
+  BACKUP
+  RESTORE
 }
 
-enum ReportType {
-  MONTHLY
-  YEARLY
-  CUSTOM
-  AUDIT
+enum EntityType {
+  InventoryItem
+  User
+  Report
+  Backup
+  Settings
+  AuditLog
 }
 
-enum ReportStatus {
-  GENERATING
-  COMPLETED
-  FAILED
+enum BackupType {
+  MANUAL
+  AUTOMATIC
+  PRE_RESTORE
 }
 
-enum BackupFileType {
+enum BackupFormat {
   CSV
   JSON
   SQL
@@ -71,6 +77,51 @@ enum BackupStatus {
   IN_PROGRESS
   COMPLETED
   FAILED
+  CORRUPTED
+}
+
+enum ReportType {
+  MONTHLY_INVENTORY
+  YEARLY_SUMMARY
+  CUSTOM_RANGE
+  AUDIT_REPORT
+  USER_ACTIVITY
+  CATEGORY_ANALYSIS
+}
+
+enum ReportFormat {
+  PDF
+  EXCEL
+  PPTX
+}
+
+enum ReportStatus {
+  GENERATING
+  COMPLETED
+  FAILED
+}
+
+enum ScheduleFrequency {
+  DAILY
+  WEEKLY
+  MONTHLY
+  YEARLY
+}
+
+// Legacy enums for backward compatibility
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  LOGIN
+  LOGOUT
+  EXPORT
+}
+
+enum BackupFileType {
+  CSV
+  JSON
+  SQL
 }
 
 // Models
@@ -90,6 +141,8 @@ model User {
   reports         Report[]
   backups         Backup[]
   settingsUpdates SystemSettings[]
+  reportSchedules ReportSchedule[]
+  backupConfigs   BackupConfig[]
 
   @@index([email])
   @@map("users")
@@ -162,60 +215,110 @@ model Transaction {
 
 model AuditLog {
   id            String         @id @default(cuid())
-  userId        String
-  action        AuditAction
-  entityType    String
-  entityId      String?
-  oldValue      Json?
-  newValue      Json?
-  ipAddress     String?
-  userAgent     String?
   timestamp     DateTime       @default(now())
+  userId        String
   user          User           @relation(fields: [userId], references: [id])
+  action        ActionType
+  entityType    EntityType
+  entityId      String
+  changes       Json?
+  ipAddress     String
+  userAgent     String
+  signature     String
   inventoryItem InventoryItem? @relation(fields: [entityId], references: [id])
 
-  @@index([userId, timestamp])
-  @@index([entityType, entityId])
   @@index([timestamp])
+  @@index([userId])
+  @@index([entityType, entityId])
+  @@index([action])
   @@map("audit_logs")
 }
 
 // New models for enhanced functionality
 model Report {
-  id            String       @id @default(cuid())
-  title         String
-  type          ReportType
-  periodStart   DateTime
-  periodEnd     DateTime
-  generatedById String
-  fileUrl       String?
-  dataSnapshot  Json
-  aiInsights    String?      @db.Text
-  status        ReportStatus
-  createdAt     DateTime     @default(now())
-  generatedBy   User         @relation(fields: [generatedById], references: [id])
+  id                String       @id @default(cuid())
+  title             String
+  type              ReportType
+  periodFrom        DateTime
+  periodTo          DateTime
+  generatedAt       DateTime     @default(now())
+  generatedBy       String
+  generator         User         @relation(fields: [generatedBy], references: [id])
+  fileSize          BigInt
+  format            ReportFormat
+  status            ReportStatus
+  filePath          String
+  includeAIInsights Boolean      @default(false)
 
-  @@index([type, periodStart])
-  @@index([createdAt])
+  @@index([generatedAt])
+  @@index([type])
   @@index([status])
   @@map("reports")
 }
 
 model Backup {
-  id          String         @id @default(cuid())
-  fileName    String
-  fileSize    Int
-  fileType    BackupFileType
-  recordCount Int
-  storagePath String
-  status      BackupStatus
-  createdAt   DateTime       @default(now())
-  createdById String
-  createdBy   User           @relation(fields: [createdById], references: [id])
+  id               String       @id @default(cuid())
+  filename         String       @unique
+  type             BackupType
+  format           BackupFormat
+  fileSize         BigInt
+  recordCount      Int
+  status           BackupStatus
+  createdAt        DateTime     @default(now())
+  createdBy        String
+  creator          User         @relation(fields: [createdBy], references: [id])
+  includeAuditLogs Boolean      @default(false)
+  includeUserData  Boolean      @default(false)
+  includeSettings  Boolean      @default(false)
+  dateRangeFrom    DateTime?
+  dateRangeTo      DateTime?
+  notes            String?      @db.Text
+  encrypted        Boolean      @default(false)
+  checksum         String
+  validated        Boolean      @default(false)
+  validatedAt      DateTime?
 
   @@index([createdAt])
   @@index([status])
+  @@index([type])
   @@map("backups")
+}
+
+model ReportSchedule {
+  id         String            @id @default(cuid())
+  name       String
+  reportType ReportType
+  frequency  ScheduleFrequency
+  time       String
+  recipients String[]
+  enabled    Boolean           @default(true)
+  config     Json
+  lastRun    DateTime?
+  nextRun    DateTime
+  createdAt  DateTime          @default(now())
+  createdBy  String
+  creator    User              @relation(fields: [createdBy], references: [id])
+
+  @@index([nextRun])
+  @@index([enabled])
+  @@map("report_schedules")
+}
+
+model BackupConfig {
+  id                     String         @id @default(cuid())
+  enabled                Boolean        @default(false)
+  scheduleTime           String         @default("02:00")
+  formats                BackupFormat[]
+  includeAuditLogs       Boolean        @default(true)
+  retentionDailyDays     Int            @default(30)
+  retentionWeeklyWeeks   Int            @default(12)
+  retentionMonthlyMonths Int            @default(12)
+  storagePath            String
+  updatedAt              DateTime       @updatedAt
+  updatedBy              String
+  updater                User           @relation(fields: [updatedBy], references: [id])
+
+  @@map("backup_configs")
 }
 
 model SystemSettings {
