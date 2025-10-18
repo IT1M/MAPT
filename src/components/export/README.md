@@ -1,10 +1,20 @@
-# Export Components
+# Export System
 
-This directory contains components for exporting data in various formats.
+This directory contains a comprehensive export system with support for CSV, Excel, JSON, and PDF formats, including audit logging, email delivery for large exports, and export history tracking.
 
-## ExportButton Component
+## Components
+
+### ExportButton Component
 
 A comprehensive export button with dropdown menu for exporting data to CSV, JSON, Excel, and PDF formats.
+
+### ExportModal Component
+
+An advanced export modal with column selection, filename customization, filter inclusion, and progress tracking.
+
+### ExportHistory Component
+
+A component to view export history with details about past exports including format, record count, file size, and timestamp.
 
 ### Features
 
@@ -139,3 +149,221 @@ The component handles various error scenarios:
 - Empty datasets
 
 Errors are displayed inline in the dropdown with a dismiss button.
+
+
+## Universal Export API
+
+### POST /api/export
+
+Universal export endpoint supporting multiple entities and formats.
+
+**Request Body:**
+```json
+{
+  "format": "csv" | "excel" | "json" | "pdf",
+  "entity": "inventory" | "audit" | "reports" | "users",
+  "filters": { /* entity-specific filters */ },
+  "ids": ["id1", "id2"], // optional, for selected items
+  "columns": ["column1", "column2"], // optional, specific columns
+  "filename": "my-export", // optional, custom filename
+  "includeFilters": true, // optional, include filter info in export
+  "emailDelivery": false // optional, force email delivery
+}
+```
+
+**Response:**
+- For small exports (<5000 records): File download
+- For large exports (>5000 records): Email delivery confirmation
+
+**Features:**
+- Rate limiting: 10 exports per 15 minutes
+- Automatic email delivery for large datasets
+- Audit logging for all exports
+- Role-based access control
+- Column selection
+- Filter inclusion in metadata
+
+### GET /api/export/history
+
+Get export history for the current user.
+
+**Query Parameters:**
+- `limit`: Number of records to return (default: 50)
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "export_123",
+      "format": "excel",
+      "recordCount": 1500,
+      "fileSize": 245760,
+      "filters": { /* applied filters */ },
+      "createdAt": "2024-01-15T10:30:00Z"
+    }
+  ],
+  "total": 25
+}
+```
+
+## Export Service
+
+The export service (`src/services/export.ts`) provides utility functions for generating exports:
+
+### Functions
+
+#### `exportToCSV(options: ExportOptions): Promise<Buffer>`
+Generates a CSV file with UTF-8 BOM for Excel compatibility.
+
+#### `exportToExcel(options: ExportOptions): Promise<Buffer>`
+Generates an Excel file with formatting, summary section, and auto-sized columns.
+
+#### `exportToJSON(options: ExportOptions): Promise<Buffer>`
+Generates a JSON file with metadata including export date, filters, and record count.
+
+#### `logExport(params): Promise<void>`
+Logs export activity to the audit trail.
+
+#### `getExportHistory(userId: string, limit?: number): Promise<ExportHistoryEntry[]>`
+Retrieves export history for a user.
+
+#### `emailExport(params): Promise<void>`
+Sends an export file via email with the file attached.
+
+#### `shouldEmailExport(recordCount: number, threshold?: number): boolean`
+Determines if an export should be emailed based on record count (default threshold: 5000).
+
+## Usage Examples
+
+### Using ExportModal
+
+```tsx
+import { ExportModal } from '@/components/export'
+
+function MyComponent() {
+  const [showExportModal, setShowExportModal] = useState(false)
+  const [selectedIds, setSelectedIds] = useState<string[]>([])
+  const [filters, setFilters] = useState({})
+
+  return (
+    <>
+      <button onClick={() => setShowExportModal(true)}>
+        Export Data
+      </button>
+
+      <ExportModal
+        isOpen={showExportModal}
+        onClose={() => setShowExportModal(false)}
+        entity="inventory"
+        filters={filters}
+        selectedIds={selectedIds}
+        onExportComplete={(success, format) => {
+          if (success) {
+            console.log(`Export completed: ${format}`)
+          }
+        }}
+      />
+    </>
+  )
+}
+```
+
+### Using ExportHistory
+
+```tsx
+import { ExportHistory } from '@/components/export'
+
+function SettingsPage() {
+  return (
+    <div>
+      <h2>Export History</h2>
+      <ExportHistory />
+    </div>
+  )
+}
+```
+
+### Direct API Usage
+
+```typescript
+// Export with custom options
+const response = await fetch('/api/export', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    format: 'excel',
+    entity: 'inventory',
+    filters: {
+      startDate: '2024-01-01',
+      endDate: '2024-01-31',
+      destination: 'MAIS'
+    },
+    columns: ['itemName', 'batch', 'quantity', 'reject'],
+    filename: 'january-inventory',
+    includeFilters: true
+  })
+})
+
+if (response.ok) {
+  const blob = await response.blob()
+  // Handle download
+}
+```
+
+## Email Delivery
+
+For exports exceeding 5000 records, the system automatically sends the export file via email:
+
+1. User initiates export
+2. System detects large dataset
+3. Export is generated in background
+4. Email is sent with file attached
+5. User receives notification
+
+The email includes:
+- Export filename
+- Format
+- Record count
+- File size
+- Attached export file
+
+## Audit Logging
+
+All exports are logged to the audit trail with:
+- User ID
+- Timestamp
+- Format
+- Record count
+- File size
+- Applied filters
+- Entity type
+
+View export history:
+- In the UI: Use the `ExportHistory` component
+- Via API: `GET /api/export/history`
+
+## Security Features
+
+- **Rate Limiting**: 10 exports per 15 minutes per user
+- **Permission Checks**: Role-based access control for each entity
+- **Data Filtering**: Users only see data they have permission to access
+- **Audit Trail**: All exports are logged for compliance
+- **Secure Delivery**: Email attachments for large exports
+
+## Performance Considerations
+
+- **Client-side exports** (CSV, JSON): Fast, no server load, limited by browser memory
+- **Server-side exports** (Excel, PDF): Better for large datasets, formatted output
+- **Email delivery**: Automatic for >5000 records, prevents browser timeouts
+- **Streaming**: Large files are streamed to prevent memory issues
+
+## Supported Entities
+
+- **inventory**: Inventory items with quantities, rejects, and metadata
+- **audit**: Audit log entries with user actions and changes
+- **reports**: Generated reports with status and metadata
+- **users**: User accounts with roles and activity (admin only)
+
+Each entity has specific columns and filters appropriate to its data structure.

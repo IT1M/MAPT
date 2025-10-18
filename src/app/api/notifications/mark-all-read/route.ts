@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/auth.config'
+import { auth } from '@/services/auth'
 import { prisma } from '@/services/prisma'
 
 // PATCH /api/notifications/mark-all-read - Mark all notifications as read
 export async function PATCH(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
+    const session = await auth()
     
     if (!session?.user?.id) {
       return NextResponse.json(

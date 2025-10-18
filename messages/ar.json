@@ -1593,5 +1593,34 @@
     "generating": "جاري الإنشاء...",
     "timeout": "هذا يستغرق وقتًا أطول من المتوقع...",
     "retry": "إعادة المحاولة"
+  },
+  "search": {
+    "search": "بحث",
+    "placeholder": "البحث في المخزون، التقارير، المستخدمين، الإعدادات...",
+    "openSearch": "فتح البحث",
+    "recent": "عمليات البحث الأخيرة",
+    "clearRecent": "مسح",
+    "items": "عناصر المخزون",
+    "reports": "التقارير",
+    "users": "المستخدمون",
+    "settings": "الإعدادات",
+    "noResults": "لم يتم العثور على نتائج",
+    "tryDifferent": "جرب مصطلح بحث مختلف",
+    "startTyping": "ابدأ الكتابة للبحث",
+    "navigate": "التنقل",
+    "select": "اختيار",
+    "close": "إغلاق"
+  },
+  "shortcuts": {
+    "title": "اختصارات لوحة المفاتيح",
+    "search": "البحث عن اختصارات...",
+    "allCategories": "جميع الفئات",
+    "print": "طباعة",
+    "macInfo": "عرض اختصارات macOS",
+    "windowsInfo": "عرض اختصارات Windows/Linux",
+    "noResults": "لم يتم العثور على اختصارات",
+    "showing": "عرض",
+    "shortcuts": "اختصارات",
+    "toClose": "للإغلاق"
   }
 }

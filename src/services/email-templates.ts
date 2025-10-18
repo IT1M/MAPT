@@ -3,14 +3,14 @@
  * All templates return HTML, plain text, and subject
  */
 
-import type {
-  WelcomeEmailData,
-  PasswordResetEmailData,
-  SecurityAlertEmailData,
-  DailySummaryEmailData,
-  HighRejectRateAlertData,
-  BackupStatusEmailData,
-  ReportReadyEmailData,
+import {
+  type WelcomeEmailData,
+  type PasswordResetEmailData,
+  type SecurityAlertEmailData,
+  type DailySummaryEmailData,
+  type HighRejectRateAlertData,
+  type BackupStatusEmailData,
+  type ReportReadyEmailData,
 } from './email'
 
 const APP_NAME = 'Saudi Mais Inventory System'
@@ -696,5 +696,66 @@ View All Reports: ${APP_URL}/reports
     html,
     text,
     subject: '📊 Your Report is Ready',
+  }
+}
+
+/**
+ * Export Ready Email Template
+ */
+export interface ExportReadyEmailData {
+  userName: string
+  filename: string
+  recordCount: number
+  format: string
+  fileSize: string
+}
+
+export function exportReadyEmailTemplate(data: ExportReadyEmailData) {
+  const html = emailLayout(`
+    <h2>📦 Your Export is Ready</h2>
+    <p>Hello ${data.userName},</p>
+    <p>The data export you requested has been completed and is attached to this email.</p>
+    
+    <div class="info-box">
+      <p><strong>Export Details:</strong></p>
+      <p>Filename: ${data.filename}</p>
+      <p>Format: ${data.format}</p>
+      <p>Records: ${data.recordCount.toLocaleString()}</p>
+      <p>File Size: ${data.fileSize}</p>
+    </div>
+    
+    <p>The exported file is attached to this email. You can download it directly from your email client.</p>
+    
+    <p><strong>Note:</strong> For security reasons, please handle this data according to your organization's data protection policies.</p>
+    
+    <p style="text-align: center;">
+      <a href="${APP_URL}/dashboard" class="button">Go to Dashboard</a>
+    </p>
+  `)
+
+  const text = `
+📦 Your Export is Ready
+
+Hello ${data.userName},
+
+The data export you requested has been completed and is attached to this email.
+
+Export Details:
+- Filename: ${data.filename}
+- Format: ${data.format}
+- Records: ${data.recordCount.toLocaleString()}
+- File Size: ${data.fileSize}
+
+The exported file is attached to this email. You can download it directly from your email client.
+
+Note: For security reasons, please handle this data according to your organization's data protection policies.
+
+Go to Dashboard: ${APP_URL}/dashboard
+  `
+
+  return {
+    html,
+    text,
+    subject: '📦 Your Export is Ready',
   }
 }

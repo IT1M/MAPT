@@ -1,0 +1,298 @@
+/**
+ * Theme Customization CSS
+ * Applies dynamic theme variables and density classes
+ */
+
+/* Theme Color Variables */
+:root {
+  /* Default theme colors - will be overridden by JavaScript */
+  --theme-primary: #0d9488;
+  --theme-secondary: #06b6d4;
+  --theme-accent: #3b82f6;
+  --theme-background: #ffffff;
+  --theme-foreground: #0f172a;
+  --theme-muted: #f1f5f9;
+  --theme-mutedForeground: #64748b;
+  --theme-border: #e2e8f0;
+  --theme-card: #ffffff;
+  --theme-cardForeground: #0f172a;
+  --theme-success: #10b981;
+  --theme-warning: #f59e0b;
+  --theme-error: #ef4444;
+  --theme-info: #3b82f6;
+
+  /* Font variables */
+  --theme-font-family: 'Inter', system-ui, sans-serif;
+  --theme-font-size-base: 16px;
+  --theme-font-size-sm: 14px;
+  --theme-font-size-lg: 18px;
+  --theme-font-size-xl: 20px;
+
+  /* Spacing variables */
+  --theme-padding: 1rem;
+  --theme-gap: 1rem;
+  --theme-density-font-size: 1rem;
+
+  /* Animation variables */
+  --theme-animation-speed: 200ms;
+}
+
+/* Apply theme colors to common elements */
+.theme-primary {
+  color: var(--theme-primary);
+}
+
+.theme-bg-primary {
+  background-color: var(--theme-primary);
+}
+
+.theme-border-primary {
+  border-color: var(--theme-primary);
+}
+
+.theme-secondary {
+  color: var(--theme-secondary);
+}
+
+.theme-bg-secondary {
+  background-color: var(--theme-secondary);
+}
+
+.theme-accent {
+  color: var(--theme-accent);
+}
+
+.theme-bg-accent {
+  background-color: var(--theme-accent);
+}
+
+/* Density Classes */
+.density-compact {
+  --theme-padding: 0.5rem;
+  --theme-gap: 0.5rem;
+  --theme-density-font-size: 0.875rem;
+}
+
+.density-compact .card,
+.density-compact .panel,
+.density-compact .section {
+  padding: var(--theme-padding);
+  gap: var(--theme-gap);
+}
+
+.density-compact button,
+.density-compact input,
+.density-compact select,
+.density-compact textarea {
+  padding: 0.375rem 0.75rem;
+  font-size: var(--theme-density-font-size);
+}
+
+.density-compact h1 {
+  font-size: 1.5rem;
+}
+
+.density-compact h2 {
+  font-size: 1.25rem;
+}
+
+.density-compact h3 {
+  font-size: 1.125rem;
+}
+
+.density-comfortable {
+  --theme-padding: 1rem;
+  --theme-gap: 1rem;
+  --theme-density-font-size: 1rem;
+}
+
+.density-comfortable .card,
+.density-comfortable .panel,
+.density-comfortable .section {
+  padding: var(--theme-padding);
+  gap: var(--theme-gap);
+}
+
+.density-comfortable button,
+.density-comfortable input,
+.density-comfortable select,
+.density-comfortable textarea {
+  padding: 0.5rem 1rem;
+  font-size: var(--theme-density-font-size);
+}
+
+.density-spacious {
+  --theme-padding: 1.5rem;
+  --theme-gap: 1.5rem;
+  --theme-density-font-size: 1.125rem;
+}
+
+.density-spacious .card,
+.density-spacious .panel,
+.density-spacious .section {
+  padding: var(--theme-padding);
+  gap: var(--theme-gap);
+}
+
+.density-spacious button,
+.density-spacious input,
+.density-spacious select,
+.density-spacious textarea {
+  padding: 0.75rem 1.5rem;
+  font-size: var(--theme-density-font-size);
+}
+
+.density-spacious h1 {
+  font-size: 2.5rem;
+}
+
+.density-spacious h2 {
+  font-size: 2rem;
+}
+
+.density-spacious h3 {
+  font-size: 1.5rem;
+}
+
+/* Animation Classes */
+.animations-disabled * {
+  animation-duration: 0ms !important;
+  transition-duration: 0ms !important;
+}
+
+/* Themed transitions */
+.theme-transition {
+  transition-duration: var(--theme-animation-speed);
+  transition-timing-function: ease-in-out;
+}
+
+.theme-transition-colors {
+  transition-property: color, background-color, border-color;
+  transition-duration: var(--theme-animation-speed);
+  transition-timing-function: ease-in-out;
+}
+
+.theme-transition-transform {
+  transition-property: transform;
+  transition-duration: var(--theme-animation-speed);
+  transition-timing-function: ease-in-out;
+}
+
+/* Apply theme font family globally */
+body {
+  font-family: var(--theme-font-family);
+}
+
+/* Themed components */
+.theme-card {
+  background-color: var(--theme-card);
+  color: var(--theme-cardForeground);
+  border: 1px solid var(--theme-border);
+  border-radius: 0.5rem;
+  padding: var(--theme-padding);
+}
+
+.theme-button-primary {
+  background-color: var(--theme-primary);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  transition: all var(--theme-animation-speed);
+}
+
+.theme-button-primary:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.theme-button-secondary {
+  background-color: var(--theme-secondary);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  transition: all var(--theme-animation-speed);
+}
+
+.theme-button-secondary:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.theme-input {
+  background-color: var(--theme-background);
+  color: var(--theme-foreground);
+  border: 1px solid var(--theme-border);
+  border-radius: 0.375rem;
+  padding: 0.5rem 0.75rem;
+  font-size: var(--theme-font-size-base);
+  transition: border-color var(--theme-animation-speed);
+}
+
+.theme-input:focus {
+  outline: none;
+  border-color: var(--theme-primary);
+  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
+}
+
+.theme-badge-success {
+  background-color: var(--theme-success);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.theme-badge-warning {
+  background-color: var(--theme-warning);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.theme-badge-error {
+  background-color: var(--theme-error);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.theme-badge-info {
+  background-color: var(--theme-info);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .density-spacious {
+    --theme-padding: 1rem;
+    --theme-gap: 1rem;
+  }
+}
+
+/* Print styles - disable animations */
+@media print {
+  * {
+    animation-duration: 0ms !important;
+    transition-duration: 0ms !important;
+  }
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

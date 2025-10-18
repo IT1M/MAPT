@@ -33,6 +33,7 @@ export { AppearanceSettings } from './AppearanceSettings'
 export { ThemeSelector } from './ThemeSelector'
 export { UIDensitySelector } from './UIDensitySelector'
 export { ColorSchemeCustomizer } from './ColorSchemeCustomizer'
+export { ThemeCustomizer } from './ThemeCustomizer'
 
 // Notification components
 export { NotificationSettings } from './NotificationSettings'

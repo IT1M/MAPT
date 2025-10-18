@@ -6,6 +6,7 @@ import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { LocaleSwitcher } from '@/components/ui/locale-switcher'
 import { Breadcrumbs } from '@/components/layout/Breadcrumbs'
 import { NotificationBell } from '@/components/notifications'
+import { SearchButton } from '@/components/search'
 import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useLocale } from 'next-intl'
@@ -86,6 +87,9 @@ export function Header() {
 
           {/* Right side controls */}
           <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3">
+            {/* Global Search */}
+            {isMounted && session?.user && <SearchButton />}
+
             {/* Notifications */}
             {isMounted && session?.user && <NotificationBell />}
 

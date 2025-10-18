@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react'
+import { useEffect, useCallback, useState, useRef } from 'react'
 
 export interface KeyboardShortcut {
   key: string
@@ -9,6 +9,8 @@ export interface KeyboardShortcut {
   callback: (event: KeyboardEvent) => void
   description: string
   preventDefault?: boolean
+  category?: string
+  sequence?: string[] // For sequences like 'g' then 'd'
 }
 
 interface UseKeyboardShortcutsOptions {
@@ -17,35 +19,139 @@ interface UseKeyboardShortcutsOptions {
 }
 
 /**
+ * Detect if user is on Mac
+ */
+export function isMac(): boolean {
+  if (typeof window === 'undefined') return false
+  return /Mac|iPhone|iPad|iPod/.test(navigator.platform)
+}
+
+/**
+ * Get the modifier key name based on platform
+ */
+export function getModifierKey(): 'Ctrl' | 'Cmd' {
+  return isMac() ? 'Cmd' : 'Ctrl'
+}
+
+/**
+ * Format shortcut for display
+ */
+export function formatShortcut(shortcut: KeyboardShortcut): string {
+  const parts: string[] = []
+  
+  if (shortcut.ctrlKey || shortcut.metaKey) {
+    parts.push(getModifierKey())
+  }
+  if (shortcut.shiftKey) {
+    parts.push('Shift')
+  }
+  if (shortcut.altKey) {
+    parts.push('Alt')
+  }
+  
+  if (shortcut.sequence) {
+    parts.push(shortcut.sequence.join(' then '))
+  } else {
+    parts.push(shortcut.key.toUpperCase())
+  }
+  
+  return parts.join('+')
+}
+
+/**
  * Hook for managing keyboard shortcuts with accessibility support
- * Supports common shortcuts like Ctrl+S, Ctrl+K, Esc
+ * Supports common shortcuts like Ctrl+S, Ctrl+K, Esc, and sequences like G then D
  */
 export function useKeyboardShortcuts({
   shortcuts,
   enabled = true,
 }: UseKeyboardShortcutsOptions) {
+  const [sequenceBuffer, setSequenceBuffer] = useState<string[]>([])
+  const sequenceTimeoutRef = useRef<NodeJS.Timeout>()
+
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
       if (!enabled) return
 
-      // Find matching shortcut
-      const matchingShortcut = shortcuts.find((shortcut) => {
-        const keyMatches = event.key.toLowerCase() === shortcut.key.toLowerCase()
-        const ctrlMatches = shortcut.ctrlKey ? event.ctrlKey : !event.ctrlKey
-        const metaMatches = shortcut.metaKey ? event.metaKey : !event.metaKey
-        const shiftMatches = shortcut.shiftKey ? event.shiftKey : !event.shiftKey
-        const altMatches = shortcut.altKey ? event.altKey : !event.altKey
+      // Ignore shortcuts when typing in input fields (except Escape)
+      const target = event.target as HTMLElement
+      const isInputField = ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName) ||
+        target.isContentEditable
+      
+      if (isInputField && event.key !== 'Escape') {
+        return
+      }
 
-        // On Mac, Cmd key is metaKey, on Windows/Linux it's ctrlKey
-        const modifierMatches =
-          (shortcut.ctrlKey || shortcut.metaKey) &&
-          (event.ctrlKey || event.metaKey)
+      // Check for sequence shortcuts first
+      const sequenceShortcuts = shortcuts.filter(s => s.sequence)
+      if (sequenceShortcuts.length > 0) {
+        const newBuffer = [...sequenceBuffer, event.key.toLowerCase()]
+        
+        // Check if any sequence matches
+        const matchingSequence = sequenceShortcuts.find(shortcut => {
+          if (!shortcut.sequence) return false
+          
+          // Check if current buffer matches the sequence
+          if (newBuffer.length > shortcut.sequence.length) return false
+          
+          return shortcut.sequence.every((key, index) => 
+            newBuffer[index]?.toLowerCase() === key.toLowerCase()
+          )
+        })
 
-        if (shortcut.ctrlKey || shortcut.metaKey) {
-          return keyMatches && modifierMatches && shiftMatches && altMatches
+        if (matchingSequence) {
+          if (newBuffer.length === matchingSequence.sequence!.length) {
+            // Complete sequence match
+            event.preventDefault()
+            matchingSequence.callback(event)
+            setSequenceBuffer([])
+            if (sequenceTimeoutRef.current) {
+              clearTimeout(sequenceTimeoutRef.current)
+            }
+            return
+          } else {
+            // Partial match, continue building sequence
+            setSequenceBuffer(newBuffer)
+            
+            // Clear sequence after 1 second of inactivity
+            if (sequenceTimeoutRef.current) {
+              clearTimeout(sequenceTimeoutRef.current)
+            }
+            sequenceTimeoutRef.current = setTimeout(() => {
+              setSequenceBuffer([])
+            }, 1000)
+            return
+          }
+        } else if (newBuffer.length > 0) {
+          // No match, reset buffer
+          setSequenceBuffer([])
         }
+      }
 
-        return keyMatches && ctrlMatches && metaMatches && shiftMatches && altMatches
+      // Find matching single-key shortcut
+      const matchingShortcut = shortcuts.find((shortcut) => {
+        if (shortcut.sequence) return false // Skip sequence shortcuts
+        
+        const keyMatches = event.key.toLowerCase() === shortcut.key.toLowerCase()
+        
+        // Handle modifier keys with platform detection
+        const hasModifier = shortcut.ctrlKey || shortcut.metaKey
+        const modifierPressed = event.ctrlKey || event.metaKey
+        
+        if (hasModifier) {
+          const modifierMatches = modifierPressed
+          const shiftMatches = shortcut.shiftKey === undefined || shortcut.shiftKey === event.shiftKey
+          const altMatches = shortcut.altKey === undefined || shortcut.altKey === event.altKey
+          
+          return keyMatches && modifierMatches && shiftMatches && altMatches
+        } else {
+          // No modifier required
+          const ctrlMatches = !event.ctrlKey && !event.metaKey
+          const shiftMatches = shortcut.shiftKey === undefined || shortcut.shiftKey === event.shiftKey
+          const altMatches = shortcut.altKey === undefined || shortcut.altKey === event.altKey
+          
+          return keyMatches && ctrlMatches && shiftMatches && altMatches
+        }
       })
 
       if (matchingShortcut) {
@@ -55,7 +161,7 @@ export function useKeyboardShortcuts({
         matchingShortcut.callback(event)
       }
     },
-    [shortcuts, enabled]
+    [shortcuts, enabled, sequenceBuffer]
   )
 
   useEffect(() => {
@@ -65,11 +171,15 @@ export function useKeyboardShortcuts({
 
     return () => {
       window.removeEventListener('keydown', handleKeyDown)
+      if (sequenceTimeoutRef.current) {
+        clearTimeout(sequenceTimeoutRef.current)
+      }
     }
   }, [handleKeyDown, enabled])
 
   return {
     shortcuts,
+    sequenceBuffer,
   }
 }
 

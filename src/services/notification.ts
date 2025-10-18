@@ -19,6 +19,7 @@ export async function createNotification(options: CreateNotificationOptions) {
   try {
     const notification = await prisma.notification.create({
       data: {
+        id: `notif_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         userId: options.userId,
         type: options.type,
         title: options.title,
@@ -46,7 +47,8 @@ export async function createBulkNotifications(
 ) {
   try {
     const notifications = await prisma.notification.createMany({
-      data: userIds.map(userId => ({
+      data: userIds.map((userId, index) => ({
+        id: `notif_${Date.now()}_${index}_${Math.random().toString(36).substr(2, 9)}`,
         userId,
         type: options.type,
         title: options.title,

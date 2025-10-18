@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/auth.config'
+import { auth } from '@/services/auth'
 import { prisma } from '@/services/prisma'
 
 // GET /api/notifications - List user's notifications
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
+    const session = await auth()
     
     if (!session?.user?.id) {
       return NextResponse.json(
@@ -68,7 +67,7 @@ export async function GET(request: NextRequest) {
 // POST /api/notifications - Create a notification (internal use)
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
+    const session = await auth()
     
     if (!session?.user?.id) {
       return NextResponse.json(
@@ -90,6 +89,7 @@ export async function POST(request: NextRequest) {
 
     const notification = await prisma.notification.create({
       data: {
+        id: `notif_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         userId: userId || session.user.id,
         type,
         title,

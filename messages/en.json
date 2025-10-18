@@ -1598,5 +1598,34 @@
     "generating": "Generating...",
     "timeout": "This is taking longer than expected...",
     "retry": "Retry"
+  },
+  "search": {
+    "search": "Search",
+    "placeholder": "Search inventory, reports, users, settings...",
+    "openSearch": "Open search",
+    "recent": "Recent Searches",
+    "clearRecent": "Clear",
+    "items": "Inventory Items",
+    "reports": "Reports",
+    "users": "Users",
+    "settings": "Settings",
+    "noResults": "No results found",
+    "tryDifferent": "Try a different search term",
+    "startTyping": "Start typing to search",
+    "navigate": "Navigate",
+    "select": "Select",
+    "close": "Close"
+  },
+  "shortcuts": {
+    "title": "Keyboard Shortcuts",
+    "search": "Search shortcuts...",
+    "allCategories": "All Categories",
+    "print": "Print",
+    "macInfo": "Showing shortcuts for macOS",
+    "windowsInfo": "Showing shortcuts for Windows/Linux",
+    "noResults": "No shortcuts found",
+    "showing": "Showing",
+    "shortcuts": "shortcuts",
+    "toClose": "to close"
   }
 }

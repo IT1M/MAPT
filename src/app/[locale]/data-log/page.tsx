@@ -12,6 +12,7 @@ import { BulkActionsToolbar } from '@/components/tables/BulkActionsToolbar'
 import { ExportButton } from '@/components/export/ExportButton'
 import { useTablePreferences } from '@/hooks/useTablePreferences'
 import { useDataLogManager } from '@/hooks/useDataLogManager'
+import { useDataLogKeyboardShortcuts } from '@/hooks/usePageKeyboardShortcuts'
 import type { FilterState, InventoryItemWithUser } from '@/types'
 import { toast } from '@/utils/toast'
 import {
@@ -25,6 +26,7 @@ export default function DataLogPage() {
   const t = useTranslations()
   const { data: session, status } = useSession()
   const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(true)
+  const [showExportModal, setShowExportModal] = useState(false)
   
   // Table preferences hook
   const {
@@ -68,6 +70,14 @@ export default function DataLogPage() {
   const [viewingAuditItemId, setViewingAuditItemId] = useState<string | null>(null)
   const [viewingAuditItemName, setViewingAuditItemName] = useState<string | null>(null)
   const [bulkEditingItems, setBulkEditingItems] = useState<InventoryItemWithUser[]>([])
+  
+  // Keyboard shortcuts
+  useDataLogKeyboardShortcuts({
+    onFilter: () => setIsFilterPanelOpen(prev => !prev),
+    onExport: () => setShowExportModal(true),
+    onRefresh: () => refresh(),
+    enabled: true,
+  })
   
   // Fetch initial data when session is ready
   useEffect(() => {

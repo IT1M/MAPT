@@ -1,13 +1,14 @@
 import nodemailer from 'nodemailer'
 import { prisma } from './prisma'
-import { 
-  welcomeEmailTemplate, 
-  passwordResetEmailTemplate, 
+import {
+  welcomeEmailTemplate,
+  passwordResetEmailTemplate,
   securityAlertEmailTemplate,
   dailySummaryEmailTemplate,
   highRejectRateAlertTemplate,
   backupStatusEmailTemplate,
-  reportReadyEmailTemplate
+  reportReadyEmailTemplate,
+  exportReadyEmailTemplate
 } from './email-templates'
 
 /**
@@ -38,6 +39,11 @@ export interface EmailOptions {
   template: string
   data: Record<string, any>
   priority?: 'low' | 'normal' | 'high'
+  attachments?: Array<{
+    filename: string
+    content: Buffer
+    contentType: string
+  }>
 }
 
 export interface EmailJob {
@@ -157,7 +163,7 @@ class EmailQueue {
       status: 'pending',
     }
     this.queue.push(emailJob)
-    
+
     if (!this.processing) {
       this.process()
     }
@@ -165,19 +171,19 @@ class EmailQueue {
 
   async process(): Promise<void> {
     if (this.processing || this.queue.length === 0) return
-    
+
     this.processing = true
-    
+
     while (this.queue.length > 0) {
       const job = this.queue[0]
-      
+
       try {
         await sendEmailInternal(job.to, job.template, job.data)
         job.status = 'sent'
         this.queue.shift()
       } catch (error) {
         job.attempts++
-        
+
         if (job.attempts >= 3) {
           job.status = 'failed'
           this.queue.shift()
@@ -190,7 +196,7 @@ class EmailQueue {
         }
       }
     }
-    
+
     this.processing = false
   }
 
@@ -220,37 +226,58 @@ const emailQueue = new EmailQueue()
 async function sendEmailInternal(
   to: string | string[],
   template: string,
-  data: Record<string, any>
+  data: Record<string, any>,
+  attachments?: Array<{ filename: string; content: Buffer; contentType: string }>
 ): Promise<void> {
   const { html, text, subject } = getEmailTemplate(template, data)
-  
+
   if (emailConfig.provider === 'smtp') {
     const transporter = getTransporter()
-    
-    await transporter.sendMail({
+
+    const mailOptions: any = {
       from: `"${emailConfig.from.name}" <${emailConfig.from.email}>`,
       to: Array.isArray(to) ? to.join(', ') : to,
       subject,
       html,
       text,
-    })
+    }
+
+    if (attachments && attachments.length > 0) {
+      mailOptions.attachments = attachments.map(att => ({
+        filename: att.filename,
+        content: att.content,
+        contentType: att.contentType,
+      }))
+    }
+
+    await transporter.sendMail(mailOptions)
   } else if (emailConfig.provider === 'resend') {
     // Resend API implementation
+    const body: any = {
+      from: `${emailConfig.from.name} <${emailConfig.from.email}>`,
+      to: Array.isArray(to) ? to : [to],
+      subject,
+      html,
+      text,
+    }
+
+    if (attachments && attachments.length > 0) {
+      body.attachments = attachments.map(att => ({
+        filename: att.filename,
+        content: att.content.toString('base64'),
+        type: att.contentType,
+      }))
+    }
+
     const response = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${emailConfig.resend!.apiKey}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        from: `${emailConfig.from.name} <${emailConfig.from.email}>`,
-        to: Array.isArray(to) ? to : [to],
-        subject,
-        html,
-        text,
-      }),
+      body: JSON.stringify(body),
     })
-    
+
     if (!response.ok) {
       throw new Error(`Resend API error: ${response.statusText}`)
     }
@@ -279,6 +306,8 @@ function getEmailTemplate(
       return backupStatusEmailTemplate(data as BackupStatusEmailData)
     case 'report-ready':
       return reportReadyEmailTemplate(data as ReportReadyEmailData)
+    case 'export-ready':
+      return exportReadyEmailTemplate(data as any)
     default:
       throw new Error(`Unknown email template: ${template}`)
   }
@@ -287,16 +316,16 @@ function getEmailTemplate(
 /**
  * Send email with logging and retry
  */
-async function sendEmail(options: EmailOptions): Promise<void> {
+export async function sendEmail(options: EmailOptions): Promise<void> {
   const emailId = await logEmail(options)
-  
+
   try {
-    await sendEmailInternal(options.to, options.template, options.data)
+    await sendEmailInternal(options.to, options.template, options.data, options.attachments)
     await markEmailAsSent(emailId)
   } catch (error) {
     console.error('[Email] Failed to send email:', error)
     await markEmailAsFailed(emailId, error instanceof Error ? error.message : 'Unknown error')
-    
+
     // Add to queue for retry
     emailQueue.add({
       to: Array.isArray(options.to) ? options.to[0] : options.to,
@@ -304,7 +333,7 @@ async function sendEmail(options: EmailOptions): Promise<void> {
       data: options.data,
       scheduledFor: new Date(),
     })
-    
+
     throw error
   }
 }
@@ -396,8 +425,8 @@ export async function sendBackupStatusEmail(
 ): Promise<void> {
   await sendEmail({
     to: email,
-    subject: data.status === 'success' 
-      ? '✅ Backup Completed Successfully' 
+    subject: data.status === 'success'
+      ? '✅ Backup Completed Successfully'
       : '❌ Backup Failed',
     template: 'backup-status',
     data,
