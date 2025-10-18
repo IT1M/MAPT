@@ -45,16 +45,16 @@ export default function LoginPage({ params }: { params: Promise<{ locale: string
       })
 
       if (result?.error) {
-        // Authentication failed
-        toast.error(t('errors.loginFailed'))
+        // Authentication failed - show specific error message
+        toast.error(t('errors.invalidCredentials') || 'خطأ في معلومات الدخول')
       } else if (result?.ok) {
         // Authentication successful
-        toast.success(t('auth.welcomeBack'))
+        toast.success(t('auth.loginSuccess') || 'تم تسجيل الدخول بنجاح')
         
         // Get locale from params
         const { locale } = await params
         
-        // Redirect to dashboard
+        // Redirect to dashboard immediately
         router.push(`/${locale}/dashboard`)
         router.refresh()
       }

@@ -514,6 +514,30 @@ export const AnalyticsDashboard: React.FC = () => {
     setAnnounceMessage(t('analytics.filterApplied'))
   }, [handleFilterChange, t])
 
+  // Handle trend chart data point click - navigate to Data Log with date filter
+  const handleTrendDataPointClick = useCallback((date: string) => {
+    const locale = typeof window !== 'undefined' ? 
+      document.documentElement.lang || 'en' : 'en'
+    const params = new URLSearchParams()
+    
+    // Set date range for the clicked date (single day)
+    const clickedDate = new Date(date)
+    const startOfDay = new Date(clickedDate)
+    startOfDay.setHours(0, 0, 0, 0)
+    const endOfDay = new Date(clickedDate)
+    endOfDay.setHours(23, 59, 59, 999)
+    
+    params.append('startDate', startOfDay.toISOString())
+    params.append('endDate', endOfDay.toISOString())
+    
+    // Apply current filters
+    filters.destinations.forEach(d => params.append('destination', d))
+    filters.categories.forEach(c => params.append('category', c))
+    filters.userIds.forEach(u => params.append('userId', u))
+    
+    window.location.href = `/${locale}/data-log?${params.toString()}`
+  }, [filters])
+
   // Dashboard context for AI
   const aiDashboardContext = useMemo(() => ({
     summary: data.summary || {
@@ -564,6 +588,40 @@ export const AnalyticsDashboard: React.FC = () => {
 
         {/* Header Controls */}
         <div className="flex flex-wrap items-center gap-3">
+          <button
+            onClick={() => {
+              // Build data log URL with current filters
+              const locale = typeof window !== 'undefined' ? 
+                document.documentElement.lang || 'en' : 'en'
+              const params = new URLSearchParams()
+              
+              if (filters.dateRange.start) params.append('startDate', filters.dateRange.start.toISOString())
+              if (filters.dateRange.end) params.append('endDate', filters.dateRange.end.toISOString())
+              filters.destinations.forEach(d => params.append('destination', d))
+              filters.categories.forEach(c => params.append('category', c))
+              filters.userIds.forEach(u => params.append('userId', u))
+              
+              const queryString = params.toString()
+              window.location.href = `/${locale}/data-log${queryString ? '?' + queryString : ''}`
+            }}
+            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-2"
+          >
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"
+              />
+            </svg>
+            View Raw Data
+          </button>
+          
           <DashboardExporter
             dashboardData={exportDashboardSnapshot}
             filters={filters}
@@ -627,7 +685,10 @@ export const AnalyticsDashboard: React.FC = () => {
                     <p className="text-red-600 dark:text-red-400">{errors.trends}</p>
                   </div>
                 ) : (
-                  <InventoryTrendChart data={data.trends} />
+                  <InventoryTrendChart 
+                    data={data.trends} 
+                    onDataPointClick={handleTrendDataPointClick}
+                  />
                 )}
               </Card.Body>
             </Card>

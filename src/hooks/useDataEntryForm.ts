@@ -213,7 +213,7 @@ export function useDataEntryForm(options: UseDataEntryFormOptions = {}) {
           lastError: null,
           canRetry: false 
         }))
-        toast.success('Item added successfully!')
+        
         const lastDestination = formData.destination
         reset(lastDestination)
         

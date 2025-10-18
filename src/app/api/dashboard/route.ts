@@ -14,32 +14,16 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Fetch total inventory items count (excluding soft-deleted)
-    const totalItems = await prisma.inventoryItem.count({
-      where: {
-        deletedAt: null
-      }
-    })
+    // Get date ranges
+    const now = new Date()
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+    const weekStart = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
 
-    // Fetch items with high reject rate (reject > 10% of quantity)
+    // Fetch all inventory items (excluding soft-deleted)
     const inventoryItems = await prisma.inventoryItem.findMany({
       where: {
         deletedAt: null
-      }
-    })
-
-    const highRejectCount = inventoryItems.filter(
-      item => item.reject > 0 && (item.reject / item.quantity) > 0.1
-    ).length
-
-    // Fetch recent inventory items (last 10)
-    const recentItems = await prisma.inventoryItem.findMany({
-      take: 10,
-      where: {
-        deletedAt: null
-      },
-      orderBy: {
-        createdAt: 'desc'
       },
       include: {
         enteredBy: {
@@ -47,36 +31,74 @@ export async function GET(request: NextRequest) {
             name: true
           }
         }
+      },
+      orderBy: {
+        createdAt: 'desc'
       }
     })
 
-    // Format items for response
-    const formattedItems = recentItems.map(item => ({
+    // Calculate counts by time period
+    const todayCount = inventoryItems.filter(item => item.createdAt >= todayStart).length
+    const weekCount = inventoryItems.filter(item => item.createdAt >= weekStart).length
+    const monthCount = inventoryItems.filter(item => item.createdAt >= monthStart).length
+
+    // Calculate total items
+    const totalItems = inventoryItems.length
+
+    // Calculate average reject rate
+    const totalQuantity = inventoryItems.reduce((sum, item) => sum + item.quantity, 0)
+    const totalRejects = inventoryItems.reduce((sum, item) => sum + item.reject, 0)
+    const rejectRate = totalQuantity > 0 ? (totalRejects / totalQuantity) * 100 : 0
+
+    // Count active users (users who added items in last 30 days)
+    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
+    const activeUserIds = new Set(
+      inventoryItems
+        .filter(item => item.createdAt >= thirtyDaysAgo)
+        .map(item => item.enteredById)
+    )
+    const activeUsers = activeUserIds.size
+
+    // Calculate destination percentages
+    const maisItems = inventoryItems.filter(item => item.destination === 'MAIS')
+    const fozanItems = inventoryItems.filter(item => item.destination === 'FOZAN')
+    const maisPercentage = totalItems > 0 ? (maisItems.length / totalItems) * 100 : 0
+    const fozanPercentage = totalItems > 0 ? (fozanItems.length / totalItems) * 100 : 0
+
+    // Calculate trend data (last 7 days)
+    const trendData: number[] = []
+    for (let i = 6; i >= 0; i--) {
+      const dayStart = new Date(now.getTime() - i * 24 * 60 * 60 * 1000)
+      dayStart.setHours(0, 0, 0, 0)
+      const dayEnd = new Date(dayStart.getTime() + 24 * 60 * 60 * 1000)
+      const dayCount = inventoryItems.filter(
+        item => item.createdAt >= dayStart && item.createdAt < dayEnd
+      ).length
+      trendData.push(dayCount)
+    }
+
+    // Format recent items (last 10)
+    const recentItems = inventoryItems.slice(0, 10).map(item => ({
       id: item.id,
       itemName: item.itemName,
-      batch: item.batch,
       quantity: item.quantity,
       destination: item.destination,
       enteredBy: item.enteredBy.name,
       createdAt: item.createdAt.toISOString()
     }))
 
-    // Calculate total quantity by destination
-    const maisTotalQuantity = inventoryItems
-      .filter(item => item.destination === 'MAIS')
-      .reduce((sum, item) => sum + item.quantity, 0)
-    
-    const fozanTotalQuantity = inventoryItems
-      .filter(item => item.destination === 'FOZAN')
-      .reduce((sum, item) => sum + item.quantity, 0)
-
     // Return dashboard metrics
     return NextResponse.json({
+      todayCount,
+      weekCount,
+      monthCount,
       totalItems,
-      highRejectItems: highRejectCount,
-      maisTotalQuantity,
-      fozanTotalQuantity,
-      recentItems: formattedItems
+      rejectRate,
+      activeUsers,
+      maisPercentage,
+      fozanPercentage,
+      trendData,
+      recentItems
     })
 
   } catch (error) {

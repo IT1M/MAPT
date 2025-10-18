@@ -37,12 +37,14 @@ interface InventoryTrendChartProps {
   data: TrendDataPoint[];
   loading?: boolean;
   onExport?: (format: 'png' | 'svg' | 'csv') => void;
+  onDataPointClick?: (date: string) => void;
 }
 
 export const InventoryTrendChart: React.FC<InventoryTrendChartProps> = ({
   data,
   loading = false,
   onExport,
+  onDataPointClick,
 }) => {
   const t = useTranslations('analytics');
   const locale = useLocale();
@@ -218,10 +220,15 @@ export const InventoryTrendChart: React.FC<InventoryTrendChartProps> = ({
                 dataKey="totalQuantity"
                 stroke="#3b82f6"
                 strokeWidth={3}
-                dot={{ r: 4 }}
-                activeDot={{ r: 6 }}
+                dot={{ r: 4, cursor: onDataPointClick ? 'pointer' : 'default' }}
+                activeDot={{ r: 6, cursor: onDataPointClick ? 'pointer' : 'default' }}
                 name="Total"
                 fill="url(#totalGradient)"
+                onClick={(data: any) => {
+                  if (onDataPointClick && data?.payload?.date) {
+                    onDataPointClick(data.payload.date)
+                  }
+                }}
               />
             )}
             {visibleLines.mais && (

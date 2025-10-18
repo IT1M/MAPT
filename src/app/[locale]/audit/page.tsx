@@ -111,31 +111,35 @@ export default function AuditPage() {
   }
 
   const renderChanges = (log: AuditLogWithUser) => {
-    if (!log.oldValue && !log.newValue) {
+    if (!log.changes) {
       return <p className="text-gray-500 dark:text-gray-400">No changes recorded</p>
     }
 
+    const changes = log.changes as any
+    const oldValue = changes.oldValue || changes.before
+    const newValue = changes.newValue || changes.after || changes.data
+
     return (
       <div className="space-y-4">
-        {log.newValue && !log.oldValue && (
+        {newValue && !oldValue && (
           <div>
             <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">
               {t('audit.new')}
             </h4>
             <pre className="bg-gray-50 dark:bg-gray-800 p-3 rounded text-sm overflow-x-auto">
-              {JSON.stringify(log.newValue, null, 2)}
+              {JSON.stringify(newValue, null, 2)}
             </pre>
           </div>
         )}
         
-        {log.oldValue && log.newValue && (
+        {oldValue && newValue && (
           <>
             <div>
               <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">
                 {t('audit.before')}
               </h4>
               <pre className="bg-gray-50 dark:bg-gray-800 p-3 rounded text-sm overflow-x-auto">
-                {JSON.stringify(log.oldValue, null, 2)}
+                {JSON.stringify(oldValue, null, 2)}
               </pre>
             </div>
             <div>
@@ -143,19 +147,19 @@ export default function AuditPage() {
                 {t('audit.after')}
               </h4>
               <pre className="bg-gray-50 dark:bg-gray-800 p-3 rounded text-sm overflow-x-auto">
-                {JSON.stringify(log.newValue, null, 2)}
+                {JSON.stringify(newValue, null, 2)}
               </pre>
             </div>
           </>
         )}
         
-        {log.oldValue && !log.newValue && (
+        {oldValue && !newValue && (
           <div>
             <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">
               {t('audit.deleted')}
             </h4>
             <pre className="bg-gray-50 dark:bg-gray-800 p-3 rounded text-sm overflow-x-auto">
-              {JSON.stringify(log.oldValue, null, 2)}
+              {JSON.stringify(oldValue, null, 2)}
             </pre>
           </div>
         )}
@@ -266,7 +270,11 @@ export default function AuditPage() {
                 </thead>
                 <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                   {logs.map((log) => (
-                    <tr key={log.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <tr 
+                      key={log.id} 
+                      className="hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors"
+                      onClick={() => handleViewChanges(log)}
+                    >
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                         {formatDate(log.timestamp)}
                       </td>
@@ -293,13 +301,52 @@ export default function AuditPage() {
                         {log.ipAddress || '-'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <Button
-                          size="small"
-                          variant="secondary"
-                          onClick={() => handleViewChanges(log)}
-                        >
-                          {t('audit.viewChanges')}
-                        </Button>
+                        <div className="flex items-center justify-end gap-2">
+                          <Button
+                            size="small"
+                            variant="secondary"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleViewChanges(log)
+                            }}
+                          >
+                            {t('audit.viewChanges')}
+                          </Button>
+                          {log.entityType === 'InventoryItem' && log.entityId && (
+                            <Button
+                              size="small"
+                              variant="secondary"
+                              onClick={async (e) => {
+                                e.stopPropagation()
+                                // Navigate to data log with item filter
+                                const locale = typeof window !== 'undefined' ? 
+                                  document.documentElement.lang || 'en' : 'en'
+                                window.location.href = `/${locale}/data-log?search=${log.entityId}`
+                              }}
+                              title="View item in Data Log"
+                            >
+                              <svg
+                                className="w-4 h-4"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                                />
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                                />
+                              </svg>
+                            </Button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -366,11 +413,92 @@ export default function AuditPage() {
               </div>
               <div>
                 <p className="text-sm text-gray-500 dark:text-gray-400">{t('audit.entity')}</p>
-                <p className="font-medium text-gray-900 dark:text-gray-100">
-                  {t(`audit.entities.${selectedLog.entityType}` as any) || selectedLog.entityType}
-                </p>
+                <div className="flex items-center gap-2">
+                  <p className="font-medium text-gray-900 dark:text-gray-100">
+                    {t(`audit.entities.${selectedLog.entityType}` as any) || selectedLog.entityType}
+                  </p>
+                  {selectedLog.entityType === 'InventoryItem' && selectedLog.entityId && selectedLog.action !== 'DELETE' && (
+                    <button
+                      onClick={() => {
+                        const locale = typeof window !== 'undefined' ? 
+                          document.documentElement.lang || 'en' : 'en'
+                        window.location.href = `/${locale}/data-log?search=${selectedLog.entityId}`
+                      }}
+                      className="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 text-sm flex items-center gap-1"
+                      title="View item in Data Log"
+                    >
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                        />
+                      </svg>
+                      View Item
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
+            
+            {/* Show item details if available */}
+            {selectedLog.entityType === 'InventoryItem' && selectedLog.changes && (() => {
+              const changes = selectedLog.changes as any
+              const itemData = changes.newValue || changes.after || changes.data || changes.oldValue || changes.before
+              return itemData && (
+                <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                  <h4 className="font-semibold text-blue-900 dark:text-blue-100 mb-2 flex items-center gap-2">
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+                      />
+                    </svg>
+                    Item Details
+                  </h4>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                    {itemData.itemName && (
+                      <div>
+                        <span className="text-blue-700 dark:text-blue-300 font-medium">Item:</span>
+                        <p className="text-blue-900 dark:text-blue-100">{itemData.itemName}</p>
+                      </div>
+                    )}
+                    {itemData.batch && (
+                      <div>
+                        <span className="text-blue-700 dark:text-blue-300 font-medium">Batch:</span>
+                        <p className="text-blue-900 dark:text-blue-100 font-mono text-xs">{itemData.batch}</p>
+                      </div>
+                    )}
+                    {itemData.quantity !== undefined && (
+                      <div>
+                        <span className="text-blue-700 dark:text-blue-300 font-medium">Quantity:</span>
+                        <p className="text-blue-900 dark:text-blue-100">{itemData.quantity}</p>
+                      </div>
+                    )}
+                    {itemData.destination && (
+                      <div>
+                        <span className="text-blue-700 dark:text-blue-300 font-medium">Destination:</span>
+                        <p className="text-blue-900 dark:text-blue-100">{itemData.destination}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )
+            })()}
+            
             {renderChanges(selectedLog)}
           </div>
         )}

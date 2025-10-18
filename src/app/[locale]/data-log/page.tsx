@@ -433,6 +433,42 @@ export default function DataLogPage() {
               {t('common.refresh')}
             </Button>
             
+            <Button
+              variant="secondary"
+              size="small"
+              onClick={() => {
+                // Build analytics URL with current filters
+                const locale = typeof window !== 'undefined' ? 
+                  document.documentElement.lang || 'en' : 'en'
+                const params = new URLSearchParams()
+                
+                if (filters.startDate) params.append('startDate', filters.startDate.toISOString())
+                if (filters.endDate) params.append('endDate', filters.endDate.toISOString())
+                filters.destinations.forEach(d => params.append('destination', d))
+                filters.categories.forEach(c => params.append('category', c))
+                filters.enteredByIds.forEach(u => params.append('userId', u))
+                
+                const queryString = params.toString()
+                window.location.href = `/${locale}/analytics${queryString ? '?' + queryString : ''}`
+              }}
+              title="View Analytics"
+            >
+              <svg
+                className="w-4 h-4 mr-1"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                />
+              </svg>
+              View Analytics
+            </Button>
+            
             <ExportButton
               data={items}
               filename="inventory-data-log"

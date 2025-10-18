@@ -1,4 +1,4 @@
-import { PrismaClient, UserRole, Destination, AuditAction, Prisma } from '@prisma/client';
+import { PrismaClient, UserRole, Destination, ActionType, Prisma } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
@@ -338,11 +338,10 @@ async function main() {
   await prisma.auditLog.create({
     data: {
       userId: dataEntry.id,
-      action: AuditAction.CREATE,
+      action: ActionType.CREATE,
       entityType: 'InventoryItem',
       entityId: inventoryItems[0].id,
-      oldValue: Prisma.JsonNull,
-      newValue: {
+      changes: {
         itemName: 'Surgical Gloves - Large',
         batch: 'SG2024-001',
         quantity: 500,
@@ -351,7 +350,7 @@ async function main() {
       },
       ipAddress: '192.168.1.102',
       userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-      timestamp: new Date(),
+      signature: 'seed_data_signature_1',
     },
   });
 
@@ -359,20 +358,22 @@ async function main() {
   await prisma.auditLog.create({
     data: {
       userId: supervisor.id,
-      action: AuditAction.UPDATE,
+      action: ActionType.UPDATE,
       entityType: 'InventoryItem',
       entityId: inventoryItems[2].id,
-      oldValue: {
-        quantity: 350,
-        reject: 20,
-      },
-      newValue: {
-        quantity: 300,
-        reject: 25,
+      changes: {
+        before: {
+          quantity: 350,
+          reject: 20,
+        },
+        after: {
+          quantity: 300,
+          reject: 25,
+        },
       },
       ipAddress: '192.168.1.105',
       userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
-      timestamp: new Date(),
+      signature: 'seed_data_signature_2',
     },
   });
 
@@ -380,17 +381,16 @@ async function main() {
   await prisma.auditLog.create({
     data: {
       userId: manager.id,
-      action: AuditAction.LOGIN,
-      entityType: 'Session',
-      entityId: null,
-      oldValue: Prisma.JsonNull,
-      newValue: {
+      action: ActionType.LOGIN,
+      entityType: 'User',
+      entityId: manager.id,
+      changes: {
         loginTime: new Date().toISOString(),
         method: 'credentials',
       },
       ipAddress: '192.168.1.110',
       userAgent: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36',
-      timestamp: new Date(),
+      signature: 'seed_data_signature_3',
     },
   });
 
@@ -398,38 +398,36 @@ async function main() {
   await prisma.auditLog.create({
     data: {
       userId: auditor.id,
-      action: AuditAction.EXPORT,
+      action: ActionType.EXPORT,
       entityType: 'Report',
-      entityId: null,
-      oldValue: Prisma.JsonNull,
-      newValue: {
+      entityId: 'report_export_1',
+      changes: {
         reportType: 'MONTHLY',
         format: 'CSV',
         recordCount: 150,
       },
       ipAddress: '192.168.1.115',
       userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0',
-      timestamp: new Date(),
+      signature: 'seed_data_signature_4',
     },
   });
 
-  // Audit log 5: Inventory item deletion (no entityId since item was deleted)
+  // Audit log 5: Inventory item deletion
   await prisma.auditLog.create({
     data: {
       userId: supervisor.id,
-      action: AuditAction.DELETE,
+      action: ActionType.DELETE,
       entityType: 'InventoryItem',
-      entityId: null,
-      oldValue: {
+      entityId: 'deleted_item_1',
+      changes: {
         itemName: 'Expired Bandages',
         batch: 'EB2023-001',
         quantity: 50,
         reject: 50,
       },
-      newValue: Prisma.JsonNull,
       ipAddress: '192.168.1.105',
       userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
-      timestamp: new Date(),
+      signature: 'seed_data_signature_5',
     },
   });
 

@@ -82,7 +82,8 @@
     "rememberMe": "تذكرني",
     "forgotPassword": "نسيت كلمة المرور؟",
     "welcomeBack": "مرحباً بعودتك!",
-    "signInToContinue": "سجل الدخول للمتابعة إلى حسابك"
+    "signInToContinue": "سجل الدخول للمتابعة إلى حسابك",
+    "loginSuccess": "تم تسجيل الدخول بنجاح"
   },
   "dashboard": {
     "title": "لوحة التحكم",
@@ -90,6 +91,9 @@
     "totalProducts": "إجمالي المنتجات",
     "lowStock": "عناصر منخفضة المخزون",
     "recentTransactions": "المعاملات الأخيرة",
+    "recentItems": "العناصر الأخيرة",
+    "totalItems": "إجمالي العناصر",
+    "highReject": "عناصر مرفوضة عالية",
     "aiInsights": "رؤى الذكاء الاصطناعي",
     "trends": "الاتجاهات",
     "noInsights": "لا توجد رؤى متاحة في الوقت الحالي",
@@ -97,7 +101,42 @@
     "confidence": "الثقة",
     "trendIncreasing": "متزايد",
     "trendDecreasing": "متناقص",
-    "trendStable": "مستقر"
+    "trendStable": "مستقر",
+    "goodMorning": "صباح الخير",
+    "goodAfternoon": "مساء الخير",
+    "goodEvening": "مساء الخير",
+    "today": "اليوم",
+    "thisWeek": "هذا الأسبوع",
+    "thisMonth": "هذا الشهر",
+    "quickActions": {
+      "addItem": "إضافة عنصر",
+      "addItemDesc": "إضافة عنصر مخزون جديد بسرعة",
+      "viewDataLog": "سجل البيانات",
+      "viewDataLogDesc": "عرض وإدارة إدخالات المخزون",
+      "viewAnalytics": "التحليلات",
+      "viewAnalyticsDesc": "عرض الرؤى والاتجاهات",
+      "generateReports": "التقارير",
+      "generateReportsDesc": "إنشاء وتحميل التقارير"
+    },
+    "recentActivity": "النشاط الأخير",
+    "last10Entries": "آخر 10 إدخالات",
+    "viewAll": "عرض الكل",
+    "noRecentActivity": "لا يوجد نشاط حديث",
+    "addedBy": "أضيف بواسطة",
+    "justNow": "الآن",
+    "minutesAgo": "منذ {count} دقيقة",
+    "minutesAgo_plural": "منذ {count} دقائق",
+    "hoursAgo": "منذ {count} ساعة",
+    "hoursAgo_plural": "منذ {count} ساعات",
+    "daysAgo": "منذ {count} يوم",
+    "daysAgo_plural": "منذ {count} أيام",
+    "stats": {
+      "totalItems": "إجمالي العناصر",
+      "avgRejectRate": "متوسط معدل الرفض",
+      "activeUsers": "المستخدمون النشطون",
+      "last7Days": "اتجاه آخر 7 أيام",
+      "destinationDistribution": "توزيع الوجهات"
+    }
   },
   "inventory": {
     "title": "إدارة المخزون",
@@ -305,6 +344,7 @@
     "invalidEmail": "عنوان البريد الإلكتروني غير صالح",
     "invalidPassword": "يجب أن تكون كلمة المرور 8 أحرف على الأقل",
     "loginFailed": "فشل تسجيل الدخول. يرجى التحقق من بيانات الاعتماد الخاصة بك.",
+    "invalidCredentials": "خطأ في معلومات الدخول. البريد الإلكتروني أو كلمة المرور غير صحيحة.",
     "unauthorized": "ليس لديك صلاحية للوصول إلى هذه الصفحة",
     "notFound": "الصفحة غير موجودة",
     "serverError": "حدث خطأ. يرجى المحاولة مرة أخرى لاحقاً.",

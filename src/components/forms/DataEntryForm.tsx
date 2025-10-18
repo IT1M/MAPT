@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState, useCallback, useMemo } from 'react'
 import Link from 'next/link'
+import toast from 'react-hot-toast'
 import { useDataEntryForm } from '@/hooks/useDataEntryForm'
 // import { useAutoSave } from '@/hooks/useAutosave'
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts'
@@ -45,12 +46,13 @@ export function DataEntryForm({
   const [currentDateTime, setCurrentDateTime] = useState(new Date())
   const [showDraftDialog, setShowDraftDialog] = useState(false)
   const [hasJustSubmitted, setHasJustSubmitted] = useState(false)
+  const [recentlyAddedItem, setRecentlyAddedItem] = useState<any>(null)
 
   // Temporary stub functions until autosave is implemented
   const clearDraft = useCallback(() => {
     // TODO: Implement draft clearing
   }, [])
-  
+
   const restoreDraft = useCallback(() => {
     // TODO: Implement draft restoration
     return null
@@ -61,7 +63,50 @@ export function DataEntryForm({
     initialData: userLastDestination ? { destination: userLastDestination } : undefined,
     onSuccess: (data) => {
       setHasJustSubmitted(true)
+      setRecentlyAddedItem(data)
       clearDraft()
+
+      // Show success toast with action buttons
+      const locale = typeof window !== 'undefined' ?
+        document.documentElement.lang || 'en' : 'en'
+
+      toast.success(
+        (t) => (
+          <div className="flex flex-col gap-2">
+            <div className="font-medium">
+              Item added successfully!
+            </div>
+            <div className="flex gap-2 mt-1">
+              <button
+                onClick={() => {
+                  toast.dismiss(t.id)
+                  window.location.href = `/${locale}/data-log`
+                }}
+                className="px-3 py-1 text-sm bg-primary-600 text-white rounded hover:bg-primary-700 transition-colors"
+              >
+                View in Data Log
+              </button>
+              <button
+                onClick={() => {
+                  toast.dismiss(t.id)
+                  const firstInput = document.querySelector<HTMLInputElement>('input[name="itemName"]')
+                  firstInput?.focus()
+                }}
+                className="px-3 py-1 text-sm bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
+              >
+                Add Another Item
+              </button>
+            </div>
+          </div>
+        ),
+        {
+          duration: 6000,
+          style: {
+            minWidth: '300px',
+          },
+        }
+      )
+
       // Focus first field after successful submission
       setTimeout(() => {
         const firstInput = document.querySelector<HTMLInputElement>('input[name="itemName"]')
@@ -140,7 +185,7 @@ export function DataEntryForm({
         key: 's',
         ctrlKey: true,
         description: 'Save entry',
-        handler: () => {
+        callback: () => {
           if (!meta.isSubmitting) {
             handleSubmit()
           }
@@ -150,7 +195,7 @@ export function DataEntryForm({
         key: 'Enter',
         ctrlKey: true,
         description: 'Save entry',
-        handler: () => {
+        callback: () => {
           if (!meta.isSubmitting) {
             handleSubmit()
           }
@@ -159,14 +204,14 @@ export function DataEntryForm({
       {
         key: 'Escape',
         description: 'Clear form',
-        handler: handleClear,
+        callback: handleClear,
       },
     ],
     [meta.isSubmitting, handleSubmit, handleClear]
   )
 
   // Initialize keyboard shortcuts
-  useKeyboardShortcuts(keyboardShortcuts, true)
+  useKeyboardShortcuts({ shortcuts: keyboardShortcuts, enabled: true })
 
   // Update current date/time every minute
   useEffect(() => {
@@ -257,6 +302,51 @@ export function DataEntryForm({
         </div>
       )}
 
+      {/* Recently Added Item Card */}
+      {recentlyAddedItem && (
+        <div className="w-full max-w-7xl mx-auto mb-4 animate-fade-in">
+          <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-green-600 dark:text-green-400 text-xl">✓</span>
+                  <h3 className="text-sm font-semibold text-green-900 dark:text-green-100">
+                    Recently Added Item
+                  </h3>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                  <div>
+                    <span className="text-green-700 dark:text-green-300 font-medium">Item:</span>
+                    <p className="text-green-900 dark:text-green-100">{recentlyAddedItem.itemName}</p>
+                  </div>
+                  <div>
+                    <span className="text-green-700 dark:text-green-300 font-medium">Batch:</span>
+                    <p className="text-green-900 dark:text-green-100 font-mono text-xs">{recentlyAddedItem.batch}</p>
+                  </div>
+                  <div>
+                    <span className="text-green-700 dark:text-green-300 font-medium">Quantity:</span>
+                    <p className="text-green-900 dark:text-green-100">{recentlyAddedItem.quantity}</p>
+                  </div>
+                  <div>
+                    <span className="text-green-700 dark:text-green-300 font-medium">Destination:</span>
+                    <p className="text-green-900 dark:text-green-100">{recentlyAddedItem.destination}</p>
+                  </div>
+                </div>
+              </div>
+              <button
+                onClick={() => setRecentlyAddedItem(null)}
+                className="text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-200 transition-colors"
+                aria-label="Dismiss"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Main Form */}
       <main className="w-full max-w-7xl mx-auto" role="main" aria-label="Data entry interface">
         {/* Skip to main content link for screen readers */}
@@ -266,7 +356,7 @@ export function DataEntryForm({
         >
           Skip to form
         </a>
-        
+
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg">
           {/* Form Header */}
           <div className="border-b border-gray-200 dark:border-gray-700 px-4 md:px-6 py-3 md:py-4">
@@ -300,9 +390,9 @@ export function DataEntryForm({
           </div>
 
           {/* Form Body */}
-          <form 
+          <form
             id="data-entry-form"
-            onSubmit={handleSubmit} 
+            onSubmit={handleSubmit}
             className="p-4 md:p-6 pb-24 md:pb-6"
             role="form"
             aria-label="Inventory data entry form"
@@ -405,7 +495,7 @@ export function DataEntryForm({
 
             {/* Error Message with Retry */}
             {meta.lastError && meta.canRetry && (
-              <div 
+              <div
                 className="mt-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg"
                 role="alert"
                 aria-live="polite"
@@ -498,7 +588,7 @@ export function DataEntryForm({
         </div>
 
         {/* Keyboard Shortcuts Help */}
-        <aside 
+        <aside
           className="mt-4 mb-4 md:mb-0 text-center text-xs text-gray-500 dark:text-gray-400"
           role="complementary"
           aria-label="Keyboard shortcuts information"
