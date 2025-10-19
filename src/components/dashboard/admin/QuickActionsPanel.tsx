@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/hooks/useTranslations'
 
 export function QuickActionsPanel() {
   const router = useRouter()

@@ -2,7 +2,7 @@
 
 import React, { useMemo } from 'react';
 import { Card } from '@/components/ui/card';
-import { useTranslations } from 'next-intl';
+import { useTranslations } from '@/hooks/useTranslations';
 
 export interface HeatmapDataPoint {
   dayOfWeek: number; // 0-6 (Sunday-Saturday)

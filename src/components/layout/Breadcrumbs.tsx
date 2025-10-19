@@ -2,7 +2,8 @@
 
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
-import { useLocale, useTranslations } from 'next-intl'
+import { useTranslations } from '@/hooks/useTranslations'
+import { useLocale } from '@/hooks/useLocale'
 import { ChevronRight, Home } from 'lucide-react'
 import { Fragment, useState, useEffect } from 'react'
 

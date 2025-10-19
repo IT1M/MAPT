@@ -13,7 +13,7 @@ import {
   Cell,
 } from 'recharts';
 import { Card } from '@/components/ui/card';
-import { useTranslations } from 'next-intl';
+import { useTranslations } from '@/hooks/useTranslations';
 
 export interface MonthlyDataPoint {
   month: string; // YYYY-MM

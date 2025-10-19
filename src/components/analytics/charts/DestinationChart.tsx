@@ -1,10 +1,10 @@
 'use client';
 
 import React from 'react';
-import { useLocale } from 'next-intl';
+import { useLocale } from '@/hooks/useLocale';
 import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer } from 'recharts';
 import { Card } from '@/components/ui/card';
-import { useTranslations } from 'next-intl';
+import { useTranslations } from '@/hooks/useTranslations';
 import { 
   formatChartNumber, 
   getChartTitleAlign, 

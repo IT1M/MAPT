@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { useSession } from 'next-auth/react'
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/hooks/useTranslations'
 import { Card } from '@/components/ui/card'
 import { ChartErrorBoundary } from './ChartErrorBoundary'
 import { ChartSkeleton } from './ChartSkeleton'

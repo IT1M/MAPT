@@ -1,7 +1,8 @@
 'use client'
 
 import React from 'react'
-import { useTranslations, useLocale } from 'next-intl'
+import { useTranslations } from '@/hooks/useTranslations'
+import { useLocale } from '@/hooks/useLocale'
 import { highlightMatches, type SearchResult } from '@/utils/settings-search'
 
 interface SearchResultsProps {

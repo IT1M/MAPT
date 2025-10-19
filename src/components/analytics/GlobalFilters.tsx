@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/hooks/useTranslations'
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'

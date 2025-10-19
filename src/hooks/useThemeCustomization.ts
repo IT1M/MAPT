@@ -1,3 +1,5 @@
+'use client'
+
 /**
  * Theme Customization Hook
  * Manages theme state, application, and persistence

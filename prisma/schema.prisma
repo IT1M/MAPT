@@ -7,7 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model ActivityLog {
+model activity_logs {
   id        String   @id
   userId    String
   event     String
@@ -16,36 +16,34 @@ model ActivityLog {
   userAgent String
   sessionId String?
   timestamp DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  users     users    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([userId])
-  @@index([timestamp])
   @@index([event])
-  @@map("activity_logs")
-}
-
-model AuditLog {
-  id            String        @id
-  userId        String
-  entityId      String
-  ipAddress     String
-  userAgent     String
-  timestamp     DateTime      @default(now())
-  changes       Json?
-  signature     String
-  action        ActionType
-  entityType    EntityType
-  inventoryItem InventoryItem @relation(fields: [entityId], references: [id])
-  user          User          @relation(fields: [userId], references: [id])
-
   @@index([timestamp])
   @@index([userId])
-  @@index([entityType, entityId])
-  @@index([action])
-  @@map("audit_logs")
 }
 
-model BackupConfig {
+model audit_logs {
+  id              String          @id
+  userId          String
+  entityId        String
+  ipAddress       String
+  userAgent       String
+  timestamp       DateTime        @default(now())
+  changes         Json?
+  signature       String
+  action          ActionType
+  entityType      EntityType
+  inventory_items inventory_items @relation(fields: [entityId], references: [id])
+  users           users           @relation(fields: [userId], references: [id])
+
+  @@index([action])
+  @@index([entityType, entityId])
+  @@index([timestamp])
+  @@index([userId])
+}
+
+model backup_configs {
   id                     String         @id
   enabled                Boolean        @default(false)
   scheduleTime           String         @default("02:00")
@@ -57,12 +55,10 @@ model BackupConfig {
   storagePath            String
   updatedAt              DateTime
   updatedBy              String
-  updater                User           @relation(fields: [updatedBy], references: [id])
-
-  @@map("backup_configs")
+  users                  users          @relation(fields: [updatedBy], references: [id])
 }
 
-model Backup {
+model backups {
   id               String       @id
   createdAt        DateTime     @default(now())
   fileSize         BigInt
@@ -82,15 +78,14 @@ model Backup {
   type             BackupType
   validated        Boolean      @default(false)
   validatedAt      DateTime?
-  creator          User         @relation("UserBackups", fields: [createdBy], references: [id])
+  users            users        @relation(fields: [createdBy], references: [id])
 
   @@index([createdAt])
   @@index([status])
   @@index([type])
-  @@map("backups")
 }
 
-model EmailLog {
+model email_logs {
   id           String      @id
   userId       String?
   to           String
@@ -104,15 +99,14 @@ model EmailLog {
   attempts     Int         @default(0)
   metadata     Json?
   createdAt    DateTime    @default(now())
-  user         User?       @relation(fields: [userId], references: [id])
+  users        users?      @relation(fields: [userId], references: [id])
 
-  @@index([userId])
-  @@index([status])
   @@index([createdAt])
-  @@map("email_logs")
+  @@index([status])
+  @@index([userId])
 }
 
-model HelpArticle {
+model help_articles {
   id          String            @id
   title       String
   slug        String            @unique
@@ -127,38 +121,36 @@ model HelpArticle {
   updatedAt   DateTime
   publishedAt DateTime?
 
-  @@index([slug])
   @@index([category])
+  @@index([slug])
   @@index([status])
-  @@map("help_articles")
 }
 
-model InventoryItem {
-  id          String      @id
+model inventory_items {
+  id          String       @id
   itemName    String
   batch       String
   quantity    Int
-  reject      Int         @default(0)
+  reject      Int          @default(0)
   destination Destination
   category    String?
   notes       String?
   enteredById String
-  createdAt   DateTime    @default(now())
+  createdAt   DateTime     @default(now())
   updatedAt   DateTime
   deletedAt   DateTime?
-  auditLogs   AuditLog[]
-  enteredBy   User        @relation(fields: [enteredById], references: [id])
+  audit_logs  audit_logs[]
+  users       users        @relation(fields: [enteredById], references: [id])
 
-  @@index([itemName])
   @@index([batch])
+  @@index([createdAt, destination])
   @@index([createdAt])
   @@index([destination])
   @@index([itemName, batch])
-  @@index([createdAt, destination])
-  @@map("inventory_items")
+  @@index([itemName])
 }
 
-model Notification {
+model notifications {
   id        String               @id
   userId    String
   type      NotificationType
@@ -171,14 +163,13 @@ model Notification {
   metadata  Json?
   createdAt DateTime             @default(now())
   expiresAt DateTime?
-  user      User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  users     users                @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([userId, read])
   @@index([createdAt])
-  @@map("notifications")
+  @@index([userId, read])
 }
 
-model PasswordResetToken {
+model password_reset_tokens {
   id        String    @id
   token     String    @unique
   userId    String    @unique
@@ -186,14 +177,13 @@ model PasswordResetToken {
   used      Boolean   @default(false)
   usedAt    DateTime?
   createdAt DateTime  @default(now())
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  users     users     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([token])
   @@index([expiresAt])
-  @@map("password_reset_tokens")
+  @@index([token])
 }
 
-model Product {
+model products {
   id            String   @id
   name          String
   nameAr        String
@@ -207,11 +197,9 @@ model Product {
   reorderPoint  Int
   createdAt     DateTime @default(now())
   updatedAt     DateTime
-
-  @@map("products")
 }
 
-model ReportSchedule {
+model report_schedules {
   id         String            @id
   name       String
   reportType ReportType
@@ -224,14 +212,13 @@ model ReportSchedule {
   nextRun    DateTime
   createdAt  DateTime          @default(now())
   createdBy  String
-  creator    User              @relation(fields: [createdBy], references: [id])
+  users      users             @relation(fields: [createdBy], references: [id])
 
-  @@index([nextRun])
   @@index([enabled])
-  @@map("report_schedules")
+  @@index([nextRun])
 }
 
-model Report {
+model reports {
   id                String       @id
   title             String
   status            ReportStatus
@@ -244,15 +231,14 @@ model Report {
   includeAIInsights Boolean      @default(false)
   periodFrom        DateTime
   periodTo          DateTime
-  generator         User         @relation(fields: [generatedBy], references: [id])
+  users             users        @relation(fields: [generatedBy], references: [id])
 
   @@index([generatedAt])
-  @@index([type])
   @@index([status])
-  @@map("reports")
+  @@index([type])
 }
 
-model SavedFilter {
+model saved_filters {
   id        String   @id
   userId    String
   name      String
@@ -261,14 +247,13 @@ model SavedFilter {
   isDefault Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  users     users    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([userId, page])
-  @@map("saved_filters")
 }
 
-model Session {
+model sessions {
   id           String   @id
   sessionToken String   @unique
   userId       String
@@ -281,27 +266,25 @@ model Session {
   location     String?
   os           String?
   userAgent    String?
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  users        users    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([sessionToken])
   @@index([userId])
-  @@map("sessions")
 }
 
-model SystemSettings {
+model system_settings {
   id          String   @id
   key         String   @unique
   value       Json
   updatedById String
   updatedAt   DateTime
   category    String
-  updatedBy   User     @relation(fields: [updatedById], references: [id])
+  users       users    @relation(fields: [updatedById], references: [id])
 
   @@index([category])
-  @@map("system_settings")
 }
 
-model Transaction {
+model transactions {
   id              String          @id
   inventoryItemId String
   type            TransactionType
@@ -309,11 +292,9 @@ model Transaction {
   reason          String?
   performedBy     String
   createdAt       DateTime        @default(now())
-
-  @@map("transactions")
 }
 
-model TwoFactorAuth {
+model two_factor_auth {
   id          String    @id
   userId      String    @unique
   secret      String
@@ -323,44 +304,41 @@ model TwoFactorAuth {
   lastUsedAt  DateTime?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("two_factor_auth")
+  users       users     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model User {
-  id                 String              @id
-  email              String              @unique
-  name               String
-  passwordHash       String
-  role               UserRole
-  isActive           Boolean             @default(true)
-  preferences        Json?               @default("{}")
-  createdAt          DateTime            @default(now())
-  updatedAt          DateTime
-  emailVerified      Boolean             @default(false)
-  emailVerifiedAt    DateTime?
-  lastLogin          DateTime?
-  lastLoginIp        String?
-  lockedUntil        DateTime?
-  passwordChangedAt  DateTime?
-  activityLogs       ActivityLog[]
-  auditLogs          AuditLog[]
-  backupConfigs      BackupConfig[]
-  backups            Backup[]            @relation("UserBackups")
-  emailLogs          EmailLog[]
-  inventoryItems     InventoryItem[]
-  notifications      Notification[]
-  passwordResetToken PasswordResetToken?
-  reportSchedules    ReportSchedule[]
-  reports            Report[]
-  savedFilters       SavedFilter[]
-  sessions           Session[]
-  settingsUpdates    SystemSettings[]
-  twoFactorAuth      TwoFactorAuth?
+model users {
+  id                    String                 @id
+  email                 String                 @unique
+  name                  String
+  passwordHash          String
+  role                  UserRole
+  isActive              Boolean                @default(true)
+  preferences           Json?                  @default("{}")
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime
+  emailVerified         Boolean                @default(false)
+  emailVerifiedAt       DateTime?
+  lastLogin             DateTime?
+  lastLoginIp           String?
+  lockedUntil           DateTime?
+  passwordChangedAt     DateTime?
+  activity_logs         activity_logs[]
+  audit_logs            audit_logs[]
+  backup_configs        backup_configs[]
+  backups               backups[]
+  email_logs            email_logs[]
+  inventory_items       inventory_items[]
+  notifications         notifications[]
+  password_reset_tokens password_reset_tokens?
+  report_schedules      report_schedules[]
+  reports               reports[]
+  saved_filters         saved_filters[]
+  sessions              sessions[]
+  system_settings       system_settings[]
+  two_factor_auth       two_factor_auth?
 
   @@index([email])
-  @@map("users")
 }
 
 enum ActionType {

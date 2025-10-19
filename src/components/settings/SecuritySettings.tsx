@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useCallback } from 'react'
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/hooks/useTranslations'
 import { PasswordChangeForm, PasswordChangeData } from './PasswordChangeForm'
 import { SessionManager } from './SessionManager'
 import { SecurityAuditLog, SecurityEvent } from './SecurityAuditLog'

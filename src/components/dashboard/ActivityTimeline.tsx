@@ -1,7 +1,8 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useLocale, useTranslations } from 'next-intl'
+import { useTranslations } from '@/hooks/useTranslations'
+import { useLocale } from '@/hooks/useLocale'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 
@@ -49,7 +50,7 @@ export function ActivityTimeline({ activities }: ActivityTimelineProps) {
   }
 
   const handleViewAll = () => {
-    router.push(`/${locale}/data-log`)
+    router.push(`/data-log`)
   }
 
   return (

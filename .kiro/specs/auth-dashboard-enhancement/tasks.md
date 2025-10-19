@@ -170,16 +170,16 @@
   - Add audit logging for all bulk operations
   - _Requirements: 14.1, 14.2, 14.3, 14.4, 14.5_
 
-- [ ] 13. Advanced Filtering System
-- [ ] 13.1 Complete filtering with saved filters and sharing
+- [x] 13. Advanced Filtering System
+- [x] 13.1 Complete filtering with saved filters and sharing
   - Build filter builder UI (add/remove, field/operator/value selection, AND/OR logic, filter chips)
   - Implement Prisma where clause generator supporting all operators (equals, contains, gt, lt, etc.)
   - Add saved filters (save modal, load presets, edit/delete, default filter per page, API endpoints)
   - Implement filter sharing (shareable URL, export/import, copy link)
   - _Requirements: 15.1, 15.2, 15.3, 15.4, 15.5_
 
-- [ ] 14. Data Import System
-- [ ] 14.1 Complete import wizard with validation and API
+- [x] 14. Data Import System
+- [x] 14.1 Complete import wizard with validation and API
   - Build multi-step wizard (file upload, column mapping, validation, options, execution)
   - Implement drag & drop upload for CSV/Excel (max 10 MB) with preview of first 5 rows
   - Create column mapping interface (auto-detect, manual dropdowns, example data, required fields)
@@ -188,8 +188,8 @@
   - Create API endpoint: POST /api/inventory/import with batch insert, transactions, audit logs, import log file
   - _Requirements: 16.1, 16.2, 16.3, 16.4, 16.5, 16.6_
 
-- [ ] 15. Help Center System
-- [ ] 15.1 Complete help center with search and admin management
+- [-] 15. Help Center System
+- [x] 15.1 Complete help center with search and admin management
   - Build help center layout (search bar, category navigation, article list, breadcrumbs)
   - Create article component (markdown rendering, table of contents, related articles, feedback, print/share)
   - Implement full-text search (relevance ranking, highlighting, analytics tracking)

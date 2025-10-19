@@ -1,6 +1,6 @@
 'use client'
 
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/hooks/useTranslations'
 import { DatabaseInfo } from '@/types/settings'
 
 interface DatabaseStatusProps {

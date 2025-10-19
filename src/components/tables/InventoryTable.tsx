@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useMemo, useState, useRef, useCallback, useEffect } from 'react'
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/hooks/useTranslations'
 import type { InventoryItemWithUser } from '@/types'
 import { Destination } from '@prisma/client'
 import { VirtualizedTable } from './VirtualizedTable'

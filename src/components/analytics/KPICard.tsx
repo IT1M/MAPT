@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { useLocale } from 'next-intl';
+import { useLocale } from '@/hooks/useLocale';
 import { Card } from '@/components/ui/card';
 import { LineChart, Line, ResponsiveContainer } from 'recharts';
 import { getKPICardLayoutClass, getIconTransform } from '@/utils/analytics-rtl';

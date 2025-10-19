@@ -61,24 +61,16 @@ function isValidCallbackUrl(url: string): boolean {
 }
 
 /**
- * Get the full dashboard URL with locale
+ * Get the full dashboard URL (no locale needed)
  * @param role - User role
- * @param locale - Current locale (en or ar)
+ * @param locale - Deprecated, kept for compatibility
  * @param callbackUrl - Optional callback URL
- * @returns Full dashboard URL with locale
+ * @returns Full dashboard URL
  */
 export function getDashboardUrl(
   role: UserRole,
-  locale: string,
+  locale?: string,
   callbackUrl?: string
 ): string {
-  const path = getDashboardPath(role, callbackUrl)
-  
-  // If path already includes locale, return as is
-  if (path.startsWith(`/${locale}/`)) {
-    return path
-  }
-  
-  // Otherwise, prepend locale
-  return `/${locale}${path}`
+  return getDashboardPath(role, callbackUrl)
 }

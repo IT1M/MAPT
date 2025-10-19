@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations } from '@/hooks/useTranslations';
 import BackupProgressModal from './BackupProgressModal';
 import { BackupCreateConfig } from '@/types/backup';
 

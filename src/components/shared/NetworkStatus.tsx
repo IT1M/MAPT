@@ -1,7 +1,7 @@
 'use client';
 
 import { useNetworkStatus } from '@/hooks/useApiErrorHandler';
-import { useTranslations } from 'next-intl';
+import { useTranslations } from '@/hooks/useTranslations';
 import { useEffect, useState } from 'react';
 
 /**

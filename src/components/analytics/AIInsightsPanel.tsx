@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useTranslations, useLocale } from 'next-intl'
+import { useTranslations } from '@/hooks/useTranslations'
+import { useLocale } from '@/hooks/useLocale'
 
 // ============================================================================
 // Type Definitions

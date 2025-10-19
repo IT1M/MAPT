@@ -49,7 +49,7 @@ export function TodaysEntries() {
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-          Today's Entries
+          Today&apos;s Entries
         </h3>
         <span className="px-3 py-1 bg-primary-100 text-primary-800 dark:bg-primary-900/20 dark:text-primary-400 text-sm font-medium rounded-full">
           {entries.length} items

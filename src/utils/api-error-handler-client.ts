@@ -83,7 +83,7 @@ export async function handleApiError(
           onUnauthorized();
         } else if (router) {
           const currentPath = window.location.pathname;
-          router.push(`/${locale}/login?callbackUrl=${encodeURIComponent(currentPath)}`);
+          router.push(`/login?callbackUrl=${encodeURIComponent(currentPath)}`);
         }
         break;
 
@@ -96,7 +96,7 @@ export async function handleApiError(
           onForbidden();
         } else if (router) {
           const currentPath = window.location.pathname;
-          router.push(`/${locale}/access-denied?path=${encodeURIComponent(currentPath)}`);
+          router.push(`/access-denied?path=${encodeURIComponent(currentPath)}`);
         }
         break;
 

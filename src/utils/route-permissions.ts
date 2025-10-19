@@ -34,8 +34,8 @@ export const PUBLIC_ROUTES = ['/login', '/']
  * @returns True if the route is public
  */
 export function isPublicRoute(pathname: string): boolean {
-  // Root path and locale root paths are public
-  if (pathname === '/' || pathname === '/en' || pathname === '/ar') {
+  // Root path is public
+  if (pathname === '/') {
     return true
   }
   

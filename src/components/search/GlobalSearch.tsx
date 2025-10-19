@@ -8,7 +8,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/hooks/useTranslations'
 import { useDebounce } from '@/hooks/useDebounce'
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts'
 import {

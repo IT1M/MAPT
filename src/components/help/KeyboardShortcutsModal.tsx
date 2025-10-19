@@ -7,7 +7,7 @@
  */
 
 import { useState, useMemo } from 'react'
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/hooks/useTranslations'
 import { 
   GLOBAL_SHORTCUTS, 
   getAllCategories,

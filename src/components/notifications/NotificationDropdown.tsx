@@ -2,7 +2,7 @@
 
 import { useNotifications } from '@/context/NotificationContext'
 import { NotificationItem } from './NotificationItem'
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/hooks/useTranslations'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 

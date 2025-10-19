@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useRef, useEffect, useMemo } from 'react'
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/hooks/useTranslations'
 
 export interface ExportButtonProps {
   data: any[]

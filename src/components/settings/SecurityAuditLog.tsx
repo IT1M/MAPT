@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/hooks/useTranslations'
 import { format } from 'date-fns'
 import { Button } from '@/components/ui/button'
 import { Pagination } from '@/components/ui/Pagination'

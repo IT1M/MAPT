@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/hooks/useTranslations'
 import { Modal } from '@/components/ui/modal'
 import { Button } from '@/components/ui/button'
 import type { AuditHistoryEntry } from '@/types'

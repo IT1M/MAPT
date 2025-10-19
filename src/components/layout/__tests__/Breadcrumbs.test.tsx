@@ -8,7 +8,8 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { Breadcrumbs } from '../Breadcrumbs'
 import { usePathname } from 'next/navigation'
-import { useLocale, useTranslations } from 'next-intl'
+import { useTranslations } from '@/hooks/useTranslations'
+import { useLocale } from '@/hooks/useLocale'
 
 // Mock dependencies
 vi.mock('next/navigation')

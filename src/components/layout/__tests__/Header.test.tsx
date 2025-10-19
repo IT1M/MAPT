@@ -9,7 +9,8 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { Header } from '../header'
 import { useSession, signOut } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { useLocale, useTranslations } from 'next-intl'
+import { useTranslations } from '@/hooks/useTranslations'
+import { useLocale } from '@/hooks/useLocale'
 
 // Mock dependencies
 vi.mock('next-auth/react')

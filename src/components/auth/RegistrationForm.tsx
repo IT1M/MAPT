@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { signIn } from 'next-auth/react'
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/hooks/useTranslations'
 import { toast } from 'react-hot-toast'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -164,12 +164,12 @@ export function RegistrationForm({ locale }: RegistrationFormProps) {
       })
 
       if (signInResult?.ok) {
-        router.push(`/${locale}/dashboard`)
+        router.push(`/dashboard`)
         router.refresh()
       } else {
         // If auto-login fails, redirect to login page
         toast.success('Registration successful! Please log in.')
-        router.push(`/${locale}/login`)
+        router.push(`/login`)
       }
     } catch (error: any) {
       // Handle Zod validation errors
@@ -438,7 +438,7 @@ export function RegistrationForm({ locale }: RegistrationFormProps) {
                 
                 <h3>6. Limitation of Liability</h3>
                 <p>
-                  The system is provided "as is" without warranties of any kind. We shall not be liable for any damages arising from the use or inability to use the system.
+                  The system is provided &quot;as is&quot; without warranties of any kind. We shall not be liable for any damages arising from the use or inability to use the system.
                 </p>
               </div>
             </div>

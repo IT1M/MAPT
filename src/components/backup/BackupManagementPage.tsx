@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations } from '@/hooks/useTranslations';
 import BackupConfigPanel from './BackupConfigPanel';
 import BackupHistoryTable from './BackupHistoryTable';
 import BackupHealthMonitor from './BackupHealthMonitor';

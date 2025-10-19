@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/hooks/useTranslations'
 import { Modal } from '@/components/ui/modal'
 import { InventoryForm } from '@/components/forms/inventory-form'
 import type { InventoryItemWithUser, AuditHistoryEntry } from '@/types'

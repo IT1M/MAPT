@@ -2,8 +2,9 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import NextAuth from 'next-auth'
 import { authConfig } from '@/auth.config'
-import createMiddleware from 'next-intl/middleware'
-import { locales, defaultLocale } from '@/i18n'
+// Removed next-intl to simplify routing
+// import createMiddleware from 'next-intl/middleware'
+// import { locales, defaultLocale } from '@/i18n'
 import type { UserRole } from '@/utils/route-permissions'
 import {
   ROUTE_PERMISSIONS,
@@ -15,38 +16,15 @@ import {
 const { auth } = NextAuth(authConfig)
 
 /**
- * Routes that should bypass internationalization middleware
- */
-const INTL_BYPASS_ROUTES = ['/api/auth']
-
-/**
- * Create next-intl middleware for locale handling
- */
-const intlMiddleware = createMiddleware({
-  locales,
-  defaultLocale,
-  localePrefix: 'always',
-})
-
-/**
  * Middleware function
- * Handles internationalization, authentication and authorization for protected routes
+ * Handles authentication and authorization for protected routes
  */
 export default auth((req) => {
   const { pathname } = req.nextUrl
   
-  // Bypass intl middleware for auth API routes
-  if (INTL_BYPASS_ROUTES.some(route => pathname.startsWith(route))) {
-    return NextResponse.next()
-  }
-  
-  // First, handle internationalization
-  // This will handle locale detection and persistence via cookies
-  const intlResponse = intlMiddleware(req)
-  
   // Allow public routes
   if (isPublicRoute(pathname)) {
-    return intlResponse
+    return NextResponse.next()
   }
   
   // Check if user is authenticated
@@ -54,11 +32,7 @@ export default auth((req) => {
   
   if (!session?.user) {
     // Redirect to login if not authenticated
-    // Extract locale from pathname
-    const localeMatch = pathname.match(/^\/(en|ar)/)
-    const locale = localeMatch ? localeMatch[1] : defaultLocale
-    
-    const loginUrl = new URL(`/${locale}/login`, req.url)
+    const loginUrl = new URL('/login', req.url)
     loginUrl.searchParams.set('callbackUrl', pathname)
     loginUrl.searchParams.set('reason', 'session_required')
     return NextResponse.redirect(loginUrl)
@@ -70,18 +44,14 @@ export default auth((req) => {
   
   if (!hasRoutePermission(userRole, baseRoute)) {
     // Redirect to access denied page with context
-    // Extract locale from pathname
-    const localeMatch = pathname.match(/^\/(en|ar)/)
-    const locale = localeMatch ? localeMatch[1] : defaultLocale
-    
-    const accessDeniedUrl = new URL(`/${locale}/access-denied`, req.url)
+    const accessDeniedUrl = new URL('/access-denied', req.url)
     accessDeniedUrl.searchParams.set('path', pathname)
     accessDeniedUrl.searchParams.set('route', baseRoute)
     return NextResponse.redirect(accessDeniedUrl)
   }
   
-  // Allow access with intl response (preserves locale cookies)
-  return intlResponse
+  // Allow access
+  return NextResponse.next()
 })
 
 /**

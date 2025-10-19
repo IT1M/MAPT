@@ -1,7 +1,7 @@
 'use client'
 
 import { useSession, signOut } from 'next-auth/react'
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/hooks/useTranslations'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { LocaleSwitcher } from '@/components/ui/locale-switcher'
 import { Breadcrumbs } from '@/components/layout/Breadcrumbs'
@@ -9,7 +9,7 @@ import { NotificationBell } from '@/components/notifications'
 import { SearchButton } from '@/components/search'
 import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { useLocale } from 'next-intl'
+import { useLocale } from '@/hooks/useLocale'
 
 export function Header() {
   const { data: session } = useSession()
@@ -168,7 +168,7 @@ export function Header() {
                         <button
                           onClick={() => {
                             setIsDropdownOpen(false)
-                            router.push(`/${locale}/settings?section=profile`)
+                            router.push(`/settings?section=profile`)
                           }}
                           className="w-full text-left rtl:text-right px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-3 transition-colors"
                         >
@@ -182,7 +182,7 @@ export function Header() {
                         <button
                           onClick={() => {
                             setIsDropdownOpen(false)
-                            router.push(`/${locale}/settings`)
+                            router.push(`/settings`)
                           }}
                           className="w-full text-left rtl:text-right px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-3 transition-colors"
                         >

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations } from '@/hooks/useTranslations';
 import ReportGeneratorForm from './ReportGeneratorForm';
 import ReportHistoryTable from './ReportHistoryTable';
 import ScheduledReportsPanel from './ScheduledReportsPanel';

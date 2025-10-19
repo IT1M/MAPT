@@ -14,3 +14,10 @@ You can now log in with these credentials:
 Email: admin@saudimais.com
 Password: Password123!
 Open http://localhost:3001 in your browser and you should see the login page.
+
+
+npm run db:studio          
+ npm run dev
+ git add .         
+  git commit -m "first commit"  
+  git push -u origin main     

@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/hooks/useTranslations'
 import { Modal } from '@/components/ui/modal'
 import { Button } from '@/components/ui/button'
 import type { InventoryItemWithUser } from '@/types'

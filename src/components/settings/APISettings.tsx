@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/hooks/useTranslations'
 import { GeminiConfig } from './GeminiConfig'
 import { DatabaseStatus } from './DatabaseStatus'
 import { GeminiConfiguration, DatabaseInfo, ValidationResult } from '@/types/settings'

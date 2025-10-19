@@ -6,7 +6,7 @@
  */
 
 import { useEffect } from 'react';
-import { useLocale } from 'next-intl';
+import { useLocale } from '@/hooks/useLocale';
 import { isRTL, getTextDirection } from '@/utils/rtl';
 
 interface RTLProviderProps {

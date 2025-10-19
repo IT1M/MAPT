@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, forwardRef, useEffect } from 'react'
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/hooks/useTranslations'
 import { useDebounce } from '@/hooks/useDebounce'
 
 interface SettingsSearchProps {

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { Card } from '@/components/ui/card'
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/hooks/useTranslations'
 
 interface InventoryTrend {
   product: string

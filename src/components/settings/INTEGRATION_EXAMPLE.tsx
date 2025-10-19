@@ -12,7 +12,8 @@
 'use client'
 
 import React, { useState } from 'react'
-import { useTranslations, useLocale } from 'next-intl'
+import { useTranslations } from '@/hooks/useTranslations'
+import { useLocale } from '@/hooks/useLocale'
 import { SettingsSearchDemo } from '@/components/settings/SettingsSearchDemo'
 
 // Import RTL styles

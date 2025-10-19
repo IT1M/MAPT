@@ -2,7 +2,10 @@ import type { Metadata } from 'next'
 import { Inter, Cairo } from 'next/font/google'
 import { ThemeProvider } from 'next-themes'
 import { Toaster } from 'react-hot-toast'
-import '../styles/globals.css'
+import { SessionProvider } from 'next-auth/react'
+import { NotificationProvider } from '@/context/NotificationContext'
+import { GlobalSearchProvider } from '@/components/search'
+import './globals.css'
 
 // Configure Inter font for English
 const inter = Inter({
@@ -50,14 +53,19 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning className={`${inter.variable} ${cairo.variable}`}>
       <body className="font-sans antialiased">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange={false}
-        >
-          {children}
-          <Toaster
+        <SessionProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange={false}
+          >
+            <NotificationProvider>
+              <GlobalSearchProvider>
+                {children}
+              </GlobalSearchProvider>
+            </NotificationProvider>
+            <Toaster
             position="top-right"
             containerStyle={{
               top: 20,
@@ -120,8 +128,9 @@ export default function RootLayout({
                 className: 'dark:!bg-blue-900/20 dark:!text-blue-200 dark:!border-blue-800',
               },
             }}
-          />
-        </ThemeProvider>
+            />
+          </ThemeProvider>
+        </SessionProvider>
       </body>
     </html>
   )

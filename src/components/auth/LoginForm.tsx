@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/hooks/useTranslations'
 import { toast } from 'react-hot-toast'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -178,7 +178,7 @@ export function LoginForm({ locale }: LoginFormProps) {
         
         // Redirect to dashboard after short delay for better UX
         setTimeout(() => {
-          router.push(`/${locale}/dashboard`)
+          router.push(`/dashboard`)
           router.refresh()
         }, 500)
       }

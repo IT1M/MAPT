@@ -6,7 +6,7 @@
  */
 
 import { useEffect, useState } from 'react'
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/hooks/useTranslations'
 import { UserRole } from '@prisma/client'
 
 interface WelcomeModalProps {

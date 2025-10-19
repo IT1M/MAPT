@@ -1,7 +1,7 @@
 'use client'
 
 import { useNotifications } from '@/context/NotificationContext'
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/hooks/useTranslations'
 
 /**
  * Demo component to test the notification system

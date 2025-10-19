@@ -3,7 +3,7 @@
 import { useSession } from 'next-auth/react'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
-import { useLocale } from 'next-intl'
+import { useLocale } from '@/hooks/useLocale'
 import { useState, useEffect, useRef, KeyboardEvent } from 'react'
 import { UserRole } from '@prisma/client'
 import {

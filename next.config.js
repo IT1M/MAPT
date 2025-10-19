@@ -1,8 +1,15 @@
 /** @type {import('next').NextConfig} */
-const withNextIntl = require('next-intl/plugin')('./src/i18n.ts')
+// Removed next-intl to simplify routing and fix webpack errors
+// const withNextIntl = require('next-intl/plugin')('./src/i18n.ts')
 
 const nextConfig = {
   reactStrictMode: true,
+  
+  // Set English as the only locale
+  i18n: {
+    locales: ['en'],
+    defaultLocale: 'en',
+  },
   
   // Production optimizations (Task 4.1)
   compress: true,
@@ -194,16 +201,7 @@ const nextConfig = {
     ]
   },
   
-  // Redirects (Task 4.4)
-  async redirects() {
-    return [
-      {
-        source: '/',
-        destination: '/en',
-        permanent: false,
-      },
-    ]
-  },
+  // Redirects removed - home page is now at /
 }
 
-module.exports = withNextIntl(nextConfig)
+module.exports = nextConfig

@@ -6,8 +6,8 @@ import type { NextAuthConfig } from 'next-auth'
  */
 export const authConfig: NextAuthConfig = {
   pages: {
-    signIn: '/en/login',
-    error: '/en/login',
+    signIn: '/login',
+    error: '/login',
   },
   session: {
     strategy: 'jwt',
@@ -35,13 +35,11 @@ export const authConfig: NextAuthConfig = {
       
       if (isOnLoginPage) {
         if (isLoggedIn) {
-          // Extract locale from current path or default to 'ar'
-          const locale = nextUrl.pathname.split('/')[1] || 'ar'
           // Get callback URL from query params
           const callbackUrl = nextUrl.searchParams.get('callbackUrl')
           
           // Redirect to root page which will handle role-based routing
-          const redirectUrl = new URL(`/${locale}`, nextUrl)
+          const redirectUrl = new URL('/', nextUrl)
           if (callbackUrl) {
             redirectUrl.searchParams.set('callbackUrl', callbackUrl)
           }

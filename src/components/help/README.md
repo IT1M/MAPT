@@ -1,336 +1,238 @@
-# Keyboard Shortcuts System
+# Help Center System
 
-This directory contains the comprehensive keyboard shortcuts system for the Saudi Mais Medical Inventory application.
+A comprehensive help center and support system with article management, search functionality, and admin interface.
 
-## Overview
+## Features
 
-The keyboard shortcuts system provides:
-- **Global shortcuts** available throughout the application
-- **Page-specific shortcuts** for different pages (data-log, analytics, etc.)
-- **Sequence shortcuts** (e.g., G then D for navigation)
-- **Platform detection** (Ctrl vs Cmd for Windows/Mac)
-- **Help modal** with search and categorization
-- **Accessibility support** with screen reader announcements
+### User-Facing Features
+
+1. **Help Center Layout**
+   - Clean, professional design
+   - Category navigation
+   - Search functionality
+   - Breadcrumb navigation
+   - Responsive design
+
+2. **Article Browsing**
+   - Browse by category
+   - Full-text search with relevance ranking
+   - Pagination support
+   - View counts and feedback metrics
+   - Related articles suggestions
+
+3. **Article Viewing**
+   - Markdown rendering
+   - Table of contents (for long articles)
+   - Print functionality
+   - Share functionality
+   - Feedback system (helpful/not helpful)
+   - Related articles
+
+4. **Support Form**
+   - Category selection
+   - Priority levels
+   - Rich text description
+   - File attachments (planned)
+   - Email confirmation
+   - Expected response time
+
+### Admin Features
+
+1. **Article Management**
+   - Create, edit, and delete articles
+   - Draft and published status
+   - Markdown editor
+   - Slug management
+   - Category management
+   - Tag management
+   - View statistics (views, helpful votes)
+
+2. **Analytics** (planned)
+   - Article views tracking
+   - Search analytics
+   - Feedback metrics
+   - Popular articles
+   - User engagement
 
 ## Components
 
-### GlobalKeyboardShortcuts
+### Public Components
 
-The main provider component that manages all global keyboard shortcuts.
+- `HelpCenterLayout` - Main layout wrapper
+- `HelpSearchBar` - Search input with debouncing
+- `HelpCategories` - Category navigation sidebar
+- `HelpArticleList` - Article listing with pagination
+- `HelpArticleView` - Single article view with markdown rendering
+- `HelpBreadcrumbs` - Navigation breadcrumbs
+- `SupportForm` - Contact support form
 
-**Location**: `src/components/help/GlobalKeyboardShortcuts.tsx`
+### Admin Components
 
-**Features**:
-- Integrates with GlobalSearchProvider
-- Manages global navigation shortcuts
-- Opens keyboard shortcuts help modal
-- Handles sequence shortcuts (G+D, G+E, etc.)
+- `HelpAdminLayout` - Admin layout wrapper
+- `HelpArticleManager` - Article management interface
+- `HelpArticleEditor` - Article creation/editing modal
 
-**Usage**:
-```tsx
-import { GlobalKeyboardShortcuts } from '@/components/help'
+## API Routes
 
-export default function Layout({ children }) {
-  return (
-    <GlobalKeyboardShortcuts>
-      {children}
-    </GlobalKeyboardShortcuts>
-  )
+### Public Routes
+
+- `GET /api/help/articles` - List articles with search and filtering
+- `GET /api/help/articles/[slug]` - Get single article
+- `POST /api/help/articles/[slug]/feedback` - Submit article feedback
+- `GET /api/help/categories` - Get all categories with counts
+- `GET /api/help/search` - Full-text search with relevance ranking
+- `POST /api/help/support` - Submit support request
+
+### Admin Routes (ADMIN role required)
+
+- `POST /api/help/articles` - Create new article
+- `PATCH /api/help/articles/[slug]` - Update article
+- `DELETE /api/help/articles/[slug]` - Delete article
+
+## Database Schema
+
+```prisma
+model HelpArticle {
+  id          String            @id
+  title       String
+  slug        String            @unique
+  category    String
+  content     String
+  tags        String[]
+  status      HelpArticleStatus @default(DRAFT)
+  views       Int               @default(0)
+  helpful     Int               @default(0)
+  notHelpful  Int               @default(0)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime
+  publishedAt DateTime?
+
+  @@index([slug])
+  @@index([category])
+  @@index([status])
+  @@map("help_articles")
+}
+
+enum HelpArticleStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
 }
 ```
 
-### KeyboardShortcutsModal
+## Usage
 
-A comprehensive modal displaying all available keyboard shortcuts.
+### Accessing the Help Center
 
-**Location**: `src/components/help/KeyboardShortcutsModal.tsx`
+Users can access the help center at `/help`. The page displays:
+- Search bar
+- Category navigation
+- Article list
 
-**Features**:
-- Search shortcuts by name or key
-- Filter by category
-- Platform-specific display (Ctrl vs Cmd)
-- Print functionality
-- Grouped by category with icons
-- Responsive design
+### Viewing an Article
 
-**Props**:
-```typescript
-interface KeyboardShortcutsModalProps {
-  isOpen: boolean
-  onClose: () => void
-  currentPage?: string // For page-specific shortcuts
-}
-```
+Navigate to `/help/[slug]` to view a specific article. Features include:
+- Markdown-rendered content
+- Related articles
+- Feedback buttons
+- Print and share options
 
-## Hooks
+### Contacting Support
 
-### useKeyboardShortcuts
+Users can submit support requests at `/help/support`. The form includes:
+- Category selection
+- Priority level
+- Subject and description
+- Email confirmation
 
-Core hook for managing keyboard shortcuts with platform detection and sequence support.
+### Admin Management
 
-**Location**: `src/hooks/useKeyboardShortcuts.ts`
+Admins can manage articles at `/admin/help`. Features include:
+- Create new articles
+- Edit existing articles
+- Delete articles
+- Filter by status (all, published, drafts)
+- View statistics
 
-**Features**:
-- Platform detection (Mac vs Windows/Linux)
-- Sequence shortcuts (e.g., G then D)
-- Modifier key handling (Ctrl/Cmd, Shift, Alt)
-- Input field detection (ignores shortcuts in forms except Escape)
-- Timeout for sequence shortcuts (1 second)
+## Search Functionality
 
-**Usage**:
-```tsx
-import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts'
+The search system includes:
 
-function MyComponent() {
-  useKeyboardShortcuts({
-    shortcuts: [
-      {
-        key: 's',
-        ctrlKey: true,
-        metaKey: true,
-        callback: () => handleSave(),
-        description: 'Save form',
-        category: 'Actions',
-        preventDefault: true,
-      },
-      {
-        key: 'd',
-        sequence: ['g', 'd'],
-        callback: () => router.push('/dashboard'),
-        description: 'Go to dashboard',
-        category: 'Navigation',
-        preventDefault: true,
-      }
-    ],
-    enabled: true,
-  })
-}
-```
+1. **Full-text search** across title, content, and tags
+2. **Relevance ranking** based on:
+   - Title matches (highest weight)
+   - Tag matches
+   - Content matches
+   - Popularity (views and helpful votes)
+3. **Highlighting** of search terms in results
+4. **Snippet extraction** with context
 
-### Page-Specific Hooks
+## Markdown Support
 
-**Location**: `src/hooks/usePageKeyboardShortcuts.ts`
+Articles support full Markdown syntax including:
+- Headers
+- Lists (ordered and unordered)
+- Links
+- Images
+- Code blocks
+- Tables
+- Blockquotes
+- Bold and italic text
 
-Provides pre-configured shortcuts for specific pages:
+## Internationalization
 
-- `useDataLogKeyboardShortcuts` - Data log page shortcuts
-- `useAnalyticsKeyboardShortcuts` - Analytics page shortcuts
-- `useDataEntryKeyboardShortcuts` - Data entry page shortcuts
-- `useAuditKeyboardShortcuts` - Audit page shortcuts
-- `useTableKeyboardShortcuts` - Generic table shortcuts
-- `useFormKeyboardShortcuts` - Generic form shortcuts
+The help center is fully internationalized with support for:
+- English (en)
+- Arabic (ar)
 
-**Example**:
-```tsx
-import { useDataLogKeyboardShortcuts } from '@/hooks/usePageKeyboardShortcuts'
-
-function DataLogPage() {
-  useDataLogKeyboardShortcuts({
-    onFilter: () => setShowFilters(true),
-    onExport: () => setShowExport(true),
-    onRefresh: () => refetch(),
-    onNavigateUp: () => selectPreviousRow(),
-    onNavigateDown: () => selectNextRow(),
-    onSelectItem: () => openSelectedItem(),
-    enabled: true,
-  })
-}
-```
-
-## Configuration
-
-### Global Shortcuts Config
-
-**Location**: `src/config/keyboard-shortcuts.ts`
-
-Defines all available keyboard shortcuts in the application.
-
-**Structure**:
-```typescript
-export interface GlobalShortcutConfig {
-  id: string
-  key: string
-  ctrlKey?: boolean
-  metaKey?: boolean
-  shiftKey?: boolean
-  altKey?: boolean
-  sequence?: string[]
-  description: string
-  category: ShortcutCategory
-  pageSpecific?: string[]
-  preventDefault?: boolean
-}
-```
-
-**Categories**:
-- Navigation
-- Actions
-- Search
-- Help
-- Table
-- Forms
-- Modals
-
-## Global Shortcuts
-
-### Navigation Shortcuts
-
-| Shortcut | Description |
-|----------|-------------|
-| `Ctrl/Cmd + K` | Open global search |
-| `G then D` | Go to dashboard |
-| `G then E` | Go to data entry |
-| `G then L` | Go to data log |
-| `G then A` | Go to analytics |
-| `G then U` | Go to audit logs |
-| `G then S` | Go to settings |
-
-### Action Shortcuts
-
-| Shortcut | Description | Pages |
-|----------|-------------|-------|
-| `Ctrl/Cmd + N` | Create new item | Data Entry |
-| `Ctrl/Cmd + S` | Save form | Data Entry, Settings |
-| `R` | Refresh page | All |
-| `E` | Export data | Data Log, Analytics, Audit |
-| `F` | Open filters | Data Log, Analytics, Audit |
-
-### Help Shortcuts
-
-| Shortcut | Description |
-|----------|-------------|
-| `Ctrl/Cmd + /` | Show keyboard shortcuts |
-| `Shift + ?` | Show help |
-
-### Modal Shortcuts
-
-| Shortcut | Description |
-|----------|-------------|
-| `Escape` | Close modal or dialog |
-
-### Table Shortcuts
-
-| Shortcut | Description | Pages |
-|----------|-------------|-------|
-| `↑` | Navigate up | Data Log, Audit |
-| `↓` | Navigate down | Data Log, Audit |
-| `Enter` | Select/open item | Data Log, Audit |
-| `Ctrl/Cmd + A` | Select all | Data Log, Audit |
-
-## Integration
-
-### 1. Layout Integration
-
-The `GlobalKeyboardShortcuts` component is integrated in the main layout:
-
-```tsx
-// src/app/[locale]/layout.tsx
-import { GlobalKeyboardShortcuts } from '@/components/help'
-
-export default function Layout({ children }) {
-  return (
-    <GlobalSearchProvider>
-      <GlobalKeyboardShortcuts>
-        {children}
-      </GlobalKeyboardShortcuts>
-    </GlobalSearchProvider>
-  )
-}
-```
-
-### 2. Page-Specific Integration
-
-Add page-specific shortcuts in your page components:
-
-```tsx
-// src/app/[locale]/data-log/page.tsx
-import { useDataLogKeyboardShortcuts } from '@/hooks/usePageKeyboardShortcuts'
-
-export default function DataLogPage() {
-  const [showFilters, setShowFilters] = useState(false)
-  const [showExport, setShowExport] = useState(false)
-  
-  useDataLogKeyboardShortcuts({
-    onFilter: () => setShowFilters(true),
-    onExport: () => setShowExport(true),
-    onRefresh: () => window.location.reload(),
-  })
-  
-  return (
-    // ... page content
-  )
-}
-```
-
-## Accessibility
-
-The keyboard shortcuts system includes accessibility features:
-
-1. **Screen Reader Support**: Shortcuts are announced when triggered
-2. **Input Field Detection**: Shortcuts are disabled in input fields (except Escape)
-3. **Visual Indicators**: Help modal shows all available shortcuts
-4. **Platform Detection**: Displays correct modifier keys (Ctrl vs Cmd)
-5. **Focus Management**: Proper focus handling in modals
-
-## Translations
-
-Keyboard shortcuts support internationalization:
-
-**English** (`messages/en.json`):
-```json
-{
-  "shortcuts": {
-    "title": "Keyboard Shortcuts",
-    "search": "Search shortcuts...",
-    "allCategories": "All Categories",
-    "print": "Print",
-    "macInfo": "Showing shortcuts for macOS",
-    "windowsInfo": "Showing shortcuts for Windows/Linux"
-  }
-}
-```
-
-**Arabic** (`messages/ar.json`):
-```json
-{
-  "shortcuts": {
-    "title": "اختصارات لوحة المفاتيح",
-    "search": "البحث عن اختصارات...",
-    "allCategories": "جميع الفئات",
-    "print": "طباعة"
-  }
-}
-```
-
-## Testing
-
-To test keyboard shortcuts:
-
-1. **Open Help Modal**: Press `Ctrl/Cmd + /` or `Shift + ?`
-2. **Search**: Press `Ctrl/Cmd + K`
-3. **Navigate**: Press `G` then `D` to go to dashboard
-4. **Page Actions**: On data-log page, press `F` for filters, `E` for export
-5. **Table Navigation**: Use arrow keys in tables
-
-## Best Practices
-
-1. **Don't Override Browser Shortcuts**: Avoid common browser shortcuts like `Ctrl+T`, `Ctrl+W`
-2. **Use Sequences for Navigation**: Use `G + X` pattern for navigation shortcuts
-3. **Single Keys for Actions**: Use single keys (F, E, R) for page-specific actions
-4. **Escape for Cancel**: Always use Escape to close modals/dialogs
-5. **Platform Detection**: Always use both `ctrlKey` and `metaKey` for cross-platform support
+All UI text is translated, and RTL layout is supported for Arabic.
 
 ## Future Enhancements
 
-- [ ] Customizable shortcuts (user preferences)
-- [ ] Shortcut conflicts detection
-- [ ] Shortcut recording/learning mode
-- [ ] Vim-style command mode
-- [ ] Shortcut analytics (most used shortcuts)
+1. **Advanced Analytics**
+   - Search term tracking
+   - Article performance metrics
+   - User journey analysis
 
-## Support
+2. **File Attachments**
+   - Support for image uploads in articles
+   - File attachments in support requests
 
-For issues or questions about keyboard shortcuts:
-1. Check the help modal (`Ctrl/Cmd + /`)
-2. Review this documentation
-3. Contact the development team
+3. **Video Support**
+   - Embed video tutorials
+   - Screen recording integration
+
+4. **AI-Powered Features**
+   - Suggested articles based on user behavior
+   - Auto-categorization of support requests
+   - Chatbot integration
+
+5. **Multi-language Articles**
+   - Support for article translations
+   - Language-specific content
+
+## Best Practices
+
+### Writing Help Articles
+
+1. **Use clear, descriptive titles**
+2. **Start with a brief summary**
+3. **Use headers to organize content**
+4. **Include screenshots and examples**
+5. **Add relevant tags for searchability**
+6. **Keep articles focused on one topic**
+7. **Update articles regularly**
+
+### Managing Categories
+
+1. **Use consistent naming**
+2. **Keep categories broad but meaningful**
+3. **Limit to 5-10 main categories**
+4. **Use subcategories for organization**
+
+### Handling Support Requests
+
+1. **Respond within expected timeframe**
+2. **Provide clear, actionable solutions**
+3. **Follow up to ensure resolution**
+4. **Create help articles for common issues**

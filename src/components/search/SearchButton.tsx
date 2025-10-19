@@ -6,7 +6,7 @@
  */
 
 import { useGlobalSearchContext } from './GlobalSearchProvider'
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/hooks/useTranslations'
 
 export function SearchButton() {
   const { openSearch } = useGlobalSearchContext()

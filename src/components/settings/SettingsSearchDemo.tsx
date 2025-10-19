@@ -7,7 +7,7 @@
  */
 
 import React, { useRef, useEffect } from 'react'
-import { useLocale } from 'next-intl'
+import { useLocale } from '@/hooks/useLocale'
 import { SettingsSearch } from './SettingsSearch'
 import { SearchResults } from './SearchResults'
 import { useSettingsSearch } from '@/hooks/useSettingsSearch'

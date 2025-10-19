@@ -2,7 +2,7 @@
 
 import { Notification } from '@/context/NotificationContext'
 import { useRouter } from 'next/navigation'
-import { useLocale } from 'next-intl'
+import { useLocale } from '@/hooks/useLocale'
 
 interface NotificationItemProps {
   notification: Notification

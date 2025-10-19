@@ -9,7 +9,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { Sidebar } from '../sidebar'
 import { useSession } from 'next-auth/react'
 import { usePathname } from 'next/navigation'
-import { useLocale } from 'next-intl'
+import { useLocale } from '@/hooks/useLocale'
 
 // Mock dependencies
 vi.mock('next-auth/react')

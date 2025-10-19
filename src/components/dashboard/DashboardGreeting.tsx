@@ -5,7 +5,7 @@
  * Displays personalized greeting with time-based message, last login info, and Hijri date
  */
 
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/hooks/useTranslations'
 import { formatDistanceToNow } from 'date-fns'
 import { ar, enUS } from 'date-fns/locale'
 import { useParams } from 'next/navigation'

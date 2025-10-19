@@ -19,19 +19,16 @@ describe('Route Permissions', () => {
   describe('isPublicRoute', () => {
     it('should identify root paths as public', () => {
       expect(isPublicRoute('/')).toBe(true)
-      expect(isPublicRoute('/en')).toBe(true)
-      expect(isPublicRoute('/ar')).toBe(true)
     })
 
     it('should identify login path as public', () => {
-      expect(isPublicRoute('/en/login')).toBe(true)
-      expect(isPublicRoute('/ar/login')).toBe(true)
+      expect(isPublicRoute('/login')).toBe(true)
     })
 
     it('should identify protected routes as not public', () => {
-      expect(isPublicRoute('/en/dashboard')).toBe(false)
-      expect(isPublicRoute('/ar/settings')).toBe(false)
-      expect(isPublicRoute('/en/audit')).toBe(false)
+      expect(isPublicRoute('/dashboard')).toBe(false)
+      expect(isPublicRoute('/settings')).toBe(false)
+      expect(isPublicRoute('/audit')).toBe(false)
     })
   })
 

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { useLocale } from 'next-intl';
+import { useLocale } from '@/hooks/useLocale';
 import {
   LineChart,
   Line,
@@ -14,7 +14,7 @@ import {
   Brush,
 } from 'recharts';
 import { Card } from '@/components/ui/card';
-import { useTranslations } from 'next-intl';
+import { useTranslations } from '@/hooks/useTranslations';
 import {
   getChartLayout,
   getRechartsRTLConfig,
