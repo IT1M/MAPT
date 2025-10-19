@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect, useMemo } from 'react'
 import { useTranslations } from '@/hooks/useTranslations'
+import { downloadBlob } from '@/utils/download-helper'
 
 export interface ExportButtonProps {
   data: any[]
@@ -101,14 +102,7 @@ export const ExportButton: React.FC<ExportButtonProps> = ({
       setExportProgress(90)
 
       // Create download link
-      const url = URL.createObjectURL(blob)
-      const link = document.createElement('a')
-      link.href = url
-      link.download = `${filename}-${new Date().toISOString().split('T')[0]}.csv`
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-      URL.revokeObjectURL(url)
+      downloadBlob(blob, `${filename}-${new Date().toISOString().split('T')[0]}.csv`)
 
       setExportProgress(100)
 
@@ -167,14 +161,7 @@ export const ExportButton: React.FC<ExportButtonProps> = ({
       setExportProgress(90)
 
       // Create download link
-      const url = URL.createObjectURL(blob)
-      const link = document.createElement('a')
-      link.href = url
-      link.download = `${filename}-${new Date().toISOString().split('T')[0]}.json`
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-      URL.revokeObjectURL(url)
+      downloadBlob(blob, `${filename}-${new Date().toISOString().split('T')[0]}.json`)
 
       setExportProgress(100)
 
@@ -256,14 +243,7 @@ export const ExportButton: React.FC<ExportButtonProps> = ({
       }
 
       // Create download link
-      const url = URL.createObjectURL(blob)
-      const link = document.createElement('a')
-      link.href = url
-      link.download = fileName
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-      URL.revokeObjectURL(url)
+      downloadBlob(blob, fileName)
 
       setExportProgress(100)
 
@@ -350,14 +330,7 @@ export const ExportButton: React.FC<ExportButtonProps> = ({
       }
 
       // Create download link
-      const url = URL.createObjectURL(blob)
-      const link = document.createElement('a')
-      link.href = url
-      link.download = fileName
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-      URL.revokeObjectURL(url)
+      downloadBlob(blob, fileName)
 
       setExportProgress(100)
 

@@ -23,7 +23,7 @@ const mockUseLocale = vi.mocked(useLocale)
 describe('Sidebar', () => {
   beforeEach(() => {
     // Setup default mocks
-    mockUsePathname.mockReturnValue('/en/dashboard')
+    mockUsePathname.mockReturnValue('/dashboard')
     mockUseLocale.mockReturnValue('en')
 
     // Clear localStorage
@@ -246,7 +246,7 @@ describe('Sidebar', () => {
     })
 
     it('should highlight active menu item based on pathname', () => {
-      mockUsePathname.mockReturnValue('/en/dashboard')
+      mockUsePathname.mockReturnValue('/dashboard')
 
       render(<Sidebar />)
 
@@ -258,7 +258,7 @@ describe('Sidebar', () => {
     })
 
     it('should highlight active item for nested paths', () => {
-      mockUsePathname.mockReturnValue('/en/audit/dashboard')
+      mockUsePathname.mockReturnValue('/audit/dashboard')
 
       render(<Sidebar />)
 
@@ -269,7 +269,7 @@ describe('Sidebar', () => {
     })
 
     it('should not highlight inactive menu items', () => {
-      mockUsePathname.mockReturnValue('/en/dashboard')
+      mockUsePathname.mockReturnValue('/dashboard')
 
       render(<Sidebar />)
 

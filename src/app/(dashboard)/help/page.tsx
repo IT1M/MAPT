@@ -8,8 +8,9 @@ import HelpCategories from '@/components/help/HelpCategories'
 export default async function HelpCenterPage({
   searchParams
 }: {
-  searchParams: { q?: string; category?: string }
+  searchParams: Promise<{ q?: string; category?: string }>
 }) {
+  const params = await searchParams
   const t = await getTranslations('help')
 
   return (
@@ -27,7 +28,7 @@ export default async function HelpCenterPage({
           {/* Search Bar */}
           <div className="max-w-2xl mx-auto">
             <Suspense fallback={<div className="h-12 bg-gray-100 dark:bg-gray-800 rounded-lg animate-pulse" />}>
-              <HelpSearchBar initialQuery={searchParams.q} />
+              <HelpSearchBar initialQuery={params.q} />
             </Suspense>
           </div>
         </div>
@@ -36,7 +37,7 @@ export default async function HelpCenterPage({
           {/* Sidebar - Categories */}
           <aside className="lg:col-span-1">
             <Suspense fallback={<div className="h-64 bg-gray-100 dark:bg-gray-800 rounded-lg animate-pulse" />}>
-              <HelpCategories selectedCategory={searchParams.category} />
+              <HelpCategories selectedCategory={params.category} />
             </Suspense>
           </aside>
 
@@ -48,8 +49,8 @@ export default async function HelpCenterPage({
               ))}
             </div>}>
               <HelpArticleList 
-                query={searchParams.q}
-                category={searchParams.category}
+                query={params.q}
+                category={params.category}
               />
             </Suspense>
           </main>

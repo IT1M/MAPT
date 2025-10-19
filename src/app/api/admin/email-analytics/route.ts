@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@/auth.config'
+import { auth } from '@/services/auth'
 import { prisma } from '@/services/prisma'
-import { apiResponse } from '@/utils/api-response'
 
 /**
  * GET /api/admin/email-analytics
@@ -13,11 +12,11 @@ export async function GET(request: NextRequest) {
     const session = await auth()
 
     if (!session?.user) {
-      return apiResponse.unauthorized('Authentication required')
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
     }
 
     if (session.user.role !== 'ADMIN') {
-      return apiResponse.forbidden('Admin access required')
+      return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
     }
 
     const { searchParams } = new URL(request.url)
@@ -154,29 +153,36 @@ export async function GET(request: NextRequest) {
       count: item._count.id,
     }))
 
-    return apiResponse.success({
-      summary: {
-        total: totalEmails,
-        sent: sentEmails,
-        failed: failedEmails,
-        pending: pendingEmails,
-        successRate: parseFloat(successRate),
-        avgDeliveryTime: Math.round(avgDeliverySeconds),
-      },
-      templateStats,
-      deliveryRate: deliveryRateFormatted,
-      recentFailures,
-      period: {
-        days,
-        startDate,
-        endDate: new Date(),
+    return NextResponse.json({
+      success: true,
+      data: {
+        summary: {
+          total: totalEmails,
+          sent: sentEmails,
+          failed: failedEmails,
+          pending: pendingEmails,
+          successRate: parseFloat(successRate),
+          avgDeliveryTime: Math.round(avgDeliverySeconds),
+        },
+        templateStats,
+        deliveryRate: deliveryRateFormatted,
+        recentFailures,
+        period: {
+          days,
+          startDate,
+          endDate: new Date(),
+        },
       },
     })
   } catch (error) {
     console.error('[Email Analytics] Error:', error)
-    return apiResponse.error(
-      'Failed to fetch email analytics',
-      error instanceof Error ? error.message : 'Unknown error'
+    return NextResponse.json(
+      { 
+        success: false,
+        error: 'Failed to fetch email analytics',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      },
+      { status: 500 }
     )
   }
 }
@@ -191,18 +197,18 @@ export async function POST(request: NextRequest) {
     const session = await auth()
 
     if (!session?.user) {
-      return apiResponse.unauthorized('Authentication required')
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
     }
 
     if (session.user.role !== 'ADMIN') {
-      return apiResponse.forbidden('Admin access required')
+      return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
     }
 
     const body = await request.json()
     const { emailIds } = body
 
     if (!Array.isArray(emailIds) || emailIds.length === 0) {
-      return apiResponse.badRequest('Email IDs are required')
+      return NextResponse.json({ error: 'Email IDs are required' }, { status: 400 })
     }
 
     // Reset failed emails to pending for retry
@@ -218,15 +224,22 @@ export async function POST(request: NextRequest) {
       },
     })
 
-    return apiResponse.success({
-      message: `${result.count} emails queued for retry`,
-      count: result.count,
+    return NextResponse.json({
+      success: true,
+      data: {
+        message: `${result.count} emails queued for retry`,
+        count: result.count,
+      },
     })
   } catch (error) {
     console.error('[Email Analytics] Retry error:', error)
-    return apiResponse.error(
-      'Failed to retry emails',
-      error instanceof Error ? error.message : 'Unknown error'
+    return NextResponse.json(
+      { 
+        success: false,
+        error: 'Failed to retry emails',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      },
+      { status: 500 }
     )
   }
 }

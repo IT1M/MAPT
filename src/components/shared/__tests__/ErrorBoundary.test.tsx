@@ -26,7 +26,7 @@ vi.mock('@/components/ui/ErrorState', () => ({
       <h1>{title}</h1>
       <p>{description}</p>
       {retry && <button onClick={retry}>Retry</button>}
-      {showHomeButton && <a href="/">Go Home</a>}
+      {showHomeButton && <button onClick={() => window.location.href = '/'}>Go Home</button>}
     </div>
   ),
 }))

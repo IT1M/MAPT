@@ -7,6 +7,7 @@ import ReportHistoryTable from './ReportHistoryTable';
 import ScheduledReportsPanel from './ScheduledReportsPanel';
 import ReportPreviewModal from './ReportPreviewModal';
 import ReportProgressModal from './ReportProgressModal';
+import { downloadBlob } from '@/utils/download-helper';
 
 interface Report {
   id: string;
@@ -139,14 +140,7 @@ export default function ReportsManagementPage({ locale, userRole }: ReportsManag
       const res = await fetch(`/api/reports/download/${reportId}`);
       if (res.ok) {
         const blob = await res.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `report-${reportId}.pdf`;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
+        downloadBlob(blob, `report-${reportId}.pdf`);
       }
     } catch (error) {
       console.error('Failed to download report:', error);

@@ -477,14 +477,14 @@ export const performanceMonitor = new PerformanceMonitor()
  * React hook for measuring component render time
  */
 export function usePerformanceMonitor(componentName: string) {
-  if (typeof window === 'undefined') return
-
   React.useEffect(() => {
+    if (typeof window === 'undefined') return
+    
     performanceMonitor.start(`${componentName}-render`)
     return () => {
       performanceMonitor.end(`${componentName}-render`)
     }
-  })
+  }, [componentName])
 }
 
 /**

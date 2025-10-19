@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { developerSettingsSchema } from '@/utils/settings-validation'
 import type { DeveloperConfiguration, LogLevel } from '@/types/settings'
+import { downloadBlob } from '@/utils/download-helper'
 
 interface DeveloperSettingsProps {
   onSave?: (data: DeveloperConfiguration) => void
@@ -158,14 +159,7 @@ export function DeveloperSettings({ onSave }: DeveloperSettingsProps) {
 
       // Download the file
       const blob = await response.blob()
-      const url = window.URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `system-logs-${new Date().toISOString().split('T')[0]}.txt`
-      document.body.appendChild(a)
-      a.click()
-      window.URL.revokeObjectURL(url)
-      document.body.removeChild(a)
+      downloadBlob(blob, `system-logs-${new Date().toISOString().split('T')[0]}.txt`)
 
       setSuccessMessage('System logs exported successfully')
     } catch (err) {

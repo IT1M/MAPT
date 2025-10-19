@@ -286,7 +286,7 @@ export function SessionManager() {
       {sessions.length > 1 && (
         <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            💡 Tip: If you see a session you don't recognize, sign it out immediately
+            💡 Tip: If you see a session you don&apos;t recognize, sign it out immediately
             and change your password.
           </p>
         </div>

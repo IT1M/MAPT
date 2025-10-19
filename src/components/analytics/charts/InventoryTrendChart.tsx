@@ -24,6 +24,7 @@ import {
 } from '@/utils/analytics-rtl';
 import { AccessibleChartWrapper } from '../AccessibleChartWrapper';
 import type { TableColumn } from '@/utils/accessibility';
+import { downloadCSV } from '@/utils/download-helper';
 
 export interface TrendDataPoint {
   date: string;
@@ -96,13 +97,7 @@ export const InventoryTrendChart: React.FC<InventoryTrendChartProps> = ({
           .map((row) => row.join(','))
           .join('\n');
 
-        const blob = new Blob([csv], { type: 'text/csv' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `inventory-trend-${new Date().toISOString().split('T')[0]}.csv`;
-        a.click();
-        URL.revokeObjectURL(url);
+        downloadCSV(csv, `inventory-trend-${new Date().toISOString().split('T')[0]}.csv`);
       }
     }
   };

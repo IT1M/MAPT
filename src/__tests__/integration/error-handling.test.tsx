@@ -20,7 +20,7 @@ vi.mock('next/navigation', () => ({
     push: mockPush,
     refresh: mockRefresh,
   }),
-  usePathname: () => '/en/dashboard',
+  usePathname: () => '/dashboard',
 }))
 
 const messages = {

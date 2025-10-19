@@ -25,9 +25,10 @@ async function getArticle(slug: string) {
 export default async function HelpArticlePage({
   params
 }: {
-  params: { slug: string; locale: string }
+  params: Promise<{ slug: string; locale: string }>
 }) {
-  const article = await getArticle(params.slug)
+  const { slug } = await params
+  const article = await getArticle(slug)
 
   if (!article) {
     notFound()

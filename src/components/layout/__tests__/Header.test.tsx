@@ -232,7 +232,7 @@ describe('Header', () => {
         const profileButton = screen.getByText('Profile')
         fireEvent.click(profileButton)
 
-        expect(mockRouter.push).toHaveBeenCalledWith('/en/settings?section=profile')
+        expect(mockRouter.push).toHaveBeenCalledWith('/settings?section=profile')
       })
     })
 
@@ -246,7 +246,7 @@ describe('Header', () => {
         const settingsButton = screen.getByText('Settings')
         fireEvent.click(settingsButton)
 
-        expect(mockRouter.push).toHaveBeenCalledWith('/en/settings')
+        expect(mockRouter.push).toHaveBeenCalledWith('/settings')
       })
     })
 

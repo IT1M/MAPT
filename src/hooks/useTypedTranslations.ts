@@ -3,7 +3,7 @@
  * Provides autocomplete and type checking for translation keys
  */
 
-import { useTranslations } from 'next-intl';
+import { useTranslations } from '@/hooks/useTranslations';
 import type {
   TranslationNamespace,
   TranslationParams,

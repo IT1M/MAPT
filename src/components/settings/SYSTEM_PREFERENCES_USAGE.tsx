@@ -188,19 +188,14 @@ async function updateSettings() {
 }
 
 // Export system logs (Admin only)
+import { downloadBlob } from '@/utils/download-helper'
+
 async function exportSystemLogs() {
   const response = await fetch('/api/settings/logs/export')
   
   if (response.ok) {
     const blob = await response.blob()
-    const url = window.URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `system-logs-${new Date().toISOString().split('T')[0]}.txt`
-    document.body.appendChild(a)
-    a.click()
-    window.URL.revokeObjectURL(url)
-    document.body.removeChild(a)
+    downloadBlob(blob, `system-logs-${new Date().toISOString().split('T')[0]}.txt`)
   } else {
     console.error('Failed to export logs')
   }

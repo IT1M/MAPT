@@ -16,7 +16,7 @@ import { NotificationProvider } from '@/context/NotificationContext'
 
 // Mock next/navigation
 const mockPush = vi.fn()
-const mockPathname = '/en/dashboard'
+const mockPathname = '/dashboard'
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({
@@ -296,7 +296,7 @@ describe('Navigation Flow Integration Tests', () => {
       })
 
       const dataEntryLink = screen.getByRole('link', { name: /data entry/i })
-      expect(dataEntryLink).toHaveAttribute('href', '/en/data-entry')
+      expect(dataEntryLink).toHaveAttribute('href', '/data-entry')
     })
 
     it('should handle keyboard navigation in sidebar', async () => {
@@ -445,7 +445,7 @@ describe('Navigation Flow Integration Tests', () => {
       const settingsButton = await screen.findByText('Settings')
       await user.click(settingsButton)
 
-      expect(mockPush).toHaveBeenCalledWith('/en/settings')
+      expect(mockPush).toHaveBeenCalledWith('/settings')
     })
   })
 })

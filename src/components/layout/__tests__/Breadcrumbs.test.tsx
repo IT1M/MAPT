@@ -46,7 +46,7 @@ describe('Breadcrumbs', () => {
 
   describe('Path parsing', () => {
     it('should generate breadcrumbs from simple path', () => {
-      mockUsePathname.mockReturnValue('/en/dashboard')
+      mockUsePathname.mockReturnValue('/dashboard')
 
       render(<Breadcrumbs />)
 
@@ -54,7 +54,7 @@ describe('Breadcrumbs', () => {
     })
 
     it('should generate breadcrumbs from nested path', () => {
-      mockUsePathname.mockReturnValue('/en/audit/dashboard')
+      mockUsePathname.mockReturnValue('/audit/dashboard')
 
       render(<Breadcrumbs />)
 
@@ -63,7 +63,7 @@ describe('Breadcrumbs', () => {
     })
 
     it('should handle paths with multiple segments', () => {
-      mockUsePathname.mockReturnValue('/en/settings/users')
+      mockUsePathname.mockReturnValue('/settings/users')
 
       render(<Breadcrumbs />)
 
@@ -85,7 +85,7 @@ describe('Breadcrumbs', () => {
   describe('Localization', () => {
     it('should use English labels when locale is en', () => {
       mockUseLocale.mockReturnValue('en')
-      mockUsePathname.mockReturnValue('/en/data-entry')
+      mockUsePathname.mockReturnValue('/data-entry')
 
       render(<Breadcrumbs />)
 
@@ -94,7 +94,7 @@ describe('Breadcrumbs', () => {
     })
 
     it('should translate known segments', () => {
-      mockUsePathname.mockReturnValue('/en/analytics')
+      mockUsePathname.mockReturnValue('/analytics')
 
       render(<Breadcrumbs />)
 
@@ -102,7 +102,7 @@ describe('Breadcrumbs', () => {
     })
 
     it('should capitalize unknown segments', () => {
-      mockUsePathname.mockReturnValue('/en/unknown-page')
+      mockUsePathname.mockReturnValue('/unknown-page')
 
       render(<Breadcrumbs />)
 
@@ -112,16 +112,16 @@ describe('Breadcrumbs', () => {
 
   describe('Clickable links', () => {
     it('should make non-current items clickable', () => {
-      mockUsePathname.mockReturnValue('/en/audit/dashboard')
+      mockUsePathname.mockReturnValue('/audit/dashboard')
 
       render(<Breadcrumbs />)
 
       const dashboardLink = screen.getByRole('link', { name: /dashboard/i })
-      expect(dashboardLink).toHaveAttribute('href', '/en/dashboard')
+      expect(dashboardLink).toHaveAttribute('href', '/dashboard')
     })
 
     it('should not make current page clickable', () => {
-      mockUsePathname.mockReturnValue('/en/audit/dashboard')
+      mockUsePathname.mockReturnValue('/audit/dashboard')
 
       render(<Breadcrumbs />)
 
@@ -132,7 +132,7 @@ describe('Breadcrumbs', () => {
     })
 
     it('should set aria-current on current page', () => {
-      mockUsePathname.mockReturnValue('/en/settings')
+      mockUsePathname.mockReturnValue('/settings')
 
       render(<Breadcrumbs />)
 
@@ -143,7 +143,7 @@ describe('Breadcrumbs', () => {
 
   describe('Truncation', () => {
     it('should truncate breadcrumbs exceeding maxItems', () => {
-      mockUsePathname.mockReturnValue('/en/settings/users/profile/details')
+      mockUsePathname.mockReturnValue('/settings/users/profile/details')
 
       render(<Breadcrumbs maxItems={4} />)
 
@@ -151,7 +151,7 @@ describe('Breadcrumbs', () => {
     })
 
     it('should show first and last items when truncated', () => {
-      mockUsePathname.mockReturnValue('/en/settings/users/profile/details')
+      mockUsePathname.mockReturnValue('/settings/users/profile/details')
 
       render(<Breadcrumbs maxItems={4} />)
 
@@ -160,7 +160,7 @@ describe('Breadcrumbs', () => {
     })
 
     it('should not truncate when items are within limit', () => {
-      mockUsePathname.mockReturnValue('/en/settings/users')
+      mockUsePathname.mockReturnValue('/settings/users')
 
       render(<Breadcrumbs maxItems={4} />)
 
@@ -233,7 +233,7 @@ describe('Breadcrumbs', () => {
 
   describe('Accessibility', () => {
     it('should have proper ARIA label', () => {
-      mockUsePathname.mockReturnValue('/en/dashboard')
+      mockUsePathname.mockReturnValue('/dashboard')
 
       render(<Breadcrumbs />)
 
@@ -242,7 +242,7 @@ describe('Breadcrumbs', () => {
     })
 
     it('should use list structure', () => {
-      mockUsePathname.mockReturnValue('/en/audit/dashboard')
+      mockUsePathname.mockReturnValue('/audit/dashboard')
 
       render(<Breadcrumbs />)
 
@@ -251,7 +251,7 @@ describe('Breadcrumbs', () => {
     })
 
     it('should have focus indicators on links', () => {
-      mockUsePathname.mockReturnValue('/en/audit/dashboard')
+      mockUsePathname.mockReturnValue('/audit/dashboard')
 
       render(<Breadcrumbs />)
 
@@ -264,7 +264,7 @@ describe('Breadcrumbs', () => {
 
   describe('Hydration handling', () => {
     it('should render simplified version during SSR', () => {
-      mockUsePathname.mockReturnValue('/en/dashboard')
+      mockUsePathname.mockReturnValue('/dashboard')
 
       const { container } = render(<Breadcrumbs />)
 
@@ -284,7 +284,7 @@ describe('Breadcrumbs', () => {
 
   describe('Custom className', () => {
     it('should apply custom className', () => {
-      mockUsePathname.mockReturnValue('/en/dashboard')
+      mockUsePathname.mockReturnValue('/dashboard')
 
       render(<Breadcrumbs className="custom-class" />)
 
@@ -295,7 +295,7 @@ describe('Breadcrumbs', () => {
 
   describe('Separator display', () => {
     it('should show separators between items', () => {
-      mockUsePathname.mockReturnValue('/en/audit/dashboard')
+      mockUsePathname.mockReturnValue('/audit/dashboard')
 
       const { container } = render(<Breadcrumbs />)
 
@@ -305,7 +305,7 @@ describe('Breadcrumbs', () => {
     })
 
     it('should not show separator before first item', () => {
-      mockUsePathname.mockReturnValue('/en/dashboard')
+      mockUsePathname.mockReturnValue('/dashboard')
 
       const { container } = render(<Breadcrumbs />)
 

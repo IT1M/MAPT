@@ -7,6 +7,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { Theme, PRESET_THEMES, ANIMATION_SPEEDS, DENSITY_SPACING } from '@/config/themes'
+import { downloadJSON } from '@/utils/download-helper'
 
 const THEME_STORAGE_KEY = 'custom-theme'
 const THEME_CHANNEL = 'theme-sync'
@@ -178,15 +179,7 @@ export function useThemeCustomization() {
 
   const exportTheme = useCallback(() => {
     const themeJson = JSON.stringify(currentTheme, null, 2)
-    const blob = new Blob([themeJson], { type: 'application/json' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `theme-${currentTheme.id}-${Date.now()}.json`
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-    URL.revokeObjectURL(url)
+    downloadJSON(currentTheme, `theme-${currentTheme.id}-${Date.now()}.json`)
   }, [currentTheme])
 
   const importTheme = useCallback((themeJson: string): { success: boolean; error?: string } => {

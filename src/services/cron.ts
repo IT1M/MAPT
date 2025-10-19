@@ -7,7 +7,7 @@ import cron from 'node-cron';
 import { BackupService } from './backup';
 import { ReportService } from './report';
 import { AuditService } from './audit';
-import prisma from './prisma';
+import { prisma } from './prisma';
 
 class CronService {
   private backupJob: cron.ScheduledTask | null = null;

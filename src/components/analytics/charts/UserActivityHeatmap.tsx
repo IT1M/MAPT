@@ -3,6 +3,7 @@
 import React, { useMemo } from 'react';
 import { Card } from '@/components/ui/card';
 import { useTranslations } from '@/hooks/useTranslations';
+import { downloadCSV } from '@/utils/download-helper';
 
 export interface HeatmapDataPoint {
   dayOfWeek: number; // 0-6 (Sunday-Saturday)
@@ -75,13 +76,7 @@ export const UserActivityHeatmap: React.FC<UserActivityHeatmapProps> = ({
         .map((row) => row.join(','))
         .join('\n');
 
-      const blob = new Blob([csv], { type: 'text/csv' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `user-activity-heatmap-${new Date().toISOString().split('T')[0]}.csv`;
-      a.click();
-      URL.revokeObjectURL(url);
+      downloadCSV(csv, `user-activity-heatmap-${new Date().toISOString().split('T')[0]}.csv`);
     }
   };
 

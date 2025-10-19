@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/auth.config'
+import { auth } from '@/services/auth'
 import { prisma } from '@/services/prisma'
 import { z } from 'zod'
 
@@ -79,7 +78,7 @@ export async function GET(request: NextRequest) {
 // POST /api/help/articles - Create new article (admin only)
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
+    const session = await auth()
     
     if (!session?.user || session.user.role !== 'ADMIN') {
       return NextResponse.json(

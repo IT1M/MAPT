@@ -13,6 +13,7 @@ import {
 } from 'recharts';
 import { Card } from '@/components/ui/card';
 import { useTranslations } from '@/hooks/useTranslations';
+import { downloadCSV } from '@/utils/download-helper';
 
 export interface CategoryDataPoint {
   category: string;
@@ -62,13 +63,7 @@ export const CategoryChart: React.FC<CategoryChartProps> = ({
         .map((row) => row.join(','))
         .join('\n');
 
-      const blob = new Blob([csv], { type: 'text/csv' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `category-performance-${new Date().toISOString().split('T')[0]}.csv`;
-      a.click();
-      URL.revokeObjectURL(url);
+      downloadCSV(csv, `category-performance-${new Date().toISOString().split('T')[0]}.csv`);
     }
   };
 

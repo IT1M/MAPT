@@ -1,6 +1,6 @@
 import { BrandingPanel } from '@/components/auth/BrandingPanel'
 import { RegistrationForm } from '@/components/auth/RegistrationForm'
-import { useTranslations } from 'next-intl'
+import { useTranslations } from '@/hooks/useTranslations'
 
 export default async function RegisterPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params

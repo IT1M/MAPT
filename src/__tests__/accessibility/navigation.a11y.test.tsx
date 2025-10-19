@@ -23,7 +23,7 @@ vi.mock('next/navigation', () => ({
     push: vi.fn(),
     back: vi.fn(),
   }),
-  usePathname: () => '/en/dashboard',
+  usePathname: () => '/dashboard',
   useSearchParams: () => new URLSearchParams(),
 }))
 

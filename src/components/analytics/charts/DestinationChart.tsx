@@ -11,6 +11,7 @@ import {
   getChartControlsClass,
   getLegendConfig 
 } from '@/utils/analytics-rtl';
+import { downloadCSV } from '@/utils/download-helper';
 
 export interface DestinationData {
   MAIS: { quantity: number; items: number };
@@ -74,13 +75,7 @@ export const DestinationChart: React.FC<DestinationChartProps> = ({
         .map((row) => row.join(','))
         .join('\n');
 
-      const blob = new Blob([csv], { type: 'text/csv' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `destination-distribution-${new Date().toISOString().split('T')[0]}.csv`;
-      a.click();
-      URL.revokeObjectURL(url);
+      downloadCSV(csv, `destination-distribution-${new Date().toISOString().split('T')[0]}.csv`);
     }
   };
 

@@ -7,6 +7,7 @@ import { exportFilterGroup, importFilterGroup } from '@/utils/filter-builder'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { toast } from '@/utils/toast'
+import { downloadJSON } from '@/utils/download-helper'
 
 interface FilterSharingProps {
   filterGroup: FilterGroup
@@ -80,16 +81,7 @@ export function FilterSharing({
       exportedAt: new Date().toISOString(),
     }
 
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `filter-${filterName.replace(/\s+/g, '-').toLowerCase()}.json`
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-    URL.revokeObjectURL(url)
-
+    downloadJSON(data, `filter-${filterName.replace(/\s+/g, '-').toLowerCase()}.json`)
     toast.success(t('success.filterExported'))
   }
 

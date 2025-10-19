@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { useTranslations } from '@/hooks/useTranslations'
+import { downloadBlob } from '@/utils/download-helper'
 
 export interface ExportModalProps {
   isOpen: boolean
@@ -148,10 +149,6 @@ export const ExportModal: React.FC<ExportModalProps> = ({
       const blob = await response.blob()
       setProgress(75)
 
-      const url = URL.createObjectURL(blob)
-      const link = document.createElement('a')
-      link.href = url
-      
       // Extract filename from Content-Disposition header
       const contentDisposition = response.headers.get('Content-Disposition')
       let downloadFilename = `${filename}.${format === 'excel' ? 'xlsx' : format}`
@@ -163,11 +160,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
         }
       }
       
-      link.download = downloadFilename
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-      URL.revokeObjectURL(url)
+      downloadBlob(blob, downloadFilename)
 
       setProgress(100)
 

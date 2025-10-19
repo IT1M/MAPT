@@ -15,6 +15,7 @@ import {
 } from 'recharts';
 import { Card } from '@/components/ui/card';
 import { useTranslations } from '@/hooks/useTranslations';
+import { downloadCSV } from '@/utils/download-helper';
 
 export interface RejectDataPoint {
   date: string;
@@ -59,13 +60,7 @@ export const RejectAnalysisChart: React.FC<RejectAnalysisChartProps> = ({
         .map((row) => row.join(','))
         .join('\n');
 
-      const blob = new Blob([csv], { type: 'text/csv' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `reject-analysis-${new Date().toISOString().split('T')[0]}.csv`;
-      a.click();
-      URL.revokeObjectURL(url);
+      downloadCSV(csv, `reject-analysis-${new Date().toISOString().split('T')[0]}.csv`);
     }
   };
 

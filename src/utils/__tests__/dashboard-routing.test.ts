@@ -57,13 +57,13 @@ describe('Dashboard Routing', () => {
 
   describe('getDashboardUrl', () => {
     it('should prepend locale to dashboard path', () => {
-      expect(getDashboardUrl('ADMIN' as UserRole, 'en')).toBe('/en/dashboard')
+      expect(getDashboardUrl('ADMIN' as UserRole, 'en')).toBe('/dashboard')
       expect(getDashboardUrl('MANAGER' as UserRole, 'ar')).toBe('/ar/analytics')
     })
 
     it('should not duplicate locale if already present', () => {
-      const callbackUrl = '/en/inventory'
-      expect(getDashboardUrl('ADMIN' as UserRole, 'en', callbackUrl)).toBe('/en/inventory')
+      const callbackUrl = '/inventory'
+      expect(getDashboardUrl('ADMIN' as UserRole, 'en', callbackUrl)).toBe('/inventory')
     })
 
     it('should handle callback URL with locale prepending', () => {

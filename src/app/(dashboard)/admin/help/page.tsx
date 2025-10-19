@@ -1,12 +1,11 @@
 import { redirect } from 'next/navigation'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/auth.config'
+import { auth } from '@/services/auth'
 import { getTranslations } from 'next-intl/server'
 import HelpAdminLayout from '@/components/help/admin/HelpAdminLayout'
 import HelpArticleManager from '@/components/help/admin/HelpArticleManager'
 
 export default async function HelpAdminPage() {
-  const session = await getServerSession(authOptions)
+  const session = await auth()
 
   if (!session?.user || session.user.role !== 'ADMIN') {
     redirect('/access-denied')

@@ -34,9 +34,9 @@ describe('Route Permissions', () => {
 
   describe('getBaseRoute', () => {
     it('should extract base route from English paths', () => {
-      expect(getBaseRoute('/en/dashboard')).toBe('/dashboard')
-      expect(getBaseRoute('/en/data-entry')).toBe('/data-entry')
-      expect(getBaseRoute('/en/audit/dashboard')).toBe('/audit')
+      expect(getBaseRoute('/dashboard')).toBe('/dashboard')
+      expect(getBaseRoute('/data-entry')).toBe('/data-entry')
+      expect(getBaseRoute('/audit/dashboard')).toBe('/audit')
     })
 
     it('should extract base route from Arabic paths', () => {

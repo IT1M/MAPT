@@ -7,7 +7,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useLocale } from 'next-intl';
+import { useLocale } from '@/hooks/useLocale';
 import { useCallback } from 'react';
 import { handleApiError, ApiErrorHandlerOptions } from '@/utils/api-error-handler-client';
 

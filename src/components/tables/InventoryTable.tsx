@@ -490,114 +490,7 @@ export const InventoryTable: React.FC<InventoryTableProps> = ({
     }
   }, [contextMenu])
 
-  // Loading skeleton
-  if (loading) {
-    return (
-      <div className="overflow-x-auto">
-        <div className="inline-block min-w-full align-middle">
-          <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 rounded-lg">
-            <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-700">
-              <thead className="bg-gray-50 dark:bg-gray-800">
-                <tr>
-                  {columns.filter(col => isColumnVisible(col.id)).map(col => (
-                    <th
-                      key={col.id}
-                      className={`px-3 py-3.5 text-sm font-semibold text-gray-900 dark:text-gray-100 ${
-                        col.hiddenOnMobile ? 'hidden md:table-cell' : ''
-                      }`}
-                    >
-                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-900">
-                {[...Array(5)].map((_, idx) => (
-                  <tr key={idx}>
-                    {columns.filter(col => isColumnVisible(col.id)).map(col => (
-                      <td
-                        key={col.id}
-                        className={`px-3 py-4 ${
-                          col.hiddenOnMobile ? 'hidden md:table-cell' : ''
-                        }`}
-                      >
-                        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  // Error state
-  if (error) {
-    return (
-      <div className="text-center py-12">
-        <svg
-          className="w-16 h-16 mx-auto mb-4 text-red-500"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-          />
-        </svg>
-        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
-          Failed to load data
-        </h3>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-          {error.message}
-        </p>
-        <button
-          onClick={() => window.location.reload()}
-          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-        >
-          {t('common.retry')}
-        </button>
-      </div>
-    )
-  }
-
-  // Empty state
-  if (items.length === 0) {
-    return (
-      <div className="text-center py-12">
-        <svg
-          className="w-16 h-16 mx-auto mb-4 text-gray-300 dark:text-gray-600"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-          />
-        </svg>
-        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
-          {t('dataLog.noData')}
-        </h3>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
-          No inventory entries found. Try adjusting your filters.
-        </p>
-      </div>
-    )
-  }
-
-  // Use virtual scrolling for large datasets (>1000 rows)
-  const useVirtualScrolling = items.length > 1000
-
-  // Render row for virtual scrolling
+  // Render row for virtual scrolling (defined before any early returns)
   const renderVirtualRow = useCallback(({
     item,
     index,
@@ -733,6 +626,113 @@ export const InventoryTable: React.FC<InventoryTableProps> = ({
       </div>
     )
   }, [columns, columnVisibility, columnWidths, onSelectionChange, calculateRejectPercentage, getRejectPercentageColor, getDestinationBadgeColor, formatDate, isColumnVisible, getColumnWidth])
+
+  // Loading skeleton
+  if (loading) {
+    return (
+      <div className="overflow-x-auto">
+        <div className="inline-block min-w-full align-middle">
+          <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 rounded-lg">
+            <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-700">
+              <thead className="bg-gray-50 dark:bg-gray-800">
+                <tr>
+                  {columns.filter(col => isColumnVisible(col.id)).map(col => (
+                    <th
+                      key={col.id}
+                      className={`px-3 py-3.5 text-sm font-semibold text-gray-900 dark:text-gray-100 ${
+                        col.hiddenOnMobile ? 'hidden md:table-cell' : ''
+                      }`}
+                    >
+                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-900">
+                {[...Array(5)].map((_, idx) => (
+                  <tr key={idx}>
+                    {columns.filter(col => isColumnVisible(col.id)).map(col => (
+                      <td
+                        key={col.id}
+                        className={`px-3 py-4 ${
+                          col.hiddenOnMobile ? 'hidden md:table-cell' : ''
+                        }`}
+                      >
+                        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="text-center py-12">
+        <svg
+          className="w-16 h-16 mx-auto mb-4 text-red-500"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+          Failed to load data
+        </h3>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+          {error.message}
+        </p>
+        <button
+          onClick={() => window.location.reload()}
+          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+        >
+          {t('common.retry')}
+        </button>
+      </div>
+    )
+  }
+
+  // Empty state
+  if (items.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <svg
+          className="w-16 h-16 mx-auto mb-4 text-gray-300 dark:text-gray-600"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+          />
+        </svg>
+        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+          {t('dataLog.noData')}
+        </h3>
+        <p className="text-sm text-gray-500 dark:text-gray-400">
+          No inventory entries found. Try adjusting your filters.
+        </p>
+      </div>
+    )
+  }
+
+  // Use virtual scrolling for large datasets (>1000 rows)
+  const useVirtualScrolling = items.length > 1000
 
   // If using virtual scrolling, render VirtualizedTable
   if (useVirtualScrolling) {

@@ -10,6 +10,7 @@ import CreateBackupDialog from './CreateBackupDialog';
 import RestoreBackupDialog from './RestoreBackupDialog';
 import BackupValidationPanel from './BackupValidationPanel';
 import { BackupConfig, Backup, BackupHealth, ValidationResult } from '@/types/backup';
+import { downloadBlob } from '@/utils/download-helper';
 
 interface BackupManagementPageProps {
   locale: string;
@@ -99,14 +100,7 @@ export default function BackupManagementPage({ locale, userRole }: BackupManagem
       const res = await fetch(`/api/backup/download/${backupId}`);
       if (res.ok) {
         const blob = await res.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `backup-${backupId}.zip`;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
+        downloadBlob(blob, `backup-${backupId}.zip`);
       }
     } catch (error) {
       console.error('Failed to download backup:', error);

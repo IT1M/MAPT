@@ -7,7 +7,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
+import { auth } from '@/services/auth'
 import { z } from 'zod'
 import { globalSearch } from '@/services/search-server'
 import { searchSettings } from '@/services/search'
@@ -26,7 +26,7 @@ const searchSchema = z.object({
 export async function POST(request: NextRequest) {
   try {
     // Check authentication
-    const session = await getServerSession()
+    const session = await auth()
     if (!session?.user?.id) {
       return NextResponse.json(
         apiResponse.error('Authentication required', 'AUTH_REQUIRED'),
