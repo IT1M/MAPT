@@ -198,15 +198,15 @@
   - _Requirements: 17.1, 17.2, 17.3, 17.4, 17.5_
 
 - [ ] 16. Progressive Web App (PWA) Support
-- [ ] 16.1 Complete PWA with offline support and install prompt
+- [x] 16.1 Complete PWA with offline support and install prompt
   - Create manifest.json (app metadata, icons 192x192/512x512, standalone mode, theme colors)
   - Implement service worker (caching strategies, static assets cache, offline fallback, background sync)
   - Build offline queue system (localStorage queue, sync on reconnect, offline banner, sync progress)
   - Add install prompt UI (show after 30s on mobile, benefits explanation, analytics tracking)
   - _Requirements: 18.1, 18.2, 18.3, 18.4, 18.5_
 
-- [ ] 17. Security Enhancements
-- [ ] 17.1 Complete security system with 2FA and monitoring
+- [-] 17. Security Enhancements
+- [-] 17.1 Complete security system with 2FA and monitoring
   - Implement 2FA (setup flow with QR code, TOTP using speakeasy, backup codes, login verification, recovery flow, settings management)
   - Add rate limiting middleware (per-IP and per-user, configurable limits per endpoint, 429 status with Retry-After)
   - Build account lockout (track failed attempts, CAPTCHA after 5 attempts, lock after 10, security alerts, auto-unlock after 15 min)

@@ -8,7 +8,7 @@ import { prisma } from '@/services/prisma'
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth()
@@ -20,7 +20,7 @@ export async function DELETE(
       )
     }
 
-    const sessionId = params.id
+    const { id: sessionId } = await params
 
     // Get current session token to prevent self-termination
     const currentSessionToken = request.cookies.get('authjs.session-token')?.value ||

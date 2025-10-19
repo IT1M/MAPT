@@ -31,8 +31,10 @@
     "migrate:status": "prisma migrate status",
     "backup:database": "bash scripts/backup-database.sh",
     "verify:backups": "tsx scripts/verify-backups.ts",
+    "verify:pwa": "node scripts/verify-pwa.js",
     "analyze:bundle": "node scripts/analyze-bundle.js",
     "analyze:db": "tsx scripts/analyze-db-performance.ts",
+    "postinstall": "find node_modules/@types/ -maxdepth 1 -name '* 2' -type d -exec rm -rf {} \\; 2>/dev/null || true",
     "predev": "npm run validate:env",
     "prebuild": "npm run validate:env"
   },

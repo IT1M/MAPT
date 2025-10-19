@@ -18,7 +18,7 @@ import {
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Check authentication
@@ -35,7 +35,7 @@ export async function DELETE(
       return insufficientPermissionsError('Permission to delete reports required')
     }
 
-    const reportId = params.id
+    const reportId = (await params).id
 
     // Check if report exists
     const report = await reportService.getReportById(reportId)

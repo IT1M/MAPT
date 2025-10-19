@@ -19,7 +19,7 @@ import path from 'path'
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Check authentication
@@ -36,7 +36,7 @@ export async function GET(
       return insufficientPermissionsError('Permission to preview reports required')
     }
 
-    const reportId = params.id
+    const reportId = (await params).id
 
     // Get report from database
     const report = await reportService.getReportById(reportId)

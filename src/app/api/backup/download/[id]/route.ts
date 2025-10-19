@@ -15,7 +15,7 @@ import { readFile } from 'fs/promises'
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Check authentication
@@ -37,7 +37,7 @@ export async function GET(
       }
     }
 
-    const backupId = params.id
+    const backupId = (await params).id
 
     // Get backup record
     const backup: any = await prisma.backup.findUnique({

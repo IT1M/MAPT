@@ -5,6 +5,7 @@ import { Toaster } from 'react-hot-toast'
 import { SessionProvider } from 'next-auth/react'
 import { NotificationProvider } from '@/context/NotificationContext'
 import { GlobalSearchProvider } from '@/components/search'
+import { PWAProvider } from '@/components/pwa/PWAProvider'
 import './globals.css'
 
 // Configure Inter font for English
@@ -35,6 +36,17 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  manifest: '/manifest.json',
+  themeColor: '#0d9488',
+  icons: {
+    icon: '/icons/icon-192.png',
+    apple: '/icons/icon-192.png',
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Mais Inventory',
+  },
   openGraph: {
     type: 'website',
     locale: 'en_US',
@@ -62,7 +74,9 @@ export default function RootLayout({
           >
             <NotificationProvider>
               <GlobalSearchProvider>
-                {children}
+                <PWAProvider>
+                  {children}
+                </PWAProvider>
               </GlobalSearchProvider>
             </NotificationProvider>
             <Toaster

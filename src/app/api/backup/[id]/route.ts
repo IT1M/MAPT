@@ -16,7 +16,7 @@ import { BackupService } from '@/services/backup'
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Check authentication
@@ -33,7 +33,7 @@ export async function DELETE(
       return roleCheck.error
     }
 
-    const backupId = params.id
+    const backupId = (await params).id
 
     // Delete backup using BackupService
     await BackupService.deleteBackup(backupId, context.user.id)

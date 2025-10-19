@@ -20,7 +20,7 @@ import { ReportType, ReportFormat, ScheduleFrequency } from '@prisma/client'
  */
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Check authentication
@@ -36,7 +36,7 @@ export async function PUT(
       return insufficientPermissionsError('ADMIN role required to update scheduled reports')
     }
 
-    const scheduleId = params.id
+    const scheduleId = (await params).id
 
     // Check if schedule exists
     const existingSchedule = await prisma.reportSchedule.findUnique({
@@ -147,7 +147,7 @@ export async function PUT(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Check authentication
@@ -163,7 +163,7 @@ export async function DELETE(
       return insufficientPermissionsError('ADMIN role required to delete scheduled reports')
     }
 
-    const scheduleId = params.id
+    const scheduleId = (await params).id
 
     // Check if schedule exists
     const schedule = await prisma.reportSchedule.findUnique({

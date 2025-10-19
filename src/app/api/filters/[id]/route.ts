@@ -9,7 +9,7 @@ import { FilterGroup } from '@/types/filters'
  */
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth()
@@ -25,7 +25,7 @@ export async function PATCH(
 
     // Verify ownership
     const existingFilter = await prisma.savedFilter.findUnique({
-      where: { id: params.id },
+      where: { id: (await params).id },
     })
 
     if (!existingFilter) {
@@ -49,7 +49,7 @@ export async function PATCH(
           userId: session.user.id,
           page: existingFilter.page,
           isDefault: true,
-          id: { not: params.id },
+          id: { not: (await params).id },
         },
         data: {
           isDefault: false,
@@ -66,7 +66,7 @@ export async function PATCH(
     if (isDefault !== undefined) updateData.isDefault = isDefault
 
     const updatedFilter = await prisma.savedFilter.update({
-      where: { id: params.id },
+      where: { id: (await params).id },
       data: updateData,
     })
 
@@ -92,7 +92,7 @@ export async function PATCH(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth()
@@ -105,7 +105,7 @@ export async function DELETE(
 
     // Verify ownership
     const existingFilter = await prisma.savedFilter.findUnique({
-      where: { id: params.id },
+      where: { id: (await params).id },
     })
 
     if (!existingFilter) {
@@ -123,7 +123,7 @@ export async function DELETE(
     }
 
     await prisma.savedFilter.delete({
-      where: { id: params.id },
+      where: { id: (await params).id },
     })
 
     return NextResponse.json({

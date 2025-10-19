@@ -711,3 +711,39 @@
     transition: outline 0.1s ease-out;
   }
 }
+
+/* ============================================
+   PWA Animations
+   ============================================ */
+
+/* Slide up animation for PWA install prompt */
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-up {
+  animation: slideUp 300ms ease-out forwards;
+}
+
+/* Slide down animation for offline banner */
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-down {
+  animation: slideDown 300ms ease-out forwards;
+}
