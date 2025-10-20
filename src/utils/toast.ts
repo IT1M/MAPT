@@ -1,4 +1,4 @@
-import toastLib from 'react-hot-toast'
+import toastLib from 'react-hot-toast';
 
 /**
  * Show an info toast notification with blue styling
@@ -16,7 +16,8 @@ export const toastInfo = (message: string, options?: any) => {
       borderRadius: '8px',
       fontSize: '14px',
       fontWeight: '500',
-      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+      boxShadow:
+        '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
     },
     iconTheme: {
       primary: 'rgb(59 130 246)', // blue-500
@@ -25,8 +26,8 @@ export const toastInfo = (message: string, options?: any) => {
     icon: 'ℹ️',
     className: 'dark:!bg-blue-900/20 dark:!text-blue-200 dark:!border-blue-800',
     ...options,
-  })
-}
+  });
+};
 
 /**
  * Toast utility with custom methods for notifications
@@ -40,8 +41,8 @@ export const toast = {
         borderRadius: '8px',
         fontSize: '14px',
         fontWeight: '500',
-      }
-    })
+      },
+    });
   },
   error: (title: string, message?: string) => {
     return toastLib.error(message || title, {
@@ -51,8 +52,8 @@ export const toast = {
         borderRadius: '8px',
         fontSize: '14px',
         fontWeight: '500',
-      }
-    })
+      },
+    });
   },
   warning: (title: string, message?: string) => {
     return toastLib(message || title, {
@@ -67,8 +68,9 @@ export const toast = {
         fontSize: '14px',
         fontWeight: '500',
       },
-      className: 'dark:!bg-yellow-900/20 dark:!text-yellow-200 dark:!border-yellow-800',
-    })
+      className:
+        'dark:!bg-yellow-900/20 dark:!text-yellow-200 dark:!border-yellow-800',
+    });
   },
   info: toastInfo,
   loading: (message: string) => {
@@ -78,16 +80,16 @@ export const toast = {
         borderRadius: '8px',
         fontSize: '14px',
         fontWeight: '500',
-      }
-    })
+      },
+    });
   },
   dismiss: (toastId?: string) => {
-    return toastLib.dismiss(toastId)
-  }
-}
+    return toastLib.dismiss(toastId);
+  },
+};
 
 /**
  * Re-export toast library for direct access
  */
-export { toastLib }
-export default toast
+export { toastLib };
+export default toast;

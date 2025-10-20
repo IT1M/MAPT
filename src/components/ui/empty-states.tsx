@@ -1,6 +1,6 @@
 /**
  * Empty State Components Index
- * 
+ *
  * Centralized exports for all empty state components
  */
 

@@ -1,6 +1,6 @@
 /**
  * Alerting and Notification Service
- * 
+ *
  * Provides alerting capabilities for monitoring critical system events
  */
 
@@ -108,11 +108,15 @@ class AlertingService {
     this.alerts.push(alert);
 
     // Log alert
-    logger.error(`ALERT [${severity.toUpperCase()}]: ${message}`, new Error(message), {
-      alertId: alert.id,
-      type,
-      metadata,
-    });
+    logger.error(
+      `ALERT [${severity.toUpperCase()}]: ${message}`,
+      new Error(message),
+      {
+        alertId: alert.id,
+        type,
+        metadata,
+      }
+    );
 
     // Send notifications
     this.sendNotifications(alert);
@@ -125,7 +129,7 @@ class AlertingService {
    */
   trackMetric(type: AlertType, value: number): void {
     const key = type.toString();
-    
+
     if (!this.metrics.has(key)) {
       this.metrics.set(key, []);
     }
@@ -163,21 +167,29 @@ class AlertingService {
 
     switch (type) {
       case AlertType.ERROR_RATE: {
-        const errorRate = (metrics.reduce((a, b) => a + b, 0) / metrics.length) * 100;
+        const errorRate =
+          (metrics.reduce((a, b) => a + b, 0) / metrics.length) * 100;
         if (errorRate > threshold.threshold) {
           shouldAlert = true;
           message = `Error rate (${errorRate.toFixed(2)}%) exceeds threshold (${threshold.threshold}%)`;
-          severity = errorRate > threshold.threshold * 2 ? AlertSeverity.CRITICAL : AlertSeverity.ERROR;
+          severity =
+            errorRate > threshold.threshold * 2
+              ? AlertSeverity.CRITICAL
+              : AlertSeverity.ERROR;
         }
         break;
       }
 
       case AlertType.RESPONSE_TIME: {
-        const avgResponseTime = metrics.reduce((a, b) => a + b, 0) / metrics.length;
+        const avgResponseTime =
+          metrics.reduce((a, b) => a + b, 0) / metrics.length;
         if (avgResponseTime > threshold.threshold) {
           shouldAlert = true;
           message = `Average response time (${avgResponseTime.toFixed(0)}ms) exceeds threshold (${threshold.threshold}ms)`;
-          severity = avgResponseTime > threshold.threshold * 2 ? AlertSeverity.CRITICAL : AlertSeverity.WARNING;
+          severity =
+            avgResponseTime > threshold.threshold * 2
+              ? AlertSeverity.CRITICAL
+              : AlertSeverity.WARNING;
         }
         break;
       }
@@ -193,7 +205,7 @@ class AlertingService {
       }
 
       case AlertType.PERFORMANCE: {
-        const poorMetrics = metrics.filter(m => m > 0).length;
+        const poorMetrics = metrics.filter((m) => m > 0).length;
         if (poorMetrics > 0) {
           shouldAlert = true;
           message = `${poorMetrics} Core Web Vitals metrics in poor range`;
@@ -206,8 +218,10 @@ class AlertingService {
     if (shouldAlert) {
       // Check if similar alert already exists and is not resolved
       const existingAlert = this.alerts.find(
-        a => a.type === type && !a.resolved && 
-        Date.now() - a.timestamp.getTime() < threshold.window
+        (a) =>
+          a.type === type &&
+          !a.resolved &&
+          Date.now() - a.timestamp.getTime() < threshold.window
       );
 
       if (!existingAlert) {
@@ -225,7 +239,10 @@ class AlertingService {
    */
   private async sendNotifications(alert: Alert): Promise<void> {
     // Send to different channels based on severity
-    if (alert.severity === AlertSeverity.CRITICAL || alert.severity === AlertSeverity.ERROR) {
+    if (
+      alert.severity === AlertSeverity.CRITICAL ||
+      alert.severity === AlertSeverity.ERROR
+    ) {
       await this.sendEmailNotification(alert);
       await this.sendSlackNotification(alert);
     } else if (alert.severity === AlertSeverity.WARNING) {
@@ -367,10 +384,14 @@ Message: ${alert.message}
 Time: ${alert.timestamp.toISOString()}
 Alert ID: ${alert.id}
 
-${alert.metadata ? `
+${
+  alert.metadata
+    ? `
 Metadata:
 ${JSON.stringify(alert.metadata, null, 2)}
-` : ''}
+`
+    : ''
+}
 
 ---
 This is an automated alert from the Saudi Mais Inventory Management System.
@@ -381,7 +402,7 @@ This is an automated alert from the Saudi Mais Inventory Management System.
    * Resolve an alert
    */
   resolveAlert(alertId: string): void {
-    const alert = this.alerts.find(a => a.id === alertId);
+    const alert = this.alerts.find((a) => a.id === alertId);
     if (alert && !alert.resolved) {
       alert.resolved = true;
       alert.resolvedAt = new Date();
@@ -406,15 +427,15 @@ This is an automated alert from the Saudi Mais Inventory Management System.
     let filtered = [...this.alerts];
 
     if (options?.type) {
-      filtered = filtered.filter(a => a.type === options.type);
+      filtered = filtered.filter((a) => a.type === options.type);
     }
 
     if (options?.severity) {
-      filtered = filtered.filter(a => a.severity === options.severity);
+      filtered = filtered.filter((a) => a.severity === options.severity);
     }
 
     if (options?.resolved !== undefined) {
-      filtered = filtered.filter(a => a.resolved === options.resolved);
+      filtered = filtered.filter((a) => a.resolved === options.resolved);
     }
 
     // Sort by timestamp (newest first)
@@ -451,7 +472,7 @@ This is an automated alert from the Saudi Mais Inventory Management System.
     const byType = {} as Record<AlertType, number>;
     const bySeverity = {} as Record<AlertSeverity, number>;
 
-    this.alerts.forEach(alert => {
+    this.alerts.forEach((alert) => {
       byType[alert.type] = (byType[alert.type] || 0) + 1;
       bySeverity[alert.severity] = (bySeverity[alert.severity] || 0) + 1;
     });
@@ -460,8 +481,8 @@ This is an automated alert from the Saudi Mais Inventory Management System.
       total: this.alerts.length,
       byType,
       bySeverity,
-      resolved: this.alerts.filter(a => a.resolved).length,
-      unresolved: this.alerts.filter(a => !a.resolved).length,
+      resolved: this.alerts.filter((a) => a.resolved).length,
+      unresolved: this.alerts.filter((a) => !a.resolved).length,
     };
   }
 }

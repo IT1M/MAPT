@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 /**
  * Global Search Modal Component
@@ -6,108 +6,111 @@
  * with keyboard navigation and recent searches
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react'
-import { useRouter } from 'next/navigation'
-import { useTranslations } from '@/hooks/useTranslations'
-import { useDebounce } from '@/hooks/useDebounce'
-import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts'
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { useRouter } from 'next/navigation';
+import { useTranslations } from '@/hooks/useTranslations';
+import { useDebounce } from '@/hooks/useDebounce';
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import {
   getRecentSearches,
   saveRecentSearch,
   clearRecentSearches,
   type SearchResult,
-  type SearchResultItem
-} from '@/services/search'
+  type SearchResultItem,
+} from '@/services/search';
 
 interface GlobalSearchProps {
-  isOpen: boolean
-  onClose: () => void
+  isOpen: boolean;
+  onClose: () => void;
 }
 
 export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
-  const t = useTranslations()
-  const router = useRouter()
-  const [query, setQuery] = useState('')
-  const [results, setResults] = useState<SearchResult | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [selectedIndex, setSelectedIndex] = useState(0)
-  const [recentSearches, setRecentSearches] = useState<string[]>([])
-  const inputRef = useRef<HTMLInputElement>(null)
-  const resultsRef = useRef<HTMLDivElement>(null)
+  const t = useTranslations();
+  const router = useRouter();
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState<SearchResult | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const resultsRef = useRef<HTMLDivElement>(null);
 
-  const debouncedQuery = useDebounce(query, 300)
+  const debouncedQuery = useDebounce(query, 300);
 
   // Load recent searches on mount
   useEffect(() => {
     if (isOpen) {
-      setRecentSearches(getRecentSearches())
+      setRecentSearches(getRecentSearches());
       // Focus input when modal opens
-      setTimeout(() => inputRef.current?.focus(), 100)
+      setTimeout(() => inputRef.current?.focus(), 100);
     }
-  }, [isOpen])
+  }, [isOpen]);
 
   // Perform search when debounced query changes
   useEffect(() => {
     if (debouncedQuery.trim()) {
-      performSearch(debouncedQuery)
+      performSearch(debouncedQuery);
     } else {
-      setResults(null)
-      setSelectedIndex(0)
+      setResults(null);
+      setSelectedIndex(0);
     }
-  }, [debouncedQuery])
+  }, [debouncedQuery]);
 
   // Perform search API call
   const performSearch = async (searchQuery: string) => {
-    setLoading(true)
+    setLoading(true);
     try {
       const response = await fetch('/api/search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: searchQuery, limit: 5 })
-      })
+        body: JSON.stringify({ query: searchQuery, limit: 5 }),
+      });
 
       if (response.ok) {
-        const data = await response.json()
-        setResults(data.data)
-        setSelectedIndex(0)
+        const data = await response.json();
+        setResults(data.data);
+        setSelectedIndex(0);
       }
     } catch (error) {
-      console.error('Search error:', error)
+      console.error('Search error:', error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   // Get all results as flat array for keyboard navigation
   const getAllResults = useCallback((): SearchResultItem[] => {
-    if (!results) return []
+    if (!results) return [];
     return [
       ...results.items,
       ...results.reports,
       ...results.users,
-      ...results.settings
-    ]
-  }, [results])
+      ...results.settings,
+    ];
+  }, [results]);
 
   // Handle result selection
-  const handleSelectResult = useCallback((result: SearchResultItem) => {
-    saveRecentSearch(query)
-    router.push(result.url)
-    onClose()
-    setQuery('')
-  }, [query, router, onClose])
+  const handleSelectResult = useCallback(
+    (result: SearchResultItem) => {
+      saveRecentSearch(query);
+      router.push(result.url);
+      onClose();
+      setQuery('');
+    },
+    [query, router, onClose]
+  );
 
   // Handle recent search selection
   const handleSelectRecentSearch = useCallback((search: string) => {
-    setQuery(search)
-    inputRef.current?.focus()
-  }, [])
+    setQuery(search);
+    inputRef.current?.focus();
+  }, []);
 
   // Clear recent searches
   const handleClearRecent = useCallback(() => {
-    clearRecentSearches()
-    setRecentSearches([])
-  }, [])
+    clearRecentSearches();
+    setRecentSearches([]);
+  }, []);
 
   // Keyboard navigation
   useKeyboardShortcuts({
@@ -115,64 +118,66 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
       {
         key: 'Escape',
         callback: () => {
-          onClose()
-          setQuery('')
+          onClose();
+          setQuery('');
         },
         description: 'Close search',
-        preventDefault: true
+        preventDefault: true,
       },
       {
         key: 'ArrowDown',
         callback: () => {
-          const allResults = getAllResults()
+          const allResults = getAllResults();
           if (allResults.length > 0) {
-            setSelectedIndex(prev => (prev + 1) % allResults.length)
+            setSelectedIndex((prev) => (prev + 1) % allResults.length);
           }
         },
         description: 'Navigate down',
-        preventDefault: true
+        preventDefault: true,
       },
       {
         key: 'ArrowUp',
         callback: () => {
-          const allResults = getAllResults()
+          const allResults = getAllResults();
           if (allResults.length > 0) {
-            setSelectedIndex(prev => (prev - 1 + allResults.length) % allResults.length)
+            setSelectedIndex(
+              (prev) => (prev - 1 + allResults.length) % allResults.length
+            );
           }
         },
         description: 'Navigate up',
-        preventDefault: true
+        preventDefault: true,
       },
       {
         key: 'Enter',
         callback: () => {
-          const allResults = getAllResults()
+          const allResults = getAllResults();
           if (allResults[selectedIndex]) {
-            handleSelectResult(allResults[selectedIndex])
+            handleSelectResult(allResults[selectedIndex]);
           }
         },
         description: 'Select result',
-        preventDefault: true
-      }
+        preventDefault: true,
+      },
     ],
-    enabled: isOpen
-  })
+    enabled: isOpen,
+  });
 
   // Scroll selected item into view
   useEffect(() => {
     if (resultsRef.current) {
       const selectedElement = resultsRef.current.querySelector(
         `[data-index="${selectedIndex}"]`
-      )
-      selectedElement?.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+      );
+      selectedElement?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     }
-  }, [selectedIndex])
+  }, [selectedIndex]);
 
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
-  const allResults = getAllResults()
-  const hasResults = results && results.total > 0
-  const showRecent = !query.trim() && recentSearches.length > 0
+  const allResults = getAllResults();
+  const hasResults = results && results.total > 0;
+  const showRecent = !query.trim() && recentSearches.length > 0;
 
   return (
     <>
@@ -213,7 +218,10 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder={t('search.placeholder') || 'Search inventory, reports, users, settings...'}
+                placeholder={
+                  t('search.placeholder') ||
+                  'Search inventory, reports, users, settings...'
+                }
                 className="w-full pl-10 pr-4 py-3 bg-transparent border-none focus:outline-none text-lg"
                 autoComplete="off"
                 aria-label="Search query"
@@ -321,7 +329,9 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
                     selectedIndex={selectedIndex}
                     onSelect={handleSelectResult}
                     startIndex={
-                      results.items.length + results.reports.length + results.users.length
+                      results.items.length +
+                      results.reports.length +
+                      results.users.length
                     }
                   />
                 )}
@@ -404,17 +414,17 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
         </div>
       </div>
     </>
-  )
+  );
 }
 
 // Search Result Group Component
 interface SearchResultGroupProps {
-  title: string
-  icon: string
-  results: SearchResultItem[]
-  selectedIndex: number
-  onSelect: (result: SearchResultItem) => void
-  startIndex: number
+  title: string;
+  icon: string;
+  results: SearchResultItem[];
+  selectedIndex: number;
+  onSelect: (result: SearchResultItem) => void;
+  startIndex: number;
 }
 
 function SearchResultGroup({
@@ -423,7 +433,7 @@ function SearchResultGroup({
   results,
   selectedIndex,
   onSelect,
-  startIndex
+  startIndex,
 }: SearchResultGroupProps) {
   return (
     <div className="p-2">
@@ -433,8 +443,8 @@ function SearchResultGroup({
       </h3>
       <div className="space-y-1">
         {results.map((result, index) => {
-          const globalIndex = startIndex + index
-          const isSelected = globalIndex === selectedIndex
+          const globalIndex = startIndex + index;
+          const isSelected = globalIndex === selectedIndex;
 
           return (
             <button
@@ -456,9 +466,9 @@ function SearchResultGroup({
                 {result.description}
               </div>
             </button>
-          )
+          );
         })}
       </div>
     </div>
-  )
+  );
 }

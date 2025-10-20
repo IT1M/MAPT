@@ -1,36 +1,38 @@
-'use client'
+'use client';
 
 /**
  * Global Keyboard Shortcuts Provider
  * Manages all global keyboard shortcuts throughout the application
  */
 
-import { useState, useCallback, useEffect } from 'react'
-import { useRouter, usePathname } from 'next/navigation'
-import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts'
-import { KeyboardShortcutsModal } from './KeyboardShortcutsModal'
-import { useGlobalSearchContext } from '@/components/search'
+import { useState, useCallback, useEffect } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
+import { KeyboardShortcutsModal } from './KeyboardShortcutsModal';
+import { useGlobalSearchContext } from '@/components/search/GlobalSearchProvider';
 
 interface GlobalKeyboardShortcutsProps {
-  children?: React.ReactNode
+  children?: React.ReactNode;
 }
 
-export function GlobalKeyboardShortcuts({ children }: GlobalKeyboardShortcutsProps) {
-  const router = useRouter()
-  const pathname = usePathname()
-  const { openSearch } = useGlobalSearchContext()
-  const [showShortcutsModal, setShowShortcutsModal] = useState(false)
+export function GlobalKeyboardShortcuts({
+  children,
+}: GlobalKeyboardShortcutsProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const { openSearch } = useGlobalSearchContext();
+  const [showShortcutsModal, setShowShortcutsModal] = useState(false);
 
   // Get current page for context-aware shortcuts
   const getCurrentPage = useCallback(() => {
-    if (pathname.includes('/data-entry')) return 'data-entry'
-    if (pathname.includes('/data-log')) return 'data-log'
-    if (pathname.includes('/analytics')) return 'analytics'
-    if (pathname.includes('/audit')) return 'audit'
-    if (pathname.includes('/settings')) return 'settings'
-    if (pathname.includes('/dashboard')) return 'dashboard'
-    return 'other'
-  }, [pathname])
+    if (pathname.includes('/data-entry')) return 'data-entry';
+    if (pathname.includes('/data-log')) return 'data-log';
+    if (pathname.includes('/analytics')) return 'analytics';
+    if (pathname.includes('/audit')) return 'audit';
+    if (pathname.includes('/settings')) return 'settings';
+    if (pathname.includes('/dashboard')) return 'dashboard';
+    return 'other';
+  }, [pathname]);
 
   // Define global shortcuts
   useKeyboardShortcuts({
@@ -119,7 +121,7 @@ export function GlobalKeyboardShortcuts({ children }: GlobalKeyboardShortcutsPro
       {
         key: 'r',
         callback: () => {
-          window.location.reload()
+          window.location.reload();
         },
         description: 'Refresh current page',
         category: 'Actions',
@@ -127,7 +129,7 @@ export function GlobalKeyboardShortcuts({ children }: GlobalKeyboardShortcutsPro
       },
     ],
     enabled: true,
-  })
+  });
 
   return (
     <>
@@ -138,5 +140,5 @@ export function GlobalKeyboardShortcuts({ children }: GlobalKeyboardShortcutsPro
         currentPage={getCurrentPage()}
       />
     </>
-  )
+  );
 }

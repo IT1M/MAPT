@@ -269,12 +269,12 @@
   [dir='rtl'] .settings-layout {
     flex-direction: column;
   }
-  
+
   [dir='rtl'] .settings-nav {
     border-left: none;
     border-bottom: 1px solid var(--border-color);
   }
-  
+
   [dir='rtl'] .settings-content {
     padding-right: 1rem;
     padding-left: 1rem;

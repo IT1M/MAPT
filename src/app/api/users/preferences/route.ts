@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@/services/auth'
-import { prisma } from '@/services/prisma'
-import { z } from 'zod'
-import { createAuditLog } from '@/utils/audit'
+import { NextRequest, NextResponse } from 'next/server';
+import { auth } from '@/services/auth';
+import { prisma } from '@/services/prisma';
+import { z } from 'zod';
+import { createAuditLog } from '@/utils/audit';
 
 // Validation schema for user preferences
 const preferencesSchema = z.object({
@@ -40,7 +40,7 @@ const preferencesSchema = z.object({
   sidebarCollapsed: z.boolean().optional(),
   sidebarPosition: z.enum(['left', 'right']).optional(),
   showBreadcrumbs: z.boolean().optional(),
-})
+});
 
 const DEFAULT_PREFERENCES = {
   theme: 'system',
@@ -65,7 +65,7 @@ const DEFAULT_PREFERENCES = {
   sidebarCollapsed: false,
   sidebarPosition: 'left',
   showBreadcrumbs: true,
-}
+};
 
 /**
  * GET /api/users/preferences
@@ -73,13 +73,16 @@ const DEFAULT_PREFERENCES = {
  */
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth()
+    const session = await auth();
 
     if (!session?.user?.id) {
       return NextResponse.json(
-        { success: false, error: { code: 'AUTH_REQUIRED', message: 'Authentication required' } },
+        {
+          success: false,
+          error: { code: 'AUTH_REQUIRED', message: 'Authentication required' },
+        },
         { status: 401 }
-      )
+      );
     }
 
     const user = await prisma.user.findUnique({
@@ -87,27 +90,30 @@ export async function GET(request: NextRequest) {
       select: {
         preferences: true,
       },
-    })
+    });
 
     if (!user) {
       return NextResponse.json(
-        { success: false, error: { code: 'NOT_FOUND', message: 'User not found' } },
+        {
+          success: false,
+          error: { code: 'NOT_FOUND', message: 'User not found' },
+        },
         { status: 404 }
-      )
+      );
     }
 
     // Merge with defaults to ensure all fields are present
     const preferences = {
       ...DEFAULT_PREFERENCES,
-      ...(user.preferences as any || {}),
-    }
+      ...((user.preferences as any) || {}),
+    };
 
     return NextResponse.json({
       success: true,
       data: preferences,
-    })
+    });
   } catch (error) {
-    console.error('Error fetching preferences:', error)
+    console.error('Error fetching preferences:', error);
     return NextResponse.json(
       {
         success: false,
@@ -117,7 +123,7 @@ export async function GET(request: NextRequest) {
         },
       },
       { status: 500 }
-    )
+    );
   }
 }
 
@@ -127,19 +133,22 @@ export async function GET(request: NextRequest) {
  */
 export async function PATCH(request: NextRequest) {
   try {
-    const session = await auth()
+    const session = await auth();
 
     if (!session?.user?.id) {
       return NextResponse.json(
-        { success: false, error: { code: 'AUTH_REQUIRED', message: 'Authentication required' } },
+        {
+          success: false,
+          error: { code: 'AUTH_REQUIRED', message: 'Authentication required' },
+        },
         { status: 401 }
-      )
+      );
     }
 
-    const body = await request.json()
+    const body = await request.json();
 
     // Validate input
-    const validation = preferencesSchema.safeParse(body)
+    const validation = preferencesSchema.safeParse(body);
     if (!validation.success) {
       return NextResponse.json(
         {
@@ -155,7 +164,7 @@ export async function PATCH(request: NextRequest) {
           },
         },
         { status: 400 }
-      )
+      );
     }
 
     // Get current user data
@@ -164,42 +173,45 @@ export async function PATCH(request: NextRequest) {
       select: {
         preferences: true,
       },
-    })
+    });
 
     if (!currentUser) {
       return NextResponse.json(
-        { success: false, error: { code: 'NOT_FOUND', message: 'User not found' } },
+        {
+          success: false,
+          error: { code: 'NOT_FOUND', message: 'User not found' },
+        },
         { status: 404 }
-      )
+      );
     }
 
-    const currentPreferences = (currentUser.preferences as any) || {}
+    const currentPreferences = (currentUser.preferences as any) || {};
 
     // Deep merge preferences
     const updatedPreferences = {
       ...currentPreferences,
       ...validation.data,
-    }
+    };
 
     // Handle nested notifications object
     if (validation.data.notifications) {
       updatedPreferences.notifications = {
         ...currentPreferences.notifications,
         ...validation.data.notifications,
-      }
+      };
 
       if (validation.data.notifications.email) {
         updatedPreferences.notifications.email = {
           ...currentPreferences.notifications?.email,
           ...validation.data.notifications.email,
-        }
+        };
       }
 
       if (validation.data.notifications.inApp) {
         updatedPreferences.notifications.inApp = {
           ...currentPreferences.notifications?.inApp,
           ...validation.data.notifications.inApp,
-        }
+        };
       }
     }
 
@@ -212,13 +224,13 @@ export async function PATCH(request: NextRequest) {
       select: {
         preferences: true,
       },
-    })
+    });
 
     // Create audit log for significant preference changes
-    const significantChanges = ['theme', 'colorScheme']
+    const significantChanges = ['theme', 'colorScheme'];
     const hasSignificantChange = Object.keys(validation.data).some((key) =>
       significantChanges.includes(key)
-    )
+    );
 
     if (hasSignificantChange) {
       await createAuditLog({
@@ -231,19 +243,22 @@ export async function PATCH(request: NextRequest) {
           newValue: updatedPreferences,
         },
         metadata: {
-          ipAddress: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || undefined,
+          ipAddress:
+            request.headers.get('x-forwarded-for') ||
+            request.headers.get('x-real-ip') ||
+            undefined,
           userAgent: request.headers.get('user-agent') || undefined,
         },
-      })
+      });
     }
 
     return NextResponse.json({
       success: true,
       data: updatedUser.preferences,
       message: 'Preferences updated successfully',
-    })
+    });
   } catch (error) {
-    console.error('Error updating preferences:', error)
+    console.error('Error updating preferences:', error);
     return NextResponse.json(
       {
         success: false,
@@ -253,6 +268,6 @@ export async function PATCH(request: NextRequest) {
         },
       },
       { status: 500 }
-    )
+    );
   }
 }

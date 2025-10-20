@@ -1,20 +1,20 @@
-'use client'
+'use client';
 
-import { ReactNode } from 'react'
-import Link from 'next/link'
-import { useTranslations } from '@/hooks/useTranslations'
-import { 
-  BookOpenIcon, 
+import { ReactNode } from 'react';
+import Link from 'next/link';
+import { useTranslations } from '@/hooks/useTranslations';
+import {
+  BookOpenIcon,
   ChartBarIcon,
-  ArrowLeftIcon
-} from '@heroicons/react/24/outline'
+  ArrowLeftIcon,
+} from '@heroicons/react/24/outline';
 
 interface HelpAdminLayoutProps {
-  children: ReactNode
+  children: ReactNode;
 }
 
 export default function HelpAdminLayout({ children }: HelpAdminLayoutProps) {
-  const t = useTranslations('help.admin')
+  const t = useTranslations('help.admin');
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -61,5 +61,5 @@ export default function HelpAdminLayout({ children }: HelpAdminLayoutProps) {
       {/* Main Content */}
       {children}
     </div>
-  )
+  );
 }

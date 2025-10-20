@@ -1,4 +1,10 @@
-import { PrismaClient, UserRole, Destination, ActionType, Prisma } from '@prisma/client';
+import {
+  PrismaClient,
+  UserRole,
+  Destination,
+  ActionType,
+  Prisma,
+} from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
@@ -120,7 +126,9 @@ async function main() {
     },
   });
 
-  console.log('✅ Created 5 users with roles: ADMIN, DATA_ENTRY, SUPERVISOR, MANAGER, AUDITOR');
+  console.log(
+    '✅ Created 5 users with roles: ADMIN, DATA_ENTRY, SUPERVISOR, MANAGER, AUDITOR'
+  );
 
   // ============================================
   // SUBTASK 10.2: Seed sample inventory items
@@ -258,7 +266,9 @@ async function main() {
     }),
   ]);
 
-  console.log(`✅ Created ${inventoryItems.length} inventory items with varied destinations and categories`);
+  console.log(
+    `✅ Created ${inventoryItems.length} inventory items with varied destinations and categories`
+  );
 
   // ============================================
   // SUBTASK 10.3: Seed default system settings
@@ -327,13 +337,15 @@ async function main() {
     }),
   ]);
 
-  console.log('✅ Created 7 system settings across theme, notifications, inventory, and api categories');
+  console.log(
+    '✅ Created 7 system settings across theme, notifications, inventory, and api categories'
+  );
 
   // ============================================
   // SUBTASK 10.4: Seed sample audit logs
   // ============================================
   console.log('📋 Creating sample audit logs...');
-  
+
   // Audit log 1: Inventory item creation
   await prisma.auditLog.create({
     data: {
@@ -372,7 +384,8 @@ async function main() {
         },
       },
       ipAddress: '192.168.1.105',
-      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
+      userAgent:
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
       signature: 'seed_data_signature_2',
     },
   });
@@ -426,23 +439,36 @@ async function main() {
         reject: 50,
       },
       ipAddress: '192.168.1.105',
-      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
+      userAgent:
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
       signature: 'seed_data_signature_5',
     },
   });
 
-  console.log('✅ Created 5 audit log entries with different action types (CREATE, UPDATE, LOGIN, EXPORT, DELETE)');
+  console.log(
+    '✅ Created 5 audit log entries with different action types (CREATE, UPDATE, LOGIN, EXPORT, DELETE)'
+  );
 
   console.log('\n🎉 Database seeding completed successfully!');
   console.log('\n📝 Test User Credentials:');
   console.log('   Email: admin@mais.sa | Password: Password123! | Role: ADMIN');
-  console.log('   Email: dataentry@mais.sa | Password: Password123! | Role: DATA_ENTRY');
-  console.log('   Email: supervisor@mais.sa | Password: Password123! | Role: SUPERVISOR');
-  console.log('   Email: manager@mais.sa | Password: Password123! | Role: MANAGER');
-  console.log('   Email: auditor@mais.sa | Password: Password123! | Role: AUDITOR');
+  console.log(
+    '   Email: dataentry@mais.sa | Password: Password123! | Role: DATA_ENTRY'
+  );
+  console.log(
+    '   Email: supervisor@mais.sa | Password: Password123! | Role: SUPERVISOR'
+  );
+  console.log(
+    '   Email: manager@mais.sa | Password: Password123! | Role: MANAGER'
+  );
+  console.log(
+    '   Email: auditor@mais.sa | Password: Password123! | Role: AUDITOR'
+  );
   console.log('\n📊 Seeded Data Summary:');
   console.log(`   - ${5} users with different roles and preferences`);
-  console.log(`   - ${inventoryItems.length} inventory items (MAIS: 5, FOZAN: 5)`);
+  console.log(
+    `   - ${inventoryItems.length} inventory items (MAIS: 5, FOZAN: 5)`
+  );
   console.log(`   - ${7} system settings across 4 categories`);
   console.log(`   - ${5} audit log entries`);
 }

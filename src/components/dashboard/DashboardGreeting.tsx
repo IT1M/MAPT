@@ -1,29 +1,29 @@
-'use client'
+'use client';
 
 /**
  * DashboardGreeting Component
  * Displays personalized greeting with time-based message, last login info, and Hijri date
  */
 
-import { useTranslations } from '@/hooks/useTranslations'
-import { formatDistanceToNow } from 'date-fns'
-import { ar, enUS } from 'date-fns/locale'
-import { useParams } from 'next/navigation'
+import { useTranslations } from '@/hooks/useTranslations';
+import { formatDistanceToNow } from 'date-fns';
+import { ar, enUS } from 'date-fns/locale';
+import { useParams } from 'next/navigation';
 
 interface DashboardGreetingProps {
-  userName: string
-  lastLogin?: Date | null
-  lastLoginIp?: string | null
+  userName: string;
+  lastLogin?: Date | null;
+  lastLoginIp?: string | null;
 }
 
 /**
  * Get time-based greeting message
  */
 function getGreeting(hour: number): string {
-  if (hour >= 6 && hour < 12) return 'goodMorning'
-  if (hour >= 12 && hour < 18) return 'goodAfternoon'
-  if (hour >= 18 && hour < 24) return 'goodEvening'
-  return 'goodNight'
+  if (hour >= 6 && hour < 12) return 'goodMorning';
+  if (hour >= 12 && hour < 18) return 'goodAfternoon';
+  if (hour >= 18 && hour < 24) return 'goodEvening';
+  return 'goodNight';
 }
 
 /**
@@ -31,12 +31,12 @@ function getGreeting(hour: number): string {
  * For production, use a proper library like @hebcal/core or moment-hijri
  */
 function getHijriDate(): string {
-  const now = new Date()
+  const now = new Date();
   // This is a simplified calculation - use a proper library in production
-  const gregorianYear = now.getFullYear()
-  const hijriYear = Math.floor((gregorianYear - 622) * 1.030684)
-  
-  return `${hijriYear} هـ`
+  const gregorianYear = now.getFullYear();
+  const hijriYear = Math.floor((gregorianYear - 622) * 1.030684);
+
+  return `${hijriYear} هـ`;
 }
 
 export function DashboardGreeting({
@@ -44,22 +44,22 @@ export function DashboardGreeting({
   lastLogin,
   lastLoginIp,
 }: DashboardGreetingProps) {
-  const t = useTranslations('dashboard')
-  const params = useParams()
-  const locale = params?.locale as string || 'en'
-  
-  const hour = new Date().getHours()
-  const greetingKey = getGreeting(hour)
-  
-  const hijriDate = getHijriDate()
-  
+  const t = useTranslations('dashboard');
+  const params = useParams();
+  const locale = (params?.locale as string) || 'en';
+
+  const hour = new Date().getHours();
+  const greetingKey = getGreeting(hour);
+
+  const hijriDate = getHijriDate();
+
   // Format last login time
   const lastLoginText = lastLogin
     ? formatDistanceToNow(new Date(lastLogin), {
         addSuffix: true,
         locale: locale === 'ar' ? ar : enUS,
       })
-    : null
+    : null;
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 mb-6">
@@ -69,7 +69,7 @@ export function DashboardGreeting({
           <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
             {t(greetingKey)}, {userName}! 👋
           </h1>
-          
+
           {lastLogin && (
             <div className="flex flex-col sm:flex-row sm:items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
               <div className="flex items-center gap-2">
@@ -90,7 +90,7 @@ export function DashboardGreeting({
                   {t('lastLogin')}: {lastLoginText}
                 </span>
               </div>
-              
+
               {lastLoginIp && (
                 <>
                   <span className="hidden sm:inline text-gray-400">•</span>
@@ -139,12 +139,15 @@ export function DashboardGreeting({
           </svg>
           <div className="text-sm">
             <div className="font-medium text-gray-900 dark:text-gray-100">
-              {new Date().toLocaleDateString(locale === 'ar' ? 'ar-SA' : 'en-US', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-              })}
+              {new Date().toLocaleDateString(
+                locale === 'ar' ? 'ar-SA' : 'en-US',
+                {
+                  weekday: 'long',
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                }
+              )}
             </div>
             {locale === 'ar' && (
               <div className="text-xs text-gray-600 dark:text-gray-400">
@@ -155,5 +158,5 @@ export function DashboardGreeting({
         </div>
       </div>
     </div>
-  )
+  );
 }

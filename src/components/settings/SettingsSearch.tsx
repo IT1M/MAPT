@@ -1,47 +1,50 @@
-'use client'
+'use client';
 
-import React, { useState, forwardRef, useEffect } from 'react'
-import { useTranslations } from '@/hooks/useTranslations'
-import { useDebounce } from '@/hooks/useDebounce'
+import React, { useState, forwardRef, useEffect } from 'react';
+import { useTranslations } from '@/hooks/useTranslations';
+import { useDebounce } from '@/hooks/useDebounce';
 
 interface SettingsSearchProps {
-  onSearch: (query: string) => void
-  placeholder?: string
-  debounceMs?: number
-  locale?: string
+  onSearch: (query: string) => void;
+  placeholder?: string;
+  debounceMs?: number;
+  locale?: string;
 }
 
 export const SettingsSearch = forwardRef<HTMLInputElement, SettingsSearchProps>(
-  function SettingsSearch({ onSearch, placeholder, debounceMs = 300, locale = 'en' }, ref) {
-    const t = useTranslations('settings')
-    const [query, setQuery] = useState('')
-    const debouncedQuery = useDebounce(query, debounceMs)
-    const isRTL = locale === 'ar'
+  function SettingsSearch(
+    { onSearch, placeholder, debounceMs = 300, locale = 'en' },
+    ref
+  ) {
+    const t = useTranslations('settings');
+    const [query, setQuery] = useState('');
+    const debouncedQuery = useDebounce(query, debounceMs);
+    const isRTL = locale === 'ar';
 
     // Call onSearch with debounced value
     useEffect(() => {
-      onSearch(debouncedQuery)
-    }, [debouncedQuery, onSearch])
+      onSearch(debouncedQuery);
+    }, [debouncedQuery, onSearch]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      setQuery(e.target.value)
-    }
+      setQuery(e.target.value);
+    };
 
     const handleClear = () => {
-      setQuery('')
-    }
+      setQuery('');
+    };
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
       if (e.key === 'Escape') {
-        handleClear()
+        handleClear();
       }
-    }
+    };
 
     return (
       <div className="relative w-full" role="search">
         <div className="relative">
           {/* Search Icon - positioned based on text direction */}
-          <div 
+          <div
             className={`absolute inset-y-0 ${isRTL ? 'right-0 pr-3' : 'left-0 pl-3'} flex items-center pointer-events-none`}
             style={{ transform: isRTL ? 'scaleX(-1)' : 'none' }}
           >
@@ -59,7 +62,7 @@ export const SettingsSearch = forwardRef<HTMLInputElement, SettingsSearchProps>(
               />
             </svg>
           </div>
-          
+
           {/* Search Input */}
           <input
             ref={ref}
@@ -80,7 +83,7 @@ export const SettingsSearch = forwardRef<HTMLInputElement, SettingsSearchProps>(
             role="searchbox"
             aria-describedby="search-description"
           />
-          
+
           {/* Screen reader description */}
           <span id="search-description" className="sr-only">
             {t('searchPlaceholder')}
@@ -118,10 +121,15 @@ export const SettingsSearch = forwardRef<HTMLInputElement, SettingsSearchProps>(
         </div>
 
         {/* Live region for screen readers */}
-        <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+        <div
+          className="sr-only"
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+        >
           {query && debouncedQuery !== query && t('searching')}
         </div>
       </div>
-    )
+    );
   }
-)
+);

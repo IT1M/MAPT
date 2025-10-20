@@ -1,8 +1,8 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { useTranslations } from '@/hooks/useTranslations'
-import { Button } from '@/components/ui/button'
+import { useState } from 'react';
+import { useTranslations } from '@/hooks/useTranslations';
+import { Button } from '@/components/ui/button';
 
 // ============================================================================
 // Type Definitions
@@ -10,37 +10,37 @@ import { Button } from '@/components/ui/button'
 
 export interface DashboardSnapshot {
   summary: {
-    totalItems: number
-    totalQuantity: number
-    rejectRate: number
-    activeUsers: number
-    categoriesCount: number
-    avgDailyEntries: number
-    maisPercentage: number
-    fozanPercentage: number
-    topContributor?: { name: string; count: number }
-    mostActiveCategory?: string
-  }
-  charts?: ChartSnapshot[]
-  insights?: any[]
-  timestamp: Date
+    totalItems: number;
+    totalQuantity: number;
+    rejectRate: number;
+    activeUsers: number;
+    categoriesCount: number;
+    avgDailyEntries: number;
+    maisPercentage: number;
+    fozanPercentage: number;
+    topContributor?: { name: string; count: number };
+    mostActiveCategory?: string;
+  };
+  charts?: ChartSnapshot[];
+  insights?: any[];
+  timestamp: Date;
 }
 
 export interface ChartSnapshot {
-  title: string
-  imageData?: string // base64 PNG
-  data: any[] // CSV data
+  title: string;
+  imageData?: string; // base64 PNG
+  data: any[]; // CSV data
 }
 
 interface DashboardExporterProps {
-  dashboardData: DashboardSnapshot
+  dashboardData: DashboardSnapshot;
   filters?: {
-    startDate?: Date | null
-    endDate?: Date | null
-    destinations?: string[]
-    categories?: string[]
-  }
-  onExportComplete?: () => void
+    startDate?: Date | null;
+    endDate?: Date | null;
+    destinations?: string[];
+    categories?: string[];
+  };
+  onExportComplete?: () => void;
 }
 
 // ============================================================================
@@ -52,19 +52,19 @@ export function DashboardExporter({
   filters,
   onExportComplete,
 }: DashboardExporterProps) {
-  const t = useTranslations('analytics.export')
-  const [isExporting, setIsExporting] = useState(false)
-  const [progress, setProgress] = useState(0)
-  const [error, setError] = useState<string | null>(null)
+  const t = useTranslations('analytics.export');
+  const [isExporting, setIsExporting] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [error, setError] = useState<string | null>(null);
 
   const handleExport = async (format: 'pdf' | 'email') => {
-    setIsExporting(true)
-    setProgress(0)
-    setError(null)
+    setIsExporting(true);
+    setProgress(0);
+    setError(null);
 
     try {
       // Simulate progress updates
-      setProgress(10)
+      setProgress(10);
 
       // Prepare export request
       const exportData = {
@@ -78,9 +78,9 @@ export function DashboardExporter({
         charts: dashboardData.charts || [],
         insights: dashboardData.insights || [],
         timestamp: dashboardData.timestamp.toISOString(),
-      }
+      };
 
-      setProgress(30)
+      setProgress(30);
 
       // Call export API
       const response = await fetch('/api/analytics/export', {
@@ -92,47 +92,49 @@ export function DashboardExporter({
           ...exportData,
           format,
         }),
-      })
+      });
 
-      setProgress(60)
+      setProgress(60);
 
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error?.message || 'Export failed')
+        const errorData = await response.json();
+        throw new Error(errorData.error?.message || 'Export failed');
       }
 
-      setProgress(80)
+      setProgress(80);
 
-      const result = await response.json()
+      const result = await response.json();
 
       if (result.success) {
-        setProgress(100)
+        setProgress(100);
 
         if (format === 'pdf' && result.data.fileUrl) {
           // Download PDF
-          const link = document.createElement('a')
-          link.href = result.data.fileUrl
-          link.download = result.data.fileName || 'analytics-dashboard.pdf'
-          document.body.appendChild(link)
-          link.click()
-          document.body.removeChild(link)
+          const link = document.createElement('a');
+          link.href = result.data.fileUrl;
+          link.download = result.data.fileName || 'analytics-dashboard.pdf';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
         } else if (format === 'email') {
           // Show success message for email
-          alert('Dashboard report has been sent to your email')
+          alert('Dashboard report has been sent to your email');
         }
 
-        onExportComplete?.()
+        onExportComplete?.();
       } else {
-        throw new Error(result.error?.message || 'Export failed')
+        throw new Error(result.error?.message || 'Export failed');
       }
     } catch (err) {
-      console.error('Export error:', err)
-      setError(err instanceof Error ? err.message : 'An error occurred during export')
+      console.error('Export error:', err);
+      setError(
+        err instanceof Error ? err.message : 'An error occurred during export'
+      );
     } finally {
-      setIsExporting(false)
-      setProgress(0)
+      setIsExporting(false);
+      setProgress(0);
     }
-  }
+  };
 
   return (
     <div className="relative">
@@ -185,8 +187,12 @@ export function DashboardExporter({
         <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-4 z-50">
           <div className="space-y-2">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-700 dark:text-gray-300">Exporting dashboard...</span>
-              <span className="text-gray-600 dark:text-gray-400">{progress}%</span>
+              <span className="text-gray-700 dark:text-gray-300">
+                Exporting dashboard...
+              </span>
+              <span className="text-gray-600 dark:text-gray-400">
+                {progress}%
+              </span>
             </div>
             <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
               <div
@@ -216,8 +222,12 @@ export function DashboardExporter({
               />
             </svg>
             <div className="flex-1">
-              <p className="text-sm font-medium text-red-800 dark:text-red-200">Export Failed</p>
-              <p className="text-sm text-red-700 dark:text-red-300 mt-1">{error}</p>
+              <p className="text-sm font-medium text-red-800 dark:text-red-200">
+                Export Failed
+              </p>
+              <p className="text-sm text-red-700 dark:text-red-300 mt-1">
+                {error}
+              </p>
               <button
                 onClick={() => setError(null)}
                 className="text-sm text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-200 mt-2 underline"
@@ -229,5 +239,5 @@ export function DashboardExporter({
         </div>
       )}
     </div>
-  )
+  );
 }

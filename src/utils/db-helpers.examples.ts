@@ -3,7 +3,7 @@
  * This file demonstrates how to use the utilities in db-helpers.ts
  */
 
-import { prisma } from '@/services/prisma'
+import { prisma } from '@/services/prisma';
 import {
   withTransaction,
   safeQuery,
@@ -18,21 +18,18 @@ import {
   buildSearchFilter,
   aggregateData,
   handlePrismaError,
-} from './db-helpers'
+} from './db-helpers';
 
 /**
  * Example 1: Using transaction wrapper for atomic operations
  * Creates an inventory item and audit log in a single transaction
  */
-export async function createInventoryWithAudit(
-  itemData: any,
-  userId: string
-) {
+export async function createInventoryWithAudit(itemData: any, userId: string) {
   return await withTransaction(async (tx) => {
     // Create inventory item
     const item = await tx.inventoryItem.create({
       data: itemData,
-    })
+    });
 
     // Create audit log
     await tx.auditLog.create({
@@ -44,10 +41,10 @@ export async function createInventoryWithAudit(
         newValue: itemData,
         timestamp: new Date(),
       },
-    })
+    });
 
-    return item
-  })
+    return item;
+  });
 }
 
 /**
@@ -59,21 +56,24 @@ export async function getUserSafely(email: string) {
     prisma.user.findUnique({
       where: { email },
     })
-  )
+  );
 
   if (error) {
-    console.error('Failed to fetch user:', error.message)
-    return null
+    console.error('Failed to fetch user:', error.message);
+    return null;
   }
 
-  return data
+  return data;
 }
 
 /**
  * Example 3: Offset-based pagination
  * Good for traditional page-based navigation
  */
-export async function getInventoryItemsPaginated(page: number, pageSize: number) {
+export async function getInventoryItemsPaginated(
+  page: number,
+  pageSize: number
+) {
   return await paginateQuery(
     prisma.inventoryItem,
     {
@@ -84,7 +84,7 @@ export async function getInventoryItemsPaginated(page: number, pageSize: number)
       include: { enteredBy: true },
     },
     10 // default page size
-  )
+  );
 }
 
 /**
@@ -92,15 +92,12 @@ export async function getInventoryItemsPaginated(page: number, pageSize: number)
  * Good for infinite scroll
  */
 export async function getInventoryItemsInfiniteScroll(cursor?: string) {
-  return await paginateWithCursor(
-    prisma.inventoryItem,
-    {
-      cursor,
-      pageSize: 20,
-      where: { destination: 'FOZAN' },
-      orderBy: { createdAt: 'desc' },
-    }
-  )
+  return await paginateWithCursor(prisma.inventoryItem, {
+    cursor,
+    pageSize: 20,
+    where: { destination: 'FOZAN' },
+    orderBy: { createdAt: 'desc' },
+  });
 }
 
 /**
@@ -122,10 +119,10 @@ export async function updateInventoryItemsInBatches(
             data: updateData,
           })
         )
-      )
-      return results
+      );
+      return results;
     }
-  )
+  );
 }
 
 /**
@@ -151,7 +148,7 @@ export async function updateSystemSetting(
       value,
       updatedById: userId,
     }
-  )
+  );
 }
 
 /**
@@ -163,15 +160,15 @@ export async function ensureUserExists(email: string, userData: any) {
     prisma.user,
     { email },
     userData
-  )
+  );
 
   if (created) {
-    console.log('New user created:', email)
+    console.log('New user created:', email);
   } else {
-    console.log('Existing user found:', email)
+    console.log('Existing user found:', email);
   }
 
-  return record
+  return record;
 }
 
 /**
@@ -179,13 +176,13 @@ export async function ensureUserExists(email: string, userData: any) {
  * Validate before creating
  */
 export async function validateUniqueEmail(email: string) {
-  const exists = await recordExists(prisma.user, { email })
+  const exists = await recordExists(prisma.user, { email });
 
   if (exists) {
-    throw new Error('Email already in use')
+    throw new Error('Email already in use');
   }
 
-  return true
+  return true;
 }
 
 /**
@@ -197,27 +194,24 @@ export async function getUserOrFail(userId: string) {
     prisma.user,
     { id: userId },
     { inventoryItems: true }
-  )
+  );
 }
 
 /**
  * Example 10: Date range filtering
  * Get inventory items created in a date range
  */
-export async function getInventoryByDateRange(
-  startDate: Date,
-  endDate: Date
-) {
+export async function getInventoryByDateRange(startDate: Date, endDate: Date) {
   const dateFilter = buildDateRangeFilter({
     startDate,
     endDate,
     field: 'createdAt',
-  })
+  });
 
   return await prisma.inventoryItem.findMany({
     where: dateFilter,
     orderBy: { createdAt: 'desc' },
-  })
+  });
 }
 
 /**
@@ -225,12 +219,16 @@ export async function getInventoryByDateRange(
  * Search inventory items by name or batch
  */
 export async function searchInventoryItems(searchTerm: string) {
-  const searchFilter = buildSearchFilter(searchTerm, ['itemName', 'batch', 'category'])
+  const searchFilter = buildSearchFilter(searchTerm, [
+    'itemName',
+    'batch',
+    'category',
+  ]);
 
   return await prisma.inventoryItem.findMany({
     where: searchFilter,
     orderBy: { createdAt: 'desc' },
-  })
+  });
 }
 
 /**
@@ -248,7 +246,7 @@ export async function getInventoryStats(destination?: string) {
       min: ['quantity'],
       max: ['quantity'],
     }
-  )
+  );
 }
 
 /**
@@ -259,11 +257,11 @@ export async function createUserWithErrorHandling(userData: any) {
   try {
     return await prisma.user.create({
       data: userData,
-    })
+    });
   } catch (error) {
-    const dbError = handlePrismaError(error)
-    console.error('Database error:', dbError.message)
-    throw dbError
+    const dbError = handlePrismaError(error);
+    console.error('Database error:', dbError.message);
+    throw dbError;
   }
 }
 
@@ -280,13 +278,13 @@ export async function transferInventory(
     // Get current item
     const currentItem = await tx.inventoryItem.findUniqueOrThrow({
       where: { id: itemId },
-    })
+    });
 
     // Update destination
     const updatedItem = await tx.inventoryItem.update({
       where: { id: itemId },
       data: { destination: newDestination },
-    })
+    });
 
     // Create audit log
     await tx.auditLog.create({
@@ -299,8 +297,8 @@ export async function transferInventory(
         newValue: { destination: newDestination },
         timestamp: new Date(),
       },
-    })
+    });
 
-    return updatedItem
-  })
+    return updatedItem;
+  });
 }

@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@/services/auth'
-import { prisma } from '@/services/prisma'
-import { profileSchema } from '@/utils/settings-validation'
-import { createAuditLog } from '@/utils/audit'
+import { NextRequest, NextResponse } from 'next/server';
+import { auth } from '@/services/auth';
+import { prisma } from '@/services/prisma';
+import { profileSchema } from '@/utils/settings-validation';
+import { createAuditLog } from '@/utils/audit';
 
 /**
  * GET /api/users/profile
@@ -10,13 +10,16 @@ import { createAuditLog } from '@/utils/audit'
  */
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth()
+    const session = await auth();
 
     if (!session?.user?.id) {
       return NextResponse.json(
-        { success: false, error: { code: 'AUTH_REQUIRED', message: 'Authentication required' } },
+        {
+          success: false,
+          error: { code: 'AUTH_REQUIRED', message: 'Authentication required' },
+        },
         { status: 401 }
-      )
+      );
     }
 
     const user = await prisma.user.findUnique({
@@ -31,18 +34,21 @@ export async function GET(request: NextRequest) {
         createdAt: true,
         updatedAt: true,
       },
-    })
+    });
 
     if (!user) {
       return NextResponse.json(
-        { success: false, error: { code: 'NOT_FOUND', message: 'User not found' } },
+        {
+          success: false,
+          error: { code: 'NOT_FOUND', message: 'User not found' },
+        },
         { status: 404 }
-      )
+      );
     }
 
     // Parse preferences to extract profile fields
-    const preferences = (user.preferences as any) || {}
-    
+    const preferences = (user.preferences as any) || {};
+
     const profile = {
       id: user.id,
       name: user.name,
@@ -56,14 +62,14 @@ export async function GET(request: NextRequest) {
       isActive: user.isActive,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
-    }
+    };
 
     return NextResponse.json({
       success: true,
       data: profile,
-    })
+    });
   } catch (error) {
-    console.error('Error fetching profile:', error)
+    console.error('Error fetching profile:', error);
     return NextResponse.json(
       {
         success: false,
@@ -73,7 +79,7 @@ export async function GET(request: NextRequest) {
         },
       },
       { status: 500 }
-    )
+    );
   }
 }
 
@@ -83,19 +89,22 @@ export async function GET(request: NextRequest) {
  */
 export async function PATCH(request: NextRequest) {
   try {
-    const session = await auth()
+    const session = await auth();
 
     if (!session?.user?.id) {
       return NextResponse.json(
-        { success: false, error: { code: 'AUTH_REQUIRED', message: 'Authentication required' } },
+        {
+          success: false,
+          error: { code: 'AUTH_REQUIRED', message: 'Authentication required' },
+        },
         { status: 401 }
-      )
+      );
     }
 
-    const body = await request.json()
+    const body = await request.json();
 
     // Validate input
-    const validation = profileSchema.safeParse(body)
+    const validation = profileSchema.safeParse(body);
     if (!validation.success) {
       return NextResponse.json(
         {
@@ -111,7 +120,7 @@ export async function PATCH(request: NextRequest) {
           },
         },
         { status: 400 }
-      )
+      );
     }
 
     // Get current user data
@@ -127,16 +136,19 @@ export async function PATCH(request: NextRequest) {
         createdAt: true,
         updatedAt: true,
       },
-    })
+    });
 
     if (!currentUser) {
       return NextResponse.json(
-        { success: false, error: { code: 'NOT_FOUND', message: 'User not found' } },
+        {
+          success: false,
+          error: { code: 'NOT_FOUND', message: 'User not found' },
+        },
         { status: 404 }
-      )
+      );
     }
 
-    const currentPreferences = (currentUser.preferences as any) || {}
+    const currentPreferences = (currentUser.preferences as any) || {};
 
     // Update user with new profile data
     const updatedUser = await prisma.user.update({
@@ -161,7 +173,7 @@ export async function PATCH(request: NextRequest) {
         createdAt: true,
         updatedAt: true,
       },
-    })
+    });
 
     // Create audit log
     await createAuditLog({
@@ -186,12 +198,15 @@ export async function PATCH(request: NextRequest) {
         },
       },
       metadata: {
-        ipAddress: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || undefined,
+        ipAddress:
+          request.headers.get('x-forwarded-for') ||
+          request.headers.get('x-real-ip') ||
+          undefined,
         userAgent: request.headers.get('user-agent') || undefined,
       },
-    })
+    });
 
-    const updatedPreferences = (updatedUser.preferences as any) || {}
+    const updatedPreferences = (updatedUser.preferences as any) || {};
 
     const profile = {
       id: updatedUser.id,
@@ -206,15 +221,15 @@ export async function PATCH(request: NextRequest) {
       isActive: updatedUser.isActive,
       createdAt: updatedUser.createdAt,
       updatedAt: updatedUser.updatedAt,
-    }
+    };
 
     return NextResponse.json({
       success: true,
       data: profile,
       message: 'Profile updated successfully',
-    })
+    });
   } catch (error) {
-    console.error('Error updating profile:', error)
+    console.error('Error updating profile:', error);
     return NextResponse.json(
       {
         success: false,
@@ -224,6 +239,6 @@ export async function PATCH(request: NextRequest) {
         },
       },
       { status: 500 }
-    )
+    );
   }
 }

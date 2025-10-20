@@ -117,10 +117,10 @@ export function ProgressSteps({ steps, className = '' }: ProgressStepsProps) {
                 step.status === 'completed'
                   ? 'bg-green-100 dark:bg-green-900/30'
                   : step.status === 'active'
-                  ? 'bg-blue-100 dark:bg-blue-900/30'
-                  : step.status === 'error'
-                  ? 'bg-red-100 dark:bg-red-900/30'
-                  : 'bg-gray-100 dark:bg-gray-700'
+                    ? 'bg-blue-100 dark:bg-blue-900/30'
+                    : step.status === 'error'
+                      ? 'bg-red-100 dark:bg-red-900/30'
+                      : 'bg-gray-100 dark:bg-gray-700'
               }
             `}
           >
@@ -170,10 +170,10 @@ export function ProgressSteps({ steps, className = '' }: ProgressStepsProps) {
                 step.status === 'active'
                   ? 'font-medium text-gray-900 dark:text-gray-100'
                   : step.status === 'completed'
-                  ? 'text-gray-700 dark:text-gray-300'
-                  : step.status === 'error'
-                  ? 'text-red-600 dark:text-red-400'
-                  : 'text-gray-500 dark:text-gray-500'
+                    ? 'text-gray-700 dark:text-gray-300'
+                    : step.status === 'error'
+                      ? 'text-red-600 dark:text-red-400'
+                      : 'text-gray-500 dark:text-gray-500'
               }
             `}
           >

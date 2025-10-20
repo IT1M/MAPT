@@ -6,7 +6,7 @@ A comprehensive global search system that provides full-text search across inven
 
 - **Universal Search**: Search across inventory, reports, users, and settings
 - **Role-Based Filtering**: Results filtered based on user permissions
-- **Keyboard Shortcuts**: 
+- **Keyboard Shortcuts**:
   - `Ctrl+K` / `Cmd+K` - Open search modal
   - `↑` / `↓` - Navigate results
   - `Enter` - Select result
@@ -20,15 +20,19 @@ A comprehensive global search system that provides full-text search across inven
 ## Components
 
 ### GlobalSearch
+
 Main search modal component with input, results display, and keyboard navigation.
 
 ### GlobalSearchProvider
+
 Context provider that makes search available throughout the app.
 
 ### SearchButton
+
 Button component to trigger search, displays keyboard shortcut hint.
 
 ### useGlobalSearch
+
 Hook for managing search state and keyboard shortcut.
 
 ## Usage
@@ -39,14 +43,10 @@ The GlobalSearchProvider is already integrated in the app layout:
 
 ```tsx
 // src/app/[locale]/layout.tsx
-import { GlobalSearchProvider } from '@/components/search'
+import { GlobalSearchProvider } from '@/components/search';
 
 export default function Layout({ children }) {
-  return (
-    <GlobalSearchProvider>
-      {children}
-    </GlobalSearchProvider>
-  )
+  return <GlobalSearchProvider>{children}</GlobalSearchProvider>;
 }
 ```
 
@@ -55,14 +55,14 @@ export default function Layout({ children }) {
 Add the SearchButton to any component:
 
 ```tsx
-import { SearchButton } from '@/components/search'
+import { SearchButton } from '@/components/search';
 
 export function MyComponent() {
   return (
     <div>
       <SearchButton />
     </div>
-  )
+  );
 }
 ```
 
@@ -71,16 +71,12 @@ export function MyComponent() {
 Use the context to control search programmatically:
 
 ```tsx
-import { useGlobalSearchContext } from '@/components/search'
+import { useGlobalSearchContext } from '@/components/search';
 
 export function MyComponent() {
-  const { openSearch, closeSearch, isOpen } = useGlobalSearchContext()
-  
-  return (
-    <button onClick={openSearch}>
-      Open Search
-    </button>
-  )
+  const { openSearch, closeSearch, isOpen } = useGlobalSearchContext();
+
+  return <button onClick={openSearch}>Open Search</button>;
 }
 ```
 
@@ -91,6 +87,7 @@ export function MyComponent() {
 Performs global search with role-based filtering.
 
 **Request Body:**
+
 ```json
 {
   "query": "search term",
@@ -99,6 +96,7 @@ Performs global search with role-based filtering.
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -139,13 +137,13 @@ Search results are filtered based on user role:
 
 ## Keyboard Shortcuts
 
-| Shortcut | Action |
-|----------|--------|
-| `Ctrl+K` / `Cmd+K` | Open search modal |
-| `↑` | Navigate to previous result |
-| `↓` | Navigate to next result |
-| `Enter` | Select highlighted result |
-| `Esc` | Close search modal |
+| Shortcut           | Action                      |
+| ------------------ | --------------------------- |
+| `Ctrl+K` / `Cmd+K` | Open search modal           |
+| `↑`                | Navigate to previous result |
+| `↓`                | Navigate to next result     |
+| `Enter`            | Select highlighted result   |
+| `Esc`              | Close search modal          |
 
 ## Translations
 

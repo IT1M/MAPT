@@ -1,17 +1,21 @@
-'use client'
+'use client';
 
-import React, { useState, useRef, useEffect, useMemo } from 'react'
-import { useTranslations } from '@/hooks/useTranslations'
-import { downloadBlob } from '@/utils/download-helper'
+import React, { useState, useRef, useEffect, useMemo } from 'react';
+import { useTranslations } from '@/hooks/useTranslations';
+import { downloadBlob } from '@/utils/download-helper';
 
 export interface ExportButtonProps {
-  data: any[]
-  filename?: string
-  selectedIds?: Set<string>
-  filters?: Record<string, any>
-  onExport?: (format: 'csv' | 'json' | 'excel' | 'pdf', success: boolean, fileSize?: number) => void
-  className?: string
-  disabled?: boolean
+  data: any[];
+  filename?: string;
+  selectedIds?: Set<string>;
+  filters?: Record<string, any>;
+  onExport?: (
+    format: 'csv' | 'json' | 'excel' | 'pdf',
+    success: boolean,
+    fileSize?: number
+  ) => void;
+  className?: string;
+  disabled?: boolean;
 }
 
 export const ExportButton: React.FC<ExportButtonProps> = ({
@@ -23,124 +27,131 @@ export const ExportButton: React.FC<ExportButtonProps> = ({
   className = '',
   disabled = false,
 }) => {
-  const t = useTranslations()
-  const [isOpen, setIsOpen] = useState(false)
-  const [isExporting, setIsExporting] = useState(false)
-  const [exportProgress, setExportProgress] = useState(0)
-  const [exportError, setExportError] = useState<string | null>(null)
-  const [showPdfOptions, setShowPdfOptions] = useState(false)
-  const dropdownRef = useRef<HTMLDivElement>(null)
+  const t = useTranslations();
+  const [isOpen, setIsOpen] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+  const [exportProgress, setExportProgress] = useState(0);
+  const [exportError, setExportError] = useState<string | null>(null);
+  const [showPdfOptions, setShowPdfOptions] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Get data to export (filtered or selected) - memoized for performance
   const exportData = useMemo(() => {
     if (selectedIds && selectedIds.size > 0) {
-      return data.filter(item => selectedIds.has(item.id))
+      return data.filter((item) => selectedIds.has(item.id));
     }
-    return data
-  }, [data, selectedIds])
+    return data;
+  }, [data, selectedIds]);
 
-  const getExportData = () => exportData
+  const getExportData = () => exportData;
 
   // Convert data to CSV with UTF-8 BOM for Excel compatibility
   const exportToCSV = async () => {
-    setIsExporting(true)
-    setExportProgress(0)
+    setIsExporting(true);
+    setExportProgress(0);
 
     try {
-      const exportData = getExportData()
-      
+      const exportData = getExportData();
+
       if (exportData.length === 0) {
-        throw new Error('No data to export')
+        throw new Error('No data to export');
       }
 
-      setExportProgress(25)
+      setExportProgress(25);
 
       // Get all unique keys from the data
       const headers = Array.from(
-        new Set(exportData.flatMap(item => Object.keys(item)))
-      )
+        new Set(exportData.flatMap((item) => Object.keys(item)))
+      );
 
-      setExportProgress(50)
+      setExportProgress(50);
 
       // Create CSV content
-      const csvRows = []
-      
+      const csvRows = [];
+
       // Add header row
-      csvRows.push(headers.map(header => `"${header}"`).join(','))
-      
+      csvRows.push(headers.map((header) => `"${header}"`).join(','));
+
       // Add data rows
       for (const item of exportData) {
-        const values = headers.map(header => {
-          const value = item[header]
-          
+        const values = headers.map((header) => {
+          const value = item[header];
+
           // Handle different data types
           if (value === null || value === undefined) {
-            return '""'
+            return '""';
           }
-          
+
           if (typeof value === 'object') {
             // Handle nested objects (like user)
-            if (value.name) return `"${value.name}"`
-            return `"${JSON.stringify(value).replace(/"/g, '""')}"`
+            if (value.name) return `"${value.name}"`;
+            return `"${JSON.stringify(value).replace(/"/g, '""')}"`;
           }
-          
+
           // Escape quotes and wrap in quotes
-          return `"${String(value).replace(/"/g, '""')}"`
-        })
-        
-        csvRows.push(values.join(','))
+          return `"${String(value).replace(/"/g, '""')}"`;
+        });
+
+        csvRows.push(values.join(','));
       }
 
-      setExportProgress(75)
+      setExportProgress(75);
 
-      const csvContent = csvRows.join('\n')
-      
+      const csvContent = csvRows.join('\n');
+
       // Add UTF-8 BOM for Excel compatibility
-      const BOM = '\uFEFF'
-      const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' })
-      
-      setExportProgress(90)
+      const BOM = '\uFEFF';
+      const blob = new Blob([BOM + csvContent], {
+        type: 'text/csv;charset=utf-8;',
+      });
+
+      setExportProgress(90);
 
       // Create download link
-      downloadBlob(blob, `${filename}-${new Date().toISOString().split('T')[0]}.csv`)
+      downloadBlob(
+        blob,
+        `${filename}-${new Date().toISOString().split('T')[0]}.csv`
+      );
 
-      setExportProgress(100)
+      setExportProgress(100);
 
       // Calculate file size
-      const fileSize = blob.size / 1024
-      
+      const fileSize = blob.size / 1024;
+
       // Show success message (you can replace with toast notification)
-      console.log(`CSV exported successfully (${fileSize.toFixed(2)} KB)`)
-      
+      console.log(`CSV exported successfully (${fileSize.toFixed(2)} KB)`);
+
       if (onExport) {
-        onExport('csv', true, fileSize)
+        onExport('csv', true, fileSize);
       }
     } catch (error) {
-      console.error('CSV export failed:', error)
-      setExportError(error instanceof Error ? error.message : 'Failed to export CSV')
+      console.error('CSV export failed:', error);
+      setExportError(
+        error instanceof Error ? error.message : 'Failed to export CSV'
+      );
       if (onExport) {
-        onExport('csv', false)
+        onExport('csv', false);
       }
     } finally {
-      setIsExporting(false)
-      setExportProgress(0)
-      setIsOpen(false)
+      setIsExporting(false);
+      setExportProgress(0);
+      setIsOpen(false);
     }
-  }
+  };
 
   // Export to JSON with metadata
   const exportToJSON = async () => {
-    setIsExporting(true)
-    setExportProgress(0)
+    setIsExporting(true);
+    setExportProgress(0);
 
     try {
-      const exportData = getExportData()
-      
+      const exportData = getExportData();
+
       if (exportData.length === 0) {
-        throw new Error('No data to export')
+        throw new Error('No data to export');
       }
 
-      setExportProgress(25)
+      setExportProgress(25);
 
       // Create JSON with metadata
       const jsonData = {
@@ -151,64 +162,72 @@ export const ExportButton: React.FC<ExportButtonProps> = ({
           selectedOnly: selectedIds && selectedIds.size > 0,
         },
         data: exportData,
-      }
+      };
 
-      setExportProgress(75)
+      setExportProgress(75);
 
-      const jsonString = JSON.stringify(jsonData, null, 2)
-      const blob = new Blob([jsonString], { type: 'application/json' })
-      
-      setExportProgress(90)
+      const jsonString = JSON.stringify(jsonData, null, 2);
+      const blob = new Blob([jsonString], { type: 'application/json' });
+
+      setExportProgress(90);
 
       // Create download link
-      downloadBlob(blob, `${filename}-${new Date().toISOString().split('T')[0]}.json`)
+      downloadBlob(
+        blob,
+        `${filename}-${new Date().toISOString().split('T')[0]}.json`
+      );
 
-      setExportProgress(100)
+      setExportProgress(100);
 
       // Calculate file size
-      const fileSize = blob.size / 1024
-      
+      const fileSize = blob.size / 1024;
+
       // Show success message (you can replace with toast notification)
-      console.log(`JSON exported successfully (${fileSize.toFixed(2)} KB)`)
-      
+      console.log(`JSON exported successfully (${fileSize.toFixed(2)} KB)`);
+
       if (onExport) {
-        onExport('json', true, fileSize)
+        onExport('json', true, fileSize);
       }
     } catch (error) {
-      console.error('JSON export failed:', error)
-      setExportError(error instanceof Error ? error.message : 'Failed to export JSON')
+      console.error('JSON export failed:', error);
+      setExportError(
+        error instanceof Error ? error.message : 'Failed to export JSON'
+      );
       if (onExport) {
-        onExport('json', false)
+        onExport('json', false);
       }
     } finally {
-      setIsExporting(false)
-      setExportProgress(0)
-      setIsOpen(false)
+      setIsExporting(false);
+      setExportProgress(0);
+      setIsOpen(false);
     }
-  }
+  };
 
   // Export to Excel (server-side)
   const exportToExcel = async () => {
-    setIsExporting(true)
-    setExportProgress(0)
-    setExportError(null)
+    setIsExporting(true);
+    setExportProgress(0);
+    setExportError(null);
 
     try {
-      const exportData = getExportData()
-      
+      const exportData = getExportData();
+
       if (exportData.length === 0) {
-        throw new Error('No data to export')
+        throw new Error('No data to export');
       }
 
-      setExportProgress(10)
+      setExportProgress(10);
 
       // Prepare request payload
       const payload = {
         filters: filters || {},
-        ids: selectedIds && selectedIds.size > 0 ? Array.from(selectedIds) : undefined,
-      }
+        ids:
+          selectedIds && selectedIds.size > 0
+            ? Array.from(selectedIds)
+            : undefined,
+      };
 
-      setExportProgress(25)
+      setExportProgress(25);
 
       // Call API endpoint
       const response = await fetch('/api/inventory/export/excel', {
@@ -217,85 +236,95 @@ export const ExportButton: React.FC<ExportButtonProps> = ({
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(payload),
-      })
+      });
 
-      setExportProgress(50)
+      setExportProgress(50);
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
-        throw new Error(errorData.error?.message || `Export failed with status ${response.status}`)
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(
+          errorData.error?.message ||
+            `Export failed with status ${response.status}`
+        );
       }
 
       // Get the blob from response
-      const blob = await response.blob()
-      
-      setExportProgress(75)
+      const blob = await response.blob();
+
+      setExportProgress(75);
 
       // Extract filename from Content-Disposition header or use default
-      const contentDisposition = response.headers.get('Content-Disposition')
-      let fileName = `${filename}-${new Date().toISOString().split('T')[0]}.xlsx`
-      
+      const contentDisposition = response.headers.get('Content-Disposition');
+      let fileName = `${filename}-${new Date().toISOString().split('T')[0]}.xlsx`;
+
       if (contentDisposition) {
-        const fileNameMatch = contentDisposition.match(/filename="?(.+)"?/)
+        const fileNameMatch = contentDisposition.match(/filename="?(.+)"?/);
         if (fileNameMatch) {
-          fileName = fileNameMatch[1]
+          fileName = fileNameMatch[1];
         }
       }
 
       // Create download link
-      downloadBlob(blob, fileName)
+      downloadBlob(blob, fileName);
 
-      setExportProgress(100)
+      setExportProgress(100);
 
       // Calculate file size
-      const fileSize = blob.size / 1024
-      
+      const fileSize = blob.size / 1024;
+
       // Show success message
-      console.log(`Excel exported successfully (${fileSize.toFixed(2)} KB)`)
-      
+      console.log(`Excel exported successfully (${fileSize.toFixed(2)} KB)`);
+
       if (onExport) {
-        onExport('excel', true, fileSize)
+        onExport('excel', true, fileSize);
       }
     } catch (error) {
-      console.error('Excel export failed:', error)
-      setExportError(error instanceof Error ? error.message : 'Failed to export Excel')
+      console.error('Excel export failed:', error);
+      setExportError(
+        error instanceof Error ? error.message : 'Failed to export Excel'
+      );
       if (onExport) {
-        onExport('excel', false)
+        onExport('excel', false);
       }
     } finally {
-      setIsExporting(false)
-      setExportProgress(0)
-      setIsOpen(false)
+      setIsExporting(false);
+      setExportProgress(0);
+      setIsOpen(false);
     }
-  }
+  };
 
   // Export to PDF (server-side)
-  const exportToPDF = async (orientation: 'portrait' | 'landscape' = 'landscape') => {
-    setIsExporting(true)
-    setExportProgress(0)
-    setExportError(null)
+  const exportToPDF = async (
+    orientation: 'portrait' | 'landscape' = 'landscape'
+  ) => {
+    setIsExporting(true);
+    setExportProgress(0);
+    setExportError(null);
 
     try {
-      const exportData = getExportData()
-      
+      const exportData = getExportData();
+
       if (exportData.length === 0) {
-        throw new Error('No data to export')
+        throw new Error('No data to export');
       }
 
-      setExportProgress(10)
+      setExportProgress(10);
 
       // Prepare request payload
       const payload = {
         filters: filters || {},
-        ids: selectedIds && selectedIds.size > 0 ? Array.from(selectedIds) : undefined,
+        ids:
+          selectedIds && selectedIds.size > 0
+            ? Array.from(selectedIds)
+            : undefined,
         options: {
           orientation,
           includeHeader: true,
           includeLogo: true,
         },
-      }
+      };
 
-      setExportProgress(25)
+      setExportProgress(25);
 
       // Call API endpoint
       const response = await fetch('/api/inventory/export/pdf', {
@@ -304,76 +333,85 @@ export const ExportButton: React.FC<ExportButtonProps> = ({
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(payload),
-      })
+      });
 
-      setExportProgress(50)
+      setExportProgress(50);
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
-        throw new Error(errorData.error?.message || `Export failed with status ${response.status}`)
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(
+          errorData.error?.message ||
+            `Export failed with status ${response.status}`
+        );
       }
 
       // Get the blob from response
-      const blob = await response.blob()
-      
-      setExportProgress(75)
+      const blob = await response.blob();
+
+      setExportProgress(75);
 
       // Extract filename from Content-Disposition header or use default
-      const contentDisposition = response.headers.get('Content-Disposition')
-      let fileName = `${filename}-${new Date().toISOString().split('T')[0]}.pdf`
-      
+      const contentDisposition = response.headers.get('Content-Disposition');
+      let fileName = `${filename}-${new Date().toISOString().split('T')[0]}.pdf`;
+
       if (contentDisposition) {
-        const fileNameMatch = contentDisposition.match(/filename="?(.+)"?/)
+        const fileNameMatch = contentDisposition.match(/filename="?(.+)"?/);
         if (fileNameMatch) {
-          fileName = fileNameMatch[1]
+          fileName = fileNameMatch[1];
         }
       }
 
       // Create download link
-      downloadBlob(blob, fileName)
+      downloadBlob(blob, fileName);
 
-      setExportProgress(100)
+      setExportProgress(100);
 
       // Calculate file size
-      const fileSize = blob.size / 1024
-      
+      const fileSize = blob.size / 1024;
+
       // Show success message
-      console.log(`PDF exported successfully (${fileSize.toFixed(2)} KB)`)
-      
+      console.log(`PDF exported successfully (${fileSize.toFixed(2)} KB)`);
+
       if (onExport) {
-        onExport('pdf', true, fileSize)
+        onExport('pdf', true, fileSize);
       }
     } catch (error) {
-      console.error('PDF export failed:', error)
-      setExportError(error instanceof Error ? error.message : 'Failed to export PDF')
+      console.error('PDF export failed:', error);
+      setExportError(
+        error instanceof Error ? error.message : 'Failed to export PDF'
+      );
       if (onExport) {
-        onExport('pdf', false)
+        onExport('pdf', false);
       }
     } finally {
-      setIsExporting(false)
-      setExportProgress(0)
-      setIsOpen(false)
-      setShowPdfOptions(false)
+      setIsExporting(false);
+      setExportProgress(0);
+      setIsOpen(false);
+      setShowPdfOptions(false);
     }
-  }
+  };
 
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false)
-        setShowPdfOptions(false)
-        setExportError(null)
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+        setShowPdfOptions(false);
+        setExportError(null);
       }
-    }
+    };
 
     if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside)
-      return () => document.removeEventListener('mousedown', handleClickOutside)
+      document.addEventListener('mousedown', handleClickOutside);
+      return () =>
+        document.removeEventListener('mousedown', handleClickOutside);
     }
-  }, [isOpen])
+  }, [isOpen]);
 
-  const exportDataCount = exportData.length
+  const exportDataCount = exportData.length;
 
   return (
     <div className={`relative inline-block ${className}`} ref={dropdownRef}>
@@ -407,7 +445,9 @@ export const ExportButton: React.FC<ExportButtonProps> = ({
                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
               />
             </svg>
-            <span>{t('dataLog.exporting')} {exportProgress}%</span>
+            <span>
+              {t('dataLog.exporting')} {exportProgress}%
+            </span>
           </>
         ) : (
           <>
@@ -650,8 +690,12 @@ export const ExportButton: React.FC<ExportButtonProps> = ({
                           d="M4 5h16M4 12h16M4 19h16"
                         />
                       </svg>
-                      <span className="text-gray-900 dark:text-gray-100">{t('dataLog.landscape')}</span>
-                      <span className="text-xs text-gray-500 dark:text-gray-400">({t('dataLog.recommended')})</span>
+                      <span className="text-gray-900 dark:text-gray-100">
+                        {t('dataLog.landscape')}
+                      </span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                        ({t('dataLog.recommended')})
+                      </span>
                     </div>
                   </button>
                   <button
@@ -673,7 +717,9 @@ export const ExportButton: React.FC<ExportButtonProps> = ({
                           d="M12 4v16m8-8H4"
                         />
                       </svg>
-                      <span className="text-gray-900 dark:text-gray-100">{t('dataLog.portrait')}</span>
+                      <span className="text-gray-900 dark:text-gray-100">
+                        {t('dataLog.portrait')}
+                      </span>
                     </div>
                   </button>
                 </div>
@@ -683,7 +729,10 @@ export const ExportButton: React.FC<ExportButtonProps> = ({
 
           {/* Error Display */}
           {exportError && (
-            <div className="p-3 border-t border-gray-200 dark:border-gray-700 bg-red-50 dark:bg-red-900/20" role="alert">
+            <div
+              className="p-3 border-t border-gray-200 dark:border-gray-700 bg-red-50 dark:bg-red-900/20"
+              role="alert"
+            >
               <div className="flex items-start gap-2">
                 <svg
                   className="w-4 h-4 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5"
@@ -732,7 +781,10 @@ export const ExportButton: React.FC<ExportButtonProps> = ({
           )}
 
           {selectedIds && selectedIds.size > 0 && (
-            <div className="p-3 border-t border-gray-200 dark:border-gray-700 bg-blue-50 dark:bg-blue-900/20" role="status">
+            <div
+              className="p-3 border-t border-gray-200 dark:border-gray-700 bg-blue-50 dark:bg-blue-900/20"
+              role="status"
+            >
               <div className="flex items-start gap-2">
                 <svg
                   className="w-4 h-4 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5"
@@ -757,5 +809,5 @@ export const ExportButton: React.FC<ExportButtonProps> = ({
         </div>
       )}
     </div>
-  )
-}
+  );
+};

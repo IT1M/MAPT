@@ -18,45 +18,45 @@ export type FilterOperator =
   | 'is_null'
   | 'is_not_null'
   | 'in'
-  | 'not_in'
+  | 'not_in';
 
-export type FilterLogic = 'AND' | 'OR'
+export type FilterLogic = 'AND' | 'OR';
 
 export interface Filter {
-  id: string
-  field: string
-  operator: FilterOperator
-  value: any
-  logic?: FilterLogic
+  id: string;
+  field: string;
+  operator: FilterOperator;
+  value: any;
+  logic?: FilterLogic;
 }
 
 export interface FilterGroup {
-  filters: Filter[]
-  logic: FilterLogic
+  filters: Filter[];
+  logic: FilterLogic;
 }
 
 export interface SavedFilterData {
-  id: string
-  userId: string
-  name: string
-  filters: FilterGroup
-  page: string
-  isDefault: boolean
-  createdAt: Date
-  updatedAt: Date
+  id: string;
+  userId: string;
+  name: string;
+  filters: FilterGroup;
+  page: string;
+  isDefault: boolean;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface FilterFieldConfig {
-  name: string
-  label: string
-  type: 'string' | 'number' | 'date' | 'boolean' | 'enum'
-  operators: FilterOperator[]
-  enumValues?: { value: string; label: string }[]
+  name: string;
+  label: string;
+  type: 'string' | 'number' | 'date' | 'boolean' | 'enum';
+  operators: FilterOperator[];
+  enumValues?: { value: string; label: string }[];
 }
 
 export interface ShareableFilter {
-  name: string
-  filters: FilterGroup
-  page: string
-  version: string
+  name: string;
+  filters: FilterGroup;
+  page: string;
+  version: string;
 }

@@ -3,8 +3,8 @@
  * Centralized date formatting utilities using English locale
  */
 
-import { formatDistanceToNow, format, parseISO } from 'date-fns'
-import { enUS } from 'date-fns/locale'
+import { formatDistanceToNow, format, parseISO } from 'date-fns';
+import { enUS } from 'date-fns/locale';
 
 /**
  * Format a date in various styles
@@ -16,19 +16,19 @@ export function formatDate(
   date: Date | string,
   type: 'relative' | 'short' | 'long' | 'full' = 'short'
 ): string {
-  const d = typeof date === 'string' ? parseISO(date) : date
+  const d = typeof date === 'string' ? parseISO(date) : date;
 
   switch (type) {
     case 'relative':
-      return formatDistanceToNow(d, { addSuffix: true, locale: enUS })
+      return formatDistanceToNow(d, { addSuffix: true, locale: enUS });
     case 'short':
-      return format(d, 'MMM d, yyyy', { locale: enUS })
+      return format(d, 'MMM d, yyyy', { locale: enUS });
     case 'long':
-      return format(d, 'MMMM d, yyyy', { locale: enUS })
+      return format(d, 'MMMM d, yyyy', { locale: enUS });
     case 'full':
-      return format(d, 'EEEE, MMMM d, yyyy', { locale: enUS })
+      return format(d, 'EEEE, MMMM d, yyyy', { locale: enUS });
     default:
-      return d.toLocaleDateString('en-US')
+      return d.toLocaleDateString('en-US');
   }
 }
 
@@ -42,9 +42,9 @@ export function formatDateTime(
   date: Date | string,
   includeSeconds: boolean = false
 ): string {
-  const d = typeof date === 'string' ? parseISO(date) : date
-  const timeFormat = includeSeconds ? 'h:mm:ss a' : 'h:mm a'
-  return format(d, `MMM d, yyyy ${timeFormat}`, { locale: enUS })
+  const d = typeof date === 'string' ? parseISO(date) : date;
+  const timeFormat = includeSeconds ? 'h:mm:ss a' : 'h:mm a';
+  return format(d, `MMM d, yyyy ${timeFormat}`, { locale: enUS });
 }
 
 /**
@@ -57,9 +57,9 @@ export function formatTime(
   date: Date | string,
   includeSeconds: boolean = false
 ): string {
-  const d = typeof date === 'string' ? parseISO(date) : date
-  const timeFormat = includeSeconds ? 'h:mm:ss a' : 'h:mm a'
-  return format(d, timeFormat, { locale: enUS })
+  const d = typeof date === 'string' ? parseISO(date) : date;
+  const timeFormat = includeSeconds ? 'h:mm:ss a' : 'h:mm a';
+  return format(d, timeFormat, { locale: enUS });
 }
 
 /**
@@ -68,5 +68,5 @@ export function formatTime(
  * @returns Relative time string
  */
 export function getRelativeTime(date: Date | string): string {
-  return formatDate(date, 'relative')
+  return formatDate(date, 'relative');
 }

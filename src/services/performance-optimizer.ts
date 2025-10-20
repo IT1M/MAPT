@@ -1,73 +1,79 @@
 /**
  * Performance Optimizer Service
- * 
+ *
  * Uses AI (Gemini) to analyze performance metrics and provide
  * optimization recommendations with documentation links
  */
 
-import { geminiService } from './gemini'
-import { performanceMetricsService, PerformanceStats } from './performance-metrics'
-import { logger } from './logger'
+import { geminiService } from './gemini';
+import {
+  performanceMetricsService,
+  PerformanceStats,
+} from './performance-metrics';
+import { logger } from './logger';
 
 export interface OptimizationRecommendation {
-  id: string
-  title: string
-  description: string
-  priority: 'high' | 'medium' | 'low'
-  category: 'api' | 'database' | 'frontend' | 'infrastructure'
-  impact: string
-  effort: 'low' | 'medium' | 'high'
-  documentationLinks: string[]
-  implementationSteps: string[]
-  estimatedImprovement: string
-  implemented: boolean
-  implementedAt?: Date
+  id: string;
+  title: string;
+  description: string;
+  priority: 'high' | 'medium' | 'low';
+  category: 'api' | 'database' | 'frontend' | 'infrastructure';
+  impact: string;
+  effort: 'low' | 'medium' | 'high';
+  documentationLinks: string[];
+  implementationSteps: string[];
+  estimatedImprovement: string;
+  implemented: boolean;
+  implementedAt?: Date;
 }
 
 export interface PerformanceAnalysis {
-  summary: string
-  criticalIssues: string[]
-  recommendations: OptimizationRecommendation[]
-  confidence: number
-  analyzedAt: Date
+  summary: string;
+  criticalIssues: string[];
+  recommendations: OptimizationRecommendation[];
+  confidence: number;
+  analyzedAt: Date;
 }
 
 class PerformanceOptimizerService {
-  private recommendations: OptimizationRecommendation[] = []
-  private lastAnalysis: PerformanceAnalysis | null = null
-  private readonly ANALYSIS_CACHE_TTL = 30 * 60 * 1000 // 30 minutes
+  private recommendations: OptimizationRecommendation[] = [];
+  private lastAnalysis: PerformanceAnalysis | null = null;
+  private readonly ANALYSIS_CACHE_TTL = 30 * 60 * 1000; // 30 minutes
 
   /**
    * Analyze performance metrics and generate AI-powered recommendations
    */
   async analyzePerformance(): Promise<PerformanceAnalysis> {
     // Return cached analysis if recent
-    if (this.lastAnalysis && 
-        Date.now() - this.lastAnalysis.analyzedAt.getTime() < this.ANALYSIS_CACHE_TTL) {
-      logger.info('Returning cached performance analysis')
-      return this.lastAnalysis
+    if (
+      this.lastAnalysis &&
+      Date.now() - this.lastAnalysis.analyzedAt.getTime() <
+        this.ANALYSIS_CACHE_TTL
+    ) {
+      logger.info('Returning cached performance analysis');
+      return this.lastAnalysis;
     }
 
     try {
-      const stats = performanceMetricsService.getPerformanceStats(60)
-      const alerts = await performanceMetricsService.checkAlertRules()
+      const stats = performanceMetricsService.getPerformanceStats(60);
+      const alerts = await performanceMetricsService.checkAlertRules();
 
       // Check if Gemini is available
       if (!geminiService.isAvailable()) {
-        logger.warn('Gemini service not available, using fallback analysis')
-        return this.getFallbackAnalysis(stats, alerts)
+        logger.warn('Gemini service not available, using fallback analysis');
+        return this.getFallbackAnalysis(stats, alerts);
       }
 
       // Generate AI analysis
-      const analysis = await this.generateAIAnalysis(stats, alerts)
-      this.lastAnalysis = analysis
+      const analysis = await this.generateAIAnalysis(stats, alerts);
+      this.lastAnalysis = analysis;
 
-      return analysis
+      return analysis;
     } catch (error) {
-      logger.error('Failed to analyze performance', error)
-      const stats = performanceMetricsService.getPerformanceStats(60)
-      const alerts = await performanceMetricsService.checkAlertRules()
-      return this.getFallbackAnalysis(stats, alerts)
+      logger.error('Failed to analyze performance', error);
+      const stats = performanceMetricsService.getPerformanceStats(60);
+      const alerts = await performanceMetricsService.checkAlertRules();
+      return this.getFallbackAnalysis(stats, alerts);
     }
   }
 
@@ -89,13 +95,15 @@ API Performance Metrics (last 60 minutes):
 - Error Rate: ${(stats.apiMetrics.errorRate * 100).toFixed(2)}%
 
 Error Breakdown:
-${Object.entries(stats.errorMetrics.byType).map(([type, count]) => `- ${type}: ${count} errors`).join('\n')}
+${Object.entries(stats.errorMetrics.byType)
+  .map(([type, count]) => `- ${type}: ${count} errors`)
+  .join('\n')}
 
 Slow Endpoints:
-${stats.slowEndpoints.map(e => `- ${e.endpoint}: ${e.avgDuration.toFixed(0)}ms avg (${e.count} requests)`).join('\n')}
+${stats.slowEndpoints.map((e) => `- ${e.endpoint}: ${e.avgDuration.toFixed(0)}ms avg (${e.count} requests)`).join('\n')}
 
 Active Alerts:
-${alerts.map(a => `- [${a.severity.toUpperCase()}] ${a.message}`).join('\n')}
+${alerts.map((a) => `- [${a.severity.toUpperCase()}] ${a.message}`).join('\n')}
 
 Provide:
 1. A brief summary of overall system performance
@@ -128,37 +136,38 @@ Return ONLY a valid JSON object with this structure:
     }
   ],
   "confidence": 0.85
-}`
+}`;
 
     try {
-      const model = geminiService['genAI']?.getGenerativeModel({ model: 'gemini-pro' })
+      const model = geminiService['genAI']?.getGenerativeModel({
+        model: 'gemini-pro',
+      });
       if (!model) {
-        throw new Error('Gemini model not available')
+        throw new Error('Gemini model not available');
       }
 
-      const result = await model.generateContent(prompt)
-      const response = await result.response
-      const text = response.text()
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      const text = response.text();
 
       // Extract JSON from response
-      const jsonMatch = text.match(/\{[\s\S]*\}/)
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
       if (!jsonMatch) {
-        throw new Error('Invalid response format from AI')
+        throw new Error('Invalid response format from AI');
       }
 
-      const aiResponse = JSON.parse(jsonMatch[0])
+      const aiResponse = JSON.parse(jsonMatch[0]);
 
       // Add IDs and default values to recommendations
-      const recommendations: OptimizationRecommendation[] = aiResponse.recommendations.map(
-        (rec: any, index: number) => ({
+      const recommendations: OptimizationRecommendation[] =
+        aiResponse.recommendations.map((rec: any, index: number) => ({
           id: `rec-${Date.now()}-${index}`,
           ...rec,
           implemented: false,
-        })
-      )
+        }));
 
       // Store recommendations
-      this.recommendations = recommendations
+      this.recommendations = recommendations;
 
       return {
         summary: aiResponse.summary,
@@ -166,10 +175,10 @@ Return ONLY a valid JSON object with this structure:
         recommendations,
         confidence: aiResponse.confidence,
         analyzedAt: new Date(),
-      }
+      };
     } catch (error) {
-      logger.error('Failed to generate AI analysis', error)
-      throw error
+      logger.error('Failed to generate AI analysis', error);
+      throw error;
     }
   }
 
@@ -180,17 +189,20 @@ Return ONLY a valid JSON object with this structure:
     stats: PerformanceStats,
     alerts: Array<{ rule: string; message: string; severity: string }>
   ): PerformanceAnalysis {
-    const recommendations: OptimizationRecommendation[] = []
-    const criticalIssues: string[] = []
+    const recommendations: OptimizationRecommendation[] = [];
+    const criticalIssues: string[] = [];
 
     // Analyze API performance
     if (stats.apiMetrics.p95 > 2000) {
-      criticalIssues.push(`High API response times (P95: ${stats.apiMetrics.p95.toFixed(0)}ms)`)
-      
+      criticalIssues.push(
+        `High API response times (P95: ${stats.apiMetrics.p95.toFixed(0)}ms)`
+      );
+
       recommendations.push({
         id: `rec-${Date.now()}-1`,
         title: 'Optimize Slow API Endpoints',
-        description: 'Several API endpoints are responding slowly. Consider implementing caching, database query optimization, and response compression.',
+        description:
+          'Several API endpoints are responding slowly. Consider implementing caching, database query optimization, and response compression.',
         priority: 'high',
         category: 'api',
         impact: 'Reduce API response times by 40-60%',
@@ -207,17 +219,20 @@ Return ONLY a valid JSON object with this structure:
         ],
         estimatedImprovement: '40-60% faster response times',
         implemented: false,
-      })
+      });
     }
 
     // Analyze error rate
     if (stats.apiMetrics.errorRate > 0.05) {
-      criticalIssues.push(`High error rate (${(stats.apiMetrics.errorRate * 100).toFixed(2)}%)`)
-      
+      criticalIssues.push(
+        `High error rate (${(stats.apiMetrics.errorRate * 100).toFixed(2)}%)`
+      );
+
       recommendations.push({
         id: `rec-${Date.now()}-2`,
         title: 'Reduce API Error Rate',
-        description: 'Error rate is above acceptable threshold. Review error logs and implement better error handling and validation.',
+        description:
+          'Error rate is above acceptable threshold. Review error logs and implement better error handling and validation.',
         priority: 'high',
         category: 'api',
         impact: 'Improve system reliability and user experience',
@@ -233,13 +248,13 @@ Return ONLY a valid JSON object with this structure:
         ],
         estimatedImprovement: 'Reduce errors by 70-80%',
         implemented: false,
-      })
+      });
     }
 
     // Check for slow endpoints
     if (stats.slowEndpoints.length > 0) {
-      const slowestEndpoint = stats.slowEndpoints[0]
-      
+      const slowestEndpoint = stats.slowEndpoints[0];
+
       recommendations.push({
         id: `rec-${Date.now()}-3`,
         title: `Optimize ${slowestEndpoint.endpoint} Endpoint`,
@@ -259,14 +274,15 @@ Return ONLY a valid JSON object with this structure:
         ],
         estimatedImprovement: '50-70% faster response time',
         implemented: false,
-      })
+      });
     }
 
     // General recommendations
     recommendations.push({
       id: `rec-${Date.now()}-4`,
       title: 'Implement Database Connection Pooling',
-      description: 'Optimize database connection management to reduce connection overhead and improve query performance.',
+      description:
+        'Optimize database connection management to reduce connection overhead and improve query performance.',
       priority: 'medium',
       category: 'database',
       impact: 'Reduce database connection overhead',
@@ -281,12 +297,13 @@ Return ONLY a valid JSON object with this structure:
       ],
       estimatedImprovement: '10-20% improvement in database operations',
       implemented: false,
-    })
+    });
 
     recommendations.push({
       id: `rec-${Date.now()}-5`,
       title: 'Enable Response Compression',
-      description: 'Compress API responses to reduce bandwidth usage and improve load times.',
+      description:
+        'Compress API responses to reduce bandwidth usage and improve load times.',
       priority: 'medium',
       category: 'api',
       impact: 'Reduce response size by 60-80%',
@@ -301,11 +318,12 @@ Return ONLY a valid JSON object with this structure:
       ],
       estimatedImprovement: '60-80% smaller response sizes',
       implemented: false,
-    })
+    });
 
-    const summary = criticalIssues.length > 0
-      ? `System performance needs attention. ${criticalIssues.length} critical issues detected.`
-      : `System performance is within acceptable ranges. ${recommendations.length} optimization opportunities identified.`
+    const summary =
+      criticalIssues.length > 0
+        ? `System performance needs attention. ${criticalIssues.length} critical issues detected.`
+        : `System performance is within acceptable ranges. ${recommendations.length} optimization opportunities identified.`;
 
     return {
       summary,
@@ -313,25 +331,25 @@ Return ONLY a valid JSON object with this structure:
       recommendations,
       confidence: 0.6,
       analyzedAt: new Date(),
-    }
+    };
   }
 
   /**
    * Get all recommendations
    */
   getRecommendations(): OptimizationRecommendation[] {
-    return [...this.recommendations]
+    return [...this.recommendations];
   }
 
   /**
    * Mark recommendation as implemented
    */
   markAsImplemented(recommendationId: string): void {
-    const rec = this.recommendations.find(r => r.id === recommendationId)
+    const rec = this.recommendations.find((r) => r.id === recommendationId);
     if (rec) {
-      rec.implemented = true
-      rec.implementedAt = new Date()
-      logger.info('Recommendation marked as implemented', { recommendationId })
+      rec.implemented = true;
+      rec.implementedAt = new Date();
+      logger.info('Recommendation marked as implemented', { recommendationId });
     }
   }
 
@@ -339,28 +357,30 @@ Return ONLY a valid JSON object with this structure:
    * Get implementation progress
    */
   getImplementationProgress(): {
-    total: number
-    implemented: number
-    percentage: number
+    total: number;
+    implemented: number;
+    percentage: number;
   } {
-    const total = this.recommendations.length
-    const implemented = this.recommendations.filter(r => r.implemented).length
-    
+    const total = this.recommendations.length;
+    const implemented = this.recommendations.filter(
+      (r) => r.implemented
+    ).length;
+
     return {
       total,
       implemented,
       percentage: total > 0 ? (implemented / total) * 100 : 0,
-    }
+    };
   }
 
   /**
    * Clear cache and force new analysis
    */
   clearCache(): void {
-    this.lastAnalysis = null
-    logger.info('Performance analysis cache cleared')
+    this.lastAnalysis = null;
+    logger.info('Performance analysis cache cleared');
   }
 }
 
 // Export singleton instance
-export const performanceOptimizerService = new PerformanceOptimizerService()
+export const performanceOptimizerService = new PerformanceOptimizerService();

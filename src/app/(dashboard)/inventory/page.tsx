@@ -1,149 +1,151 @@
-'use client'
+'use client';
 
-import React, { useState, useEffect } from 'react'
-import { useTranslations } from '@/hooks/useTranslations'
-import { useSession } from 'next-auth/react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Select } from '@/components/ui/select'
-import { Modal } from '@/components/ui/modal'
-import { InventoryForm } from '@/components/forms/inventory-form'
-import { InventoryItem, Destination } from '@prisma/client'
-import { 
-  DEFAULT_PAGE_SIZE 
-} from '@/utils/constants'
-import toast from 'react-hot-toast'
+import React, { useState, useEffect } from 'react';
+import { useTranslations } from '@/hooks/useTranslations';
+import { useSession } from 'next-auth/react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Select } from '@/components/ui/select';
+import { Modal } from '@/components/ui/modal';
+import { InventoryForm } from '@/components/forms/inventory-form';
+import { InventoryItem, Destination } from '@prisma/client';
+import { DEFAULT_PAGE_SIZE } from '@/utils/constants';
+import toast from 'react-hot-toast';
 
 type InventoryItemWithUser = InventoryItem & {
   enteredBy: {
-    id: string
-    name: string
-    email: string
-  }
-}
+    id: string;
+    name: string;
+    email: string;
+  };
+};
 
 export default function InventoryPage() {
-  const t = useTranslations()
-  const { data: session } = useSession()
-  const [loading, setLoading] = useState(true)
-  const [items, setItems] = useState<InventoryItemWithUser[]>([])
-  const [total, setTotal] = useState(0)
-  const [page, setPage] = useState(1)
-  const [pageSize] = useState(DEFAULT_PAGE_SIZE)
-  const [totalPages, setTotalPages] = useState(0)
-  
-  // Filters
-  const [search, setSearch] = useState('')
-  const [destinationFilter, setDestinationFilter] = useState<string>('')
-  
-  // Modal state
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [editingItem, setEditingItem] = useState<InventoryItemWithUser | undefined>()
-  const [deletingItemId, setDeletingItemId] = useState<string | null>(null)
+  const t = useTranslations();
+  const { data: session } = useSession();
+  const [loading, setLoading] = useState(true);
+  const [items, setItems] = useState<InventoryItemWithUser[]>([]);
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
+  const [pageSize] = useState(DEFAULT_PAGE_SIZE);
+  const [totalPages, setTotalPages] = useState(0);
 
-  const locale = typeof window !== 'undefined' ? 
-    document.documentElement.lang || 'en' : 'en'
+  // Filters
+  const [search, setSearch] = useState('');
+  const [destinationFilter, setDestinationFilter] = useState<string>('');
+
+  // Modal state
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingItem, setEditingItem] = useState<
+    InventoryItemWithUser | undefined
+  >();
+  const [deletingItemId, setDeletingItemId] = useState<string | null>(null);
+
+  const locale =
+    typeof window !== 'undefined'
+      ? document.documentElement.lang || 'en'
+      : 'en';
 
   // Check permissions
-  const canWrite = session?.user?.permissions?.includes('inventory:write')
-  const canDelete = session?.user?.permissions?.includes('inventory:delete')
+  const canWrite = session?.user?.permissions?.includes('inventory:write');
+  const canDelete = session?.user?.permissions?.includes('inventory:delete');
 
   // Fetch inventory items
   const fetchItems = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
       const params = new URLSearchParams({
         page: page.toString(),
         pageSize: pageSize.toString(),
-      })
-      
-      if (search) params.append('search', search)
-      if (destinationFilter) params.append('destination', destinationFilter)
+      });
 
-      const response = await fetch(`/api/inventory?${params}`)
-      const result = await response.json()
+      if (search) params.append('search', search);
+      if (destinationFilter) params.append('destination', destinationFilter);
+
+      const response = await fetch(`/api/inventory?${params}`);
+      const result = await response.json();
 
       if (result.success) {
-        setItems(result.data.items)
-        setTotal(result.data.total)
-        setTotalPages(result.data.totalPages)
+        setItems(result.data.items);
+        setTotal(result.data.total);
+        setTotalPages(result.data.totalPages);
       } else {
-        toast.error(result.error?.message || t('errors.serverError'))
+        toast.error(result.error?.message || t('errors.serverError'));
       }
     } catch (error) {
-      console.error('Error fetching inventory:', error)
-      toast.error(t('errors.networkError'))
+      console.error('Error fetching inventory:', error);
+      toast.error(t('errors.networkError'));
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
-    fetchItems()
-  }, [page, pageSize])
+    fetchItems();
+  }, [page, pageSize]);
 
   const handleSearch = () => {
-    setPage(1)
-    fetchItems()
-  }
+    setPage(1);
+    fetchItems();
+  };
 
   const handleAddItem = () => {
-    setEditingItem(undefined)
-    setIsModalOpen(true)
-  }
+    setEditingItem(undefined);
+    setIsModalOpen(true);
+  };
 
   const handleEditItem = (item: InventoryItemWithUser) => {
-    setEditingItem(item)
-    setIsModalOpen(true)
-  }
+    setEditingItem(item);
+    setIsModalOpen(true);
+  };
 
   const handleDeleteItem = async (id: string) => {
     if (!confirm(t('inventory.deleteItem') + '?')) {
-      return
+      return;
     }
 
-    setDeletingItemId(id)
+    setDeletingItemId(id);
     try {
       const response = await fetch(`/api/inventory/${id}`, {
         method: 'DELETE',
-      })
-      const result = await response.json()
+      });
+      const result = await response.json();
 
       if (result.success) {
-        toast.success(t('success.deleted'))
-        fetchItems()
+        toast.success(t('success.deleted'));
+        fetchItems();
       } else {
-        toast.error(result.error?.message || t('errors.serverError'))
+        toast.error(result.error?.message || t('errors.serverError'));
       }
     } catch (error) {
-      console.error('Error deleting item:', error)
-      toast.error(t('errors.networkError'))
+      console.error('Error deleting item:', error);
+      toast.error(t('errors.networkError'));
     } finally {
-      setDeletingItemId(null)
+      setDeletingItemId(null);
     }
-  }
+  };
 
   const handleFormSuccess = () => {
-    setIsModalOpen(false)
-    setEditingItem(undefined)
-    fetchItems()
-  }
+    setIsModalOpen(false);
+    setEditingItem(undefined);
+    fetchItems();
+  };
 
   const formatDate = (date: Date | string | null) => {
-    if (!date) return '-'
-    return new Date(date).toLocaleDateString(locale)
-  }
+    if (!date) return '-';
+    return new Date(date).toLocaleDateString(locale);
+  };
 
   const getDestinationColor = (destination: Destination) => {
     switch (destination) {
       case 'MAIS':
-        return 'bg-accent-100 text-accent-800 dark:bg-accent-900 dark:text-accent-200'
+        return 'bg-accent-100 text-accent-800 dark:bg-accent-900 dark:text-accent-200';
       case 'FOZAN':
-        return 'bg-primary-100 text-primary-800 dark:bg-primary-900 dark:text-primary-200'
+        return 'bg-primary-100 text-primary-800 dark:bg-primary-900 dark:text-primary-200';
       default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200';
     }
-  }
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -153,9 +155,7 @@ export default function InventoryPage() {
           {t('inventory.title')}
         </h1>
         {canWrite && (
-          <Button onClick={handleAddItem}>
-            {t('inventory.addItem')}
-          </Button>
+          <Button onClick={handleAddItem}>{t('inventory.addItem')}</Button>
         )}
       </div>
 
@@ -188,10 +188,10 @@ export default function InventoryPage() {
             variant="secondary"
             size="small"
             onClick={() => {
-              setSearch('')
-              setDestinationFilter('')
-              setPage(1)
-              fetchItems()
+              setSearch('');
+              setDestinationFilter('');
+              setPage(1);
+              fetchItems();
             }}
           >
             {t('common.refresh')}
@@ -239,7 +239,10 @@ export default function InventoryPage() {
                 </thead>
                 <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                   {items.map((item) => (
-                    <tr key={item.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <tr
+                      key={item.id}
+                      className="hover:bg-gray-50 dark:hover:bg-gray-700"
+                    >
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
                         {item.itemName}
                       </td>
@@ -253,7 +256,9 @@ export default function InventoryPage() {
                         {item.reject}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getDestinationColor(item.destination)}`}>
+                        <span
+                          className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getDestinationColor(item.destination)}`}
+                        >
                           {item.destination}
                         </span>
                       </td>
@@ -293,7 +298,8 @@ export default function InventoryPage() {
             {totalPages > 1 && (
               <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
                 <div className="text-sm text-gray-700 dark:text-gray-300">
-                  Showing {(page - 1) * pageSize + 1} to {Math.min(page * pageSize, total)} of {total} results
+                  Showing {(page - 1) * pageSize + 1} to{' '}
+                  {Math.min(page * pageSize, total)} of {total} results
                 </div>
                 <div className="flex gap-2">
                   <Button
@@ -323,8 +329,8 @@ export default function InventoryPage() {
       <Modal
         isOpen={isModalOpen}
         onClose={() => {
-          setIsModalOpen(false)
-          setEditingItem(undefined)
+          setIsModalOpen(false);
+          setEditingItem(undefined);
         }}
         title={editingItem ? t('inventory.editItem') : t('inventory.addItem')}
         size="medium"
@@ -333,11 +339,11 @@ export default function InventoryPage() {
           item={editingItem as any}
           onSuccess={handleFormSuccess}
           onCancel={() => {
-            setIsModalOpen(false)
-            setEditingItem(undefined)
+            setIsModalOpen(false);
+            setEditingItem(undefined);
           }}
         />
       </Modal>
     </div>
-  )
+  );
 }

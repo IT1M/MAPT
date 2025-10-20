@@ -1,6 +1,6 @@
 /**
  * Query Optimization Utilities
- * 
+ *
  * Provides helpers for optimizing database queries
  */
 
@@ -45,7 +45,7 @@ export function calculatePagination(
 ): { skip: number; take: number; page: number; limit: number } {
   const normalizedPage = Math.max(1, page);
   const normalizedLimit = Math.min(Math.max(1, limit), MAX_PAGE_SIZE);
-  
+
   return {
     skip: (normalizedPage - 1) * normalizedLimit,
     take: normalizedLimit,
@@ -64,7 +64,7 @@ export function createPaginatedResult<T>(
   limit: number
 ): PaginatedResult<T> {
   const totalPages = Math.ceil(total / limit);
-  
+
   return {
     data,
     pagination: {
@@ -86,11 +86,11 @@ export async function measureQuery<T>(
   queryFn: () => Promise<T>
 ): Promise<T> {
   const start = Date.now();
-  
+
   try {
     const result = await queryFn();
     const duration = Date.now() - start;
-    
+
     if (duration > 1000) {
       logger.warn('Slow query detected', {
         query: queryName,
@@ -102,7 +102,7 @@ export async function measureQuery<T>(
         duration: `${duration}ms`,
       });
     }
-    
+
     return result;
   } catch (error) {
     const duration = Date.now() - start;
@@ -121,13 +121,13 @@ export function buildWhereClause<T extends Record<string, any>>(
   filters: Partial<T>
 ): Record<string, any> {
   const where: Record<string, any> = {};
-  
+
   Object.entries(filters).forEach(([key, value]) => {
     if (value !== undefined && value !== null && value !== '') {
       where[key] = value;
     }
   });
-  
+
   return where;
 }
 
@@ -141,17 +141,18 @@ export function buildDateRangeFilter(
   if (!startDate && !endDate) {
     return undefined;
   }
-  
+
   const filter: { gte?: Date; lte?: Date } = {};
-  
+
   if (startDate) {
-    filter.gte = typeof startDate === 'string' ? new Date(startDate) : startDate;
+    filter.gte =
+      typeof startDate === 'string' ? new Date(startDate) : startDate;
   }
-  
+
   if (endDate) {
     filter.lte = typeof endDate === 'string' ? new Date(endDate) : endDate;
   }
-  
+
   return filter;
 }
 
@@ -165,7 +166,7 @@ export function buildSearchFilter(
   if (!searchTerm || fields.length === 0) {
     return undefined;
   }
-  
+
   return {
     OR: fields.map((field) => ({
       [field]: {
@@ -279,27 +280,27 @@ export async function batchOperation<T, R>(
   operation: (batch: T[]) => Promise<R>
 ): Promise<R[]> {
   const results: R[] = [];
-  
+
   for (let i = 0; i < items.length; i += batchSize) {
     const batch = items.slice(i, i + batchSize);
     const result = await operation(batch);
     results.push(result);
   }
-  
+
   return results;
 }
 
 /**
  * Parallel query execution helper
  */
-export async function executeParallel<T extends Record<string, any>>(
-  queries: { [K in keyof T]: () => Promise<T[K]> }
-): Promise<T> {
+export async function executeParallel<T extends Record<string, any>>(queries: {
+  [K in keyof T]: () => Promise<T[K]>;
+}): Promise<T> {
   const keys = Object.keys(queries) as (keyof T)[];
   const promises = keys.map((key) => queries[key]());
-  
+
   const results = await Promise.all(promises);
-  
+
   return keys.reduce((acc, key, index) => {
     acc[key] = results[index];
     return acc;
@@ -318,7 +319,7 @@ export function generateQueryCacheKey(
     .sort()
     .map((key) => `${key}=${JSON.stringify(params[key])}`)
     .join('&');
-  
+
   return `query:${model}:${operation}:${sortedParams}`;
 }
 

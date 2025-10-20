@@ -7,8 +7,26 @@ interface AuditFiltersProps {
   users: Array<{ id: string; name: string }>;
 }
 
-const actionTypes = ['CREATE', 'UPDATE', 'DELETE', 'LOGIN', 'LOGOUT', 'EXPORT', 'VIEW', 'REVERT', 'BACKUP', 'RESTORE'];
-const entityTypes = ['InventoryItem', 'User', 'Report', 'Backup', 'Settings', 'AuditLog'];
+const actionTypes = [
+  'CREATE',
+  'UPDATE',
+  'DELETE',
+  'LOGIN',
+  'LOGOUT',
+  'EXPORT',
+  'VIEW',
+  'REVERT',
+  'BACKUP',
+  'RESTORE',
+];
+const entityTypes = [
+  'InventoryItem',
+  'User',
+  'Report',
+  'Backup',
+  'Settings',
+  'AuditLog',
+];
 
 const datePresets = [
   { label: 'Today', value: 'today' },
@@ -29,11 +47,11 @@ export function AuditFilters({ onFilterChange, users }: AuditFiltersProps) {
 
   const handleDatePresetChange = (preset: string) => {
     setDatePreset(preset);
-    
+
     if (preset === 'custom') {
       return;
     }
-    
+
     const now = new Date();
     let from = new Date();
 
@@ -60,14 +78,18 @@ export function AuditFilters({ onFilterChange, users }: AuditFiltersProps) {
   };
 
   const toggleAction = (action: string) => {
-    setSelectedActions(prev =>
-      prev.includes(action) ? prev.filter(a => a !== action) : [...prev, action]
+    setSelectedActions((prev) =>
+      prev.includes(action)
+        ? prev.filter((a) => a !== action)
+        : [...prev, action]
     );
   };
 
   const toggleEntity = (entity: string) => {
-    setSelectedEntities(prev =>
-      prev.includes(entity) ? prev.filter(e => e !== entity) : [...prev, entity]
+    setSelectedEntities((prev) =>
+      prev.includes(entity)
+        ? prev.filter((e) => e !== entity)
+        : [...prev, entity]
     );
   };
 
@@ -99,14 +121,18 @@ export function AuditFilters({ onFilterChange, users }: AuditFiltersProps) {
 
       {/* Date Range */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Date Range</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Date Range
+        </label>
         <select
           value={datePreset}
           onChange={(e) => handleDatePresetChange(e.target.value)}
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
         >
-          {datePresets.map(preset => (
-            <option key={preset.value} value={preset.value}>{preset.label}</option>
+          {datePresets.map((preset) => (
+            <option key={preset.value} value={preset.value}>
+              {preset.label}
+            </option>
           ))}
         </select>
         {datePreset === 'custom' && (
@@ -131,7 +157,9 @@ export function AuditFilters({ onFilterChange, users }: AuditFiltersProps) {
 
       {/* Search */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Search</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Search
+        </label>
         <input
           type="text"
           value={search}
@@ -143,9 +171,11 @@ export function AuditFilters({ onFilterChange, users }: AuditFiltersProps) {
 
       {/* Action Types */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Action Types</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Action Types
+        </label>
         <div className="space-y-2 max-h-48 overflow-y-auto">
-          {actionTypes.map(action => (
+          {actionTypes.map((action) => (
             <label key={action} className="flex items-center">
               <input
                 type="checkbox"
@@ -161,9 +191,11 @@ export function AuditFilters({ onFilterChange, users }: AuditFiltersProps) {
 
       {/* Entity Types */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Entity Types</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Entity Types
+        </label>
         <div className="space-y-2">
-          {entityTypes.map(entity => (
+          {entityTypes.map((entity) => (
             <label key={entity} className="flex items-center">
               <input
                 type="checkbox"

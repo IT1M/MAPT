@@ -8,7 +8,8 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 export function InstallPrompt() {
-  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [deferredPrompt, setDeferredPrompt] =
+    useState<BeforeInstallPromptEvent | null>(null);
   const [showPrompt, setShowPrompt] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
 
@@ -23,8 +24,9 @@ export function InstallPrompt() {
     const dismissed = localStorage.getItem('pwa-install-dismissed');
     if (dismissed) {
       const dismissedTime = parseInt(dismissed, 10);
-      const daysSinceDismissed = (Date.now() - dismissedTime) / (1000 * 60 * 60 * 24);
-      
+      const daysSinceDismissed =
+        (Date.now() - dismissedTime) / (1000 * 60 * 60 * 24);
+
       // Don't show again for 30 days after dismissal
       if (daysSinceDismissed < 30) {
         return;
@@ -35,7 +37,7 @@ export function InstallPrompt() {
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
-      
+
       // Show prompt after 30 seconds on mobile
       const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
       if (isMobile) {
@@ -55,7 +57,10 @@ export function InstallPrompt() {
     });
 
     return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      window.removeEventListener(
+        'beforeinstallprompt',
+        handleBeforeInstallPrompt
+      );
     };
   }, []);
 
@@ -69,7 +74,7 @@ export function InstallPrompt() {
 
     // Wait for the user's response
     const { outcome } = await deferredPrompt.userChoice;
-    
+
     console.log(`[PWA] User response: ${outcome}`);
 
     if (outcome === 'accepted') {
@@ -77,7 +82,7 @@ export function InstallPrompt() {
       if (typeof window !== 'undefined' && (window as any).gtag) {
         (window as any).gtag('event', 'pwa_install', {
           event_category: 'engagement',
-          event_label: 'accepted'
+          event_label: 'accepted',
         });
       }
     }
@@ -90,12 +95,12 @@ export function InstallPrompt() {
   const handleDismiss = () => {
     setShowPrompt(false);
     localStorage.setItem('pwa-install-dismissed', Date.now().toString());
-    
+
     // Track dismissal
     if (typeof window !== 'undefined' && (window as any).gtag) {
       (window as any).gtag('event', 'pwa_install', {
         event_category: 'engagement',
-        event_label: 'dismissed'
+        event_label: 'dismissed',
       });
     }
   };
@@ -135,7 +140,11 @@ export function InstallPrompt() {
             </p>
             <ul className="text-sm text-slate-600 dark:text-slate-300 space-y-1 mb-4">
               <li className="flex items-center gap-2">
-                <svg className="w-4 h-4 text-teal-600" fill="currentColor" viewBox="0 0 20 20">
+                <svg
+                  className="w-4 h-4 text-teal-600"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
                   <path
                     fillRule="evenodd"
                     d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
@@ -145,7 +154,11 @@ export function InstallPrompt() {
                 Faster loading times
               </li>
               <li className="flex items-center gap-2">
-                <svg className="w-4 h-4 text-teal-600" fill="currentColor" viewBox="0 0 20 20">
+                <svg
+                  className="w-4 h-4 text-teal-600"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
                   <path
                     fillRule="evenodd"
                     d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
@@ -155,7 +168,11 @@ export function InstallPrompt() {
                 Work offline
               </li>
               <li className="flex items-center gap-2">
-                <svg className="w-4 h-4 text-teal-600" fill="currentColor" viewBox="0 0 20 20">
+                <svg
+                  className="w-4 h-4 text-teal-600"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
                   <path
                     fillRule="evenodd"
                     d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"

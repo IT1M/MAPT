@@ -1,18 +1,18 @@
-'use client'
+'use client';
 
-import React, { useState } from 'react'
-import { useTranslations } from '@/hooks/useTranslations'
-import { Modal } from '@/components/ui/modal'
-import { Button } from '@/components/ui/button'
-import type { InventoryItemWithUser } from '@/types'
+import React, { useState } from 'react';
+import { useTranslations } from '@/hooks/useTranslations';
+import { Modal } from '@/components/ui/modal';
+import { Button } from '@/components/ui/button';
+import type { InventoryItemWithUser } from '@/types';
 
 interface DeleteConfirmationDialogProps {
-  item: InventoryItemWithUser | null
-  items?: InventoryItemWithUser[]
-  isOpen: boolean
-  onClose: () => void
-  onConfirm: () => Promise<void>
-  isBulk?: boolean
+  item: InventoryItemWithUser | null;
+  items?: InventoryItemWithUser[];
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => Promise<void>;
+  isBulk?: boolean;
 }
 
 export function DeleteConfirmationDialog({
@@ -23,33 +23,33 @@ export function DeleteConfirmationDialog({
   onConfirm,
   isBulk = false,
 }: DeleteConfirmationDialogProps) {
-  const t = useTranslations()
-  const [confirmed, setConfirmed] = useState(false)
-  const [loading, setLoading] = useState(false)
+  const t = useTranslations();
+  const [confirmed, setConfirmed] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const itemCount = isBulk ? items.length : 1
+  const itemCount = isBulk ? items.length : 1;
 
   const handleConfirm = async () => {
-    if (!confirmed) return
+    if (!confirmed) return;
 
-    setLoading(true)
+    setLoading(true);
     try {
-      await onConfirm()
-      setConfirmed(false)
-      onClose()
+      await onConfirm();
+      setConfirmed(false);
+      onClose();
     } catch (error) {
-      console.error('Delete failed:', error)
+      console.error('Delete failed:', error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleClose = () => {
     if (!loading) {
-      setConfirmed(false)
-      onClose()
+      setConfirmed(false);
+      onClose();
     }
-  }
+  };
 
   return (
     <Modal
@@ -166,11 +166,7 @@ export function DeleteConfirmationDialog({
 
         {/* Action Buttons */}
         <div className="flex gap-3 justify-end pt-2">
-          <Button
-            variant="secondary"
-            onClick={handleClose}
-            disabled={loading}
-          >
+          <Button variant="secondary" onClick={handleClose} disabled={loading}>
             {t('common.cancel')}
           </Button>
           <Button
@@ -186,5 +182,5 @@ export function DeleteConfirmationDialog({
         </div>
       </div>
     </Modal>
-  )
+  );
 }

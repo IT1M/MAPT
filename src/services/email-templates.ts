@@ -11,11 +11,11 @@ import {
   type HighRejectRateAlertData,
   type BackupStatusEmailData,
   type ReportReadyEmailData,
-} from './email'
+} from './email';
 
-const APP_NAME = 'Saudi Mais Inventory System'
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
-const BRAND_COLOR = '#0d9488'
+const APP_NAME = 'Saudi Mais Inventory System';
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+const BRAND_COLOR = '#0d9488';
 
 /**
  * Base email layout
@@ -152,7 +152,7 @@ function emailLayout(content: string): string {
   </div>
 </body>
 </html>
-  `
+  `;
 }
 
 /**
@@ -184,7 +184,7 @@ export function welcomeEmailTemplate(data: WelcomeEmailData) {
     
     <p>If you have any questions, our support team is here to help.</p>
     <p>Best regards,<br>The ${APP_NAME} Team</p>
-  `)
+  `);
 
   const text = `
 Welcome to ${APP_NAME}!
@@ -208,21 +208,23 @@ If you have any questions, our support team is here to help.
 
 Best regards,
 The ${APP_NAME} Team
-  `
+  `;
 
   return {
     html,
     text,
     subject: `Welcome to ${APP_NAME}`,
-  }
+  };
 }
 
 /**
  * Password Reset Email Template
  */
 export function passwordResetEmailTemplate(data: PasswordResetEmailData) {
-  const expiresIn = Math.round((data.expiresAt.getTime() - Date.now()) / (1000 * 60))
-  
+  const expiresIn = Math.round(
+    (data.expiresAt.getTime() - Date.now()) / (1000 * 60)
+  );
+
   const html = emailLayout(`
     <h2>Reset Your Password</h2>
     <p>Hello ${data.userName},</p>
@@ -248,7 +250,7 @@ export function passwordResetEmailTemplate(data: PasswordResetEmailData) {
     
     <p>If you're having trouble clicking the button, copy and paste this URL into your browser:</p>
     <p style="word-break: break-all; color: #6b7280; font-size: 14px;">${data.resetUrl}</p>
-  `)
+  `);
 
   const text = `
 Reset Your Password
@@ -267,13 +269,13 @@ Security Tips:
 - Never share your password with anyone
 - Use a strong, unique password
 - Enable two-factor authentication for extra security
-  `
+  `;
 
   return {
     html,
     text,
     subject: 'Reset Your Password',
-  }
+  };
 }
 
 /**
@@ -283,8 +285,8 @@ export function securityAlertEmailTemplate(data: SecurityAlertEmailData) {
   const formattedTime = new Date(data.timestamp).toLocaleString('en-US', {
     dateStyle: 'full',
     timeStyle: 'long',
-  })
-  
+  });
+
   const html = emailLayout(`
     <h2>🔐 New Device Login Detected</h2>
     <p>Hello ${data.userName},</p>
@@ -332,7 +334,7 @@ export function securityAlertEmailTemplate(data: SecurityAlertEmailData) {
     <p style="text-align: center;">
       <a href="${APP_URL}/settings/security" class="button">Review Security Settings</a>
     </p>
-  `)
+  `);
 
   const text = `
 🔐 New Device Login Detected
@@ -358,13 +360,13 @@ If you recognize this activity, you can safely ignore this email.
 4. Contact support if you need assistance
 
 Review Security Settings: ${APP_URL}/settings/security
-  `
+  `;
 
   return {
     html,
     text,
     subject: '🔐 New Device Login Detected',
-  }
+  };
 }
 
 /**
@@ -373,21 +375,29 @@ Review Security Settings: ${APP_URL}/settings/security
 export function dailySummaryEmailTemplate(data: DailySummaryEmailData) {
   const formattedDate = new Date(data.date).toLocaleDateString('en-US', {
     dateStyle: 'full',
-  })
-  
-  const topItemsHtml = data.topItems.map(item => `
+  });
+
+  const topItemsHtml = data.topItems
+    .map(
+      (item) => `
     <tr>
       <td>${item.name}</td>
       <td style="text-align: right;">${item.quantity}</td>
     </tr>
-  `).join('')
-  
-  const alertsHtml = data.alerts.map(alert => `
+  `
+    )
+    .join('');
+
+  const alertsHtml = data.alerts
+    .map(
+      (alert) => `
     <div class="${alert.severity === 'high' ? 'alert-box' : 'warning-box'}">
       <p>${alert.message}</p>
     </div>
-  `).join('')
-  
+  `
+    )
+    .join('');
+
   const html = emailLayout(`
     <h2>📊 Your Daily Inventory Summary</h2>
     <p>Hello ${data.userName},</p>
@@ -412,7 +422,9 @@ export function dailySummaryEmailTemplate(data: DailySummaryEmailData) {
       </div>
     </div>
     
-    ${data.topItems.length > 0 ? `
+    ${
+      data.topItems.length > 0
+        ? `
       <h3>Top Items</h3>
       <table>
         <thead>
@@ -425,17 +437,23 @@ export function dailySummaryEmailTemplate(data: DailySummaryEmailData) {
           ${topItemsHtml}
         </tbody>
       </table>
-    ` : ''}
+    `
+        : ''
+    }
     
-    ${data.alerts.length > 0 ? `
+    ${
+      data.alerts.length > 0
+        ? `
       <h3>⚠️ Alerts</h3>
       ${alertsHtml}
-    ` : ''}
+    `
+        : ''
+    }
     
     <p style="text-align: center;">
       <a href="${APP_URL}/dashboard" class="button">View Dashboard</a>
     </p>
-  `)
+  `);
 
   const text = `
 📊 Your Daily Inventory Summary
@@ -450,40 +468,52 @@ Statistics:
 - Total Value: $${data.stats.totalValue.toLocaleString()}
 - Reject Rate: ${data.stats.rejectRate}%
 
-${data.topItems.length > 0 ? `
+${
+  data.topItems.length > 0
+    ? `
 Top Items:
-${data.topItems.map(item => `- ${item.name}: ${item.quantity}`).join('\n')}
-` : ''}
+${data.topItems.map((item) => `- ${item.name}: ${item.quantity}`).join('\n')}
+`
+    : ''
+}
 
-${data.alerts.length > 0 ? `
+${
+  data.alerts.length > 0
+    ? `
 ⚠️ Alerts:
-${data.alerts.map(alert => `- ${alert.message}`).join('\n')}
-` : ''}
+${data.alerts.map((alert) => `- ${alert.message}`).join('\n')}
+`
+    : ''
+}
 
 View Dashboard: ${APP_URL}/dashboard
-  `
+  `;
 
   return {
     html,
     text,
     subject: '📊 Your Daily Inventory Summary',
-  }
+  };
 }
 
 /**
  * High Reject Rate Alert Template
  */
 export function highRejectRateAlertTemplate(data: HighRejectRateAlertData) {
-  const dateRange = `${new Date(data.dateRange.from).toLocaleDateString()} - ${new Date(data.dateRange.to).toLocaleDateString()}`
-  
-  const affectedItemsHtml = data.affectedItems.map(item => `
+  const dateRange = `${new Date(data.dateRange.from).toLocaleDateString()} - ${new Date(data.dateRange.to).toLocaleDateString()}`;
+
+  const affectedItemsHtml = data.affectedItems
+    .map(
+      (item) => `
     <tr>
       <td>${item.name}</td>
       <td>${item.batch}</td>
       <td style="text-align: right; color: #ef4444; font-weight: 600;">${item.rejectCount}</td>
     </tr>
-  `).join('')
-  
+  `
+    )
+    .join('');
+
   const html = emailLayout(`
     <h2>⚠️ High Reject Rate Alert</h2>
     <p>A high reject rate has been detected in your inventory system.</p>
@@ -519,7 +549,7 @@ export function highRejectRateAlertTemplate(data: HighRejectRateAlertData) {
     <p style="text-align: center;">
       <a href="${APP_URL}/data-log?filter=high-reject" class="button">Investigate Now</a>
     </p>
-  `)
+  `);
 
   const text = `
 ⚠️ High Reject Rate Alert
@@ -531,7 +561,7 @@ Threshold: ${data.threshold}%
 Period: ${dateRange}
 
 Affected Items:
-${data.affectedItems.map(item => `- ${item.name} (${item.batch}): ${item.rejectCount} rejects`).join('\n')}
+${data.affectedItems.map((item) => `- ${item.name} (${item.batch}): ${item.rejectCount} rejects`).join('\n')}
 
 Recommended Actions:
 - Review quality control procedures
@@ -540,13 +570,13 @@ Recommended Actions:
 - Update inventory records
 
 Investigate Now: ${APP_URL}/data-log?filter=high-reject
-  `
+  `;
 
   return {
     html,
     text,
     subject: '⚠️ High Reject Rate Alert',
-  }
+  };
 }
 
 /**
@@ -556,12 +586,14 @@ export function backupStatusEmailTemplate(data: BackupStatusEmailData) {
   const formattedTime = new Date(data.timestamp).toLocaleString('en-US', {
     dateStyle: 'full',
     timeStyle: 'long',
-  })
-  
+  });
+
   const html = emailLayout(`
     <h2>${data.status === 'success' ? '✅ Backup Completed Successfully' : '❌ Backup Failed'}</h2>
     
-    ${data.status === 'success' ? `
+    ${
+      data.status === 'success'
+        ? `
       <div class="info-box">
         <p><strong>Backup Details:</strong></p>
         <p>Name: ${data.backupName}</p>
@@ -574,7 +606,8 @@ export function backupStatusEmailTemplate(data: BackupStatusEmailData) {
       <p style="text-align: center;">
         <a href="${APP_URL}/backup" class="button">View Backups</a>
       </p>
-    ` : `
+    `
+        : `
       <div class="alert-box">
         <p><strong>Backup Failed:</strong></p>
         <p>Name: ${data.backupName}</p>
@@ -595,13 +628,16 @@ export function backupStatusEmailTemplate(data: BackupStatusEmailData) {
       <p style="text-align: center;">
         <a href="${APP_URL}/backup" class="button">Manage Backups</a>
       </p>
-    `}
-  `)
+    `
+    }
+  `);
 
   const text = `
 ${data.status === 'success' ? '✅ Backup Completed Successfully' : '❌ Backup Failed'}
 
-${data.status === 'success' ? `
+${
+  data.status === 'success'
+    ? `
 Backup Details:
 - Name: ${data.backupName}
 - Size: ${data.size}
@@ -610,7 +646,8 @@ Backup Details:
 Your database backup has been completed successfully and is stored securely.
 
 View Backups: ${APP_URL}/backup
-` : `
+`
+    : `
 Backup Failed:
 - Name: ${data.backupName}
 - Time: ${formattedTime}
@@ -625,16 +662,18 @@ Recommended Actions:
 - Retry the backup manually
 
 Manage Backups: ${APP_URL}/backup
-`}
-  `
+`
+}
+  `;
 
   return {
     html,
     text,
-    subject: data.status === 'success' 
-      ? '✅ Backup Completed Successfully' 
-      : '❌ Backup Failed',
-  }
+    subject:
+      data.status === 'success'
+        ? '✅ Backup Completed Successfully'
+        : '❌ Backup Failed',
+  };
 }
 
 /**
@@ -644,8 +683,8 @@ export function reportReadyEmailTemplate(data: ReportReadyEmailData) {
   const formattedTime = new Date(data.generatedAt).toLocaleString('en-US', {
     dateStyle: 'full',
     timeStyle: 'short',
-  })
-  
+  });
+
   const html = emailLayout(`
     <h2>📊 Your Report is Ready</h2>
     <p>Hello ${data.userName},</p>
@@ -669,7 +708,7 @@ export function reportReadyEmailTemplate(data: ReportReadyEmailData) {
     <p style="text-align: center;">
       <a href="${APP_URL}/reports" style="color: ${BRAND_COLOR}; text-decoration: none;">View All Reports →</a>
     </p>
-  `)
+  `);
 
   const text = `
 📊 Your Report is Ready
@@ -690,24 +729,24 @@ Note: This download link will expire in 7 days for security reasons.
 You can also access this report from your reports dashboard at any time.
 
 View All Reports: ${APP_URL}/reports
-  `
+  `;
 
   return {
     html,
     text,
     subject: '📊 Your Report is Ready',
-  }
+  };
 }
 
 /**
  * Export Ready Email Template
  */
 export interface ExportReadyEmailData {
-  userName: string
-  filename: string
-  recordCount: number
-  format: string
-  fileSize: string
+  userName: string;
+  filename: string;
+  recordCount: number;
+  format: string;
+  fileSize: string;
 }
 
 export function exportReadyEmailTemplate(data: ExportReadyEmailData) {
@@ -731,7 +770,7 @@ export function exportReadyEmailTemplate(data: ExportReadyEmailData) {
     <p style="text-align: center;">
       <a href="${APP_URL}/dashboard" class="button">Go to Dashboard</a>
     </p>
-  `)
+  `);
 
   const text = `
 📦 Your Export is Ready
@@ -751,11 +790,11 @@ The exported file is attached to this email. You can download it directly from y
 Note: For security reasons, please handle this data according to your organization's data protection policies.
 
 Go to Dashboard: ${APP_URL}/dashboard
-  `
+  `;
 
   return {
     html,
     text,
     subject: '📦 Your Export is Ready',
-  }
+  };
 }

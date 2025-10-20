@@ -3,102 +3,102 @@
  * Converts filter groups to Prisma where clauses
  */
 
-import { Filter, FilterGroup, FilterOperator } from '@/types/filters'
+import { Filter, FilterGroup, FilterOperator } from '@/types/filters';
 
 /**
  * Build Prisma where clause from filter group
  */
 export function buildPrismaWhere(filterGroup: FilterGroup): any {
   if (!filterGroup.filters || filterGroup.filters.length === 0) {
-    return {}
+    return {};
   }
 
-  const conditions = filterGroup.filters.map(filter => buildFilterCondition(filter))
+  const conditions = filterGroup.filters.map((filter) =>
+    buildFilterCondition(filter)
+  );
 
   if (conditions.length === 0) {
-    return {}
+    return {};
   }
 
   if (conditions.length === 1) {
-    return conditions[0]
+    return conditions[0];
   }
 
-  return filterGroup.logic === 'AND' 
-    ? { AND: conditions }
-    : { OR: conditions }
+  return filterGroup.logic === 'AND' ? { AND: conditions } : { OR: conditions };
 }
 
 /**
  * Build a single filter condition
  */
 function buildFilterCondition(filter: Filter): any {
-  const { field, operator, value } = filter
+  const { field, operator, value } = filter;
 
   // Handle null checks
   if (operator === 'is_null') {
-    return { [field]: null }
+    return { [field]: null };
   }
 
   if (operator === 'is_not_null') {
-    return { [field]: { not: null } }
+    return { [field]: { not: null } };
   }
 
   // Handle empty values
   if (value === null || value === undefined || value === '') {
-    return {}
+    return {};
   }
 
   switch (operator) {
     case 'equals':
-      return { [field]: value }
+      return { [field]: value };
 
     case 'not_equals':
-      return { [field]: { not: value } }
+      return { [field]: { not: value } };
 
     case 'contains':
-      return { [field]: { contains: value, mode: 'insensitive' } }
+      return { [field]: { contains: value, mode: 'insensitive' } };
 
     case 'not_contains':
-      return { [field]: { not: { contains: value, mode: 'insensitive' } } }
+      return { [field]: { not: { contains: value, mode: 'insensitive' } } };
 
     case 'starts_with':
-      return { [field]: { startsWith: value, mode: 'insensitive' } }
+      return { [field]: { startsWith: value, mode: 'insensitive' } };
 
     case 'ends_with':
-      return { [field]: { endsWith: value, mode: 'insensitive' } }
+      return { [field]: { endsWith: value, mode: 'insensitive' } };
 
     case 'greater_than':
-      return { [field]: { gt: value } }
+      return { [field]: { gt: value } };
 
     case 'less_than':
-      return { [field]: { lt: value } }
+      return { [field]: { lt: value } };
 
     case 'greater_than_or_equal':
-      return { [field]: { gte: value } }
+      return { [field]: { gte: value } };
 
     case 'less_than_or_equal':
-      return { [field]: { lte: value } }
+      return { [field]: { lte: value } };
 
     case 'between':
       if (Array.isArray(value) && value.length === 2) {
-        return { [field]: { gte: value[0], lte: value[1] } }
+        return { [field]: { gte: value[0], lte: value[1] } };
       }
-      return {}
+      return {};
 
     case 'in':
       if (Array.isArray(value) && value.length > 0) {
-        return { [field]: { in: value } }
+        return { [field]: { in: value } };
       }
-      return {}
+      return {};
 
     case 'not_in':
       if (Array.isArray(value) && value.length > 0) {
-        return { [field]: { notIn: value } }
+        return { [field]: { notIn: value } };
       }
-      return {}
+      return {};
 
     default:
-      return {}
+      return {};
   }
 }
 
@@ -106,27 +106,30 @@ function buildFilterCondition(filter: Filter): any {
  * Generate a unique filter ID
  */
 export function generateFilterId(): string {
-  return `filter_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+  return `filter_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 }
 
 /**
  * Validate filter value based on operator
  */
-export function validateFilterValue(operator: FilterOperator, value: any): boolean {
+export function validateFilterValue(
+  operator: FilterOperator,
+  value: any
+): boolean {
   switch (operator) {
     case 'is_null':
     case 'is_not_null':
-      return true
+      return true;
 
     case 'between':
-      return Array.isArray(value) && value.length === 2
+      return Array.isArray(value) && value.length === 2;
 
     case 'in':
     case 'not_in':
-      return Array.isArray(value) && value.length > 0
+      return Array.isArray(value) && value.length > 0;
 
     default:
-      return value !== null && value !== undefined && value !== ''
+      return value !== null && value !== undefined && value !== '';
   }
 }
 
@@ -150,15 +153,17 @@ export function getOperatorLabel(operator: FilterOperator): string {
     is_not_null: 'is not empty',
     in: 'is one of',
     not_in: 'is not one of',
-  }
+  };
 
-  return labels[operator] || operator
+  return labels[operator] || operator;
 }
 
 /**
  * Get available operators for field type
  */
-export function getOperatorsForType(type: 'string' | 'number' | 'date' | 'boolean' | 'enum'): FilterOperator[] {
+export function getOperatorsForType(
+  type: 'string' | 'number' | 'date' | 'boolean' | 'enum'
+): FilterOperator[] {
   switch (type) {
     case 'string':
       return [
@@ -170,7 +175,7 @@ export function getOperatorsForType(type: 'string' | 'number' | 'date' | 'boolea
         'ends_with',
         'is_null',
         'is_not_null',
-      ]
+      ];
 
     case 'number':
     case 'date':
@@ -184,52 +189,58 @@ export function getOperatorsForType(type: 'string' | 'number' | 'date' | 'boolea
         'between',
         'is_null',
         'is_not_null',
-      ]
+      ];
 
     case 'boolean':
-      return ['equals', 'is_null', 'is_not_null']
+      return ['equals', 'is_null', 'is_not_null'];
 
     case 'enum':
-      return ['equals', 'not_equals', 'in', 'not_in', 'is_null', 'is_not_null']
+      return ['equals', 'not_equals', 'in', 'not_in', 'is_null', 'is_not_null'];
 
     default:
-      return ['equals', 'not_equals']
+      return ['equals', 'not_equals'];
   }
 }
 
 /**
  * Export filter group to shareable format
  */
-export function exportFilterGroup(filterGroup: FilterGroup, name: string, page: string): string {
+export function exportFilterGroup(
+  filterGroup: FilterGroup,
+  name: string,
+  page: string
+): string {
   const shareable = {
     name,
     filters: filterGroup,
     page,
     version: '1.0',
-  }
+  };
 
-  return btoa(JSON.stringify(shareable))
+  return btoa(JSON.stringify(shareable));
 }
 
 /**
  * Import filter group from shareable format
  */
-export function importFilterGroup(encoded: string): { name: string; filters: FilterGroup; page: string } | null {
+export function importFilterGroup(
+  encoded: string
+): { name: string; filters: FilterGroup; page: string } | null {
   try {
-    const decoded = atob(encoded)
-    const parsed = JSON.parse(decoded)
+    const decoded = atob(encoded);
+    const parsed = JSON.parse(decoded);
 
     if (!parsed.filters || !parsed.name || !parsed.page) {
-      return null
+      return null;
     }
 
     return {
       name: parsed.name,
       filters: parsed.filters,
       page: parsed.page,
-    }
+    };
   } catch (error) {
-    console.error('Failed to import filter:', error)
-    return null
+    console.error('Failed to import filter:', error);
+    return null;
   }
 }

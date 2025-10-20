@@ -1,11 +1,13 @@
 # Virtual Scrolling Implementation
 
 ## Overview
+
 This document describes the virtual scrolling implementation for the InventoryTable component to handle large datasets efficiently.
 
 ## Implementation Details
 
 ### 1. Library Used
+
 - **react-window**: A lightweight library for rendering large lists efficiently using windowing/virtualization
 - Version: Latest (installed via npm)
 - Type definitions: @types/react-window
@@ -13,11 +15,13 @@ This document describes the virtual scrolling implementation for the InventoryTa
 ### 2. Components Created
 
 #### VirtualizedTable Component
+
 **Location**: `src/components/tables/VirtualizedTable.tsx`
 
 **Purpose**: A wrapper component that uses react-window's FixedSizeList to render only visible rows
 
 **Key Features**:
+
 - Dynamic height calculation based on viewport
 - Maintains accessibility with ARIA attributes (role="table", aria-rowcount, aria-rowindex, aria-selected)
 - Supports row selection
@@ -26,6 +30,7 @@ This document describes the virtual scrolling implementation for the InventoryTa
 - Responsive container height (400px min, 800px max)
 
 **Props**:
+
 - `items`: Array of inventory items to display
 - `rowHeight`: Height of each row in pixels (default: 60)
 - `selectedIds`: Set of selected item IDs
@@ -38,15 +43,18 @@ This document describes the virtual scrolling implementation for the InventoryTa
 **Threshold**: Virtual scrolling is automatically enabled when dataset contains **more than 1000 rows**
 
 **Implementation**:
+
 ```typescript
-const useVirtualScrolling = items.length > 1000
+const useVirtualScrolling = items.length > 1000;
 ```
 
 **Conditional Rendering**:
+
 - **<= 1000 rows**: Standard HTML table with full features
 - **> 1000 rows**: VirtualizedTable component with optimized rendering
 
 **Features Maintained**:
+
 - Column customization (show/hide, resize)
 - Row selection
 - All action callbacks
@@ -85,6 +93,7 @@ The virtual scrolling implementation maintains full accessibility:
 ### 6. Visual Indicators
 
 When virtual scrolling is active, users see:
+
 - "Using virtual scrolling for X items" message
 - Column customization toolbar remains available
 - Consistent styling with standard table view
@@ -92,9 +101,11 @@ When virtual scrolling is active, users see:
 ## Testing
 
 ### Test Coverage
+
 **Location**: `src/components/tables/__tests__/InventoryTable.test.tsx`
 
 **Tests Added**:
+
 1. ✅ Uses virtual scrolling for datasets with more than 1000 rows
 2. ✅ Does not use virtual scrolling for datasets with 1000 or fewer rows
 3. ✅ Maintains accessibility features with virtual scrolling
@@ -126,6 +137,7 @@ import { InventoryTable } from '@/components/tables/InventoryTable'
 ## Performance Metrics
 
 **Expected Performance**:
+
 - **Standard table (1000 rows)**: ~50-100ms initial render
 - **Virtual scrolling (5000 rows)**: ~50-100ms initial render (similar!)
 - **Memory usage**: Significantly reduced for large datasets
@@ -134,6 +146,7 @@ import { InventoryTable } from '@/components/tables/InventoryTable'
 ## Future Enhancements
 
 Potential improvements for future iterations:
+
 1. Variable row heights based on content
 2. Horizontal virtual scrolling for many columns
 3. Infinite scroll/lazy loading integration

@@ -1,20 +1,23 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@/services/auth'
-import { prisma } from '@/services/prisma'
-import { auditInventoryAction, extractRequestMetadata } from '@/utils/audit'
+import { NextRequest, NextResponse } from 'next/server';
+import { auth } from '@/services/auth';
+import { prisma } from '@/services/prisma';
+import { auditInventoryAction, extractRequestMetadata } from '@/utils/audit';
 import {
   successResponse,
   authRequiredError,
   insufficientPermissionsError,
   validationError,
   handleApiError,
-} from '@/utils/api-response'
-import { z } from 'zod'
+} from '@/utils/api-response';
+import { z } from 'zod';
 
 // Validation schema for bulk delete request
 const bulkDeleteSchema = z.object({
-  ids: z.array(z.string()).min(1, 'At least one ID is required').max(100, 'Maximum 100 items can be deleted at once'),
-})
+  ids: z
+    .array(z.string())
+    .min(1, 'At least one ID is required')
+    .max(100, 'Maximum 100 items can be deleted at once'),
+});
 
 /**
  * POST /api/inventory/bulk-delete
@@ -23,30 +26,35 @@ const bulkDeleteSchema = z.object({
 export async function POST(request: NextRequest) {
   try {
     // Check authentication
-    const session = await auth()
+    const session = await auth();
     if (!session?.user) {
-      return authRequiredError()
+      return authRequiredError();
     }
 
     // Check role-based access: Only SUPERVISOR or ADMIN can bulk delete
     if (session.user.role !== 'SUPERVISOR' && session.user.role !== 'ADMIN') {
-      return insufficientPermissionsError('Only supervisors and administrators can delete inventory items')
+      return insufficientPermissionsError(
+        'Only supervisors and administrators can delete inventory items'
+      );
     }
 
     // Check permissions
     if (!session.user.permissions.includes('inventory:delete')) {
-      return insufficientPermissionsError()
+      return insufficientPermissionsError();
     }
 
     // Parse and validate request body
-    const body = await request.json()
-    const validationResult = bulkDeleteSchema.safeParse(body)
+    const body = await request.json();
+    const validationResult = bulkDeleteSchema.safeParse(body);
 
     if (!validationResult.success) {
-      return validationError('Validation failed', validationResult.error.errors)
+      return validationError(
+        'Validation failed',
+        validationResult.error.errors
+      );
     }
 
-    const { ids } = validationResult.data
+    const { ids } = validationResult.data;
 
     // Fetch items to be deleted (for audit logging)
     const itemsToDelete = await prisma.inventoryItem.findMany({
@@ -63,10 +71,10 @@ export async function POST(request: NextRequest) {
           },
         },
       },
-    })
+    });
 
     if (itemsToDelete.length === 0) {
-      return validationError('No valid items found to delete')
+      return validationError('No valid items found to delete');
     }
 
     // Track results
@@ -74,11 +82,11 @@ export async function POST(request: NextRequest) {
       successful: 0,
       failed: 0,
       errors: [] as string[],
-    }
+    };
 
     // Extract request metadata for audit logging
-    const metadata = extractRequestMetadata(request)
-    const auditLogIds: string[] = []
+    const metadata = extractRequestMetadata(request);
+    const auditLogIds: string[] = [];
 
     // Delete items individually for proper error handling and audit logging
     for (const item of itemsToDelete) {
@@ -90,7 +98,7 @@ export async function POST(request: NextRequest) {
             deletedAt: new Date(),
             updatedAt: new Date(),
           },
-        })
+        });
 
         // Create audit log entry
         const auditLog = await auditInventoryAction(
@@ -99,19 +107,19 @@ export async function POST(request: NextRequest) {
           item,
           item, // previousData is the item itself for DELETE
           metadata
-        )
-        
+        );
+
         if (auditLog) {
-          auditLogIds.push(auditLog.id)
+          auditLogIds.push(auditLog.id);
         }
 
-        results.successful++
+        results.successful++;
       } catch (error) {
-        console.error(`Failed to delete item ${item.id}:`, error)
-        results.failed++
+        console.error(`Failed to delete item ${item.id}:`, error);
+        results.failed++;
         results.errors.push(
           `Failed to delete ${item.itemName} (${item.batch}): ${error instanceof Error ? error.message : 'Unknown error'}`
-        )
+        );
       }
     }
 
@@ -126,8 +134,8 @@ export async function POST(request: NextRequest) {
         ? `Successfully deleted ${results.successful} item(s)`
         : `Deleted ${results.successful} item(s), ${results.failed} failed`,
       200
-    )
+    );
   } catch (error) {
-    return handleApiError(error)
+    return handleApiError(error);
   }
 }

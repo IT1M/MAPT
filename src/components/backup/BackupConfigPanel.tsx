@@ -10,7 +10,11 @@ interface BackupConfigPanelProps {
   isAdmin: boolean;
 }
 
-export default function BackupConfigPanel({ config, onSave, isAdmin }: BackupConfigPanelProps) {
+export default function BackupConfigPanel({
+  config,
+  onSave,
+  isAdmin,
+}: BackupConfigPanelProps) {
   const t = useTranslations('backup');
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -36,7 +40,7 @@ export default function BackupConfigPanel({ config, onSave, isAdmin }: BackupCon
 
   const toggleFormat = (format: BackupFormat) => {
     const formats = formData.formats.includes(format)
-      ? formData.formats.filter(f => f !== format)
+      ? formData.formats.filter((f) => f !== format)
       : [...formData.formats, format];
     setFormData({ ...formData, formats });
   };
@@ -70,10 +74,15 @@ export default function BackupConfigPanel({ config, onSave, isAdmin }: BackupCon
               </p>
             </div>
             <button
-              onClick={() => editing && setFormData({ ...formData, enabled: !formData.enabled })}
+              onClick={() =>
+                editing &&
+                setFormData({ ...formData, enabled: !formData.enabled })
+              }
               disabled={!editing}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                formData.enabled ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'
+                formData.enabled
+                  ? 'bg-blue-600'
+                  : 'bg-gray-300 dark:bg-gray-600'
               } ${!editing && 'opacity-50 cursor-not-allowed'}`}
             >
               <span
@@ -92,7 +101,9 @@ export default function BackupConfigPanel({ config, onSave, isAdmin }: BackupCon
             <input
               type="time"
               value={formData.scheduleTime}
-              onChange={(e) => setFormData({ ...formData, scheduleTime: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, scheduleTime: e.target.value })
+              }
               disabled={!editing}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed"
             />
@@ -134,7 +145,13 @@ export default function BackupConfigPanel({ config, onSave, isAdmin }: BackupCon
                 <input
                   type="checkbox"
                   checked={formData.includeAuditLogs}
-                  onChange={(e) => editing && setFormData({ ...formData, includeAuditLogs: e.target.checked })}
+                  onChange={(e) =>
+                    editing &&
+                    setFormData({
+                      ...formData,
+                      includeAuditLogs: e.target.checked,
+                    })
+                  }
                   disabled={!editing}
                   className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
                 />
@@ -161,7 +178,12 @@ export default function BackupConfigPanel({ config, onSave, isAdmin }: BackupCon
                     min="1"
                     max="365"
                     value={formData.retentionDailyDays}
-                    onChange={(e) => setFormData({ ...formData, retentionDailyDays: parseInt(e.target.value) })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        retentionDailyDays: parseInt(e.target.value),
+                      })
+                    }
                     disabled={!editing}
                     className="w-20 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed"
                   />
@@ -181,7 +203,12 @@ export default function BackupConfigPanel({ config, onSave, isAdmin }: BackupCon
                     min="1"
                     max="52"
                     value={formData.retentionWeeklyWeeks}
-                    onChange={(e) => setFormData({ ...formData, retentionWeeklyWeeks: parseInt(e.target.value) })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        retentionWeeklyWeeks: parseInt(e.target.value),
+                      })
+                    }
                     disabled={!editing}
                     className="w-20 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed"
                   />
@@ -201,7 +228,12 @@ export default function BackupConfigPanel({ config, onSave, isAdmin }: BackupCon
                     min="1"
                     max="120"
                     value={formData.retentionMonthlyMonths}
-                    onChange={(e) => setFormData({ ...formData, retentionMonthlyMonths: parseInt(e.target.value) })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        retentionMonthlyMonths: parseInt(e.target.value),
+                      })
+                    }
                     disabled={!editing}
                     className="w-20 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed"
                   />

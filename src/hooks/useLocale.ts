@@ -4,7 +4,7 @@
  */
 
 export function useLocale(): 'en' {
-  return 'en'
+  return 'en';
 }
 
-export type Locale = 'en'
+export type Locale = 'en';

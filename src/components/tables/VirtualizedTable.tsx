@@ -1,39 +1,38 @@
-'use client'
+'use client';
 
-import React, { useRef, useEffect, useState } from 'react'
-import type { InventoryItemWithUser } from '@/types'
+import React, { useRef, useEffect, useState } from 'react';
+import type { InventoryItemWithUser } from '@/types';
 
 // Dynamic import for react-window to avoid SSR issues
-const FixedSizeList = typeof window !== 'undefined' 
-  ? require('react-window').FixedSizeList 
-  : null
+const FixedSizeList =
+  typeof window !== 'undefined' ? require('react-window').FixedSizeList : null;
 
 interface VirtualizedTableProps {
-  items: InventoryItemWithUser[]
-  rowHeight: number
-  selectedIds?: Set<string>
-  onSelectionChange?: (ids: Set<string>) => void
-  onRowClick?: (item: InventoryItemWithUser) => void
-  onEdit?: (item: InventoryItemWithUser) => void
-  onDelete?: (id: string) => void
-  onDuplicate?: (item: InventoryItemWithUser) => void
-  onViewAudit?: (id: string) => void
-  onCopyBatch?: (batch: string) => void
-  columnVisibility?: Record<string, boolean>
-  userPermissions?: string[]
+  items: InventoryItemWithUser[];
+  rowHeight: number;
+  selectedIds?: Set<string>;
+  onSelectionChange?: (ids: Set<string>) => void;
+  onRowClick?: (item: InventoryItemWithUser) => void;
+  onEdit?: (item: InventoryItemWithUser) => void;
+  onDelete?: (id: string) => void;
+  onDuplicate?: (item: InventoryItemWithUser) => void;
+  onViewAudit?: (id: string) => void;
+  onCopyBatch?: (batch: string) => void;
+  columnVisibility?: Record<string, boolean>;
+  userPermissions?: string[];
   renderRow: (props: {
-    item: InventoryItemWithUser
-    index: number
-    style: React.CSSProperties
-    isSelected: boolean
-    onSelect: (checked: boolean) => void
-    onRowClick: () => void
-    onEdit: () => void
-    onDelete: () => void
-    onDuplicate: () => void
-    onViewAudit: () => void
-    onCopyBatch: () => void
-  }) => React.ReactNode
+    item: InventoryItemWithUser;
+    index: number;
+    style: React.CSSProperties;
+    isSelected: boolean;
+    onSelect: (checked: boolean) => void;
+    onRowClick: () => void;
+    onEdit: () => void;
+    onDelete: () => void;
+    onDuplicate: () => void;
+    onViewAudit: () => void;
+    onCopyBatch: () => void;
+  }) => React.ReactNode;
 }
 
 export const VirtualizedTable: React.FC<VirtualizedTableProps> = ({
@@ -49,41 +48,47 @@ export const VirtualizedTable: React.FC<VirtualizedTableProps> = ({
   onCopyBatch,
   renderRow,
 }) => {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const [containerHeight, setContainerHeight] = useState(600)
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [containerHeight, setContainerHeight] = useState(600);
 
   // Calculate container height based on viewport
   useEffect(() => {
     const updateHeight = () => {
       if (containerRef.current) {
-        const rect = containerRef.current.getBoundingClientRect()
-        const availableHeight = window.innerHeight - rect.top - 100 // Leave 100px for padding
-        setContainerHeight(Math.max(400, Math.min(availableHeight, 800)))
+        const rect = containerRef.current.getBoundingClientRect();
+        const availableHeight = window.innerHeight - rect.top - 100; // Leave 100px for padding
+        setContainerHeight(Math.max(400, Math.min(availableHeight, 800)));
       }
-    }
+    };
 
-    updateHeight()
-    window.addEventListener('resize', updateHeight)
-    return () => window.removeEventListener('resize', updateHeight)
-  }, [])
+    updateHeight();
+    window.addEventListener('resize', updateHeight);
+    return () => window.removeEventListener('resize', updateHeight);
+  }, []);
 
   // Handle individual selection
   const handleSelectItem = (id: string, checked: boolean) => {
     if (onSelectionChange) {
-      const newSelection = new Set(selectedIds)
+      const newSelection = new Set(selectedIds);
       if (checked) {
-        newSelection.add(id)
+        newSelection.add(id);
       } else {
-        newSelection.delete(id)
+        newSelection.delete(id);
       }
-      onSelectionChange(newSelection)
+      onSelectionChange(newSelection);
     }
-  }
+  };
 
   // Row renderer for react-window
-  const Row = ({ index, style }: { index: number; style: React.CSSProperties }) => {
-    const item = items[index]
-    const isSelected = selectedIds.has(item.id)
+  const Row = ({
+    index,
+    style,
+  }: {
+    index: number;
+    style: React.CSSProperties;
+  }) => {
+    const item = items[index];
+    const isSelected = selectedIds.has(item.id);
 
     return (
       <div
@@ -106,8 +111,8 @@ export const VirtualizedTable: React.FC<VirtualizedTableProps> = ({
           onCopyBatch: () => onCopyBatch?.(item.batch),
         })}
       </div>
-    )
-  }
+    );
+  };
 
   // Fallback if FixedSizeList is not available (SSR)
   if (!FixedSizeList) {
@@ -117,12 +122,12 @@ export const VirtualizedTable: React.FC<VirtualizedTableProps> = ({
           Loading virtual scroll...
         </div>
       </div>
-    )
+    );
   }
 
   return (
-    <div 
-      ref={containerRef} 
+    <div
+      ref={containerRef}
       className="w-full"
       role="table"
       aria-label="Inventory data table with virtual scrolling"
@@ -138,5 +143,5 @@ export const VirtualizedTable: React.FC<VirtualizedTableProps> = ({
         {Row}
       </FixedSizeList>
     </div>
-  )
-}
+  );
+};

@@ -1,38 +1,38 @@
-'use client'
+'use client';
 
-import React, { useEffect, useState, useCallback, useMemo } from 'react'
-import Link from 'next/link'
-import toast from 'react-hot-toast'
-import { useDataEntryForm } from '@/hooks/useDataEntryForm'
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import Link from 'next/link';
+import toast from 'react-hot-toast';
+import { useDataEntryForm } from '@/hooks/useDataEntryForm';
 // import { useAutoSave } from '@/hooks/useAutosave'
-import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts'
-import { ItemNameInput } from './ItemNameInput'
-import { BatchNumberInput } from './BatchNumberInput'
-import { RejectQuantityInput } from './RejectQuantityInput'
-import { DestinationSelect } from './DestinationSelect'
-import { CategoryInput } from './CategoryInput'
-import { NotesTextarea } from './NotesTextarea'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { ThemeToggle } from '@/components/ui/theme-toggle'
-import type { Destination } from '@prisma/client'
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
+import { ItemNameInput } from './ItemNameInput';
+import { BatchNumberInput } from './BatchNumberInput';
+import { RejectQuantityInput } from './RejectQuantityInput';
+import { DestinationSelect } from './DestinationSelect';
+import { CategoryInput } from './CategoryInput';
+import { NotesTextarea } from './NotesTextarea';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
+import type { Destination } from '@prisma/client';
 
 interface RecentEntry {
-  id: string
-  itemName: string
-  batch: string
-  quantity: number
-  destination: Destination
-  createdAt: Date
+  id: string;
+  itemName: string;
+  batch: string;
+  quantity: number;
+  destination: Destination;
+  createdAt: Date;
 }
 
 interface DataEntryFormProps {
-  recentItems: Array<{ itemName: string; category: string | null }>
-  todayCount: number
-  recentEntries: RecentEntry[]
-  userLastDestination?: Destination
-  userId: string
-  onSuccess?: (data: any) => void
+  recentItems: Array<{ itemName: string; category: string | null }>;
+  todayCount: number;
+  recentEntries: RecentEntry[];
+  userLastDestination?: Destination;
+  userId: string;
+  onSuccess?: (data: any) => void;
 }
 
 export function DataEntryForm({
@@ -43,79 +43,86 @@ export function DataEntryForm({
   userId,
   onSuccess,
 }: DataEntryFormProps) {
-  const [currentDateTime, setCurrentDateTime] = useState(new Date())
-  const [showDraftDialog, setShowDraftDialog] = useState(false)
-  const [hasJustSubmitted, setHasJustSubmitted] = useState(false)
-  const [recentlyAddedItem, setRecentlyAddedItem] = useState<any>(null)
+  const [currentDateTime, setCurrentDateTime] = useState(new Date());
+  const [showDraftDialog, setShowDraftDialog] = useState(false);
+  const [hasJustSubmitted, setHasJustSubmitted] = useState(false);
+  const [recentlyAddedItem, setRecentlyAddedItem] = useState<any>(null);
 
   // Temporary stub functions until autosave is implemented
   const clearDraft = useCallback(() => {
     // TODO: Implement draft clearing
-  }, [])
+  }, []);
 
   const restoreDraft = useCallback(() => {
     // TODO: Implement draft restoration
-    return null
-  }, [])
+    return null;
+  }, []);
 
   // Initialize form hook
-  const { formData, meta, updateField, validate, submit, reset } = useDataEntryForm({
-    initialData: userLastDestination ? { destination: userLastDestination } : undefined,
-    onSuccess: (data) => {
-      setHasJustSubmitted(true)
-      setRecentlyAddedItem(data)
-      clearDraft()
+  const { formData, meta, updateField, validate, submit, reset } =
+    useDataEntryForm({
+      initialData: userLastDestination
+        ? { destination: userLastDestination }
+        : undefined,
+      onSuccess: (data) => {
+        setHasJustSubmitted(true);
+        setRecentlyAddedItem(data);
+        clearDraft();
 
-      // Show success toast with action buttons
-      const locale = typeof window !== 'undefined' ?
-        document.documentElement.lang || 'en' : 'en'
+        // Show success toast with action buttons
+        const locale =
+          typeof window !== 'undefined'
+            ? document.documentElement.lang || 'en'
+            : 'en';
 
-      toast.success(
-        (t) => (
-          <div className="flex flex-col gap-2">
-            <div className="font-medium">
-              Item added successfully!
+        toast.success(
+          (t) => (
+            <div className="flex flex-col gap-2">
+              <div className="font-medium">Item added successfully!</div>
+              <div className="flex gap-2 mt-1">
+                <button
+                  onClick={() => {
+                    toast.dismiss(t.id);
+                    window.location.href = `/${locale}/data-log`;
+                  }}
+                  className="px-3 py-1 text-sm bg-primary-600 text-white rounded hover:bg-primary-700 transition-colors"
+                >
+                  View in Data Log
+                </button>
+                <button
+                  onClick={() => {
+                    toast.dismiss(t.id);
+                    const firstInput = document.querySelector<HTMLInputElement>(
+                      'input[name="itemName"]'
+                    );
+                    firstInput?.focus();
+                  }}
+                  className="px-3 py-1 text-sm bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
+                >
+                  Add Another Item
+                </button>
+              </div>
             </div>
-            <div className="flex gap-2 mt-1">
-              <button
-                onClick={() => {
-                  toast.dismiss(t.id)
-                  window.location.href = `/${locale}/data-log`
-                }}
-                className="px-3 py-1 text-sm bg-primary-600 text-white rounded hover:bg-primary-700 transition-colors"
-              >
-                View in Data Log
-              </button>
-              <button
-                onClick={() => {
-                  toast.dismiss(t.id)
-                  const firstInput = document.querySelector<HTMLInputElement>('input[name="itemName"]')
-                  firstInput?.focus()
-                }}
-                className="px-3 py-1 text-sm bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
-              >
-                Add Another Item
-              </button>
-            </div>
-          </div>
-        ),
-        {
-          duration: 6000,
-          style: {
-            minWidth: '300px',
-          },
-        }
-      )
+          ),
+          {
+            duration: 6000,
+            style: {
+              minWidth: '300px',
+            },
+          }
+        );
 
-      // Focus first field after successful submission
-      setTimeout(() => {
-        const firstInput = document.querySelector<HTMLInputElement>('input[name="itemName"]')
-        firstInput?.focus()
-        setHasJustSubmitted(false)
-      }, 100)
-      onSuccess?.(data)
-    },
-  })
+        // Focus first field after successful submission
+        setTimeout(() => {
+          const firstInput = document.querySelector<HTMLInputElement>(
+            'input[name="itemName"]'
+          );
+          firstInput?.focus();
+          setHasJustSubmitted(false);
+        }, 100);
+        onSuccess?.(data);
+      },
+    });
 
   // Initialize autosave hook
   // TODO: Implement autosave functionality
@@ -128,55 +135,63 @@ export function DataEntryForm({
   // Memoize event handlers with useCallback
   const handleSubmit = useCallback(
     async (e?: React.FormEvent) => {
-      e?.preventDefault()
-      const result = await submit()
+      e?.preventDefault();
+      const result = await submit();
 
       // If submission failed due to validation, focus on first error field
       if (result === false && meta.errors) {
-        const firstErrorField = Object.keys(meta.errors)[0]
+        const firstErrorField = Object.keys(meta.errors)[0];
         if (firstErrorField) {
-          const errorInput = document.querySelector<HTMLInputElement | HTMLTextAreaElement>(
+          const errorInput = document.querySelector<
+            HTMLInputElement | HTMLTextAreaElement
+          >(
             `input[name="${firstErrorField}"], textarea[name="${firstErrorField}"]`
-          )
-          errorInput?.focus()
+          );
+          errorInput?.focus();
         }
       }
     },
     [submit, meta.errors]
-  )
+  );
 
   const handleClear = useCallback(() => {
-    const confirmed = window.confirm('Clear form? Unsaved changes will be lost.')
+    const confirmed = window.confirm(
+      'Clear form? Unsaved changes will be lost.'
+    );
     if (confirmed) {
-      reset(formData.destination)
-      clearDraft()
+      reset(formData.destination);
+      clearDraft();
       setTimeout(() => {
-        const firstInput = document.querySelector<HTMLInputElement>('input[name="itemName"]')
-        firstInput?.focus()
-      }, 100)
+        const firstInput = document.querySelector<HTMLInputElement>(
+          'input[name="itemName"]'
+        );
+        firstInput?.focus();
+      }, 100);
     }
-  }, [reset, formData.destination, clearDraft])
+  }, [reset, formData.destination, clearDraft]);
 
   const handleRestoreDraft = useCallback(
     (restore: boolean) => {
       if (restore) {
-        const draft = restoreDraft()
+        const draft = restoreDraft();
         if (draft) {
           Object.entries(draft).forEach(([key, value]) => {
-            updateField(key as any, value as string)
-          })
+            updateField(key as any, value as string);
+          });
         }
       } else {
-        clearDraft()
+        clearDraft();
       }
-      setShowDraftDialog(false)
+      setShowDraftDialog(false);
       setTimeout(() => {
-        const firstInput = document.querySelector<HTMLInputElement>('input[name="itemName"]')
-        firstInput?.focus()
-      }, 100)
+        const firstInput = document.querySelector<HTMLInputElement>(
+          'input[name="itemName"]'
+        );
+        firstInput?.focus();
+      }, 100);
     },
     [restoreDraft, clearDraft, updateField]
-  )
+  );
 
   // Memoize keyboard shortcuts
   const keyboardShortcuts = useMemo(
@@ -187,7 +202,7 @@ export function DataEntryForm({
         description: 'Save entry',
         callback: () => {
           if (!meta.isSubmitting) {
-            handleSubmit()
+            handleSubmit();
           }
         },
       },
@@ -197,7 +212,7 @@ export function DataEntryForm({
         description: 'Save entry',
         callback: () => {
           if (!meta.isSubmitting) {
-            handleSubmit()
+            handleSubmit();
           }
         },
       },
@@ -208,46 +223,48 @@ export function DataEntryForm({
       },
     ],
     [meta.isSubmitting, handleSubmit, handleClear]
-  )
+  );
 
   // Initialize keyboard shortcuts
-  useKeyboardShortcuts({ shortcuts: keyboardShortcuts, enabled: true })
+  useKeyboardShortcuts({ shortcuts: keyboardShortcuts, enabled: true });
 
   // Update current date/time every minute
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentDateTime(new Date())
-    }, 60000) // Update every minute
+      setCurrentDateTime(new Date());
+    }, 60000); // Update every minute
 
-    return () => clearInterval(timer)
-  }, [])
+    return () => clearInterval(timer);
+  }, []);
 
   // Check for draft on mount
   useEffect(() => {
-    const draft = restoreDraft()
+    const draft = restoreDraft();
     if (draft) {
-      setShowDraftDialog(true)
+      setShowDraftDialog(true);
     } else {
       // Focus first field on mount if no draft
       setTimeout(() => {
-        const firstInput = document.querySelector<HTMLInputElement>('input[name="itemName"]')
-        firstInput?.focus()
-      }, 100)
+        const firstInput = document.querySelector<HTMLInputElement>(
+          'input[name="itemName"]'
+        );
+        firstInput?.focus();
+      }, 100);
     }
-  }, [restoreDraft])
+  }, [restoreDraft]);
 
   // Unsaved changes warning
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       if (meta.isDirty && !hasJustSubmitted) {
-        e.preventDefault()
-        e.returnValue = ''
+        e.preventDefault();
+        e.returnValue = '';
       }
-    }
+    };
 
-    window.addEventListener('beforeunload', handleBeforeUnload)
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
-  }, [meta.isDirty, hasJustSubmitted])
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [meta.isDirty, hasJustSubmitted]);
 
   // Memoize formatted date time
   const formattedDateTime = useMemo(() => {
@@ -258,8 +275,8 @@ export function DataEntryForm({
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
-    })
-  }, [currentDateTime])
+    });
+  }, [currentDateTime]);
 
   // Memoize form validity check
   const isFormValid = useMemo(() => {
@@ -269,8 +286,13 @@ export function DataEntryForm({
       formData.quantity &&
       parseInt(formData.quantity) > 0 &&
       formData.destination
-    )
-  }, [formData.itemName, formData.batch, formData.quantity, formData.destination])
+    );
+  }, [
+    formData.itemName,
+    formData.batch,
+    formData.quantity,
+    formData.destination,
+  ]);
 
   return (
     <>
@@ -282,7 +304,8 @@ export function DataEntryForm({
               Restore Draft?
             </h3>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
-              You have unsaved changes from a previous session. Would you like to restore them?
+              You have unsaved changes from a previous session. Would you like
+              to restore them?
             </p>
             <div className="flex gap-3 justify-end">
               <Button
@@ -309,27 +332,45 @@ export function DataEntryForm({
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="text-green-600 dark:text-green-400 text-xl">✓</span>
+                  <span className="text-green-600 dark:text-green-400 text-xl">
+                    ✓
+                  </span>
                   <h3 className="text-sm font-semibold text-green-900 dark:text-green-100">
                     Recently Added Item
                   </h3>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
                   <div>
-                    <span className="text-green-700 dark:text-green-300 font-medium">Item:</span>
-                    <p className="text-green-900 dark:text-green-100">{recentlyAddedItem.itemName}</p>
+                    <span className="text-green-700 dark:text-green-300 font-medium">
+                      Item:
+                    </span>
+                    <p className="text-green-900 dark:text-green-100">
+                      {recentlyAddedItem.itemName}
+                    </p>
                   </div>
                   <div>
-                    <span className="text-green-700 dark:text-green-300 font-medium">Batch:</span>
-                    <p className="text-green-900 dark:text-green-100 font-mono text-xs">{recentlyAddedItem.batch}</p>
+                    <span className="text-green-700 dark:text-green-300 font-medium">
+                      Batch:
+                    </span>
+                    <p className="text-green-900 dark:text-green-100 font-mono text-xs">
+                      {recentlyAddedItem.batch}
+                    </p>
                   </div>
                   <div>
-                    <span className="text-green-700 dark:text-green-300 font-medium">Quantity:</span>
-                    <p className="text-green-900 dark:text-green-100">{recentlyAddedItem.quantity}</p>
+                    <span className="text-green-700 dark:text-green-300 font-medium">
+                      Quantity:
+                    </span>
+                    <p className="text-green-900 dark:text-green-100">
+                      {recentlyAddedItem.quantity}
+                    </p>
                   </div>
                   <div>
-                    <span className="text-green-700 dark:text-green-300 font-medium">Destination:</span>
-                    <p className="text-green-900 dark:text-green-100">{recentlyAddedItem.destination}</p>
+                    <span className="text-green-700 dark:text-green-300 font-medium">
+                      Destination:
+                    </span>
+                    <p className="text-green-900 dark:text-green-100">
+                      {recentlyAddedItem.destination}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -338,8 +379,18 @@ export function DataEntryForm({
                 className="text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-200 transition-colors"
                 aria-label="Dismiss"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
@@ -348,7 +399,11 @@ export function DataEntryForm({
       )}
 
       {/* Main Form */}
-      <main className="w-full max-w-7xl mx-auto" role="main" aria-label="Data entry interface">
+      <main
+        className="w-full max-w-7xl mx-auto"
+        role="main"
+        aria-label="Data entry interface"
+      >
         {/* Skip to main content link for screen readers */}
         <a
           href="#data-entry-form"
@@ -501,7 +556,9 @@ export function DataEntryForm({
                 aria-live="polite"
               >
                 <div className="flex items-start gap-3">
-                  <span className="text-red-600 dark:text-red-400 text-xl">⚠️</span>
+                  <span className="text-red-600 dark:text-red-400 text-xl">
+                    ⚠️
+                  </span>
                   <div className="flex-1">
                     <p className="text-sm text-red-800 dark:text-red-200 font-medium">
                       {meta.lastError}
@@ -594,12 +651,22 @@ export function DataEntryForm({
           aria-label="Keyboard shortcuts information"
         >
           <p>
-            Keyboard shortcuts: <kbd className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded">Ctrl+S</kbd> or{' '}
-            <kbd className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded">Ctrl+Enter</kbd> to save,{' '}
-            <kbd className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded">Esc</kbd> to clear
+            Keyboard shortcuts:{' '}
+            <kbd className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded">
+              Ctrl+S
+            </kbd>{' '}
+            or{' '}
+            <kbd className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded">
+              Ctrl+Enter
+            </kbd>{' '}
+            to save,{' '}
+            <kbd className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded">
+              Esc
+            </kbd>{' '}
+            to clear
           </p>
         </aside>
       </main>
     </>
-  )
+  );
 }

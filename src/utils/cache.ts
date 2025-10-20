@@ -1,6 +1,6 @@
 /**
  * Caching Utilities
- * 
+ *
  * Provides caching strategies for API responses and data fetching
  */
 
@@ -35,7 +35,7 @@ export function setCacheHeaders(
   headers.set('Cache-Control', cacheControl);
   headers.set('CDN-Cache-Control', cacheControl);
   headers.set('Vercel-CDN-Cache-Control', cacheControl);
-  
+
   return new Response(response.body, {
     status: response.status,
     statusText: response.statusText,
@@ -68,16 +68,16 @@ class MemoryCache {
 
   get<T = any>(key: string): T | null {
     const item = this.cache.get(key);
-    
+
     if (!item) {
       return null;
     }
-    
+
     if (Date.now() > item.expires) {
       this.cache.delete(key);
       return null;
     }
-    
+
     return item.data as T;
   }
 
@@ -105,9 +105,12 @@ export const memoryCache = new MemoryCache();
 
 // Run cleanup every 5 minutes
 if (typeof window === 'undefined') {
-  setInterval(() => {
-    memoryCache.cleanup();
-  }, 5 * 60 * 1000);
+  setInterval(
+    () => {
+      memoryCache.cleanup();
+    },
+    5 * 60 * 1000
+  );
 }
 
 /**

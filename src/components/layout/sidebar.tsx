@@ -1,97 +1,102 @@
-'use client'
+'use client';
 
-import { useSession } from 'next-auth/react'
-import { usePathname } from 'next/navigation'
-import Link from 'next/link'
-import { useLocale } from '@/hooks/useLocale'
-import { useState, useEffect, useRef, KeyboardEvent } from 'react'
-import { UserRole } from '@prisma/client'
+import { useSession } from 'next-auth/react';
+import { usePathname } from 'next/navigation';
+import Link from 'next/link';
+import { useLocale } from '@/hooks/useLocale';
+import { useState, useEffect, useRef, KeyboardEvent } from 'react';
+import { UserRole } from '@prisma/client';
 import {
   navigationConfig,
   filterNavigationByRole,
   getNavigationLabel,
   NavigationItem,
-} from '@/config/navigation'
+} from '@/config/navigation';
 
-const SIDEBAR_STORAGE_KEY = 'sidebar-collapsed'
+const SIDEBAR_STORAGE_KEY = 'sidebar-collapsed';
 
 export function Sidebar() {
-  const { data: session } = useSession()
-  const pathname = usePathname()
-  const locale = useLocale() as 'en' | 'ar'
-  const [isCollapsed, setIsCollapsed] = useState(false)
-  const [isMounted, setIsMounted] = useState(false)
-  const [focusedIndex, setFocusedIndex] = useState<number>(-1)
-  const navItemsRef = useRef<(HTMLAnchorElement | null)[]>([])
+  const { data: session } = useSession();
+  const pathname = usePathname();
+  const locale = useLocale() as 'en' | 'ar';
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+  const [focusedIndex, setFocusedIndex] = useState<number>(-1);
+  const navItemsRef = useRef<(HTMLAnchorElement | null)[]>([]);
 
   // Load collapsed state from localStorage on mount
   useEffect(() => {
-    setIsMounted(true)
-    const stored = localStorage.getItem(SIDEBAR_STORAGE_KEY)
+    setIsMounted(true);
+    const stored = localStorage.getItem(SIDEBAR_STORAGE_KEY);
     if (stored !== null) {
-      setIsCollapsed(stored === 'true')
+      setIsCollapsed(stored === 'true');
     }
-  }, [])
+  }, []);
 
   // Save collapsed state to localStorage
   const toggleCollapsed = () => {
-    const newState = !isCollapsed
-    setIsCollapsed(newState)
-    localStorage.setItem(SIDEBAR_STORAGE_KEY, String(newState))
-  }
+    const newState = !isCollapsed;
+    setIsCollapsed(newState);
+    localStorage.setItem(SIDEBAR_STORAGE_KEY, String(newState));
+  };
 
   // Sync collapsed state across tabs
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === SIDEBAR_STORAGE_KEY && e.newValue !== null) {
-        setIsCollapsed(e.newValue === 'true')
+        setIsCollapsed(e.newValue === 'true');
       }
-    }
-    
-    window.addEventListener('storage', handleStorageChange)
-    return () => window.removeEventListener('storage', handleStorageChange)
-  }, [])
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
 
   // Filter navigation items based on user role
-  const filteredNavItems = filterNavigationByRole(session?.user?.role as UserRole)
+  const filteredNavItems = filterNavigationByRole(
+    session?.user?.role as UserRole
+  );
 
   // Add locale prefix to href
-  const getLocalizedHref = (item: NavigationItem) => `/${locale}${item.href}`
+  const getLocalizedHref = (item: NavigationItem) => `/${locale}${item.href}`;
 
   const isActive = (item: NavigationItem) => {
-    const itemPath = getLocalizedHref(item)
-    return pathname === itemPath || pathname.startsWith(itemPath + '/')
-  }
+    const itemPath = getLocalizedHref(item);
+    return pathname === itemPath || pathname.startsWith(itemPath + '/');
+  };
 
   // Keyboard navigation handler
-  const handleKeyDown = (e: KeyboardEvent<HTMLAnchorElement>, index: number) => {
-    const totalItems = filteredNavItems.length
+  const handleKeyDown = (
+    e: KeyboardEvent<HTMLAnchorElement>,
+    index: number
+  ) => {
+    const totalItems = filteredNavItems.length;
 
     switch (e.key) {
       case 'ArrowDown':
-        e.preventDefault()
-        const nextIndex = (index + 1) % totalItems
-        navItemsRef.current[nextIndex]?.focus()
-        setFocusedIndex(nextIndex)
-        break
+        e.preventDefault();
+        const nextIndex = (index + 1) % totalItems;
+        navItemsRef.current[nextIndex]?.focus();
+        setFocusedIndex(nextIndex);
+        break;
       case 'ArrowUp':
-        e.preventDefault()
-        const prevIndex = (index - 1 + totalItems) % totalItems
-        navItemsRef.current[prevIndex]?.focus()
-        setFocusedIndex(prevIndex)
-        break
+        e.preventDefault();
+        const prevIndex = (index - 1 + totalItems) % totalItems;
+        navItemsRef.current[prevIndex]?.focus();
+        setFocusedIndex(prevIndex);
+        break;
       case 'Home':
-        e.preventDefault()
-        navItemsRef.current[0]?.focus()
-        setFocusedIndex(0)
-        break
+        e.preventDefault();
+        navItemsRef.current[0]?.focus();
+        setFocusedIndex(0);
+        break;
       case 'End':
-        e.preventDefault()
-        navItemsRef.current[totalItems - 1]?.focus()
-        setFocusedIndex(totalItems - 1)
-        break
+        e.preventDefault();
+        navItemsRef.current[totalItems - 1]?.focus();
+        setFocusedIndex(totalItems - 1);
+        break;
     }
-  }
+  };
 
   // Prevent hydration mismatch
   if (!isMounted) {
@@ -99,7 +104,7 @@ export function Sidebar() {
       <aside className="hidden lg:block w-64 bg-white dark:bg-gray-800 border-r rtl:border-r-0 rtl:border-l border-gray-200 dark:border-gray-700">
         <div className="h-full" />
       </aside>
-    )
+    );
   }
 
   return (
@@ -116,8 +121,19 @@ export function Sidebar() {
           {!isCollapsed && (
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 bg-primary-500 rounded-lg flex items-center justify-center flex-shrink-0">
-                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                <svg
+                  className="w-5 h-5 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
                 </svg>
               </div>
               <span className="text-sm font-semibold text-gray-900 dark:text-gray-100 whitespace-nowrap">
@@ -125,7 +141,7 @@ export function Sidebar() {
               </span>
             </div>
           )}
-          
+
           {/* Toggle Button */}
           <button
             onClick={toggleCollapsed}
@@ -146,24 +162,36 @@ export function Sidebar() {
               viewBox="0 0 24 24"
               xmlns="http://www.w3.org/2000/svg"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M11 19l-7-7 7-7m8 14l-7-7 7-7"
+              />
             </svg>
           </button>
         </div>
 
         {/* Navigation Items */}
-        <nav className="flex-1 overflow-y-auto py-4" role="navigation" aria-label="Main navigation">
-          <ul className={`space-y-1 ${isCollapsed ? 'px-2' : 'px-3'}`} role="list">
+        <nav
+          className="flex-1 overflow-y-auto py-4"
+          role="navigation"
+          aria-label="Main navigation"
+        >
+          <ul
+            className={`space-y-1 ${isCollapsed ? 'px-2' : 'px-3'}`}
+            role="list"
+          >
             {filteredNavItems.map((item, index) => {
-              const active = isActive(item)
-              const Icon = item.icon
-              const label = getNavigationLabel(item, locale)
-              
+              const active = isActive(item);
+              const Icon = item.icon;
+              const label = getNavigationLabel(item, locale);
+
               return (
                 <li key={item.id}>
                   <Link
                     ref={(el) => {
-                      navItemsRef.current[index] = el
+                      navItemsRef.current[index] = el;
                     }}
                     href={getLocalizedHref(item)}
                     onKeyDown={(e) => handleKeyDown(e, index)}
@@ -183,7 +211,9 @@ export function Sidebar() {
                     aria-label={label}
                     aria-current={active ? 'page' : undefined}
                   >
-                    <span className={`flex-shrink-0 ${active ? 'text-primary-600 dark:text-primary-400' : ''}`}>
+                    <span
+                      className={`flex-shrink-0 ${active ? 'text-primary-600 dark:text-primary-400' : ''}`}
+                    >
                       <Icon className="w-5 h-5" />
                     </span>
                     {!isCollapsed && (
@@ -197,14 +227,16 @@ export function Sidebar() {
                                 item.badge.variant === 'new'
                                   ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
                                   : item.badge.variant === 'info'
-                                  ? 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400'
-                                  : item.badge.variant === 'warning'
-                                  ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
-                                  : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                                    ? 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400'
+                                    : item.badge.variant === 'warning'
+                                      ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
+                                      : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
                               }
                             `}
                           >
-                            {item.badge.count !== undefined ? item.badge.count : item.badge.text}
+                            {item.badge.count !== undefined
+                              ? item.badge.count
+                              : item.badge.text}
                           </span>
                         )}
                         {active && (
@@ -212,7 +244,7 @@ export function Sidebar() {
                         )}
                       </>
                     )}
-                    
+
                     {/* Tooltip for collapsed state */}
                     {isCollapsed && (
                       <div
@@ -229,14 +261,16 @@ export function Sidebar() {
                         {label}
                         {item.badge && (
                           <span className="ml-2 rtl:ml-0 rtl:mr-2">
-                            {item.badge.count !== undefined ? `(${item.badge.count})` : item.badge.text}
+                            {item.badge.count !== undefined
+                              ? `(${item.badge.count})`
+                              : item.badge.text}
                           </span>
                         )}
                       </div>
                     )}
                   </Link>
                 </li>
-              )
+              );
             })}
           </ul>
         </nav>
@@ -251,5 +285,5 @@ export function Sidebar() {
         )}
       </div>
     </aside>
-  )
+  );
 }

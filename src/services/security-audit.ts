@@ -1,5 +1,5 @@
-import { prisma } from './prisma'
-import { ActionType } from '@prisma/client'
+import { prisma } from './prisma';
+import { ActionType } from '@prisma/client';
 
 /**
  * Security Audit Logging Service
@@ -29,23 +29,25 @@ export type SecurityEventType =
   | 'SETTINGS_CHANGED'
   | 'USER_CREATED'
   | 'USER_DELETED'
-  | 'SUSPICIOUS_ACTIVITY'
+  | 'SUSPICIOUS_ACTIVITY';
 
 export interface SecurityAuditEvent {
-  userId: string
-  event: SecurityEventType
-  ipAddress: string
-  userAgent: string
-  sessionId?: string
-  metadata?: Record<string, any>
-  success?: boolean
-  errorMessage?: string
+  userId: string;
+  event: SecurityEventType;
+  ipAddress: string;
+  userAgent: string;
+  sessionId?: string;
+  metadata?: Record<string, any>;
+  success?: boolean;
+  errorMessage?: string;
 }
 
 /**
  * Log security event
  */
-export async function logSecurityEvent(event: SecurityAuditEvent): Promise<void> {
+export async function logSecurityEvent(
+  event: SecurityAuditEvent
+): Promise<void> {
   try {
     await prisma.activityLog.create({
       data: {
@@ -55,18 +57,20 @@ export async function logSecurityEvent(event: SecurityAuditEvent): Promise<void>
         metadata: {
           ...event.metadata,
           success: event.success,
-          errorMessage: event.errorMessage
+          errorMessage: event.errorMessage,
         },
         ipAddress: event.ipAddress,
         userAgent: event.userAgent,
         sessionId: event.sessionId || 'unknown',
-        timestamp: new Date()
-      }
-    })
+        timestamp: new Date(),
+      },
+    });
 
-    console.log(`[SecurityAudit] ${event.event} - User: ${event.userId}, IP: ${event.ipAddress}`)
+    console.log(
+      `[SecurityAudit] ${event.event} - User: ${event.userId}, IP: ${event.ipAddress}`
+    );
   } catch (error) {
-    console.error('[SecurityAudit] Error logging security event:', error)
+    console.error('[SecurityAudit] Error logging security event:', error);
   }
 }
 
@@ -76,15 +80,15 @@ export async function logSecurityEvent(event: SecurityAuditEvent): Promise<void>
 export async function getUserSecurityLogs(
   userId: string,
   options: {
-    limit?: number
-    offset?: number
-    startDate?: Date
-    endDate?: Date
-    eventTypes?: SecurityEventType[]
+    limit?: number;
+    offset?: number;
+    startDate?: Date;
+    endDate?: Date;
+    eventTypes?: SecurityEventType[];
   } = {}
 ): Promise<{
-  logs: any[]
-  total: number
+  logs: any[];
+  total: number;
 }> {
   const where: any = {
     userId,
@@ -97,18 +101,18 @@ export async function getUserSecurityLogs(
         '2FA_ENABLED',
         '2FA_DISABLED',
         'ACCOUNT_LOCKED',
-        'PERMISSION_CHANGED'
-      ]
-    }
-  }
+        'PERMISSION_CHANGED',
+      ],
+    },
+  };
 
   if (options.startDate || options.endDate) {
-    where.timestamp = {}
+    where.timestamp = {};
     if (options.startDate) {
-      where.timestamp.gte = options.startDate
+      where.timestamp.gte = options.startDate;
     }
     if (options.endDate) {
-      where.timestamp.lte = options.endDate
+      where.timestamp.lte = options.endDate;
     }
   }
 
@@ -116,7 +120,7 @@ export async function getUserSecurityLogs(
     prisma.activityLog.findMany({
       where,
       orderBy: {
-        timestamp: 'desc'
+        timestamp: 'desc',
       },
       take: options.limit || 50,
       skip: options.offset || 0,
@@ -126,15 +130,15 @@ export async function getUserSecurityLogs(
             id: true,
             name: true,
             email: true,
-            role: true
-          }
-        }
-      }
+            role: true,
+          },
+        },
+      },
     }),
-    prisma.activityLog.count({ where })
-  ])
+    prisma.activityLog.count({ where }),
+  ]);
 
-  return { logs, total }
+  return { logs, total };
 }
 
 /**
@@ -142,16 +146,16 @@ export async function getUserSecurityLogs(
  */
 export async function getAllSecurityLogs(
   options: {
-    limit?: number
-    offset?: number
-    startDate?: Date
-    endDate?: Date
-    eventTypes?: SecurityEventType[]
-    userId?: string
+    limit?: number;
+    offset?: number;
+    startDate?: Date;
+    endDate?: Date;
+    eventTypes?: SecurityEventType[];
+    userId?: string;
   } = {}
 ): Promise<{
-  logs: any[]
-  total: number
+  logs: any[];
+  total: number;
 }> {
   const where: any = {
     event: {
@@ -165,22 +169,22 @@ export async function getAllSecurityLogs(
         'ACCOUNT_LOCKED',
         'PERMISSION_CHANGED',
         'ROLE_CHANGED',
-        'SENSITIVE_DATA_ACCESSED'
-      ]
-    }
-  }
+        'SENSITIVE_DATA_ACCESSED',
+      ],
+    },
+  };
 
   if (options.userId) {
-    where.userId = options.userId
+    where.userId = options.userId;
   }
 
   if (options.startDate || options.endDate) {
-    where.timestamp = {}
+    where.timestamp = {};
     if (options.startDate) {
-      where.timestamp.gte = options.startDate
+      where.timestamp.gte = options.startDate;
     }
     if (options.endDate) {
-      where.timestamp.lte = options.endDate
+      where.timestamp.lte = options.endDate;
     }
   }
 
@@ -188,7 +192,7 @@ export async function getAllSecurityLogs(
     prisma.activityLog.findMany({
       where,
       orderBy: {
-        timestamp: 'desc'
+        timestamp: 'desc',
       },
       take: options.limit || 100,
       skip: options.offset || 0,
@@ -198,15 +202,15 @@ export async function getAllSecurityLogs(
             id: true,
             name: true,
             email: true,
-            role: true
-          }
-        }
-      }
+            role: true,
+          },
+        },
+      },
     }),
-    prisma.activityLog.count({ where })
-  ])
+    prisma.activityLog.count({ where }),
+  ]);
 
-  return { logs, total }
+  return { logs, total };
 }
 
 /**
@@ -216,73 +220,81 @@ export async function detectSuspiciousActivity(
   userId: string,
   timeWindowHours: number = 24
 ): Promise<{
-  suspicious: boolean
-  reasons: string[]
-  severity: 'low' | 'medium' | 'high'
+  suspicious: boolean;
+  reasons: string[];
+  severity: 'low' | 'medium' | 'high';
 }> {
-  const startDate = new Date(Date.now() - timeWindowHours * 60 * 60 * 1000)
+  const startDate = new Date(Date.now() - timeWindowHours * 60 * 60 * 1000);
 
   const logs = await prisma.activityLog.findMany({
     where: {
       userId,
       timestamp: {
-        gte: startDate
-      }
+        gte: startDate,
+      },
     },
     orderBy: {
-      timestamp: 'desc'
-    }
-  })
+      timestamp: 'desc',
+    },
+  });
 
-  const reasons: string[] = []
-  let severity: 'low' | 'medium' | 'high' = 'low'
+  const reasons: string[] = [];
+  let severity: 'low' | 'medium' | 'high' = 'low';
 
   // Check for multiple failed logins
-  const failedLogins = logs.filter((log: any) => log.event === 'LOGIN_FAILED')
+  const failedLogins = logs.filter((log: any) => log.event === 'LOGIN_FAILED');
   if (failedLogins.length >= 5) {
-    reasons.push(`${failedLogins.length} failed login attempts in ${timeWindowHours} hours`)
-    severity = 'high'
+    reasons.push(
+      `${failedLogins.length} failed login attempts in ${timeWindowHours} hours`
+    );
+    severity = 'high';
   } else if (failedLogins.length >= 3) {
-    reasons.push(`${failedLogins.length} failed login attempts in ${timeWindowHours} hours`)
-    severity = 'medium'
+    reasons.push(
+      `${failedLogins.length} failed login attempts in ${timeWindowHours} hours`
+    );
+    severity = 'medium';
   }
 
   // Check for logins from multiple IPs
-  const uniqueIPs = new Set(logs.map((log: any) => log.ipAddress))
+  const uniqueIPs = new Set(logs.map((log: any) => log.ipAddress));
   if (uniqueIPs.size >= 5) {
-    reasons.push(`Logins from ${uniqueIPs.size} different IP addresses`)
-    severity = severity === 'high' ? 'high' : 'medium'
+    reasons.push(`Logins from ${uniqueIPs.size} different IP addresses`);
+    severity = severity === 'high' ? 'high' : 'medium';
   }
 
   // Check for rapid session creation
-  const sessionCreations = logs.filter((log: any) => log.event === 'SESSION_CREATED')
+  const sessionCreations = logs.filter(
+    (log: any) => log.event === 'SESSION_CREATED'
+  );
   if (sessionCreations.length >= 10) {
-    reasons.push(`${sessionCreations.length} sessions created in ${timeWindowHours} hours`)
-    severity = 'high'
+    reasons.push(
+      `${sessionCreations.length} sessions created in ${timeWindowHours} hours`
+    );
+    severity = 'high';
   }
 
   // Check for multiple 2FA failures
-  const twoFAFailures = logs.filter((log: any) => log.event === '2FA_FAILED')
+  const twoFAFailures = logs.filter((log: any) => log.event === '2FA_FAILED');
   if (twoFAFailures.length >= 3) {
-    reasons.push(`${twoFAFailures.length} 2FA verification failures`)
-    severity = 'high'
+    reasons.push(`${twoFAFailures.length} 2FA verification failures`);
+    severity = 'high';
   }
 
   // Check for unusual activity hours (e.g., 2 AM - 5 AM)
   const nightActivity = logs.filter((log: any) => {
-    const hour = log.timestamp.getHours()
-    return hour >= 2 && hour <= 5
-  })
+    const hour = log.timestamp.getHours();
+    return hour >= 2 && hour <= 5;
+  });
   if (nightActivity.length >= 5) {
-    reasons.push('Unusual activity during night hours (2 AM - 5 AM)')
-    severity = severity === 'high' ? 'high' : 'medium'
+    reasons.push('Unusual activity during night hours (2 AM - 5 AM)');
+    severity = severity === 'high' ? 'high' : 'medium';
   }
 
   return {
     suspicious: reasons.length > 0,
     reasons,
-    severity
-  }
+    severity,
+  };
 }
 
 /**
@@ -291,50 +303,52 @@ export async function detectSuspiciousActivity(
 export async function getSecurityTimeline(
   userId: string,
   days: number = 30
-): Promise<{
-  date: string
-  events: {
-    type: SecurityEventType
-    count: number
+): Promise<
+  {
+    date: string;
+    events: {
+      type: SecurityEventType;
+      count: number;
+    }[];
   }[]
-}[]> {
-  const startDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000)
+> {
+  const startDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
 
   const logs = await prisma.activityLog.findMany({
     where: {
       userId,
       timestamp: {
-        gte: startDate
-      }
+        gte: startDate,
+      },
     },
     orderBy: {
-      timestamp: 'asc'
-    }
-  })
+      timestamp: 'asc',
+    },
+  });
 
   // Group by date
-  const timeline = new Map<string, Map<string, number>>()
+  const timeline = new Map<string, Map<string, number>>();
 
   logs.forEach((log: any) => {
-    const date = log.timestamp.toISOString().split('T')[0]
+    const date = log.timestamp.toISOString().split('T')[0];
 
     if (!timeline.has(date)) {
-      timeline.set(date, new Map())
+      timeline.set(date, new Map());
     }
 
-    const dateEvents = timeline.get(date)!
-    const currentCount = dateEvents.get(log.event) || 0
-    dateEvents.set(log.event, currentCount + 1)
-  })
+    const dateEvents = timeline.get(date)!;
+    const currentCount = dateEvents.get(log.event) || 0;
+    dateEvents.set(log.event, currentCount + 1);
+  });
 
   // Convert to array format
   return Array.from(timeline.entries()).map(([date, events]) => ({
     date,
     events: Array.from(events.entries()).map(([type, count]) => ({
       type: type as SecurityEventType,
-      count
-    }))
-  }))
+      count,
+    })),
+  }));
 }
 
 /**
@@ -344,41 +358,41 @@ export async function getSecurityStatistics(
   startDate: Date,
   endDate: Date
 ): Promise<{
-  totalEvents: number
-  eventsByType: Record<string, number>
-  uniqueUsers: number
-  failedLogins: number
-  successfulLogins: number
-  accountLockouts: number
-  twoFAEnabled: number
-  suspiciousActivities: number
+  totalEvents: number;
+  eventsByType: Record<string, number>;
+  uniqueUsers: number;
+  failedLogins: number;
+  successfulLogins: number;
+  accountLockouts: number;
+  twoFAEnabled: number;
+  suspiciousActivities: number;
 }> {
   const logs = await prisma.activityLog.findMany({
     where: {
       timestamp: {
         gte: startDate,
-        lte: endDate
-      }
-    }
-  })
+        lte: endDate,
+      },
+    },
+  });
 
-  const eventsByType: Record<string, number> = {}
-  const uniqueUsers = new Set<string>()
+  const eventsByType: Record<string, number> = {};
+  const uniqueUsers = new Set<string>();
 
-  let failedLogins = 0
-  let successfulLogins = 0
-  let accountLockouts = 0
-  let twoFAEnabled = 0
+  let failedLogins = 0;
+  let successfulLogins = 0;
+  let accountLockouts = 0;
+  let twoFAEnabled = 0;
 
   logs.forEach((log: any) => {
-    uniqueUsers.add(log.userId)
-    eventsByType[log.event] = (eventsByType[log.event] || 0) + 1
+    uniqueUsers.add(log.userId);
+    eventsByType[log.event] = (eventsByType[log.event] || 0) + 1;
 
-    if (log.event === 'LOGIN_FAILED') failedLogins++
-    if (log.event === 'LOGIN_SUCCESS') successfulLogins++
-    if (log.event === 'ACCOUNT_LOCKED') accountLockouts++
-    if (log.event === '2FA_ENABLED') twoFAEnabled++
-  })
+    if (log.event === 'LOGIN_FAILED') failedLogins++;
+    if (log.event === 'LOGIN_SUCCESS') successfulLogins++;
+    if (log.event === 'ACCOUNT_LOCKED') accountLockouts++;
+    if (log.event === '2FA_ENABLED') twoFAEnabled++;
+  });
 
   return {
     totalEvents: logs.length,
@@ -388,46 +402,52 @@ export async function getSecurityStatistics(
     successfulLogins,
     accountLockouts,
     twoFAEnabled,
-    suspiciousActivities: 0 // Would need to implement detection logic
-  }
+    suspiciousActivities: 0, // Would need to implement detection logic
+  };
 }
 
 /**
  * Export security audit logs
  */
-export async function exportSecurityLogs(
-  options: {
-    startDate: Date
-    endDate: Date
-    userId?: string
-    format: 'json' | 'csv'
-  }
-): Promise<string> {
+export async function exportSecurityLogs(options: {
+  startDate: Date;
+  endDate: Date;
+  userId?: string;
+  format: 'json' | 'csv';
+}): Promise<string> {
   const { logs } = await getAllSecurityLogs({
     startDate: options.startDate,
     endDate: options.endDate,
     userId: options.userId,
-    limit: 10000
-  })
+    limit: 10000,
+  });
 
   if (options.format === 'json') {
-    return JSON.stringify(logs, null, 2)
+    return JSON.stringify(logs, null, 2);
   }
 
   // CSV format
-  const headers = ['Timestamp', 'User', 'Email', 'Event', 'IP Address', 'User Agent', 'Metadata']
-  const rows = logs.map(log => [
+  const headers = [
+    'Timestamp',
+    'User',
+    'Email',
+    'Event',
+    'IP Address',
+    'User Agent',
+    'Metadata',
+  ];
+  const rows = logs.map((log) => [
     log.timestamp.toISOString(),
     log.users.name,
     log.users.email,
     log.event,
     log.ipAddress,
     log.userAgent,
-    JSON.stringify(log.metadata)
-  ])
+    JSON.stringify(log.metadata),
+  ]);
 
   return [
     headers.join(','),
-    ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
-  ].join('\n')
+    ...rows.map((row) => row.map((cell) => `"${cell}"`).join(',')),
+  ].join('\n');
 }

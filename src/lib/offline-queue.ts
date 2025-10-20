@@ -46,7 +46,7 @@ class OfflineQueueManager {
       if (stored) {
         this.queue = JSON.parse(stored).map((action: any) => ({
           ...action,
-          timestamp: new Date(action.timestamp)
+          timestamp: new Date(action.timestamp),
         }));
       }
     } catch (error) {
@@ -93,13 +93,15 @@ class OfflineQueueManager {
   /**
    * Add action to queue
    */
-  add(action: Omit<OfflineAction, 'id' | 'timestamp' | 'synced' | 'retries'>): string {
+  add(
+    action: Omit<OfflineAction, 'id' | 'timestamp' | 'synced' | 'retries'>
+  ): string {
     const offlineAction: OfflineAction = {
       ...action,
       id: this.generateId(),
       timestamp: new Date(),
       synced: false,
-      retries: 0
+      retries: 0,
     };
 
     this.queue.push(offlineAction);
@@ -119,7 +121,7 @@ class OfflineQueueManager {
    * Get all pending actions
    */
   getPending(): OfflineAction[] {
-    return this.queue.filter(action => !action.synced);
+    return this.queue.filter((action) => !action.synced);
   }
 
   /**
@@ -140,7 +142,7 @@ class OfflineQueueManager {
    * Clear synced actions
    */
   clearSynced(): void {
-    this.queue = this.queue.filter(action => !action.synced);
+    this.queue = this.queue.filter((action) => !action.synced);
     this.saveQueue();
   }
 
@@ -171,7 +173,7 @@ class OfflineQueueManager {
     const result: SyncResult = {
       successful: 0,
       failed: 0,
-      errors: []
+      errors: [],
     };
 
     console.log(`[OfflineQueue] Syncing ${pending.length} actions...`);
@@ -188,15 +190,22 @@ class OfflineQueueManager {
         result.failed++;
         result.errors.push({
           id: action.id,
-          error: action.error
+          error: action.error,
         });
 
-        console.error('[OfflineQueue] Failed to sync action:', action.id, error);
+        console.error(
+          '[OfflineQueue] Failed to sync action:',
+          action.id,
+          error
+        );
 
         // Remove action if max retries reached
         if (action.retries >= MAX_RETRIES) {
-          console.error('[OfflineQueue] Max retries reached, removing action:', action.id);
-          this.queue = this.queue.filter(a => a.id !== action.id);
+          console.error(
+            '[OfflineQueue] Max retries reached, removing action:',
+            action.id
+          );
+          this.queue = this.queue.filter((a) => a.id !== action.id);
         }
       }
     }
@@ -219,7 +228,7 @@ class OfflineQueueManager {
         'Content-Type': 'application/json',
       },
       body: action.data ? JSON.stringify(action.data) : undefined,
-      credentials: 'include'
+      credentials: 'include',
     });
 
     if (!response.ok) {
@@ -243,7 +252,7 @@ class OfflineQueueManager {
   subscribe(listener: (queue: OfflineAction[]) => void): () => void {
     this.listeners.push(listener);
     return () => {
-      this.listeners = this.listeners.filter(l => l !== listener);
+      this.listeners = this.listeners.filter((l) => l !== listener);
     };
   }
 
@@ -251,7 +260,7 @@ class OfflineQueueManager {
    * Notify all listeners
    */
   private notifyListeners(): void {
-    this.listeners.forEach(listener => listener(this.queue));
+    this.listeners.forEach((listener) => listener(this.queue));
   }
 
   /**
@@ -274,13 +283,14 @@ export function queueApiCall(
   data?: any
 ): string {
   const entity = endpoint.split('/')[2] || 'unknown'; // Extract entity from /api/entity/...
-  
+
   return offlineQueue.add({
-    type: method === 'POST' ? 'create' : method === 'DELETE' ? 'delete' : 'update',
+    type:
+      method === 'POST' ? 'create' : method === 'DELETE' ? 'delete' : 'update',
     entity,
     endpoint,
     method,
-    data
+    data,
   });
 }
 

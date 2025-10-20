@@ -39,7 +39,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Revert the change
-    const revertEntry = await AuditService.revertChange(entryId, session.user.id);
+    const revertEntry = await AuditService.revertChange(
+      entryId,
+      session.user.id
+    );
 
     return successResponse({
       success: true,

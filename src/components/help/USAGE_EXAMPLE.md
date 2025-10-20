@@ -85,9 +85,9 @@
 // 2. Fill out the form:
 
 const newArticle = {
-  title: "How to Add Inventory Items",
-  slug: "how-to-add-inventory-items", // Auto-generated from title
-  category: "Getting Started",
+  title: 'How to Add Inventory Items',
+  slug: 'how-to-add-inventory-items', // Auto-generated from title
+  category: 'Getting Started',
   content: `
 # How to Add Inventory Items
 
@@ -110,9 +110,9 @@ Enter the following information:
 
 Click the "Add Item" button to save your entry.
   `,
-  tags: ["inventory", "data-entry", "tutorial"],
-  status: "PUBLISHED" // or "DRAFT"
-}
+  tags: ['inventory', 'data-entry', 'tutorial'],
+  status: 'PUBLISHED', // or "DRAFT"
+};
 
 // 3. Click "Save"
 ```
@@ -269,13 +269,16 @@ const article = await response.json()
 
 ```typescript
 // Submit helpful feedback
-const response = await fetch('/api/help/articles/how-to-add-inventory-items/feedback', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ helpful: true })
-})
+const response = await fetch(
+  '/api/help/articles/how-to-add-inventory-items/feedback',
+  {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ helpful: true }),
+  }
+);
 
-const result = await response.json()
+const result = await response.json();
 // result: { success: true, helpful: 46, notHelpful: 2 }
 ```
 
@@ -287,16 +290,16 @@ const response = await fetch('/api/help/articles', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
-    title: "How to Add Inventory Items",
-    slug: "how-to-add-inventory-items",
-    category: "Getting Started",
-    content: "# How to Add Inventory Items\n\n...",
-    tags: ["inventory", "data-entry", "tutorial"],
-    status: "PUBLISHED"
-  })
-})
+    title: 'How to Add Inventory Items',
+    slug: 'how-to-add-inventory-items',
+    category: 'Getting Started',
+    content: '# How to Add Inventory Items\n\n...',
+    tags: ['inventory', 'data-entry', 'tutorial'],
+    status: 'PUBLISHED',
+  }),
+});
 
-const article = await response.json()
+const article = await response.json();
 ```
 
 ### Updating an Article (Admin Only)
@@ -307,13 +310,13 @@ const response = await fetch('/api/help/articles/how-to-add-inventory-items', {
   method: 'PATCH',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
-    title: "Updated Title",
-    content: "Updated content...",
-    status: "PUBLISHED"
-  })
-})
+    title: 'Updated Title',
+    content: 'Updated content...',
+    status: 'PUBLISHED',
+  }),
+});
 
-const article = await response.json()
+const article = await response.json();
 ```
 
 ### Submitting a Support Request
@@ -324,14 +327,14 @@ const response = await fetch('/api/help/support', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
-    category: "technical",
-    subject: "Cannot login to my account",
+    category: 'technical',
+    subject: 'Cannot login to my account',
     description: "I'm getting an error when trying to login...",
-    priority: "high"
-  })
-})
+    priority: 'high',
+  }),
+});
 
-const result = await response.json()
+const result = await response.json();
 // result: { success: true, message: "...", expectedResponseTime: "4-8 hours" }
 ```
 
@@ -341,11 +344,13 @@ const result = await response.json()
 
 ```markdown
 # Heading 1
+
 ## Heading 2
+
 ### Heading 3
 
 **Bold text**
-*Italic text*
+_Italic text_
 ~~Strikethrough~~
 
 - Bullet point 1
@@ -367,7 +372,7 @@ Inline code: `const x = 5`
 Code block:
 \`\`\`javascript
 function hello() {
-  console.log("Hello, world!")
+console.log("Hello, world!")
 }
 \`\`\`
 ```
@@ -376,7 +381,7 @@ function hello() {
 
 ```markdown
 | Column 1 | Column 2 | Column 3 |
-|----------|----------|----------|
+| -------- | -------- | -------- |
 | Data 1   | Data 2   | Data 3   |
 | Data 4   | Data 5   | Data 6   |
 ```

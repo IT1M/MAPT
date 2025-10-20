@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@/services/auth'
-import { verify2FASetup } from '@/services/two-factor'
-import { logSecurityEvent } from '@/services/security-audit'
+import { NextRequest, NextResponse } from 'next/server';
+import { auth } from '@/services/auth';
+import { verify2FASetup } from '@/services/two-factor';
+import { logSecurityEvent } from '@/services/security-audit';
 
 /**
  * POST /api/auth/2fa/verify
@@ -9,26 +9,26 @@ import { logSecurityEvent } from '@/services/security-audit'
  */
 export async function POST(req: NextRequest) {
   try {
-    const session = await auth()
+    const session = await auth();
 
     if (!session?.user) {
       return NextResponse.json(
         { success: false, error: 'Unauthorized' },
         { status: 401 }
-      )
+      );
     }
 
-    const body = await req.json()
-    const { token } = body
+    const body = await req.json();
+    const { token } = body;
 
     if (!token || typeof token !== 'string') {
       return NextResponse.json(
         { success: false, error: 'Token is required' },
         { status: 400 }
-      )
+      );
     }
 
-    const isValid = await verify2FASetup(session.user.id, token)
+    const isValid = await verify2FASetup(session.user.id, token);
 
     if (!isValid) {
       await logSecurityEvent({
@@ -38,14 +38,14 @@ export async function POST(req: NextRequest) {
         userAgent: req.headers.get('user-agent') || 'unknown',
         success: false,
         metadata: {
-          action: 'setup_verification'
-        }
-      })
+          action: 'setup_verification',
+        },
+      });
 
       return NextResponse.json(
         { success: false, error: 'Invalid verification code' },
         { status: 400 }
-      )
+      );
     }
 
     // Log successful verification
@@ -56,19 +56,19 @@ export async function POST(req: NextRequest) {
       userAgent: req.headers.get('user-agent') || 'unknown',
       success: true,
       metadata: {
-        action: 'setup_completed'
-      }
-    })
+        action: 'setup_completed',
+      },
+    });
 
     return NextResponse.json({
       success: true,
-      message: '2FA enabled successfully'
-    })
+      message: '2FA enabled successfully',
+    });
   } catch (error) {
-    console.error('[2FA Verify] Error:', error)
+    console.error('[2FA Verify] Error:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to verify 2FA code' },
       { status: 500 }
-    )
+    );
   }
 }

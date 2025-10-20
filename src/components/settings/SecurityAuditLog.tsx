@@ -1,30 +1,30 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { useTranslations } from '@/hooks/useTranslations'
-import { format } from 'date-fns'
-import { Button } from '@/components/ui/button'
-import { Pagination } from '@/components/ui/Pagination'
+import { useState } from 'react';
+import { useTranslations } from '@/hooks/useTranslations';
+import { format } from 'date-fns';
+import { Button } from '@/components/ui/button';
+import { Pagination } from '@/components/ui/Pagination';
 
 export interface SecurityEvent {
-  id: string
-  type: 'login' | 'failed_login' | 'password_change' | 'session_terminated'
-  timestamp: Date
-  ipAddress: string
-  location?: string
-  success: boolean
-  userAgent?: string
+  id: string;
+  type: 'login' | 'failed_login' | 'password_change' | 'session_terminated';
+  timestamp: Date;
+  ipAddress: string;
+  location?: string;
+  success: boolean;
+  userAgent?: string;
 }
 
 interface SecurityAuditLogProps {
-  userId: string
-  events: SecurityEvent[]
-  totalEvents: number
-  currentPage: number
-  pageSize: number
-  onPageChange: (page: number) => void
-  onExport: () => Promise<void>
-  isLoading?: boolean
+  userId: string;
+  events: SecurityEvent[];
+  totalEvents: number;
+  currentPage: number;
+  pageSize: number;
+  onPageChange: (page: number) => void;
+  onExport: () => Promise<void>;
+  isLoading?: boolean;
 }
 
 export function SecurityAuditLog({
@@ -37,68 +37,68 @@ export function SecurityAuditLog({
   onExport,
   isLoading,
 }: SecurityAuditLogProps) {
-  const t = useTranslations('settings.security')
-  const [isExporting, setIsExporting] = useState(false)
+  const t = useTranslations('settings.security');
+  const [isExporting, setIsExporting] = useState(false);
 
-  const totalPages = Math.ceil(totalEvents / pageSize)
+  const totalPages = Math.ceil(totalEvents / pageSize);
 
   const handleExport = async () => {
-    setIsExporting(true)
+    setIsExporting(true);
     try {
-      await onExport()
+      await onExport();
     } finally {
-      setIsExporting(false)
+      setIsExporting(false);
     }
-  }
+  };
 
   const getEventIcon = (type: SecurityEvent['type'], success: boolean) => {
-    if (!success) return '❌'
-    
+    if (!success) return '❌';
+
     switch (type) {
       case 'login':
-        return '✅'
+        return '✅';
       case 'failed_login':
-        return '⚠️'
+        return '⚠️';
       case 'password_change':
-        return '🔑'
+        return '🔑';
       case 'session_terminated':
-        return '🚪'
+        return '🚪';
       default:
-        return '📝'
+        return '📝';
     }
-  }
+  };
 
   const getEventLabel = (type: SecurityEvent['type']) => {
     switch (type) {
       case 'login':
-        return 'Successful Login'
+        return 'Successful Login';
       case 'failed_login':
-        return 'Failed Login Attempt'
+        return 'Failed Login Attempt';
       case 'password_change':
-        return 'Password Changed'
+        return 'Password Changed';
       case 'session_terminated':
-        return 'Session Terminated'
+        return 'Session Terminated';
       default:
-        return 'Security Event'
+        return 'Security Event';
     }
-  }
+  };
 
   const getEventColor = (type: SecurityEvent['type'], success: boolean) => {
-    if (!success) return 'text-red-600 dark:text-red-400'
-    
+    if (!success) return 'text-red-600 dark:text-red-400';
+
     switch (type) {
       case 'login':
-        return 'text-green-600 dark:text-green-400'
+        return 'text-green-600 dark:text-green-400';
       case 'failed_login':
-        return 'text-yellow-600 dark:text-yellow-400'
+        return 'text-yellow-600 dark:text-yellow-400';
       case 'password_change':
-        return 'text-blue-600 dark:text-blue-400'
+        return 'text-blue-600 dark:text-blue-400';
       case 'session_terminated':
-        return 'text-gray-600 dark:text-gray-400'
+        return 'text-gray-600 dark:text-gray-400';
       default:
-        return 'text-gray-600 dark:text-gray-400'
+        return 'text-gray-600 dark:text-gray-400';
     }
-  }
+  };
 
   return (
     <div className="space-y-6">
@@ -205,5 +205,5 @@ export function SecurityAuditLog({
         </div>
       )}
     </div>
-  )
+  );
 }

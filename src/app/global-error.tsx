@@ -1,17 +1,17 @@
-'use client'
+'use client';
 
-import { useEffect } from 'react'
+import { useEffect } from 'react';
 
 export default function GlobalError({
   error,
   reset,
 }: {
-  error: Error & { digest?: string }
-  reset: () => void
+  error: Error & { digest?: string };
+  reset: () => void;
 }) {
   useEffect(() => {
     // Log error to console
-    console.error('Global error boundary caught:', error)
+    console.error('Global error boundary caught:', error);
 
     // Log to monitoring service
     try {
@@ -21,19 +21,27 @@ export default function GlobalError({
         digest: error.digest,
         stack: error.stack,
         type: 'global-error',
-        userAgent: typeof window !== 'undefined' ? window.navigator.userAgent : 'unknown',
+        userAgent:
+          typeof window !== 'undefined'
+            ? window.navigator.userAgent
+            : 'unknown',
         url: typeof window !== 'undefined' ? window.location.href : 'unknown',
       };
 
       if (typeof window !== 'undefined') {
-        const existingLogs = JSON.parse(localStorage.getItem('error-logs') || '[]');
+        const existingLogs = JSON.parse(
+          localStorage.getItem('error-logs') || '[]'
+        );
         existingLogs.push(errorLog);
-        localStorage.setItem('error-logs', JSON.stringify(existingLogs.slice(-50)));
+        localStorage.setItem(
+          'error-logs',
+          JSON.stringify(existingLogs.slice(-50))
+        );
       }
     } catch (loggingError) {
       console.error('Failed to log error:', loggingError);
     }
-  }, [error])
+  }, [error]);
 
   return (
     <html>
@@ -67,7 +75,8 @@ export default function GlobalError({
 
               {/* Error Description */}
               <p className="text-sm text-gray-600 dark:text-gray-400 max-w-md mb-6">
-                A critical error occurred. Please try refreshing the page or contact support if the problem persists.
+                A critical error occurred. Please try refreshing the page or
+                contact support if the problem persists.
               </p>
 
               {/* Error Details (Development Only) */}
@@ -111,9 +120,9 @@ export default function GlobalError({
                   </svg>
                   Try Again
                 </button>
-                
+
                 <button
-                  onClick={() => window.location.href = '/'}
+                  onClick={() => (window.location.href = '/')}
                   className="inline-flex items-center px-6 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-white text-sm font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
                 >
                   <svg
@@ -137,5 +146,5 @@ export default function GlobalError({
         </div>
       </body>
     </html>
-  )
+  );
 }

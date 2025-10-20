@@ -1,16 +1,20 @@
-'use client'
+'use client';
 
-import { useState, useEffect, useCallback } from 'react'
-import { useTranslations } from '@/hooks/useTranslations'
-import { AlertTriangle, CheckCircle2, XCircle, Lightbulb } from 'lucide-react'
-import { batchImportRowSchema } from '@/utils/validators'
-import type { ColumnMapping, ParsedData, ValidationError } from '@/types/import'
+import { useState, useEffect, useCallback } from 'react';
+import { useTranslations } from '@/hooks/useTranslations';
+import { AlertTriangle, CheckCircle2, XCircle, Lightbulb } from 'lucide-react';
+import { batchImportRowSchema } from '@/utils/validators';
+import type {
+  ColumnMapping,
+  ParsedData,
+  ValidationError,
+} from '@/types/import';
 
 interface ValidationStepProps {
-  parsedData: ParsedData
-  columnMapping: ColumnMapping
-  onComplete: (errors: ValidationError[]) => void
-  onBack: () => void
+  parsedData: ParsedData;
+  columnMapping: ColumnMapping;
+  onComplete: (errors: ValidationError[]) => void;
+  onBack: () => void;
 }
 
 export default function ValidationStep({
@@ -19,56 +23,73 @@ export default function ValidationStep({
   onComplete,
   onBack,
 }: ValidationStepProps) {
-  const t = useTranslations('import.validation')
-  const [isValidating, setIsValidating] = useState(false)
-  const [validationErrors, setValidationErrors] = useState<ValidationError[]>([])
-  const [validCount, setValidCount] = useState(0)
-  const [showAllErrors, setShowAllErrors] = useState(false)
+  const t = useTranslations('import.validation');
+  const [isValidating, setIsValidating] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<ValidationError[]>(
+    []
+  );
+  const [validCount, setValidCount] = useState(0);
+  const [showAllErrors, setShowAllErrors] = useState(false);
 
   const validateData = useCallback(() => {
-    setIsValidating(true)
-    const errors: ValidationError[] = []
-    let valid = 0
+    setIsValidating(true);
+    const errors: ValidationError[] = [];
+    let valid = 0;
 
     for (let i = 0; i < parsedData.rows.length; i++) {
-      const row = parsedData.rows[i]
-      const rowNumber = i + 2 // +2 because row 1 is header
+      const row = parsedData.rows[i];
+      const rowNumber = i + 2; // +2 because row 1 is header
 
       // Map columns to expected fields
       const processedRow = {
-        itemName: columnMapping.itemName ? row[columnMapping.itemName] : undefined,
+        itemName: columnMapping.itemName
+          ? row[columnMapping.itemName]
+          : undefined,
         batch: columnMapping.batch ? row[columnMapping.batch] : undefined,
         quantity: columnMapping.quantity
           ? parseInt(String(row[columnMapping.quantity]))
           : undefined,
-        reject: columnMapping.reject ? parseInt(String(row[columnMapping.reject] || '0')) : 0,
-        destination: columnMapping.destination ? row[columnMapping.destination] : undefined,
-        category: columnMapping.category ? row[columnMapping.category] : undefined,
+        reject: columnMapping.reject
+          ? parseInt(String(row[columnMapping.reject] || '0'))
+          : 0,
+        destination: columnMapping.destination
+          ? row[columnMapping.destination]
+          : undefined,
+        category: columnMapping.category
+          ? row[columnMapping.category]
+          : undefined,
         notes: columnMapping.notes ? row[columnMapping.notes] : undefined,
-      }
+      };
 
       // Validate with Zod schema
-      const validationResult = batchImportRowSchema.safeParse(processedRow)
+      const validationResult = batchImportRowSchema.safeParse(processedRow);
 
       if (!validationResult.success) {
         validationResult.error.errors.forEach((err) => {
-          const field = err.path[0] as string
-          const value = processedRow[field as keyof typeof processedRow]
+          const field = err.path[0] as string;
+          const value = processedRow[field as keyof typeof processedRow];
 
           // Generate suggestions
-          let suggestion: string | undefined
+          let suggestion: string | undefined;
 
           if (field === 'quantity' && isNaN(Number(value))) {
-            suggestion = t('suggestions.removeNonNumeric')
+            suggestion = t('suggestions.removeNonNumeric');
           } else if (field === 'destination' && value) {
-            const upperValue = String(value).toUpperCase()
+            const upperValue = String(value).toUpperCase();
             if (upperValue.includes('MAIS') || upperValue.includes('ميس')) {
-              suggestion = t('suggestions.useMais')
-            } else if (upperValue.includes('FOZAN') || upperValue.includes('فوزان')) {
-              suggestion = t('suggestions.useFozan')
+              suggestion = t('suggestions.useMais');
+            } else if (
+              upperValue.includes('FOZAN') ||
+              upperValue.includes('فوزان')
+            ) {
+              suggestion = t('suggestions.useFozan');
             }
-          } else if (field === 'batch' && value && !/^[A-Za-z0-9-]+$/.test(String(value))) {
-            suggestion = t('suggestions.removeSpecialChars')
+          } else if (
+            field === 'batch' &&
+            value &&
+            !/^[A-Za-z0-9-]+$/.test(String(value))
+          ) {
+            suggestion = t('suggestions.removeSpecialChars');
           }
 
           errors.push({
@@ -77,28 +98,30 @@ export default function ValidationStep({
             value,
             error: err.message,
             suggestion,
-          })
-        })
+          });
+        });
       } else {
-        valid++
+        valid++;
       }
     }
 
-    setValidationErrors(errors)
-    setValidCount(valid)
-    setIsValidating(false)
-  }, [parsedData.rows, columnMapping, t])
+    setValidationErrors(errors);
+    setValidCount(valid);
+    setIsValidating(false);
+  }, [parsedData.rows, columnMapping, t]);
 
   useEffect(() => {
-    validateData()
-  }, [validateData])
+    validateData();
+  }, [validateData]);
 
   const handleContinue = useCallback(() => {
-    onComplete(validationErrors)
-  }, [validationErrors, onComplete])
+    onComplete(validationErrors);
+  }, [validationErrors, onComplete]);
 
-  const displayedErrors = showAllErrors ? validationErrors : validationErrors.slice(0, 10)
-  const hasMoreErrors = validationErrors.length > 10
+  const displayedErrors = showAllErrors
+    ? validationErrors
+    : validationErrors.slice(0, 10);
+  const hasMoreErrors = validationErrors.length > 10;
 
   return (
     <div className="space-y-6">
@@ -106,13 +129,17 @@ export default function ValidationStep({
         <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
           {t('title')}
         </h3>
-        <p className="text-sm text-gray-600 dark:text-gray-400">{t('description')}</p>
+        <p className="text-sm text-gray-600 dark:text-gray-400">
+          {t('description')}
+        </p>
       </div>
 
       {isValidating ? (
         <div className="flex flex-col items-center justify-center py-12">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600 mb-4"></div>
-          <p className="text-sm text-gray-600 dark:text-gray-400">{t('validating')}</p>
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            {t('validating')}
+          </p>
         </div>
       ) : (
         <>
@@ -127,7 +154,9 @@ export default function ValidationStep({
                   <p className="text-2xl font-bold text-gray-900 dark:text-white">
                     {parsedData.rows.length}
                   </p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{t('totalRows')}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    {t('totalRows')}
+                  </p>
                 </div>
               </div>
             </div>
@@ -138,8 +167,12 @@ export default function ValidationStep({
                   <CheckCircle2 className="w-5 h-5 text-green-600 dark:text-green-400" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{validCount}</p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{t('validRows')}</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                    {validCount}
+                  </p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    {t('validRows')}
+                  </p>
                 </div>
               </div>
             </div>
@@ -153,7 +186,9 @@ export default function ValidationStep({
                   <p className="text-2xl font-bold text-gray-900 dark:text-white">
                     {validationErrors.length}
                   </p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{t('errors')}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    {t('errors')}
+                  </p>
                 </div>
               </div>
             </div>
@@ -287,5 +322,5 @@ export default function ValidationStep({
         </button>
       </div>
     </div>
-  )
+  );
 }

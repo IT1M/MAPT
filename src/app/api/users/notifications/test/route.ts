@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@/services/auth'
-import { prisma } from '@/services/prisma'
-import { sendEmail } from '@/utils/email'
+import { NextRequest, NextResponse } from 'next/server';
+import { auth } from '@/services/auth';
+import { prisma } from '@/services/prisma';
+import { sendEmail } from '@/utils/email';
 
 /**
  * POST /api/users/notifications/test
@@ -9,7 +9,7 @@ import { sendEmail } from '@/utils/email'
  */
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth()
+    const session = await auth();
 
     if (!session?.user?.id) {
       return NextResponse.json(
@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
           error: { code: 'AUTH_REQUIRED', message: 'Authentication required' },
         },
         { status: 401 }
-      )
+      );
     }
 
     // Get user details
@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
         name: true,
         preferences: true,
       },
-    })
+    });
 
     if (!user) {
       return NextResponse.json(
@@ -38,17 +38,18 @@ export async function POST(request: NextRequest) {
           error: { code: 'NOT_FOUND', message: 'User not found' },
         },
         { status: 404 }
-      )
+      );
     }
 
     // Get notification preferences
-    const preferences = (user.preferences as any) || {}
-    const notificationPrefs = preferences.notifications || {}
+    const preferences = (user.preferences as any) || {};
+    const notificationPrefs = preferences.notifications || {};
 
     // Send test email if email notifications are enabled
-    const emailEnabled = notificationPrefs.email?.dailyInventorySummary !== false
+    const emailEnabled =
+      notificationPrefs.email?.dailyInventorySummary !== false;
     if (emailEnabled) {
-      await sendTestEmail(user.email, user.name)
+      await sendTestEmail(user.email, user.name);
     }
 
     // Note: In-app/desktop notifications are handled client-side via browser APIs
@@ -61,9 +62,9 @@ export async function POST(request: NextRequest) {
         emailSent: emailEnabled,
         inAppEnabled: notificationPrefs.inApp?.enabled !== false,
       },
-    })
+    });
   } catch (error) {
-    console.error('Error sending test notification:', error)
+    console.error('Error sending test notification:', error);
     return NextResponse.json(
       {
         success: false,
@@ -73,7 +74,7 @@ export async function POST(request: NextRequest) {
         },
       },
       { status: 500 }
-    )
+    );
   }
 }
 
@@ -81,7 +82,7 @@ export async function POST(request: NextRequest) {
  * Send a test email notification
  */
 async function sendTestEmail(email: string, name: string): Promise<void> {
-  const subject = 'Test Notification - Inventory Management System'
+  const subject = 'Test Notification - Inventory Management System';
 
   const text = `
 Hello ${name},
@@ -94,7 +95,7 @@ You can manage your notification preferences in the Settings page.
 
 Best regards,
 Inventory Management Team
-  `.trim()
+  `.trim();
 
   const html = `
 <!DOCTYPE html>
@@ -168,12 +169,12 @@ Inventory Management Team
   </div>
 </body>
 </html>
-  `.trim()
+  `.trim();
 
   await sendEmail({
     to: email,
     subject,
     text,
     html,
-  })
+  });
 }

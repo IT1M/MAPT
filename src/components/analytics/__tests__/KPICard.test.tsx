@@ -5,13 +5,7 @@ import { KPICard } from '../KPICard';
 
 describe('KPICard', () => {
   it('renders with basic props', () => {
-    render(
-      <KPICard
-        title="Test KPI"
-        value={100}
-        icon="📊"
-      />
-    );
+    render(<KPICard title="Test KPI" value={100} icon="📊" />);
 
     expect(screen.getByText('Test KPI')).toBeInTheDocument();
     expect(screen.getByText('100')).toBeInTheDocument();
@@ -39,17 +33,13 @@ describe('KPICard', () => {
 
   it('calls onClick when clicked', () => {
     const handleClick = vi.fn();
-    
+
     render(
-      <KPICard
-        title="Test KPI"
-        value={100}
-        icon="📊"
-        onClick={handleClick}
-      />
+      <KPICard title="Test KPI" value={100} icon="📊" onClick={handleClick} />
     );
 
-    const card = screen.getByText('Test KPI').closest('div')?.parentElement?.parentElement;
+    const card = screen.getByText('Test KPI').closest('div')
+      ?.parentElement?.parentElement;
     if (card) {
       fireEvent.click(card);
       expect(handleClick).toHaveBeenCalledTimes(1);
@@ -57,14 +47,7 @@ describe('KPICard', () => {
   });
 
   it('renders loading state', () => {
-    render(
-      <KPICard
-        title="Test KPI"
-        value={100}
-        icon="📊"
-        loading={true}
-      />
-    );
+    render(<KPICard title="Test KPI" value={100} icon="📊" loading={true} />);
 
     // Loading state should show skeleton
     const skeletons = document.querySelectorAll('.animate-pulse');
@@ -73,12 +56,7 @@ describe('KPICard', () => {
 
   it('applies correct color classes', () => {
     const { container } = render(
-      <KPICard
-        title="Test KPI"
-        value={100}
-        icon="📊"
-        color="danger"
-      />
+      <KPICard title="Test KPI" value={100} icon="📊" color="danger" />
     );
 
     // Check for red color classes
@@ -86,13 +64,7 @@ describe('KPICard', () => {
   });
 
   it('formats numeric values with locale', () => {
-    render(
-      <KPICard
-        title="Test KPI"
-        value={1000000}
-        icon="📊"
-      />
-    );
+    render(<KPICard title="Test KPI" value={1000000} icon="📊" />);
 
     // Should format with commas
     expect(screen.getByText('1,000,000')).toBeInTheDocument();

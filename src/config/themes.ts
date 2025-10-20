@@ -3,45 +3,45 @@
  * Defines theme interface and preset themes for the application
  */
 
-export type ThemeDensity = 'compact' | 'comfortable' | 'spacious'
-export type AnimationSpeed = 'slow' | 'normal' | 'fast'
+export type ThemeDensity = 'compact' | 'comfortable' | 'spacious';
+export type AnimationSpeed = 'slow' | 'normal' | 'fast';
 
 export interface Theme {
-  id: string
-  name: string
-  description: string
+  id: string;
+  name: string;
+  description: string;
   colors: {
-    primary: string
-    secondary: string
-    accent: string
-    background: string
-    foreground: string
-    muted: string
-    mutedForeground: string
-    border: string
-    card: string
-    cardForeground: string
-    success: string
-    warning: string
-    error: string
-    info: string
-  }
+    primary: string;
+    secondary: string;
+    accent: string;
+    background: string;
+    foreground: string;
+    muted: string;
+    mutedForeground: string;
+    border: string;
+    card: string;
+    cardForeground: string;
+    success: string;
+    warning: string;
+    error: string;
+    info: string;
+  };
   fonts: {
-    family: string
+    family: string;
     size: {
-      base: string
-      sm: string
-      lg: string
-      xl: string
-    }
-  }
+      base: string;
+      sm: string;
+      lg: string;
+      xl: string;
+    };
+  };
   spacing: {
-    density: ThemeDensity
-  }
+    density: ThemeDensity;
+  };
   animations: {
-    enabled: boolean
-    speed: AnimationSpeed
-  }
+    enabled: boolean;
+    speed: AnimationSpeed;
+  };
 }
 
 export const PRESET_THEMES: Theme[] = [
@@ -267,7 +267,7 @@ export const PRESET_THEMES: Theme[] = [
       speed: 'normal',
     },
   },
-]
+];
 
 export const FONT_FAMILIES = [
   { value: 'Inter, system-ui, sans-serif', label: 'Inter (Default)' },
@@ -276,13 +276,13 @@ export const FONT_FAMILIES = [
   { value: '"Courier New", monospace', label: 'Courier New' },
   { value: 'Arial, sans-serif', label: 'Arial' },
   { value: '"Times New Roman", serif', label: 'Times New Roman' },
-]
+];
 
 export const ANIMATION_SPEEDS = {
   slow: '300ms',
   normal: '200ms',
   fast: '100ms',
-}
+};
 
 export const DENSITY_SPACING = {
   compact: {
@@ -300,4 +300,4 @@ export const DENSITY_SPACING = {
     gap: '1.5rem',
     fontSize: '1.125rem',
   },
-}
+};

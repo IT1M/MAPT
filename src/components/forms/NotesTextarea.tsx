@@ -1,17 +1,17 @@
-'use client'
+'use client';
 
-import React, { useRef, useEffect } from 'react'
+import React, { useRef, useEffect } from 'react';
 
 interface NotesTextareaProps {
-  value: string
-  onChange: (value: string) => void
-  label?: string
-  placeholder?: string
-  error?: string
-  helperText?: string
-  maxLength?: number
-  id?: string
-  name?: string
+  value: string;
+  onChange: (value: string) => void;
+  label?: string;
+  placeholder?: string;
+  error?: string;
+  helperText?: string;
+  maxLength?: number;
+  id?: string;
+  name?: string;
 }
 
 export function NotesTextarea({
@@ -25,38 +25,39 @@ export function NotesTextarea({
   id,
   name,
 }: NotesTextareaProps) {
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
-  const textareaId = id || `textarea-${Math.random().toString(36).substr(2, 9)}`
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const textareaId =
+    id || `textarea-${Math.random().toString(36).substr(2, 9)}`;
 
-  const charCount = value.length
-  const remaining = maxLength - charCount
+  const charCount = value.length;
+  const remaining = maxLength - charCount;
 
   // Auto-expand textarea height
   useEffect(() => {
-    const textarea = textareaRef.current
+    const textarea = textareaRef.current;
     if (textarea) {
       // Reset height to auto to get the correct scrollHeight
-      textarea.style.height = 'auto'
+      textarea.style.height = 'auto';
       // Set height to scrollHeight to fit content
-      textarea.style.height = `${textarea.scrollHeight}px`
+      textarea.style.height = `${textarea.scrollHeight}px`;
     }
-  }, [value])
+  }, [value]);
 
   const baseStyles =
-    'w-full px-3 py-2 border rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-1 resize-none overflow-hidden min-h-[44px]'
+    'w-full px-3 py-2 border rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-1 resize-none overflow-hidden min-h-[44px]';
 
   const normalStyles =
-    'border-gray-300 focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-primary-400'
+    'border-gray-300 focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-primary-400';
 
   const errorStyles =
-    'border-danger-500 focus:border-danger-500 focus:ring-danger-500 dark:border-danger-400'
+    'border-danger-500 focus:border-danger-500 focus:ring-danger-500 dark:border-danger-400';
 
-  const textareaClassName = `${baseStyles} ${error ? errorStyles : normalStyles}`
-  
+  const textareaClassName = `${baseStyles} ${error ? errorStyles : normalStyles}`;
+
   // Prevent zoom on iOS by setting font-size to 16px
   const textareaStyle = {
     fontSize: '16px',
-  }
+  };
 
   return (
     <div className="w-full">
@@ -78,7 +79,7 @@ export function NotesTextarea({
           onChange={(e) => {
             // Enforce max length
             if (e.target.value.length <= maxLength) {
-              onChange(e.target.value)
+              onChange(e.target.value);
             }
           }}
           placeholder={placeholder}
@@ -91,8 +92,8 @@ export function NotesTextarea({
             error
               ? `${textareaId}-error`
               : helperText
-              ? `${textareaId}-helper`
-              : undefined
+                ? `${textareaId}-helper`
+                : undefined
           }
         />
         {error && (
@@ -157,8 +158,8 @@ export function NotesTextarea({
               remaining < 0
                 ? 'text-danger-600 dark:text-danger-400'
                 : remaining < 50
-                ? 'text-yellow-600 dark:text-yellow-400'
-                : 'text-gray-500 dark:text-gray-400'
+                  ? 'text-yellow-600 dark:text-yellow-400'
+                  : 'text-gray-500 dark:text-gray-400'
             }`}
             aria-live="polite"
             aria-label={`${remaining} characters remaining`}
@@ -168,5 +169,5 @@ export function NotesTextarea({
         </div>
       </div>
     </div>
-  )
+  );
 }

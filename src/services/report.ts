@@ -5,7 +5,12 @@
 
 import { prisma } from './prisma';
 import { geminiService } from './gemini';
-import { ReportType, ReportFormat, ReportStatus, ScheduleFrequency } from '@prisma/client';
+import {
+  ReportType,
+  ReportFormat,
+  ReportStatus,
+  ScheduleFrequency,
+} from '@prisma/client';
 import fs from 'fs/promises';
 import path from 'path';
 import ExcelJS from 'exceljs';
@@ -129,7 +134,9 @@ export class ReportService {
       });
       console.log('[ReportService] Email transporter initialized');
     } else {
-      console.warn('[ReportService] Email configuration incomplete, email features disabled');
+      console.warn(
+        '[ReportService] Email configuration incomplete, email features disabled'
+      );
     }
   }
 
@@ -143,7 +150,9 @@ export class ReportService {
         this.scheduleReport(schedule.id, schedule);
       }
 
-      console.log(`[ReportService] Loaded ${schedules.length} scheduled reports`);
+      console.log(
+        `[ReportService] Loaded ${schedules.length} scheduled reports`
+      );
     } catch (error) {
       console.error('[ReportService] Error loading scheduled reports:', error);
     }
@@ -264,9 +273,16 @@ export class ReportService {
 
     // Calculate statistics
     const totalItems = inventoryItems.length;
-    const totalQuantity = inventoryItems.reduce((sum, item) => sum + item.quantity, 0);
-    const rejectCount = inventoryItems.reduce((sum, item) => sum + item.reject, 0);
-    const rejectRate = totalQuantity > 0 ? (rejectCount / totalQuantity) * 100 : 0;
+    const totalQuantity = inventoryItems.reduce(
+      (sum, item) => sum + item.quantity,
+      0
+    );
+    const rejectCount = inventoryItems.reduce(
+      (sum, item) => sum + item.reject,
+      0
+    );
+    const rejectRate =
+      totalQuantity > 0 ? (rejectCount / totalQuantity) * 100 : 0;
 
     // Destination breakdown
     const destinationBreakdown: Record<string, number> = {};
@@ -279,7 +295,8 @@ export class ReportService {
     const categoryBreakdown: Record<string, number> = {};
     inventoryItems.forEach((item) => {
       if (item.category) {
-        categoryBreakdown[item.category] = (categoryBreakdown[item.category] || 0) + 1;
+        categoryBreakdown[item.category] =
+          (categoryBreakdown[item.category] || 0) + 1;
       }
     });
 
@@ -308,7 +325,10 @@ export class ReportService {
     return reportData;
   }
 
-  private async fetchUserActivity(dateRange: { from: Date; to: Date }): Promise<any[]> {
+  private async fetchUserActivity(dateRange: {
+    from: Date;
+    to: Date;
+  }): Promise<any[]> {
     const auditLogs = await prisma.auditLog.findMany({
       where: {
         timestamp: {
@@ -343,13 +363,19 @@ export class ReportService {
 
       const activity = userActivityMap.get(userId)!;
       activity.totalActions++;
-      activity.actionBreakdown[log.action] = (activity.actionBreakdown[log.action] || 0) + 1;
+      activity.actionBreakdown[log.action] =
+        (activity.actionBreakdown[log.action] || 0) + 1;
     });
 
-    return Array.from(userActivityMap.values()).sort((a, b) => b.totalActions - a.totalActions);
+    return Array.from(userActivityMap.values()).sort(
+      (a, b) => b.totalActions - a.totalActions
+    );
   }
 
-  private async fetchAuditTrail(dateRange: { from: Date; to: Date }): Promise<any[]> {
+  private async fetchAuditTrail(dateRange: {
+    from: Date;
+    to: Date;
+  }): Promise<any[]> {
     return await prisma.auditLog.findMany({
       where: {
         timestamp: {
@@ -384,16 +410,20 @@ export class ReportService {
     const inventoryTrend = this.calculateInventoryTrend(inventoryItems);
 
     // Destination pie chart data
-    const destinationPie = Object.entries(statistics.destinationBreakdown).map(([name, value]) => ({
-      name,
-      value,
-    }));
+    const destinationPie = Object.entries(statistics.destinationBreakdown).map(
+      ([name, value]) => ({
+        name,
+        value,
+      })
+    );
 
     // Category bar chart data
-    const categoryBar = Object.entries(statistics.categoryBreakdown).map(([name, value]) => ({
-      name,
-      value,
-    }));
+    const categoryBar = Object.entries(statistics.categoryBreakdown).map(
+      ([name, value]) => ({
+        name,
+        value,
+      })
+    );
 
     // Reject rate over time
     const rejectRate = this.calculateRejectRateTrend(inventoryItems);
@@ -407,7 +437,10 @@ export class ReportService {
   }
 
   private calculateInventoryTrend(items: any[]): any[] {
-    const trendMap = new Map<string, { date: string; quantity: number; count: number }>();
+    const trendMap = new Map<
+      string,
+      { date: string; quantity: number; count: number }
+    >();
 
     items.forEach((item) => {
       const dateKey = item.createdAt.toISOString().split('T')[0];
@@ -419,11 +452,16 @@ export class ReportService {
       trend.count += 1;
     });
 
-    return Array.from(trendMap.values()).sort((a, b) => a.date.localeCompare(b.date));
+    return Array.from(trendMap.values()).sort((a, b) =>
+      a.date.localeCompare(b.date)
+    );
   }
 
   private calculateRejectRateTrend(items: any[]): any[] {
-    const trendMap = new Map<string, { date: string; rejectRate: number; count: number }>();
+    const trendMap = new Map<
+      string,
+      { date: string; rejectRate: number; count: number }
+    >();
 
     items.forEach((item) => {
       const dateKey = item.createdAt.toISOString().split('T')[0];
@@ -432,11 +470,14 @@ export class ReportService {
       }
       const trend = trendMap.get(dateKey)!;
       const rate = item.quantity > 0 ? (item.reject / item.quantity) * 100 : 0;
-      trend.rejectRate = (trend.rejectRate * trend.count + rate) / (trend.count + 1);
+      trend.rejectRate =
+        (trend.rejectRate * trend.count + rate) / (trend.count + 1);
       trend.count += 1;
     });
 
-    return Array.from(trendMap.values()).sort((a, b) => a.date.localeCompare(b.date));
+    return Array.from(trendMap.values()).sort((a, b) =>
+      a.date.localeCompare(b.date)
+    );
   }
 
   // ============================================================================
@@ -446,7 +487,9 @@ export class ReportService {
   async getAIInsights(reportData: ReportData): Promise<AIInsights> {
     try {
       if (!geminiService.isAvailable()) {
-        console.warn('[ReportService] Gemini AI not available, using fallback insights');
+        console.warn(
+          '[ReportService] Gemini AI not available, using fallback insights'
+        );
         return this.getFallbackInsights(reportData);
       }
 
@@ -473,7 +516,9 @@ ${Object.entries(statistics.categoryBreakdown)
 Top Items:
 ${inventoryItems
   .slice(0, 10)
-  .map((item) => `- ${item.itemName}: ${item.quantity} units (${item.destination})`)
+  .map(
+    (item) => `- ${item.itemName}: ${item.quantity} units (${item.destination})`
+  )
   .join('\n')}
 
 Provide:
@@ -517,8 +562,12 @@ Return ONLY a valid JSON object with this exact structure:
 
     // Analyze reject rate
     if (statistics.rejectRate > 5) {
-      trends.push(`High reject rate of ${statistics.rejectRate.toFixed(2)}% observed`);
-      recommendations.push('Review quality control processes to reduce reject rate');
+      trends.push(
+        `High reject rate of ${statistics.rejectRate.toFixed(2)}% observed`
+      );
+      recommendations.push(
+        'Review quality control processes to reduce reject rate'
+      );
     } else if (statistics.rejectRate < 2) {
       trends.push('Low reject rate indicates effective quality control');
     }
@@ -526,23 +575,33 @@ Return ONLY a valid JSON object with this exact structure:
     // Analyze destination distribution
     const destinations = Object.entries(statistics.destinationBreakdown);
     if (destinations.length > 0) {
-      const [topDest, topQty] = destinations.reduce((a, b) => (a[1] > b[1] ? a : b));
+      const [topDest, topQty] = destinations.reduce((a, b) =>
+        a[1] > b[1] ? a : b
+      );
       trends.push(`${topDest} is the primary destination with ${topQty} units`);
 
       const distribution = destinations.map(([_, qty]) => qty);
       const maxDist = Math.max(...distribution);
       const minDist = Math.min(...distribution);
       if (maxDist / minDist > 3) {
-        anomalies.push('Significant imbalance in destination distribution detected');
-        recommendations.push('Consider balancing inventory distribution across destinations');
+        anomalies.push(
+          'Significant imbalance in destination distribution detected'
+        );
+        recommendations.push(
+          'Consider balancing inventory distribution across destinations'
+        );
       }
     }
 
     // Analyze categories
     const categories = Object.entries(statistics.categoryBreakdown);
     if (categories.length > 0) {
-      const [topCat, topCount] = categories.reduce((a, b) => (a[1] > b[1] ? a : b));
-      trends.push(`${topCat} is the most common category with ${topCount} items`);
+      const [topCat, topCount] = categories.reduce((a, b) =>
+        a[1] > b[1] ? a : b
+      );
+      trends.push(
+        `${topCat} is the most common category with ${topCount} items`
+      );
     }
 
     // General predictions
@@ -551,7 +610,10 @@ Return ONLY a valid JSON object with this exact structure:
 
     return {
       trends: trends.length > 0 ? trends : ['Inventory patterns appear stable'],
-      anomalies: anomalies.length > 0 ? anomalies : ['No significant anomalies detected'],
+      anomalies:
+        anomalies.length > 0
+          ? anomalies
+          : ['No significant anomalies detected'],
       recommendations:
         recommendations.length > 0
           ? recommendations
@@ -564,7 +626,10 @@ Return ONLY a valid JSON object with this exact structure:
   // PDF Generation (Simplified - using plain text format)
   // ============================================================================
 
-  async generatePDF(reportData: ReportData, config: ReportConfig): Promise<string> {
+  async generatePDF(
+    reportData: ReportData,
+    config: ReportConfig
+  ): Promise<string> {
     const { statistics, aiInsights } = reportData;
 
     // Create a simple text-based PDF content
@@ -591,7 +656,10 @@ DESTINATION BREAKDOWN
 ${'-'.repeat(80)}
 
 ${Object.entries(statistics.destinationBreakdown)
-  .map(([dest, qty]) => `${dest}: ${qty} units (${((qty / statistics.totalQuantity) * 100).toFixed(2)}%)`)
+  .map(
+    ([dest, qty]) =>
+      `${dest}: ${qty} units (${((qty / statistics.totalQuantity) * 100).toFixed(2)}%)`
+  )
   .join('\n')}
 
 ${'-'.repeat(80)}
@@ -632,7 +700,8 @@ ${'-'.repeat(80)}
 `;
 
     // Save to file
-    const reportsDir = process.env.REPORT_STORAGE_PATH || path.join(process.cwd(), 'reports');
+    const reportsDir =
+      process.env.REPORT_STORAGE_PATH || path.join(process.cwd(), 'reports');
     await fs.mkdir(reportsDir, { recursive: true });
 
     const filename = `report-${Date.now()}.txt`;
@@ -648,7 +717,10 @@ ${'-'.repeat(80)}
   // Excel Generation
   // ============================================================================
 
-  async generateExcel(reportData: ReportData, config: ReportConfig): Promise<string> {
+  async generateExcel(
+    reportData: ReportData,
+    config: ReportConfig
+  ): Promise<string> {
     const { inventoryItems, statistics, aiInsights } = reportData;
 
     const workbook = new ExcelJS.Workbook();
@@ -769,7 +841,8 @@ ${'-'.repeat(80)}
     }
 
     // Save to file
-    const reportsDir = process.env.REPORT_STORAGE_PATH || path.join(process.cwd(), 'reports');
+    const reportsDir =
+      process.env.REPORT_STORAGE_PATH || path.join(process.cwd(), 'reports');
     await fs.mkdir(reportsDir, { recursive: true });
 
     const filename = `report-${Date.now()}.xlsx`;
@@ -785,7 +858,10 @@ ${'-'.repeat(80)}
   // PowerPoint Generation
   // ============================================================================
 
-  async generatePPTX(reportData: ReportData, config: ReportConfig): Promise<string> {
+  async generatePPTX(
+    reportData: ReportData,
+    config: ReportConfig
+  ): Promise<string> {
     const { statistics, aiInsights } = reportData;
 
     const pres = new pptxgen();
@@ -862,11 +938,13 @@ ${'-'.repeat(80)}
 
       const destData: any[] = [
         ['Destination', 'Quantity', 'Percentage'],
-        ...Object.entries(statistics.destinationBreakdown).map(([dest, qty]) => [
-          dest,
-          qty.toString(),
-          `${((qty / statistics.totalQuantity) * 100).toFixed(2)}%`,
-        ]),
+        ...Object.entries(statistics.destinationBreakdown).map(
+          ([dest, qty]) => [
+            dest,
+            qty.toString(),
+            `${((qty / statistics.totalQuantity) * 100).toFixed(2)}%`,
+          ]
+        ),
       ];
 
       destSlide.addTable(destData as any, {
@@ -959,7 +1037,8 @@ ${'-'.repeat(80)}
     }
 
     // Save to file
-    const reportsDir = process.env.REPORT_STORAGE_PATH || path.join(process.cwd(), 'reports');
+    const reportsDir =
+      process.env.REPORT_STORAGE_PATH || path.join(process.cwd(), 'reports');
     await fs.mkdir(reportsDir, { recursive: true });
 
     const filename = `report-${Date.now()}.pptx`;
@@ -982,7 +1061,10 @@ ${'-'.repeat(80)}
     message: string
   ): Promise<void> {
     if (!this.emailTransporter) {
-      throw new ReportError('Email service not configured', 'EMAIL_NOT_CONFIGURED');
+      throw new ReportError(
+        'Email service not configured',
+        'EMAIL_NOT_CONFIGURED'
+      );
     }
 
     try {
@@ -1025,7 +1107,9 @@ ${'-'.repeat(80)}
       };
 
       await this.emailTransporter.sendMail(mailOptions);
-      console.log(`[ReportService] Report ${reportId} emailed to ${recipients.length} recipients`);
+      console.log(
+        `[ReportService] Report ${reportId} emailed to ${recipients.length} recipients`
+      );
     } catch (error) {
       console.error('[ReportService] Error emailing report:', error);
       throw new ReportError(
@@ -1070,7 +1154,9 @@ ${'-'.repeat(80)}
         cronExpression = `${minutes} ${hours} 1 1 *`; // January 1st
         break;
       default:
-        console.error(`[ReportService] Invalid frequency: ${schedule.frequency}`);
+        console.error(
+          `[ReportService] Invalid frequency: ${schedule.frequency}`
+        );
         return;
     }
 
@@ -1078,7 +1164,9 @@ ${'-'.repeat(80)}
       const task = cron.schedule(
         cronExpression,
         async () => {
-          console.log(`[ReportService] Executing scheduled report: ${schedule.name}`);
+          console.log(
+            `[ReportService] Executing scheduled report: ${schedule.name}`
+          );
           await this.executeScheduledReport(scheduleId);
         },
         {
@@ -1091,7 +1179,10 @@ ${'-'.repeat(80)}
         `[ReportService] Scheduled report "${schedule.name}" with cron: ${cronExpression}`
       );
     } catch (error) {
-      console.error(`[ReportService] Error scheduling report ${scheduleId}:`, error);
+      console.error(
+        `[ReportService] Error scheduling report ${scheduleId}:`,
+        error
+      );
     }
   }
 
@@ -1102,17 +1193,26 @@ ${'-'.repeat(80)}
       });
 
       if (!schedule || !schedule.enabled) {
-        throw new ReportError('Schedule not found or disabled', 'SCHEDULE_NOT_FOUND');
+        throw new ReportError(
+          'Schedule not found or disabled',
+          'SCHEDULE_NOT_FOUND'
+        );
       }
 
       // Parse config from JSON
       const config: ReportConfig = schedule.config as any;
 
       // Update date range to current period based on frequency
-      config.dateRange = this.calculateDateRangeForFrequency(schedule.frequency);
+      config.dateRange = this.calculateDateRangeForFrequency(
+        schedule.frequency
+      );
 
       // Generate report
-      const reportId = await this.generateReport(config, schedule.createdBy, undefined);
+      const reportId = await this.generateReport(
+        config,
+        schedule.createdBy,
+        undefined
+      );
 
       // Update schedule last run and next run
       const nextRun = this.calculateNextRun(schedule.frequency, schedule.time);
@@ -1126,7 +1226,9 @@ ${'-'.repeat(80)}
 
       // Email to recipients
       if (schedule.recipients.length > 0) {
-        const report = await prisma.report.findUnique({ where: { id: reportId } });
+        const report = await prisma.report.findUnique({
+          where: { id: reportId },
+        });
         if (report) {
           await this.emailReport(
             reportId,
@@ -1137,20 +1239,28 @@ ${'-'.repeat(80)}
         }
       }
 
-      console.log(`[ReportService] Scheduled report ${scheduleId} executed successfully`);
+      console.log(
+        `[ReportService] Scheduled report ${scheduleId} executed successfully`
+      );
       return reportId;
     } catch (error) {
-      console.error(`[ReportService] Error executing scheduled report ${scheduleId}:`, error);
+      console.error(
+        `[ReportService] Error executing scheduled report ${scheduleId}:`,
+        error
+      );
       throw new ReportError(
-        error instanceof Error ? error.message : 'Failed to execute scheduled report',
+        error instanceof Error
+          ? error.message
+          : 'Failed to execute scheduled report',
         'SCHEDULE_EXECUTION_FAILED'
       );
     }
   }
 
-  private calculateDateRangeForFrequency(
-    frequency: ScheduleFrequency
-  ): { from: Date; to: Date } {
+  private calculateDateRangeForFrequency(frequency: ScheduleFrequency): {
+    from: Date;
+    to: Date;
+  } {
     const now = new Date();
     const to = new Date(now);
     let from = new Date(now);
@@ -1251,7 +1361,10 @@ ${'-'.repeat(80)}
         await fs.unlink(report.filePath);
       }
     } catch (error) {
-      console.warn(`[ReportService] Could not delete file ${report.filePath}:`, error);
+      console.warn(
+        `[ReportService] Could not delete file ${report.filePath}:`,
+        error
+      );
     }
 
     // Delete database record

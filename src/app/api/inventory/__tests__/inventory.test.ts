@@ -1,10 +1,10 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { NextRequest } from 'next/server'
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { NextRequest } from 'next/server';
 
 // Mock dependencies
 vi.mock('@/services/auth', () => ({
   auth: vi.fn(),
-}))
+}));
 
 vi.mock('@/services/prisma', () => ({
   prisma: {
@@ -17,7 +17,7 @@ vi.mock('@/services/prisma', () => ({
       create: vi.fn(),
     },
   },
-}))
+}));
 
 vi.mock('@/utils/constants', () => ({
   DEFAULT_PAGE_SIZE: 20,
@@ -28,17 +28,17 @@ vi.mock('@/utils/constants', () => ({
     MANAGER: ['inventory:read'],
     AUDITOR: ['inventory:read'],
   },
-}))
+}));
 
-import { auth } from '@/services/auth'
-import { prisma } from '@/services/prisma'
-import { GET, POST } from '../route'
+import { auth } from '@/services/auth';
+import { prisma } from '@/services/prisma';
+import { GET, POST } from '../route';
 
 describe('Inventory API Routes', () => {
   describe('GET /api/inventory', () => {
     beforeEach(() => {
-      vi.clearAllMocks()
-    })
+      vi.clearAllMocks();
+    });
 
     it('should return paginated inventory items', async () => {
       const mockSession = {
@@ -48,7 +48,7 @@ describe('Inventory API Routes', () => {
           role: 'MANAGER',
           permissions: ['inventory:read'],
         },
-      }
+      };
 
       const mockItems = [
         {
@@ -64,22 +64,26 @@ describe('Inventory API Routes', () => {
             email: 'test@example.com',
           },
         },
-      ]
+      ];
 
-      vi.mocked(auth).mockResolvedValue(mockSession as any)
-      vi.mocked(prisma.inventoryItem.count).mockResolvedValue(1)
-      vi.mocked(prisma.inventoryItem.findMany).mockResolvedValue(mockItems as any)
+      vi.mocked(auth).mockResolvedValue(mockSession as any);
+      vi.mocked(prisma.inventoryItem.count).mockResolvedValue(1);
+      vi.mocked(prisma.inventoryItem.findMany).mockResolvedValue(
+        mockItems as any
+      );
 
-      const request = new NextRequest('http://localhost:3000/api/inventory?page=1&limit=50')
+      const request = new NextRequest(
+        'http://localhost:3000/api/inventory?page=1&limit=50'
+      );
 
-      const response = await GET(request)
-      const data = await response.json()
+      const response = await GET(request);
+      const data = await response.json();
 
-      expect(response.status).toBe(200)
-      expect(data.success).toBe(true)
-      expect(data.data.items).toHaveLength(1)
-      expect(data.data.pagination.total).toBe(1)
-    })
+      expect(response.status).toBe(200);
+      expect(data.success).toBe(true);
+      expect(data.data.items).toHaveLength(1);
+      expect(data.data.pagination.total).toBe(1);
+    });
 
     it('should filter by search term', async () => {
       const mockSession = {
@@ -88,15 +92,17 @@ describe('Inventory API Routes', () => {
           role: 'MANAGER',
           permissions: ['inventory:read'],
         },
-      }
+      };
 
-      vi.mocked(auth).mockResolvedValue(mockSession as any)
-      vi.mocked(prisma.inventoryItem.count).mockResolvedValue(0)
-      vi.mocked(prisma.inventoryItem.findMany).mockResolvedValue([])
+      vi.mocked(auth).mockResolvedValue(mockSession as any);
+      vi.mocked(prisma.inventoryItem.count).mockResolvedValue(0);
+      vi.mocked(prisma.inventoryItem.findMany).mockResolvedValue([]);
 
-      const request = new NextRequest('http://localhost:3000/api/inventory?search=medical')
+      const request = new NextRequest(
+        'http://localhost:3000/api/inventory?search=medical'
+      );
 
-      await GET(request)
+      await GET(request);
 
       expect(prisma.inventoryItem.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -110,8 +116,8 @@ describe('Inventory API Routes', () => {
             ]),
           }),
         })
-      )
-    })
+      );
+    });
 
     it('should filter by destination', async () => {
       const mockSession = {
@@ -120,15 +126,17 @@ describe('Inventory API Routes', () => {
           role: 'MANAGER',
           permissions: ['inventory:read'],
         },
-      }
+      };
 
-      vi.mocked(auth).mockResolvedValue(mockSession as any)
-      vi.mocked(prisma.inventoryItem.count).mockResolvedValue(0)
-      vi.mocked(prisma.inventoryItem.findMany).mockResolvedValue([])
+      vi.mocked(auth).mockResolvedValue(mockSession as any);
+      vi.mocked(prisma.inventoryItem.count).mockResolvedValue(0);
+      vi.mocked(prisma.inventoryItem.findMany).mockResolvedValue([]);
 
-      const request = new NextRequest('http://localhost:3000/api/inventory?destination=MAIS')
+      const request = new NextRequest(
+        'http://localhost:3000/api/inventory?destination=MAIS'
+      );
 
-      await GET(request)
+      await GET(request);
 
       expect(prisma.inventoryItem.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -136,8 +144,8 @@ describe('Inventory API Routes', () => {
             destination: 'MAIS',
           }),
         })
-      )
-    })
+      );
+    });
 
     it('should apply role-based filtering for DATA_ENTRY users', async () => {
       const mockSession = {
@@ -146,15 +154,15 @@ describe('Inventory API Routes', () => {
           role: 'DATA_ENTRY',
           permissions: ['inventory:read'],
         },
-      }
+      };
 
-      vi.mocked(auth).mockResolvedValue(mockSession as any)
-      vi.mocked(prisma.inventoryItem.count).mockResolvedValue(0)
-      vi.mocked(prisma.inventoryItem.findMany).mockResolvedValue([])
+      vi.mocked(auth).mockResolvedValue(mockSession as any);
+      vi.mocked(prisma.inventoryItem.count).mockResolvedValue(0);
+      vi.mocked(prisma.inventoryItem.findMany).mockResolvedValue([]);
 
-      const request = new NextRequest('http://localhost:3000/api/inventory')
+      const request = new NextRequest('http://localhost:3000/api/inventory');
 
-      await GET(request)
+      await GET(request);
 
       expect(prisma.inventoryItem.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -162,20 +170,20 @@ describe('Inventory API Routes', () => {
             enteredById: 'user-123',
           }),
         })
-      )
-    })
+      );
+    });
 
     it('should reject unauthenticated request', async () => {
-      vi.mocked(auth).mockResolvedValue(null)
+      vi.mocked(auth).mockResolvedValue(null);
 
-      const request = new NextRequest('http://localhost:3000/api/inventory')
+      const request = new NextRequest('http://localhost:3000/api/inventory');
 
-      const response = await GET(request)
-      const data = await response.json()
+      const response = await GET(request);
+      const data = await response.json();
 
-      expect(response.status).toBe(401)
-      expect(data.success).toBe(false)
-    })
+      expect(response.status).toBe(401);
+      expect(data.success).toBe(false);
+    });
 
     it('should reject request without permissions', async () => {
       const mockSession = {
@@ -183,24 +191,24 @@ describe('Inventory API Routes', () => {
           id: 'user-123',
           permissions: [],
         },
-      }
+      };
 
-      vi.mocked(auth).mockResolvedValue(mockSession as any)
+      vi.mocked(auth).mockResolvedValue(mockSession as any);
 
-      const request = new NextRequest('http://localhost:3000/api/inventory')
+      const request = new NextRequest('http://localhost:3000/api/inventory');
 
-      const response = await GET(request)
-      const data = await response.json()
+      const response = await GET(request);
+      const data = await response.json();
 
-      expect(response.status).toBe(403)
-      expect(data.success).toBe(false)
-    })
-  })
+      expect(response.status).toBe(403);
+      expect(data.success).toBe(false);
+    });
+  });
 
   describe('POST /api/inventory', () => {
     beforeEach(() => {
-      vi.clearAllMocks()
-    })
+      vi.clearAllMocks();
+    });
 
     it('should create inventory item successfully', async () => {
       const mockSession = {
@@ -209,7 +217,7 @@ describe('Inventory API Routes', () => {
           email: 'test@example.com',
           permissions: ['inventory:write'],
         },
-      }
+      };
 
       const mockItem = {
         id: 'item-1',
@@ -224,11 +232,11 @@ describe('Inventory API Routes', () => {
           name: 'John Doe',
           email: 'test@example.com',
         },
-      }
+      };
 
-      vi.mocked(auth).mockResolvedValue(mockSession as any)
-      vi.mocked(prisma.inventoryItem.create).mockResolvedValue(mockItem as any)
-      vi.mocked(prisma.auditLog.create).mockResolvedValue({} as any)
+      vi.mocked(auth).mockResolvedValue(mockSession as any);
+      vi.mocked(prisma.inventoryItem.create).mockResolvedValue(mockItem as any);
+      vi.mocked(prisma.auditLog.create).mockResolvedValue({} as any);
 
       const request = new NextRequest('http://localhost:3000/api/inventory', {
         method: 'POST',
@@ -239,22 +247,22 @@ describe('Inventory API Routes', () => {
           reject: 5,
           destination: 'MAIS',
         }),
-      })
+      });
 
-      const response = await POST(request)
-      const data = await response.json()
+      const response = await POST(request);
+      const data = await response.json();
 
-      expect(response.status).toBe(201)
-      expect(data.success).toBe(true)
-      expect(data.data.itemName).toBe('Medical Supplies')
+      expect(response.status).toBe(201);
+      expect(data.success).toBe(true);
+      expect(data.data.itemName).toBe('Medical Supplies');
       expect(prisma.inventoryItem.create).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({
             enteredById: 'user-123',
           }),
         })
-      )
-    })
+      );
+    });
 
     it('should reject invalid data', async () => {
       const mockSession = {
@@ -262,9 +270,9 @@ describe('Inventory API Routes', () => {
           id: 'user-123',
           permissions: ['inventory:write'],
         },
-      }
+      };
 
-      vi.mocked(auth).mockResolvedValue(mockSession as any)
+      vi.mocked(auth).mockResolvedValue(mockSession as any);
 
       const request = new NextRequest('http://localhost:3000/api/inventory', {
         method: 'POST',
@@ -274,14 +282,14 @@ describe('Inventory API Routes', () => {
           quantity: -10,
           destination: 'MAIS',
         }),
-      })
+      });
 
-      const response = await POST(request)
-      const data = await response.json()
+      const response = await POST(request);
+      const data = await response.json();
 
-      expect(response.status).toBe(400)
-      expect(data.success).toBe(false)
-    })
+      expect(response.status).toBe(400);
+      expect(data.success).toBe(false);
+    });
 
     it('should sanitize string inputs', async () => {
       const mockSession = {
@@ -289,7 +297,7 @@ describe('Inventory API Routes', () => {
           id: 'user-123',
           permissions: ['inventory:write'],
         },
-      }
+      };
 
       const mockItem = {
         id: 'item-1',
@@ -304,11 +312,11 @@ describe('Inventory API Routes', () => {
           name: 'John Doe',
           email: 'test@example.com',
         },
-      }
+      };
 
-      vi.mocked(auth).mockResolvedValue(mockSession as any)
-      vi.mocked(prisma.inventoryItem.create).mockResolvedValue(mockItem as any)
-      vi.mocked(prisma.auditLog.create).mockResolvedValue({} as any)
+      vi.mocked(auth).mockResolvedValue(mockSession as any);
+      vi.mocked(prisma.inventoryItem.create).mockResolvedValue(mockItem as any);
+      vi.mocked(prisma.auditLog.create).mockResolvedValue({} as any);
 
       const request = new NextRequest('http://localhost:3000/api/inventory', {
         method: 'POST',
@@ -318,14 +326,14 @@ describe('Inventory API Routes', () => {
           quantity: 100,
           destination: 'MAIS',
         }),
-      })
+      });
 
-      const response = await POST(request)
-      const data = await response.json()
+      const response = await POST(request);
+      const data = await response.json();
 
-      expect(response.status).toBe(201)
-      expect(data.data.itemName).toBe('Medical Supplies')
-    })
+      expect(response.status).toBe(201);
+      expect(data.data.itemName).toBe('Medical Supplies');
+    });
 
     it('should create audit log entry', async () => {
       const mockSession = {
@@ -333,7 +341,7 @@ describe('Inventory API Routes', () => {
           id: 'user-123',
           permissions: ['inventory:write'],
         },
-      }
+      };
 
       const mockItem = {
         id: 'item-1',
@@ -348,11 +356,11 @@ describe('Inventory API Routes', () => {
           name: 'John Doe',
           email: 'test@example.com',
         },
-      }
+      };
 
-      vi.mocked(auth).mockResolvedValue(mockSession as any)
-      vi.mocked(prisma.inventoryItem.create).mockResolvedValue(mockItem as any)
-      vi.mocked(prisma.auditLog.create).mockResolvedValue({} as any)
+      vi.mocked(auth).mockResolvedValue(mockSession as any);
+      vi.mocked(prisma.inventoryItem.create).mockResolvedValue(mockItem as any);
+      vi.mocked(prisma.auditLog.create).mockResolvedValue({} as any);
 
       const request = new NextRequest('http://localhost:3000/api/inventory', {
         method: 'POST',
@@ -362,11 +370,11 @@ describe('Inventory API Routes', () => {
           quantity: 100,
           destination: 'MAIS',
         }),
-      })
+      });
 
-      await POST(request)
+      await POST(request);
 
-      expect(prisma.auditLog.create).toHaveBeenCalled()
-    })
-  })
-})
+      expect(prisma.auditLog.create).toHaveBeenCalled();
+    });
+  });
+});

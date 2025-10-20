@@ -1,5 +1,5 @@
-import { z } from 'zod'
-import { UserRole, Destination } from '@prisma/client'
+import { z } from 'zod';
+import { UserRole, Destination } from '@prisma/client';
 
 // ============================================================================
 // Profile Validation Schemas
@@ -18,7 +18,7 @@ export const profileSchema = z.object({
     .optional()
     .or(z.literal('')),
   workLocation: z.string().optional(),
-})
+});
 
 export const passwordChangeSchema = z
   .object({
@@ -37,17 +37,20 @@ export const passwordChangeSchema = z
   .refine((data) => data.newPassword === data.confirmPassword, {
     message: 'Passwords do not match',
     path: ['confirmPassword'],
-  })
+  });
 
 export const avatarUploadSchema = z.object({
   file: z
     .instanceof(File)
-    .refine((file) => file.size <= 5 * 1024 * 1024, 'File size must be less than 5MB')
+    .refine(
+      (file) => file.size <= 5 * 1024 * 1024,
+      'File size must be less than 5MB'
+    )
     .refine(
       (file) => ['image/jpeg', 'image/png', 'image/webp'].includes(file.type),
       'File must be a JPEG, PNG, or WebP image'
     ),
-})
+});
 
 // ============================================================================
 // User Management Validation Schemas
@@ -80,7 +83,7 @@ export const userFormSchema = z.object({
     .optional()
     .or(z.literal('')),
   workLocation: z.string().optional(),
-})
+});
 
 export const bulkUserActionSchema = z.object({
   action: z.enum(['activate', 'deactivate', 'changeRole', 'delete']),
@@ -90,7 +93,7 @@ export const bulkUserActionSchema = z.object({
       role: z.nativeEnum(UserRole).optional(),
     })
     .optional(),
-})
+});
 
 // ============================================================================
 // Preferences Validation Schemas
@@ -125,7 +128,7 @@ export const userPreferencesSchema = z.object({
   sidebarCollapsed: z.boolean(),
   sidebarPosition: z.enum(['left', 'right']),
   showBreadcrumbs: z.boolean(),
-})
+});
 
 export const notificationPreferencesSchema = z.object({
   email: z.object({
@@ -142,7 +145,7 @@ export const notificationPreferencesSchema = z.object({
     desktop: z.boolean(),
   }),
   frequency: z.enum(['realtime', 'hourly', 'daily', 'custom']),
-})
+});
 
 // ============================================================================
 // System Configuration Validation Schemas
@@ -153,7 +156,7 @@ export const companyInfoSchema = z.object({
   logo: z.string().url('Invalid logo URL').optional(),
   fiscalYearStart: z.number().min(1).max(12),
   timezone: z.string().min(1, 'Timezone is required'),
-})
+});
 
 export const inventorySettingsSchema = z.object({
   defaultDestination: z.nativeEnum(Destination).nullable(),
@@ -163,14 +166,18 @@ export const inventorySettingsSchema = z.object({
   batchNumberPattern: z.string().optional(),
   supervisorApproval: z.boolean(),
   approvalThreshold: z.number().min(0).optional(),
-})
+});
 
 export const backupConfigSchema = z.object({
   enabled: z.boolean(),
-  time: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Invalid time format (HH:mm)'),
+  time: z
+    .string()
+    .regex(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Invalid time format (HH:mm)'),
   retentionDays: z.number().min(1).max(365),
-  format: z.array(z.enum(['CSV', 'JSON', 'SQL'])).min(1, 'At least one format must be selected'),
-})
+  format: z
+    .array(z.enum(['CSV', 'JSON', 'SQL']))
+    .min(1, 'At least one format must be selected'),
+});
 
 export const systemLimitsSchema = z.object({
   maxItemsPerUserPerDay: z
@@ -193,7 +200,7 @@ export const systemLimitsSchema = z.object({
     .number()
     .min(10, 'Must be at least 10')
     .max(1000, 'Must not exceed 1000'),
-})
+});
 
 export const geminiConfigSchema = z.object({
   apiKey: z.string().min(1, 'API key is required'),
@@ -206,7 +213,7 @@ export const geminiConfigSchema = z.object({
     predictiveAnalytics: z.boolean(),
     naturalLanguageQueries: z.boolean(),
   }),
-})
+});
 
 export const developerSettingsSchema = z.object({
   debugMode: z.boolean(),
@@ -215,54 +222,54 @@ export const developerSettingsSchema = z.object({
     perMinute: z.number().min(1),
     perHour: z.number().min(1),
   }),
-})
+});
 
 // ============================================================================
 // Validation Helper Functions
 // ============================================================================
 
 export function validateProfile(data: unknown) {
-  return profileSchema.safeParse(data)
+  return profileSchema.safeParse(data);
 }
 
 export function validatePasswordChange(data: unknown) {
-  return passwordChangeSchema.safeParse(data)
+  return passwordChangeSchema.safeParse(data);
 }
 
 export function validateUserForm(data: unknown) {
-  return userFormSchema.safeParse(data)
+  return userFormSchema.safeParse(data);
 }
 
 export function validateUserPreferences(data: unknown) {
-  return userPreferencesSchema.safeParse(data)
+  return userPreferencesSchema.safeParse(data);
 }
 
 export function validateNotificationPreferences(data: unknown) {
-  return notificationPreferencesSchema.safeParse(data)
+  return notificationPreferencesSchema.safeParse(data);
 }
 
 export function validateCompanyInfo(data: unknown) {
-  return companyInfoSchema.safeParse(data)
+  return companyInfoSchema.safeParse(data);
 }
 
 export function validateInventorySettings(data: unknown) {
-  return inventorySettingsSchema.safeParse(data)
+  return inventorySettingsSchema.safeParse(data);
 }
 
 export function validateBackupConfig(data: unknown) {
-  return backupConfigSchema.safeParse(data)
+  return backupConfigSchema.safeParse(data);
 }
 
 export function validateSystemLimits(data: unknown) {
-  return systemLimitsSchema.safeParse(data)
+  return systemLimitsSchema.safeParse(data);
 }
 
 export function validateGeminiConfig(data: unknown) {
-  return geminiConfigSchema.safeParse(data)
+  return geminiConfigSchema.safeParse(data);
 }
 
 export function validateDeveloperSettings(data: unknown) {
-  return developerSettingsSchema.safeParse(data)
+  return developerSettingsSchema.safeParse(data);
 }
 
 // ============================================================================
@@ -270,57 +277,59 @@ export function validateDeveloperSettings(data: unknown) {
 // ============================================================================
 
 export interface PasswordStrengthResult {
-  score: number // 0-4
-  feedback: string[]
-  warning?: string
+  score: number; // 0-4
+  feedback: string[];
+  warning?: string;
 }
 
-export function calculatePasswordStrength(password: string): PasswordStrengthResult {
-  let score = 0
-  const feedback: string[] = []
+export function calculatePasswordStrength(
+  password: string
+): PasswordStrengthResult {
+  let score = 0;
+  const feedback: string[] = [];
 
   // Length check
-  if (password.length >= 8) score++
-  if (password.length >= 12) score++
-  if (password.length >= 16) score++
+  if (password.length >= 8) score++;
+  if (password.length >= 12) score++;
+  if (password.length >= 16) score++;
 
   // Character variety
   if (/[a-z]/.test(password) && /[A-Z]/.test(password)) {
-    score++
-    feedback.push('Good: Mixed case letters')
+    score++;
+    feedback.push('Good: Mixed case letters');
   } else {
-    feedback.push('Add both uppercase and lowercase letters')
+    feedback.push('Add both uppercase and lowercase letters');
   }
 
   if (/[0-9]/.test(password)) {
-    feedback.push('Good: Contains numbers')
+    feedback.push('Good: Contains numbers');
   } else {
-    feedback.push('Add numbers')
+    feedback.push('Add numbers');
   }
 
   if (/[^A-Za-z0-9]/.test(password)) {
-    score++
-    feedback.push('Good: Contains special characters')
+    score++;
+    feedback.push('Good: Contains special characters');
   } else {
-    feedback.push('Add special characters')
+    feedback.push('Add special characters');
   }
 
   // Common patterns check
-  const commonPatterns = ['123', 'abc', 'password', 'qwerty', '111']
-  const lowerPassword = password.toLowerCase()
+  const commonPatterns = ['123', 'abc', 'password', 'qwerty', '111'];
+  const lowerPassword = password.toLowerCase();
   for (const pattern of commonPatterns) {
     if (lowerPassword.includes(pattern)) {
-      score = Math.max(0, score - 1)
+      score = Math.max(0, score - 1);
       return {
         score: Math.min(4, score),
         feedback,
         warning: 'Avoid common patterns',
-      }
+      };
     }
   }
 
   return {
     score: Math.min(4, score),
     feedback,
-  }
+  };
 }

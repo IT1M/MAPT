@@ -52,10 +52,10 @@ console.log('\n🎨 Checking icons...');
 const iconsDir = path.join(__dirname, '..', 'public', 'icons');
 const requiredSizes = [72, 96, 128, 144, 152, 192, 384, 512];
 if (fs.existsSync(iconsDir)) {
-  const icons = fs.readdirSync(iconsDir).filter(f => f.endsWith('.png'));
+  const icons = fs.readdirSync(iconsDir).filter((f) => f.endsWith('.png'));
   console.log(`  ✅ Icons directory exists with ${icons.length} icons`);
-  
-  requiredSizes.forEach(size => {
+
+  requiredSizes.forEach((size) => {
     const iconFile = `icon-${size}.png`;
     if (icons.includes(iconFile)) {
       console.log(`  ✅ ${iconFile} found`);
@@ -76,10 +76,10 @@ const components = [
   'src/components/pwa/InstallPrompt.tsx',
   'src/components/pwa/PWAProvider.tsx',
   'src/components/pwa/PWAStatus.tsx',
-  'src/components/pwa/index.ts'
+  'src/components/pwa/index.ts',
 ];
 
-components.forEach(comp => {
+components.forEach((comp) => {
   const compPath = path.join(__dirname, '..', comp);
   if (fs.existsSync(compPath)) {
     console.log(`  ✅ ${path.basename(comp)} exists`);
@@ -94,10 +94,10 @@ console.log('\n🛠️  Checking PWA utilities...');
 const utilities = [
   'src/lib/offline-queue.ts',
   'src/lib/pwa-register.ts',
-  'src/hooks/usePWA.ts'
+  'src/hooks/usePWA.ts',
 ];
 
-utilities.forEach(util => {
+utilities.forEach((util) => {
   const utilPath = path.join(__dirname, '..', util);
   if (fs.existsSync(utilPath)) {
     console.log(`  ✅ ${path.basename(util)} exists`);
@@ -109,7 +109,14 @@ utilities.forEach(util => {
 
 // Check offline page
 console.log('\n📱 Checking offline page...');
-const offlinePage = path.join(__dirname, '..', 'src', 'app', 'offline', 'page.tsx');
+const offlinePage = path.join(
+  __dirname,
+  '..',
+  'src',
+  'app',
+  'offline',
+  'page.tsx'
+);
 if (fs.existsSync(offlinePage)) {
   console.log('  ✅ Offline page exists');
 } else {

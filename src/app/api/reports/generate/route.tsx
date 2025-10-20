@@ -1,20 +1,20 @@
-import { NextRequest } from 'next/server'
-import { reportService, ReportConfig } from '@/services/report'
-import { checkAuth } from '@/middleware/auth'
-import { 
-  successResponse, 
+import { NextRequest } from 'next/server';
+import { reportService, ReportConfig } from '@/services/report';
+import { checkAuth } from '@/middleware/auth';
+import {
+  successResponse,
   handleApiError,
   insufficientPermissionsError,
-  validationError 
-} from '@/utils/api-response'
-import { z } from 'zod'
-import { ReportType, ReportFormat } from '@prisma/client'
+  validationError,
+} from '@/utils/api-response';
+import { z } from 'zod';
+import { ReportType, ReportFormat } from '@prisma/client';
 
 /**
  * POST /api/reports/generate
- * 
+ *
  * Generate a new report
- * 
+ *
  * Body:
  * - type: ReportType
  * - dateRange: { from: Date, to: Date }
@@ -22,33 +22,41 @@ import { ReportType, ReportFormat } from '@prisma/client'
  * - format: ReportFormat
  * - customization: object with report options
  * - email: optional email settings
- * 
+ *
  * Requirements: 21, 22
  */
 export async function POST(request: NextRequest) {
   try {
     // Check authentication
-    const authResult = await checkAuth()
+    const authResult = await checkAuth();
     if ('error' in authResult) {
-      return authResult.error
+      return authResult.error;
     }
 
-    const { context } = authResult
+    const { context } = authResult;
 
     // Check permissions (ADMIN, MANAGER can generate reports)
-    const allowedRoles = ['ADMIN', 'MANAGER']
+    const allowedRoles = ['ADMIN', 'MANAGER'];
     if (!allowedRoles.includes(context.user.role)) {
-      return insufficientPermissionsError('Permission to generate reports required')
+      return insufficientPermissionsError(
+        'Permission to generate reports required'
+      );
     }
 
     // Parse request body
-    const body = await request.json()
+    const body = await request.json();
 
     const configSchema = z.object({
       type: z.nativeEnum(ReportType),
       dateRange: z.object({
-        from: z.string().datetime().transform(str => new Date(str)),
-        to: z.string().datetime().transform(str => new Date(str)),
+        from: z
+          .string()
+          .datetime()
+          .transform((str) => new Date(str)),
+        to: z
+          .string()
+          .datetime()
+          .transform((str) => new Date(str)),
       }),
       content: z.object({
         summary: z.boolean().default(true),
@@ -70,25 +78,27 @@ export async function POST(request: NextRequest) {
         paperSize: z.enum(['a4', 'letter']).default('a4'),
         orientation: z.enum(['portrait', 'landscape']).default('portrait'),
       }),
-      email: z.object({
-        enabled: z.boolean(),
-        recipients: z.array(z.string().email()),
-        subject: z.string(),
-        message: z.string(),
-      }).optional(),
-    })
+      email: z
+        .object({
+          enabled: z.boolean(),
+          recipients: z.array(z.string().email()),
+          subject: z.string(),
+          message: z.string(),
+        })
+        .optional(),
+    });
 
-    const configResult = configSchema.safeParse(body)
+    const configResult = configSchema.safeParse(body);
 
     if (!configResult.success) {
-      return handleApiError(configResult.error)
+      return handleApiError(configResult.error);
     }
 
-    const config: ReportConfig = configResult.data as any
+    const config: ReportConfig = configResult.data as any;
 
     // Validate date range
     if (config.dateRange.from >= config.dateRange.to) {
-      return validationError('Start date must be before end date')
+      return validationError('Start date must be before end date');
     }
 
     // Generate report
@@ -96,7 +106,7 @@ export async function POST(request: NextRequest) {
       config,
       context.user.id,
       undefined // No progress callback for API
-    )
+    );
 
     return successResponse(
       {
@@ -106,8 +116,8 @@ export async function POST(request: NextRequest) {
       },
       'Report generated successfully',
       201
-    )
+    );
   } catch (error) {
-    return handleApiError(error)
+    return handleApiError(error);
   }
 }

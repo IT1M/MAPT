@@ -1,13 +1,13 @@
-import { Header } from '@/components/layout/header'
-import { Sidebar } from '@/components/layout/sidebar'
-import { Navigation } from '@/components/layout/navigation'
-import { GlobalKeyboardShortcutsProvider } from '@/components/providers/GlobalKeyboardShortcutsProvider'
-import { PageErrorBoundary } from '@/components/shared/ErrorBoundary'
+import { Header } from '@/components/layout/header';
+import { Sidebar } from '@/components/layout/sidebar';
+import { Navigation } from '@/components/layout/navigation';
+import { GlobalKeyboardShortcutsProvider } from '@/components/providers/GlobalKeyboardShortcutsProvider';
+import { PageErrorBoundary } from '@/components/shared/ErrorBoundary';
 
 export default function DashboardLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <GlobalKeyboardShortcutsProvider>
@@ -16,15 +16,15 @@ export default function DashboardLayout({
           <div className="flex h-screen overflow-hidden">
             {/* Sidebar */}
             <Sidebar />
-            
+
             {/* Main content area */}
             <div className="flex flex-1 flex-col overflow-hidden">
               {/* Header */}
               <Header />
-              
+
               {/* Navigation */}
               <Navigation />
-              
+
               {/* Page content */}
               <main className="flex-1 overflow-y-auto bg-muted/30 p-4 md:p-6 lg:p-8">
                 {children}
@@ -34,5 +34,5 @@ export default function DashboardLayout({
         </div>
       </PageErrorBoundary>
     </GlobalKeyboardShortcutsProvider>
-  )
+  );
 }

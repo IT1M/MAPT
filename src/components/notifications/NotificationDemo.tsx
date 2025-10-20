@@ -1,23 +1,23 @@
-'use client'
+'use client';
 
-import { useNotifications } from '@/context/NotificationContext'
-import { useTranslations } from '@/hooks/useTranslations'
+import { useNotifications } from '@/context/NotificationContext';
+import { useTranslations } from '@/hooks/useTranslations';
 
 /**
  * Demo component to test the notification system
  * This can be temporarily added to any page to test notifications
  */
 export function NotificationDemo() {
-  const { addNotification } = useNotifications()
-  const t = useTranslations()
+  const { addNotification } = useNotifications();
+  const t = useTranslations();
 
   const addInfoNotification = () => {
     addNotification({
       type: 'info',
       title: 'Information',
       message: 'This is an informational notification',
-    })
-  }
+    });
+  };
 
   const addSuccessNotification = () => {
     addNotification({
@@ -25,9 +25,9 @@ export function NotificationDemo() {
       title: 'Success!',
       message: 'Your item has been saved successfully',
       actionUrl: '/en/data-log',
-      actionLabel: 'View in Data Log'
-    })
-  }
+      actionLabel: 'View in Data Log',
+    });
+  };
 
   const addWarningNotification = () => {
     addNotification({
@@ -35,17 +35,17 @@ export function NotificationDemo() {
       title: 'Warning',
       message: 'High reject rate detected for batch #12345',
       actionUrl: '/en/analytics',
-      actionLabel: 'View Analytics'
-    })
-  }
+      actionLabel: 'View Analytics',
+    });
+  };
 
   const addErrorNotification = () => {
     addNotification({
       type: 'error',
       title: 'Error',
       message: 'Failed to generate report. Please try again.',
-    })
-  }
+    });
+  };
 
   return (
     <div className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow">
@@ -53,7 +53,8 @@ export function NotificationDemo() {
         Notification System Demo
       </h2>
       <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-        Click the buttons below to test different notification types. Check the bell icon in the header.
+        Click the buttons below to test different notification types. Check the
+        bell icon in the header.
       </p>
       <div className="flex flex-wrap gap-3">
         <button
@@ -82,5 +83,5 @@ export function NotificationDemo() {
         </button>
       </div>
     </div>
-  )
+  );
 }

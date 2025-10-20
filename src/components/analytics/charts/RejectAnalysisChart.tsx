@@ -40,7 +40,9 @@ export const RejectAnalysisChart: React.FC<RejectAnalysisChartProps> = ({
   onExport,
 }) => {
   const t = useTranslations('analytics');
-  const [viewMode, setViewMode] = useState<'absolute' | 'percentage'>(initialViewMode);
+  const [viewMode, setViewMode] = useState<'absolute' | 'percentage'>(
+    initialViewMode
+  );
 
   const handleViewModeChange = (mode: 'absolute' | 'percentage') => {
     setViewMode(mode);
@@ -55,12 +57,20 @@ export const RejectAnalysisChart: React.FC<RejectAnalysisChartProps> = ({
     } else if (format === 'csv') {
       const csv = [
         ['Date', 'Accepted', 'Rejected', 'Reject Rate (%)'],
-        ...data.map((d) => [d.date, d.accepted, d.rejected, d.rejectRate.toFixed(2)]),
+        ...data.map((d) => [
+          d.date,
+          d.accepted,
+          d.rejected,
+          d.rejectRate.toFixed(2),
+        ]),
       ]
         .map((row) => row.join(','))
         .join('\n');
 
-      downloadCSV(csv, `reject-analysis-${new Date().toISOString().split('T')[0]}.csv`);
+      downloadCSV(
+        csv,
+        `reject-analysis-${new Date().toISOString().split('T')[0]}.csv`
+      );
     }
   };
 
@@ -156,7 +166,10 @@ export const RejectAnalysisChart: React.FC<RejectAnalysisChartProps> = ({
 
         {/* Chart */}
         <ResponsiveContainer width="100%" height={400}>
-          <AreaChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+          <AreaChart
+            data={data}
+            margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+          >
             <defs>
               <linearGradient id="acceptedGradient" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#10b981" stopOpacity={0.8} />
@@ -167,14 +180,22 @@ export const RejectAnalysisChart: React.FC<RejectAnalysisChartProps> = ({
                 <stop offset="95%" stopColor="#ef4444" stopOpacity={0.1} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" className="dark:stroke-gray-700" />
+            <CartesianGrid
+              strokeDasharray="3 3"
+              stroke="#e5e7eb"
+              className="dark:stroke-gray-700"
+            />
             <XAxis
               dataKey="date"
               stroke="#6b7280"
               className="dark:stroke-gray-400"
               tick={{ fontSize: 12 }}
             />
-            <YAxis stroke="#6b7280" className="dark:stroke-gray-400" tick={{ fontSize: 12 }} />
+            <YAxis
+              stroke="#6b7280"
+              className="dark:stroke-gray-400"
+              tick={{ fontSize: 12 }}
+            />
             <Tooltip
               contentStyle={{
                 backgroundColor: 'rgba(255, 255, 255, 0.95)',
@@ -199,14 +220,22 @@ export const RejectAnalysisChart: React.FC<RejectAnalysisChartProps> = ({
                   y={5}
                   stroke="#10b981"
                   strokeDasharray="3 3"
-                  label={{ value: 'Safe (5%)', position: 'right', fill: '#10b981' }}
+                  label={{
+                    value: 'Safe (5%)',
+                    position: 'right',
+                    fill: '#10b981',
+                  }}
                 />
                 {/* Warning zone: 5-10% */}
                 <ReferenceLine
                   y={10}
                   stroke="#f59e0b"
                   strokeDasharray="3 3"
-                  label={{ value: 'Warning (10%)', position: 'right', fill: '#f59e0b' }}
+                  label={{
+                    value: 'Warning (10%)',
+                    position: 'right',
+                    fill: '#f59e0b',
+                  }}
                 />
               </>
             )}

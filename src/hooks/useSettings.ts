@@ -1,16 +1,16 @@
-import { useState, useEffect, useCallback } from 'react'
-import type { SystemConfiguration } from '@/types/settings'
+import { useState, useEffect, useCallback } from 'react';
+import type { SystemConfiguration } from '@/types/settings';
 
 interface UseSettingsOptions {
-  category?: string
+  category?: string;
 }
 
 interface UseSettingsReturn<T = any> {
-  settings: T | null
-  updateSettings: (updates: Partial<T>) => Promise<void>
-  isLoading: boolean
-  error: string | null
-  refetch: () => Promise<void>
+  settings: T | null;
+  updateSettings: (updates: Partial<T>) => Promise<void>;
+  isLoading: boolean;
+  error: string | null;
+  refetch: () => Promise<void>;
 }
 
 /**
@@ -21,52 +21,52 @@ interface UseSettingsReturn<T = any> {
 export function useSettings<T = SystemConfiguration>(
   options: UseSettingsOptions = {}
 ): UseSettingsReturn<T> {
-  const [settings, setSettings] = useState<T | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [settings, setSettings] = useState<T | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchSettings = useCallback(async () => {
     try {
-      setIsLoading(true)
-      setError(null)
+      setIsLoading(true);
+      setError(null);
 
-      const params = new URLSearchParams()
+      const params = new URLSearchParams();
       if (options.category) {
-        params.append('category', options.category)
+        params.append('category', options.category);
       }
 
-      const url = `/api/settings${params.toString() ? `?${params.toString()}` : ''}`
-      const response = await fetch(url)
+      const url = `/api/settings${params.toString() ? `?${params.toString()}` : ''}`;
+      const response = await fetch(url);
 
       if (!response.ok) {
-        throw new Error('Failed to fetch settings')
+        throw new Error('Failed to fetch settings');
       }
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (data.success && data.data) {
-        setSettings(data.data)
+        setSettings(data.data);
       }
     } catch (err) {
-      console.error('Error fetching settings:', err)
-      setError(err instanceof Error ? err.message : 'Failed to load settings')
+      console.error('Error fetching settings:', err);
+      setError(err instanceof Error ? err.message : 'Failed to load settings');
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }, [options.category])
+  }, [options.category]);
 
   // Fetch settings on mount
   useEffect(() => {
-    fetchSettings()
-  }, [fetchSettings])
+    fetchSettings();
+  }, [fetchSettings]);
 
   const updateSettings = useCallback(
     async (updates: Partial<T>) => {
       try {
-        setError(null)
+        setError(null);
 
         // Optimistically update local state
-        setSettings((prev) => (prev ? { ...prev, ...updates } : null))
+        setSettings((prev) => (prev ? { ...prev, ...updates } : null));
 
         const response = await fetch('/api/settings', {
           method: 'PATCH',
@@ -80,27 +80,29 @@ export function useSettings<T = SystemConfiguration>(
               category: options.category || 'general',
             })),
           }),
-        })
+        });
 
         if (!response.ok) {
-          throw new Error('Failed to update settings')
+          throw new Error('Failed to update settings');
         }
 
-        const data = await response.json()
+        const data = await response.json();
 
         if (data.success && data.data) {
-          setSettings(data.data)
+          setSettings(data.data);
         }
       } catch (err) {
-        console.error('Error updating settings:', err)
-        setError(err instanceof Error ? err.message : 'Failed to update settings')
+        console.error('Error updating settings:', err);
+        setError(
+          err instanceof Error ? err.message : 'Failed to update settings'
+        );
         // Revert optimistic update by refetching
-        await fetchSettings()
-        throw err
+        await fetchSettings();
+        throw err;
       }
     },
     [options.category, fetchSettings]
-  )
+  );
 
   return {
     settings,
@@ -108,5 +110,5 @@ export function useSettings<T = SystemConfiguration>(
     isLoading,
     error,
     refetch: fetchSettings,
-  }
+  };
 }

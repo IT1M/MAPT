@@ -1,17 +1,17 @@
-'use client'
+'use client';
 
-import React from 'react'
-import { UserRole } from '@prisma/client'
-import { UserWithStatus } from './UserTable'
+import React from 'react';
+import { UserRole } from '@prisma/client';
+import { UserWithStatus } from './UserTable';
 
 interface UserTableMobileCardProps {
-  user: UserWithStatus
-  isSelected: boolean
-  isCurrentUser: boolean
-  onSelect: (checked: boolean) => void
-  onEdit: () => void
-  onDelete: () => void
-  onToggleStatus: (active: boolean) => void
+  user: UserWithStatus;
+  isSelected: boolean;
+  isCurrentUser: boolean;
+  onSelect: (checked: boolean) => void;
+  onEdit: () => void;
+  onDelete: () => void;
+  onToggleStatus: (active: boolean) => void;
 }
 
 export function UserTableMobileCard({
@@ -26,30 +26,30 @@ export function UserTableMobileCard({
   const getRoleBadgeColor = (role: UserRole) => {
     switch (role) {
       case UserRole.ADMIN:
-        return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200'
+        return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200';
       case UserRole.SUPERVISOR:
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
+        return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
       case UserRole.MANAGER:
-        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
       case UserRole.DATA_ENTRY:
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
       case UserRole.AUDITOR:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200';
       default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200';
     }
-  }
+  };
 
   const formatDate = (date?: Date) => {
-    if (!date) return 'Never'
+    if (!date) return 'Never';
     return new Intl.DateTimeFormat('en-US', {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
-    }).format(new Date(date))
-  }
+    }).format(new Date(date));
+  };
 
   return (
     <div
@@ -57,8 +57,8 @@ export function UserTableMobileCard({
         isCurrentUser
           ? 'bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800'
           : isSelected
-          ? 'bg-gray-50 border-gray-300 dark:bg-gray-800 dark:border-gray-600'
-          : 'bg-white border-gray-200 dark:bg-gray-900 dark:border-gray-700'
+            ? 'bg-gray-50 border-gray-300 dark:bg-gray-800 dark:border-gray-600'
+            : 'bg-white border-gray-200 dark:bg-gray-900 dark:border-gray-700'
       } ${!user.isActive ? 'opacity-60' : ''}`}
       role="article"
       aria-label={`User card for ${user.name}`}
@@ -85,14 +85,18 @@ export function UserTableMobileCard({
               </span>
             )}
           </h3>
-          <p className="text-sm text-gray-600 dark:text-gray-400 truncate">{user.email}</p>
+          <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
+            {user.email}
+          </p>
         </div>
       </div>
 
       {/* Details */}
       <div className="space-y-2 pl-16">
         <div className="flex items-center justify-between">
-          <span className="text-sm text-gray-600 dark:text-gray-400">Role:</span>
+          <span className="text-sm text-gray-600 dark:text-gray-400">
+            Role:
+          </span>
           <span
             className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getRoleBadgeColor(
               user.role
@@ -103,7 +107,9 @@ export function UserTableMobileCard({
         </div>
 
         <div className="flex items-center justify-between">
-          <span className="text-sm text-gray-600 dark:text-gray-400">Status:</span>
+          <span className="text-sm text-gray-600 dark:text-gray-400">
+            Status:
+          </span>
           <button
             onClick={() => onToggleStatus(!user.isActive)}
             disabled={isCurrentUser}
@@ -124,7 +130,9 @@ export function UserTableMobileCard({
         </div>
 
         <div className="flex items-center justify-between">
-          <span className="text-sm text-gray-600 dark:text-gray-400">Last Login:</span>
+          <span className="text-sm text-gray-600 dark:text-gray-400">
+            Last Login:
+          </span>
           <span className="text-sm text-gray-900 dark:text-gray-100">
             {formatDate(user.lastLogin)}
           </span>
@@ -150,5 +158,5 @@ export function UserTableMobileCard({
         </button>
       </div>
     </div>
-  )
+  );
 }

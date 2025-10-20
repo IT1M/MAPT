@@ -12,16 +12,23 @@ export default function AuditDashboardPage() {
   const [entries, setEntries] = useState([]);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [pagination, setPagination] = useState({ page: 1, limit: 50, total: 0, totalPages: 0 });
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 50,
+    total: 0,
+    totalPages: 0,
+  });
   const [filters, setFilters] = useState<any>({});
 
   // Check authorization
   useEffect(() => {
     if (status === 'loading') return;
-    
+
     if (!session) {
-      const locale = typeof window !== 'undefined' ? 
-        document.documentElement.lang || 'en' : 'en'
+      const locale =
+        typeof window !== 'undefined'
+          ? document.documentElement.lang || 'en'
+          : 'en';
       router.push(`/${locale}/login`);
       return;
     }
@@ -36,7 +43,7 @@ export default function AuditDashboardPage() {
   // Fetch audit logs
   useEffect(() => {
     if (!session) return;
-    
+
     fetchAuditLogs();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session, pagination.page, filters]);
@@ -49,11 +56,13 @@ export default function AuditDashboardPage() {
         limit: pagination.limit.toString(),
       });
 
-      if (filters.dateFrom) params.append('dateFrom', filters.dateFrom.toISOString());
+      if (filters.dateFrom)
+        params.append('dateFrom', filters.dateFrom.toISOString());
       if (filters.dateTo) params.append('dateTo', filters.dateTo.toISOString());
       if (filters.userIds) params.append('userIds', filters.userIds.join(','));
       if (filters.actions) params.append('actions', filters.actions.join(','));
-      if (filters.entityTypes) params.append('entityTypes', filters.entityTypes.join(','));
+      if (filters.entityTypes)
+        params.append('entityTypes', filters.entityTypes.join(','));
       if (filters.search) params.append('search', filters.search);
 
       const response = await fetch(`/api/audit/logs?${params}`);
@@ -61,7 +70,7 @@ export default function AuditDashboardPage() {
 
       if (data.success) {
         setEntries(data.data.entries);
-        setPagination(prev => ({ ...prev, ...data.data.pagination }));
+        setPagination((prev) => ({ ...prev, ...data.data.pagination }));
       }
     } catch (error) {
       console.error('Failed to fetch audit logs:', error);
@@ -100,11 +109,15 @@ export default function AuditDashboardPage() {
 
   const handleFilterChange = (newFilters: any) => {
     setFilters(newFilters);
-    setPagination(prev => ({ ...prev, page: 1 }));
+    setPagination((prev) => ({ ...prev, page: 1 }));
   };
 
   if (status === 'loading' || !session) {
-    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        Loading...
+      </div>
+    );
   }
 
   return (
@@ -130,7 +143,9 @@ export default function AuditDashboardPage() {
                 <AuditLogTable
                   entries={entries}
                   onViewDetails={handleViewDetails}
-                  onRevert={session.user.role === 'ADMIN' ? handleRevert : undefined}
+                  onRevert={
+                    session.user.role === 'ADMIN' ? handleRevert : undefined
+                  }
                   currentUserRole={session.user.role}
                 />
               </div>
@@ -139,18 +154,29 @@ export default function AuditDashboardPage() {
               {pagination.totalPages > 1 && (
                 <div className="mt-6 flex items-center justify-between">
                   <div className="text-sm text-gray-700">
-                    Showing page {pagination.page} of {pagination.totalPages} ({pagination.total} total entries)
+                    Showing page {pagination.page} of {pagination.totalPages} (
+                    {pagination.total} total entries)
                   </div>
                   <div className="flex space-x-2">
                     <button
-                      onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))}
+                      onClick={() =>
+                        setPagination((prev) => ({
+                          ...prev,
+                          page: prev.page - 1,
+                        }))
+                      }
                       disabled={pagination.page === 1}
                       className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Previous
                     </button>
                     <button
-                      onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
+                      onClick={() =>
+                        setPagination((prev) => ({
+                          ...prev,
+                          page: prev.page + 1,
+                        }))
+                      }
                       disabled={pagination.page === pagination.totalPages}
                       className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                     >

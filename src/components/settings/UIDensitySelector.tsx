@@ -1,41 +1,45 @@
-'use client'
+'use client';
 
-import React, { useEffect, useState } from 'react'
-import type { UIDensity } from '@/types/settings'
+import React, { useEffect, useState } from 'react';
+import type { UIDensity } from '@/types/settings';
 
 interface UISettings {
-  density: UIDensity
-  fontSize: number
+  density: UIDensity;
+  fontSize: number;
 }
 
 interface UIDensitySelectorProps {
-  density: UIDensity
-  fontSize: number
-  onChange: (settings: UISettings) => void
+  density: UIDensity;
+  fontSize: number;
+  onChange: (settings: UISettings) => void;
 }
 
-export function UIDensitySelector({ density, fontSize, onChange }: UIDensitySelectorProps) {
-  const [localFontSize, setLocalFontSize] = useState(fontSize)
+export function UIDensitySelector({
+  density,
+  fontSize,
+  onChange,
+}: UIDensitySelectorProps) {
+  const [localFontSize, setLocalFontSize] = useState(fontSize);
 
   // Update local state when prop changes
   useEffect(() => {
-    setLocalFontSize(fontSize)
-  }, [fontSize])
+    setLocalFontSize(fontSize);
+  }, [fontSize]);
 
   const handleDensityChange = (newDensity: UIDensity) => {
-    onChange({ density: newDensity, fontSize: localFontSize })
-  }
+    onChange({ density: newDensity, fontSize: localFontSize });
+  };
 
   const handleFontSizeChange = (newSize: number) => {
-    setLocalFontSize(newSize)
-    onChange({ density, fontSize: newSize })
-  }
+    setLocalFontSize(newSize);
+    onChange({ density, fontSize: newSize });
+  };
 
   const densityOptions: Array<{
-    value: UIDensity
-    label: string
-    description: string
-    spacing: string
+    value: UIDensity;
+    label: string;
+    description: string;
+    spacing: string;
   }> = [
     {
       value: 'compact',
@@ -55,14 +59,16 @@ export function UIDensitySelector({ density, fontSize, onChange }: UIDensitySele
       description: 'More breathing room',
       spacing: '12px',
     },
-  ]
+  ];
 
   return (
     <div className="space-y-6">
       {/* UI Density Section */}
       <div className="space-y-4">
         <div>
-          <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">UI Density</h3>
+          <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">
+            UI Density
+          </h3>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
             Adjust spacing and padding throughout the interface
           </p>
@@ -70,7 +76,7 @@ export function UIDensitySelector({ density, fontSize, onChange }: UIDensitySele
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {densityOptions.map((option) => {
-            const isSelected = density === option.value
+            const isSelected = density === option.value;
 
             return (
               <button
@@ -114,7 +120,12 @@ export function UIDensitySelector({ density, fontSize, onChange }: UIDensitySele
                       key={i}
                       className="bg-gray-300 dark:bg-gray-600 rounded"
                       style={{
-                        height: option.value === 'compact' ? '8px' : option.value === 'comfortable' ? '12px' : '16px',
+                        height:
+                          option.value === 'compact'
+                            ? '8px'
+                            : option.value === 'comfortable'
+                              ? '12px'
+                              : '16px',
                         marginBottom: option.spacing,
                       }}
                     />
@@ -123,11 +134,15 @@ export function UIDensitySelector({ density, fontSize, onChange }: UIDensitySele
 
                 {/* Label */}
                 <div className="text-left">
-                  <div className="font-medium text-gray-900 dark:text-gray-100">{option.label}</div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">{option.description}</div>
+                  <div className="font-medium text-gray-900 dark:text-gray-100">
+                    {option.label}
+                  </div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    {option.description}
+                  </div>
                 </div>
               </button>
-            )
+            );
           })}
         </div>
       </div>
@@ -135,7 +150,9 @@ export function UIDensitySelector({ density, fontSize, onChange }: UIDensitySele
       {/* Font Size Section */}
       <div className="space-y-4">
         <div>
-          <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">Font Size</h3>
+          <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">
+            Font Size
+          </h3>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
             Adjust text size for better readability
           </p>
@@ -144,7 +161,10 @@ export function UIDensitySelector({ density, fontSize, onChange }: UIDensitySele
         <div className="space-y-4">
           {/* Slider */}
           <div className="flex items-center gap-4">
-            <label htmlFor="font-size-slider" className="text-sm font-medium text-gray-700 dark:text-gray-300 min-w-[60px]">
+            <label
+              htmlFor="font-size-slider"
+              className="text-sm font-medium text-gray-700 dark:text-gray-300 min-w-[60px]"
+            >
               {localFontSize}px
             </label>
             <input
@@ -173,12 +193,15 @@ export function UIDensitySelector({ density, fontSize, onChange }: UIDensitySele
 
           {/* Live preview */}
           <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
-            <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">Preview:</div>
+            <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+              Preview:
+            </div>
             <p
               className="text-gray-900 dark:text-gray-100 transition-all duration-200"
               style={{ fontSize: `${localFontSize}px` }}
             >
-              The quick brown fox jumps over the lazy dog. This is how your text will appear with the selected font size.
+              The quick brown fox jumps over the lazy dog. This is how your text
+              will appear with the selected font size.
             </p>
           </div>
 
@@ -209,9 +232,10 @@ export function UIDensitySelector({ density, fontSize, onChange }: UIDensitySele
           />
         </svg>
         <span>
-          Changes apply immediately and affect all UI elements. Your preferences are saved automatically.
+          Changes apply immediately and affect all UI elements. Your preferences
+          are saved automatically.
         </span>
       </div>
     </div>
-  )
+  );
 }

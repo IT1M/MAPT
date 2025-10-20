@@ -1,33 +1,33 @@
-'use client'
+'use client';
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react';
 
 interface UserActivity {
-  date: string
-  count: number
+  date: string;
+  count: number;
 }
 
 export function UserActivityChart() {
-  const [data, setData] = useState<UserActivity[]>([])
-  const [loading, setLoading] = useState(true)
+  const [data, setData] = useState<UserActivity[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchUserActivity()
-  }, [])
+    fetchUserActivity();
+  }, []);
 
   const fetchUserActivity = async () => {
     try {
-      const response = await fetch('/api/dashboard/user-activity')
+      const response = await fetch('/api/dashboard/user-activity');
       if (response.ok) {
-        const activityData = await response.json()
-        setData(activityData)
+        const activityData = await response.json();
+        setData(activityData);
       }
     } catch (error) {
-      console.error('Failed to fetch user activity:', error)
+      console.error('Failed to fetch user activity:', error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   if (loading) {
     return (
@@ -35,10 +35,10 @@ export function UserActivityChart() {
         <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/3 mb-4"></div>
         <div className="h-64 bg-gray-200 dark:bg-gray-700 rounded"></div>
       </div>
-    )
+    );
   }
 
-  const maxCount = Math.max(...data.map(d => d.count), 1)
+  const maxCount = Math.max(...data.map((d) => d.count), 1);
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
@@ -52,15 +52,15 @@ export function UserActivityChart() {
           </p>
         ) : (
           data.map((item) => {
-            const percentage = (item.count / maxCount) * 100
+            const percentage = (item.count / maxCount) * 100;
             return (
               <div key={item.date} className="space-y-1">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-gray-700 dark:text-gray-300">
-                    {new Date(item.date).toLocaleDateString('en-US', { 
-                      weekday: 'short', 
-                      month: 'short', 
-                      day: 'numeric' 
+                    {new Date(item.date).toLocaleDateString('en-US', {
+                      weekday: 'short',
+                      month: 'short',
+                      day: 'numeric',
                     })}
                   </span>
                   <span className="font-medium text-gray-900 dark:text-white">
@@ -74,10 +74,10 @@ export function UserActivityChart() {
                   />
                 </div>
               </div>
-            )
+            );
           })
         )}
       </div>
     </div>
-  )
+  );
 }

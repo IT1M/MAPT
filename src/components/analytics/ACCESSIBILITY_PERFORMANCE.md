@@ -86,10 +86,11 @@ Charts load only when visible in viewport:
 import { LazyInventoryTrendChart } from '@/components/analytics';
 
 // Automatically lazy loads when scrolled into view
-<LazyInventoryTrendChart data={data} />
+<LazyInventoryTrendChart data={data} />;
 ```
 
 **Benefits:**
+
 - Reduces initial page load time by ~60%
 - Saves bandwidth for users who don't scroll to all charts
 - Improves Time to Interactive (TTI)
@@ -99,13 +100,15 @@ import { LazyInventoryTrendChart } from '@/components/analytics';
 Dynamic imports for chart components:
 
 ```tsx
-const LazyComponent = lazy(() => 
-  import('./charts/InventoryTrendChart')
-    .then(m => ({ default: m.InventoryTrendChart }))
+const LazyComponent = lazy(() =>
+  import('./charts/InventoryTrendChart').then((m) => ({
+    default: m.InventoryTrendChart,
+  }))
 );
 ```
 
 **Benefits:**
+
 - Smaller initial bundle size
 - Faster first contentful paint
 - Better caching strategy
@@ -126,6 +129,7 @@ const tableColumns = useMemo(() => [...], []);
 ```
 
 **Benefits:**
+
 - Prevents unnecessary recalculations
 - Reduces render time by ~30%
 - Improves responsiveness
@@ -143,6 +147,7 @@ const { data, loading, error } = useCachedData({
 ```
 
 **Benefits:**
+
 - Reduces API calls by ~80%
 - Faster subsequent page loads
 - Lower server load
@@ -160,6 +165,7 @@ useEffect(() => {
 ```
 
 **Benefits:**
+
 - Reduces API calls during rapid filter changes
 - Smoother user experience
 - Lower server load
@@ -175,6 +181,7 @@ Isolated error handling prevents cascade failures:
 ```
 
 **Benefits:**
+
 - One chart failure doesn't break entire dashboard
 - Graceful error recovery
 - Better user experience
@@ -184,14 +191,17 @@ Isolated error handling prevents cascade failures:
 Skeleton screens during data loading:
 
 ```tsx
-{loading ? (
-  <ChartSkeleton height={400} />
-) : (
-  <InventoryTrendChart data={data} />
-)}
+{
+  loading ? (
+    <ChartSkeleton height={400} />
+  ) : (
+    <InventoryTrendChart data={data} />
+  );
+}
 ```
 
 **Benefits:**
+
 - Perceived performance improvement
 - Reduces layout shift
 - Better user experience
@@ -214,10 +224,8 @@ import { LineChart } from 'recharts';
   title="My Chart"
   description="Chart showing data over time"
 >
-  <LineChart data={data}>
-    {/* chart configuration */}
-  </LineChart>
-</AccessibleChartWrapper>
+  <LineChart data={data}>{/* chart configuration */}</LineChart>
+</AccessibleChartWrapper>;
 ```
 
 ### Lazy Loaded Chart
@@ -226,11 +234,11 @@ import { LineChart } from 'recharts';
 import { LazyChart } from '@/components/analytics';
 
 <LazyChart
-  importFn={() => import('./MyChart').then(m => ({ default: m.MyChart }))}
+  importFn={() => import('./MyChart').then((m) => ({ default: m.MyChart }))}
   componentProps={{ data, onExport }}
   chartName="My Chart"
   skeletonHeight={400}
-/>
+/>;
 ```
 
 ### Error Boundary
@@ -238,14 +246,14 @@ import { LazyChart } from '@/components/analytics';
 ```tsx
 import { ChartErrorBoundary } from '@/components/analytics';
 
-<ChartErrorBoundary 
+<ChartErrorBoundary
   chartName="My Chart"
   onError={(error, errorInfo) => {
     console.error('Chart error:', error);
   }}
 >
   <MyChart data={data} />
-</ChartErrorBoundary>
+</ChartErrorBoundary>;
 ```
 
 ### Screen Reader Announcements

@@ -1,14 +1,14 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@/services/auth'
-import { prisma } from '@/services/prisma'
-import { createAuditLog } from '@/utils/audit'
-import sharp from 'sharp'
-import { writeFile, unlink, mkdir } from 'fs/promises'
-import { existsSync } from 'fs'
-import path from 'path'
+import { NextRequest, NextResponse } from 'next/server';
+import { auth } from '@/services/auth';
+import { prisma } from '@/services/prisma';
+import { createAuditLog } from '@/utils/audit';
+import sharp from 'sharp';
+import { writeFile, unlink, mkdir } from 'fs/promises';
+import { existsSync } from 'fs';
+import path from 'path';
 
-const UPLOAD_DIR = path.join(process.cwd(), 'public', 'uploads', 'avatars')
-const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
+const UPLOAD_DIR = path.join(process.cwd(), 'public', 'uploads', 'avatars');
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
 /**
  * POST /api/users/avatar
@@ -16,23 +16,29 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
  */
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth()
+    const session = await auth();
 
     if (!session?.user?.id) {
       return NextResponse.json(
-        { success: false, error: { code: 'AUTH_REQUIRED', message: 'Authentication required' } },
+        {
+          success: false,
+          error: { code: 'AUTH_REQUIRED', message: 'Authentication required' },
+        },
         { status: 401 }
-      )
+      );
     }
 
-    const formData = await request.formData()
-    const file = formData.get('avatar') as File
+    const formData = await request.formData();
+    const file = formData.get('avatar') as File;
 
     if (!file) {
       return NextResponse.json(
-        { success: false, error: { code: 'VALIDATION_ERROR', message: 'No file provided' } },
+        {
+          success: false,
+          error: { code: 'VALIDATION_ERROR', message: 'No file provided' },
+        },
         { status: 400 }
-      )
+      );
     }
 
     // Validate file type
@@ -40,10 +46,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: { code: 'VALIDATION_ERROR', message: 'Invalid file type. Only JPEG, PNG, and WebP are allowed' },
+          error: {
+            code: 'VALIDATION_ERROR',
+            message: 'Invalid file type. Only JPEG, PNG, and WebP are allowed',
+          },
         },
         { status: 400 }
-      )
+      );
     }
 
     // Validate file size
@@ -51,34 +60,37 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: { code: 'VALIDATION_ERROR', message: 'File size exceeds 5MB limit' },
+          error: {
+            code: 'VALIDATION_ERROR',
+            message: 'File size exceeds 5MB limit',
+          },
         },
         { status: 400 }
-      )
+      );
     }
 
     // Ensure upload directory exists
     if (!existsSync(UPLOAD_DIR)) {
-      await mkdir(UPLOAD_DIR, { recursive: true })
+      await mkdir(UPLOAD_DIR, { recursive: true });
     }
 
     // Get current user to check for existing avatar
     const currentUser = await prisma.user.findUnique({
       where: { id: session.user.id },
       select: { preferences: true },
-    })
+    });
 
-    const currentPreferences = (currentUser?.preferences as any) || {}
-    const oldAvatarPath = currentPreferences.avatar
+    const currentPreferences = (currentUser?.preferences as any) || {};
+    const oldAvatarPath = currentPreferences.avatar;
 
     // Generate unique filename
-    const timestamp = Date.now()
-    const filename = `${session.user.id}-${timestamp}.jpg`
-    const filepath = path.join(UPLOAD_DIR, filename)
+    const timestamp = Date.now();
+    const filename = `${session.user.id}-${timestamp}.jpg`;
+    const filepath = path.join(UPLOAD_DIR, filename);
 
     // Convert file to buffer
-    const bytes = await file.arrayBuffer()
-    const buffer = Buffer.from(bytes)
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
 
     // Process image with sharp: resize to 200x200 and convert to JPEG
     const processedImage = await sharp(buffer)
@@ -87,13 +99,13 @@ export async function POST(request: NextRequest) {
         position: 'center',
       })
       .jpeg({ quality: 90 })
-      .toBuffer()
+      .toBuffer();
 
     // Save processed image
-    await writeFile(filepath, processedImage)
+    await writeFile(filepath, processedImage);
 
     // Update user preferences with new avatar URL
-    const avatarUrl = `/uploads/avatars/${filename}`
+    const avatarUrl = `/uploads/avatars/${filename}`;
     await prisma.user.update({
       where: { id: session.user.id },
       data: {
@@ -102,17 +114,17 @@ export async function POST(request: NextRequest) {
           avatar: avatarUrl,
         },
       },
-    })
+    });
 
     // Delete old avatar file if it exists
     if (oldAvatarPath && oldAvatarPath.startsWith('/uploads/avatars/')) {
-      const oldFilePath = path.join(process.cwd(), 'public', oldAvatarPath)
+      const oldFilePath = path.join(process.cwd(), 'public', oldAvatarPath);
       try {
         if (existsSync(oldFilePath)) {
-          await unlink(oldFilePath)
+          await unlink(oldFilePath);
         }
       } catch (error) {
-        console.error('Error deleting old avatar:', error)
+        console.error('Error deleting old avatar:', error);
         // Don't fail the request if old file deletion fails
       }
     }
@@ -128,18 +140,21 @@ export async function POST(request: NextRequest) {
         newValue: { avatar: avatarUrl },
       },
       metadata: {
-        ipAddress: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || undefined,
+        ipAddress:
+          request.headers.get('x-forwarded-for') ||
+          request.headers.get('x-real-ip') ||
+          undefined,
         userAgent: request.headers.get('user-agent') || undefined,
       },
-    })
+    });
 
     return NextResponse.json({
       success: true,
       data: { avatarUrl },
       message: 'Avatar uploaded successfully',
-    })
+    });
   } catch (error) {
-    console.error('Error uploading avatar:', error)
+    console.error('Error uploading avatar:', error);
     return NextResponse.json(
       {
         success: false,
@@ -149,7 +164,7 @@ export async function POST(request: NextRequest) {
         },
       },
       { status: 500 }
-    )
+    );
   }
 }
 
@@ -159,36 +174,45 @@ export async function POST(request: NextRequest) {
  */
 export async function DELETE(request: NextRequest) {
   try {
-    const session = await auth()
+    const session = await auth();
 
     if (!session?.user?.id) {
       return NextResponse.json(
-        { success: false, error: { code: 'AUTH_REQUIRED', message: 'Authentication required' } },
+        {
+          success: false,
+          error: { code: 'AUTH_REQUIRED', message: 'Authentication required' },
+        },
         { status: 401 }
-      )
+      );
     }
 
     // Get current user
     const currentUser = await prisma.user.findUnique({
       where: { id: session.user.id },
       select: { preferences: true },
-    })
+    });
 
     if (!currentUser) {
       return NextResponse.json(
-        { success: false, error: { code: 'NOT_FOUND', message: 'User not found' } },
+        {
+          success: false,
+          error: { code: 'NOT_FOUND', message: 'User not found' },
+        },
         { status: 404 }
-      )
+      );
     }
 
-    const currentPreferences = (currentUser.preferences as any) || {}
-    const avatarPath = currentPreferences.avatar
+    const currentPreferences = (currentUser.preferences as any) || {};
+    const avatarPath = currentPreferences.avatar;
 
     if (!avatarPath) {
       return NextResponse.json(
-        { success: false, error: { code: 'NOT_FOUND', message: 'No avatar to remove' } },
+        {
+          success: false,
+          error: { code: 'NOT_FOUND', message: 'No avatar to remove' },
+        },
         { status: 404 }
-      )
+      );
     }
 
     // Update user preferences to remove avatar
@@ -200,17 +224,17 @@ export async function DELETE(request: NextRequest) {
           avatar: null,
         },
       },
-    })
+    });
 
     // Delete avatar file if it exists
     if (avatarPath.startsWith('/uploads/avatars/')) {
-      const filePath = path.join(process.cwd(), 'public', avatarPath)
+      const filePath = path.join(process.cwd(), 'public', avatarPath);
       try {
         if (existsSync(filePath)) {
-          await unlink(filePath)
+          await unlink(filePath);
         }
       } catch (error) {
-        console.error('Error deleting avatar file:', error)
+        console.error('Error deleting avatar file:', error);
         // Don't fail the request if file deletion fails
       }
     }
@@ -226,17 +250,20 @@ export async function DELETE(request: NextRequest) {
         newValue: { avatar: null },
       },
       metadata: {
-        ipAddress: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || undefined,
+        ipAddress:
+          request.headers.get('x-forwarded-for') ||
+          request.headers.get('x-real-ip') ||
+          undefined,
         userAgent: request.headers.get('user-agent') || undefined,
       },
-    })
+    });
 
     return NextResponse.json({
       success: true,
       message: 'Avatar removed successfully',
-    })
+    });
   } catch (error) {
-    console.error('Error removing avatar:', error)
+    console.error('Error removing avatar:', error);
     return NextResponse.json(
       {
         success: false,
@@ -246,6 +273,6 @@ export async function DELETE(request: NextRequest) {
         },
       },
       { status: 500 }
-    )
+    );
   }
 }

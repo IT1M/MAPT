@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 /**
  * SettingsSearchDemo Component
@@ -6,25 +6,25 @@
  * This component can be integrated into the main settings page
  */
 
-import React, { useRef, useEffect } from 'react'
-import { useLocale } from '@/hooks/useLocale'
-import { SettingsSearch } from './SettingsSearch'
-import { SearchResults } from './SearchResults'
-import { useSettingsSearch } from '@/hooks/useSettingsSearch'
+import React, { useRef, useEffect } from 'react';
+import { useLocale } from '@/hooks/useLocale';
+import { SettingsSearch } from './SettingsSearch';
+import { SearchResults } from './SearchResults';
+import { useSettingsSearch } from '@/hooks/useSettingsSearch';
 
 interface SettingsSearchDemoProps {
-  onSectionChange?: (section: string) => void
-  className?: string
+  onSectionChange?: (section: string) => void;
+  className?: string;
 }
 
 export function SettingsSearchDemo({
   onSectionChange,
   className = '',
 }: SettingsSearchDemoProps) {
-  const locale = useLocale()
-  const isRTL = locale === 'ar'
-  const searchInputRef = useRef<HTMLInputElement>(null)
-  
+  const locale = useLocale();
+  const isRTL = locale === 'ar';
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
   const {
     query,
     results,
@@ -38,31 +38,34 @@ export function SettingsSearchDemo({
     maxResults: 20,
     onResultClick: (result) => {
       // Extract section from path
-      const urlParams = new URLSearchParams(result.path.split('?')[1])
-      const section = urlParams.get('section')
+      const urlParams = new URLSearchParams(result.path.split('?')[1]);
+      const section = urlParams.get('section');
       if (section && onSectionChange) {
-        onSectionChange(section)
+        onSectionChange(section);
       }
       // Clear search after selection
-      clearSearch()
+      clearSearch();
     },
-  })
+  });
 
   // Keyboard shortcut: Ctrl/Cmd + K to focus search
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-        e.preventDefault()
-        searchInputRef.current?.focus()
+        e.preventDefault();
+        searchInputRef.current?.focus();
       }
-    }
+    };
 
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [])
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   return (
-    <div className={`settings-search-container ${className}`} dir={isRTL ? 'rtl' : 'ltr'}>
+    <div
+      className={`settings-search-container ${className}`}
+      dir={isRTL ? 'rtl' : 'ltr'}
+    >
       {/* Search Input */}
       <div className="mb-4">
         <SettingsSearch
@@ -71,9 +74,9 @@ export function SettingsSearchDemo({
           locale={locale}
           debounceMs={300}
         />
-        
+
         {/* Keyboard shortcut hint */}
-        <div 
+        <div
           className={`
             mt-2 text-xs text-gray-500 dark:text-gray-400 
             ${isRTL ? 'text-right' : 'text-left'}
@@ -85,15 +88,14 @@ export function SettingsSearchDemo({
           {' + '}
           <kbd className="px-2 py-1 text-xs font-semibold text-gray-800 bg-gray-100 border border-gray-200 rounded dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600">
             K
-          </kbd>
-          {' '}
+          </kbd>{' '}
           {isRTL ? 'للبحث السريع' : 'for quick search'}
         </div>
       </div>
 
       {/* Search Results */}
       {query && (
-        <div 
+        <div
           className="
             bg-white dark:bg-gray-900 
             border border-gray-200 dark:border-gray-700 
@@ -115,7 +117,7 @@ export function SettingsSearchDemo({
 
       {/* Results count */}
       {hasResults && !isSearching && (
-        <div 
+        <div
           className={`
             mt-2 text-sm text-gray-600 dark:text-gray-400 
             ${isRTL ? 'text-right' : 'text-left'}
@@ -123,12 +125,11 @@ export function SettingsSearchDemo({
           role="status"
           aria-live="polite"
         >
-          {isRTL 
-            ? `تم العثور على ${results.length} نتيجة` 
-            : `Found ${results.length} result${results.length !== 1 ? 's' : ''}`
-          }
+          {isRTL
+            ? `تم العثور على ${results.length} نتيجة`
+            : `Found ${results.length} result${results.length !== 1 ? 's' : ''}`}
         </div>
       )}
     </div>
-  )
+  );
 }

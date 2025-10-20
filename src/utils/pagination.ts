@@ -1,4 +1,4 @@
-import { PaginationMetadata } from '@/types'
+import { PaginationMetadata } from '@/types';
 
 /**
  * Calculate pagination metadata
@@ -12,8 +12,8 @@ export function calculatePagination(
   page: number,
   limit: number
 ): PaginationMetadata {
-  const totalPages = Math.ceil(total / limit)
-  
+  const totalPages = Math.ceil(total / limit);
+
   return {
     total,
     page,
@@ -21,7 +21,7 @@ export function calculatePagination(
     totalPages,
     hasNext: page < totalPages,
     hasPrev: page > 1,
-  }
+  };
 }
 
 /**
@@ -31,7 +31,7 @@ export function calculatePagination(
  * @returns Number of items to skip
  */
 export function calculateSkip(page: number, limit: number): number {
-  return (page - 1) * limit
+  return (page - 1) * limit;
 }
 
 /**
@@ -46,11 +46,11 @@ export function normalizePagination(
   limit?: number,
   maxLimit: number = 200
 ): { page: number; limit: number } {
-  const normalizedPage = Math.max(1, page || 1)
-  const normalizedLimit = Math.min(maxLimit, Math.max(1, limit || 50))
-  
+  const normalizedPage = Math.max(1, page || 1);
+  const normalizedLimit = Math.min(maxLimit, Math.max(1, limit || 50));
+
   return {
     page: normalizedPage,
     limit: normalizedLimit,
-  }
+  };
 }

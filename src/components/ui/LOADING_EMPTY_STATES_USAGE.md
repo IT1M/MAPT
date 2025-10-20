@@ -21,8 +21,8 @@ import { PageLoader } from '@/components/ui';
 <PageLoader message="Generating report..." progress={45} />
 
 // With timeout handling
-<PageLoader 
-  message="Loading data..." 
+<PageLoader
+  message="Loading data..."
   timeout={3000}
   onTimeout={() => console.log('Loading timeout')}
 />
@@ -50,9 +50,9 @@ import { InlineLoader } from '@/components/ui';
 Use skeleton loaders to show content structure while data loads.
 
 ```tsx
-import { 
-  SkeletonTable, 
-  SkeletonCard, 
+import {
+  SkeletonTable,
+  SkeletonCard,
   SkeletonForm,
   SkeletonStats,
   SkeletonList,
@@ -174,7 +174,7 @@ Pre-configured empty state for notifications.
 ```tsx
 import { NotificationsEmptyState } from '@/components/ui';
 
-<NotificationsEmptyState />
+<NotificationsEmptyState />;
 ```
 
 ### SearchEmptyState
@@ -184,10 +184,7 @@ Empty state for search results.
 ```tsx
 import { SearchEmptyState } from '@/components/ui';
 
-<SearchEmptyState
-  searchQuery={searchTerm}
-  onClearSearch={handleClearSearch}
-/>
+<SearchEmptyState searchQuery={searchTerm} onClearSearch={handleClearSearch} />;
 ```
 
 ### ErrorEmptyState
@@ -201,7 +198,7 @@ import { ErrorEmptyState } from '@/components/ui';
   title="Failed to load data"
   description="We couldn't load the data. Please try again."
   onRetry={handleRetry}
-/>
+/>;
 ```
 
 ## Complete Page Example
@@ -213,11 +210,11 @@ Here's a complete example showing how to use loading and empty states in a page:
 
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
-import { 
-  PageLoader, 
-  SkeletonTable, 
+import {
+  PageLoader,
+  SkeletonTable,
   TableEmptyState,
-  ErrorEmptyState 
+  ErrorEmptyState,
 } from '@/components/ui';
 
 export default function DataLogPage() {
@@ -272,7 +269,7 @@ export default function DataLogPage() {
           description={t('emptyState.dataLog.description')}
           action={{
             label: t('emptyState.dataLog.action'),
-            href: '/data-entry'
+            href: '/data-entry',
           }}
           hasFilters={hasFilters}
           onResetFilters={() => setHasFilters(false)}
@@ -301,12 +298,9 @@ The Button component already supports loading state:
 ```tsx
 import { Button } from '@/components/ui';
 
-<Button 
-  loading={isSubmitting}
-  onClick={handleSubmit}
->
+<Button loading={isSubmitting} onClick={handleSubmit}>
   Submit
-</Button>
+</Button>;
 ```
 
 ## Best Practices

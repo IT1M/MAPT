@@ -13,7 +13,10 @@ interface MobileCardViewProps {
   className?: string;
 }
 
-export function MobileCardView({ children, className = '' }: MobileCardViewProps) {
+export function MobileCardView({
+  children,
+  className = '',
+}: MobileCardViewProps) {
   return (
     <div
       className={`
@@ -38,7 +41,9 @@ interface CardRowProps {
 
 export function CardRow({ label, value, className = '' }: CardRowProps) {
   return (
-    <div className={`flex justify-between items-start py-2 border-b border-gray-100 dark:border-gray-700 last:border-0 ${className}`}>
+    <div
+      className={`flex justify-between items-start py-2 border-b border-gray-100 dark:border-gray-700 last:border-0 ${className}`}
+    >
       <span className="text-sm font-medium text-gray-600 dark:text-gray-400 flex-shrink-0 mr-3">
         {label}
       </span>
@@ -56,7 +61,12 @@ interface CardHeaderProps {
   actions?: React.ReactNode;
 }
 
-export function CardHeader({ title, subtitle, badge, actions }: CardHeaderProps) {
+export function CardHeader({
+  title,
+  subtitle,
+  badge,
+  actions,
+}: CardHeaderProps) {
   return (
     <div className="flex justify-between items-start mb-3 pb-3 border-b border-gray-200 dark:border-gray-700">
       <div className="flex-1 min-w-0">
@@ -72,11 +82,7 @@ export function CardHeader({ title, subtitle, badge, actions }: CardHeaderProps)
           </p>
         )}
       </div>
-      {actions && (
-        <div className="flex-shrink-0 ml-3">
-          {actions}
-        </div>
-      )}
+      {actions && <div className="flex-shrink-0 ml-3">{actions}</div>}
     </div>
   );
 }
@@ -88,7 +94,9 @@ interface CardActionsProps {
 
 export function CardActions({ children, className = '' }: CardActionsProps) {
   return (
-    <div className={`flex gap-2 mt-3 pt-3 border-t border-gray-200 dark:border-gray-700 ${className}`}>
+    <div
+      className={`flex gap-2 mt-3 pt-3 border-t border-gray-200 dark:border-gray-700 ${className}`}
+    >
       {children}
     </div>
   );
@@ -100,7 +108,11 @@ interface CardSectionProps {
   className?: string;
 }
 
-export function CardSection({ title, children, className = '' }: CardSectionProps) {
+export function CardSection({
+  title,
+  children,
+  className = '',
+}: CardSectionProps) {
   return (
     <div className={`mt-3 ${className}`}>
       {title && (

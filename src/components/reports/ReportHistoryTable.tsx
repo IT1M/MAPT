@@ -65,27 +65,39 @@ export default function ReportHistoryTable({
   };
 
   const formatPeriod = (from: Date, to: Date) => {
-    const fromDate = new Date(from).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
-    const toDate = new Date(to).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+    const fromDate = new Date(from).toLocaleDateString('en-US', {
+      month: 'short',
+      year: 'numeric',
+    });
+    const toDate = new Date(to).toLocaleDateString('en-US', {
+      month: 'short',
+      year: 'numeric',
+    });
     return `${fromDate} - ${toDate}`;
   };
 
   const getStatusBadge = (status: string) => {
     const statusColors = {
-      COMPLETED: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-      GENERATING: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
+      COMPLETED:
+        'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+      GENERATING:
+        'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
       FAILED: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
     };
 
     return (
-      <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusColors[status as keyof typeof statusColors] || 'bg-gray-100 text-gray-800'}`}>
+      <span
+        className={`px-2 py-1 rounded-full text-xs font-medium ${statusColors[status as keyof typeof statusColors] || 'bg-gray-100 text-gray-800'}`}
+      >
         {t(`../status.${status}` as any)}
       </span>
     );
   };
 
   const filteredReports = reports.filter((report) => {
-    const matchesSearch = report.title.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = report.title
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
     const matchesType = !filterType || report.type === filterType;
     return matchesSearch && matchesType;
   });
@@ -111,12 +123,24 @@ export default function ReportHistoryTable({
               className="w-full md:w-48 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             >
               <option value="">{t('allTypes')}</option>
-              <option value="MONTHLY_INVENTORY">{t('../reportTypes.MONTHLY_INVENTORY')}</option>
-              <option value="YEARLY_SUMMARY">{t('../reportTypes.YEARLY_SUMMARY')}</option>
-              <option value="CUSTOM_RANGE">{t('../reportTypes.CUSTOM_RANGE')}</option>
-              <option value="AUDIT_REPORT">{t('../reportTypes.AUDIT_REPORT')}</option>
-              <option value="USER_ACTIVITY">{t('../reportTypes.USER_ACTIVITY')}</option>
-              <option value="CATEGORY_ANALYSIS">{t('../reportTypes.CATEGORY_ANALYSIS')}</option>
+              <option value="MONTHLY_INVENTORY">
+                {t('../reportTypes.MONTHLY_INVENTORY')}
+              </option>
+              <option value="YEARLY_SUMMARY">
+                {t('../reportTypes.YEARLY_SUMMARY')}
+              </option>
+              <option value="CUSTOM_RANGE">
+                {t('../reportTypes.CUSTOM_RANGE')}
+              </option>
+              <option value="AUDIT_REPORT">
+                {t('../reportTypes.AUDIT_REPORT')}
+              </option>
+              <option value="USER_ACTIVITY">
+                {t('../reportTypes.USER_ACTIVITY')}
+              </option>
+              <option value="CATEGORY_ANALYSIS">
+                {t('../reportTypes.CATEGORY_ANALYSIS')}
+              </option>
             </select>
           </div>
         </div>
@@ -153,13 +177,19 @@ export default function ReportHistoryTable({
           <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
             {filteredReports.length === 0 ? (
               <tr>
-                <td colSpan={7} className="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
+                <td
+                  colSpan={7}
+                  className="px-6 py-12 text-center text-gray-500 dark:text-gray-400"
+                >
                   {t('noReports')}
                 </td>
               </tr>
             ) : (
               filteredReports.map((report) => (
-                <tr key={report.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                <tr
+                  key={report.id}
+                  className="hover:bg-gray-50 dark:hover:bg-gray-700"
+                >
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900 dark:text-white">
                       {report.title}
@@ -194,9 +224,24 @@ export default function ReportHistoryTable({
                             className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
                             title={t('preview')}
                           >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            <svg
+                              className="w-5 h-5"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                              />
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                              />
                             </svg>
                           </button>
                           <button
@@ -204,8 +249,18 @@ export default function ReportHistoryTable({
                             className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300"
                             title={t('download')}
                           >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            <svg
+                              className="w-5 h-5"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                              />
                             </svg>
                           </button>
                           <button
@@ -213,8 +268,18 @@ export default function ReportHistoryTable({
                             className="text-purple-600 hover:text-purple-900 dark:text-purple-400 dark:hover:text-purple-300"
                             title={t('email')}
                           >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            <svg
+                              className="w-5 h-5"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                              />
                             </svg>
                           </button>
                         </>
@@ -224,8 +289,18 @@ export default function ReportHistoryTable({
                         className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
                         title={t('delete')}
                       >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        <svg
+                          className="w-5 h-5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                          />
                         </svg>
                       </button>
                     </div>

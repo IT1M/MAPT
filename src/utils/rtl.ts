@@ -6,15 +6,15 @@
  * Check if the current locale is RTL
  */
 export function isRTL(locale: string): boolean {
-  const rtlLocales = ['ar', 'he', 'fa', 'ur']
-  return rtlLocales.includes(locale.toLowerCase())
+  const rtlLocales = ['ar', 'he', 'fa', 'ur'];
+  return rtlLocales.includes(locale.toLowerCase());
 }
 
 /**
  * Get text direction based on locale
  */
 export function getTextDirection(locale: string): 'ltr' | 'rtl' {
-  return isRTL(locale) ? 'rtl' : 'ltr'
+  return isRTL(locale) ? 'rtl' : 'ltr';
 }
 
 /**
@@ -26,23 +26,23 @@ export function getSpacingClass(
   value: string,
   locale: string
 ): string {
-  const dir = getTextDirection(locale)
-  
+  const dir = getTextDirection(locale);
+
   // Swap left/right for RTL
   if (dir === 'rtl') {
-    if (side === 'left') side = 'right'
-    else if (side === 'right') side = 'left'
+    if (side === 'left') side = 'right';
+    else if (side === 'right') side = 'left';
   }
-  
-  const prefix = property === 'margin' ? 'm' : 'p'
+
+  const prefix = property === 'margin' ? 'm' : 'p';
   const sidePrefix = {
     left: 'l',
     right: 'r',
     top: 't',
     bottom: 'b',
-  }[side]
-  
-  return `${prefix}${sidePrefix}-${value}`
+  }[side];
+
+  return `${prefix}${sidePrefix}-${value}`;
 }
 
 /**
@@ -52,14 +52,14 @@ export function getFlexDirection(
   direction: 'row' | 'row-reverse' | 'col' | 'col-reverse',
   locale: string
 ): string {
-  const dir = getTextDirection(locale)
-  
+  const dir = getTextDirection(locale);
+
   if (dir === 'rtl') {
-    if (direction === 'row') return 'flex-row-reverse'
-    if (direction === 'row-reverse') return 'flex-row'
+    if (direction === 'row') return 'flex-row-reverse';
+    if (direction === 'row-reverse') return 'flex-row';
   }
-  
-  return `flex-${direction}`
+
+  return `flex-${direction}`;
 }
 
 /**
@@ -69,14 +69,14 @@ export function getTextAlign(
   align: 'left' | 'right' | 'center' | 'justify',
   locale: string
 ): string {
-  const dir = getTextDirection(locale)
-  
+  const dir = getTextDirection(locale);
+
   if (dir === 'rtl') {
-    if (align === 'left') return 'text-right'
-    if (align === 'right') return 'text-left'
+    if (align === 'left') return 'text-right';
+    if (align === 'right') return 'text-left';
   }
-  
-  return `text-${align}`
+
+  return `text-${align}`;
 }
 
 /**
@@ -87,51 +87,55 @@ export function getBorderRadiusClass(
   value: string,
   locale: string
 ): string {
-  const dir = getTextDirection(locale)
-  
+  const dir = getTextDirection(locale);
+
   if (dir === 'rtl') {
-    if (corner === 'tl') corner = 'tr'
-    else if (corner === 'tr') corner = 'tl'
-    else if (corner === 'bl') corner = 'br'
-    else if (corner === 'br') corner = 'bl'
+    if (corner === 'tl') corner = 'tr';
+    else if (corner === 'tr') corner = 'tl';
+    else if (corner === 'bl') corner = 'br';
+    else if (corner === 'br') corner = 'bl';
   }
-  
+
   const cornerMap = {
     tl: 'rounded-tl',
     tr: 'rounded-tr',
     bl: 'rounded-bl',
     br: 'rounded-br',
-  }
-  
-  return `${cornerMap[corner]}-${value}`
+  };
+
+  return `${cornerMap[corner]}-${value}`;
 }
 
 /**
  * Mirror transform for RTL (useful for icons)
  */
 export function getMirrorTransform(locale: string): string {
-  return isRTL(locale) ? 'scale(-1, 1)' : 'scale(1, 1)'
+  return isRTL(locale) ? 'scale(-1, 1)' : 'scale(1, 1)';
 }
 
 /**
  * Get appropriate icon rotation for RTL
  */
 export function getIconRotation(locale: string): number {
-  return isRTL(locale) ? 180 : 0
+  return isRTL(locale) ? 180 : 0;
 }
 
 /**
  * Format number for RTL locales
  */
 export function formatNumber(num: number, locale: string): string {
-  return new Intl.NumberFormat(locale).format(num)
+  return new Intl.NumberFormat(locale).format(num);
 }
 
 /**
  * Format date for RTL locales
  */
-export function formatDate(date: Date, locale: string, options?: Intl.DateTimeFormatOptions): string {
-  return new Intl.DateTimeFormat(locale, options).format(date)
+export function formatDate(
+  date: Date,
+  locale: string,
+  options?: Intl.DateTimeFormatOptions
+): string {
+  return new Intl.DateTimeFormat(locale, options).format(date);
 }
 
 /**
@@ -142,7 +146,7 @@ export function getLogicalProperty(
   side: 'inline-start' | 'inline-end' | 'block-start' | 'block-end',
   value: string
 ): string {
-  return `${property}-${side}: ${value}`
+  return `${property}-${side}: ${value}`;
 }
 
 /**
@@ -151,24 +155,24 @@ export function getLogicalProperty(
  */
 export function getDirectionalClasses(locale: string) {
   const rtl = isRTL(locale);
-  
+
   return {
     // Text alignment
     textStart: rtl ? 'text-right' : 'text-left',
     textEnd: rtl ? 'text-left' : 'text-right',
-    
+
     // Margins
     marginStart: rtl ? 'mr' : 'ml',
     marginEnd: rtl ? 'ml' : 'mr',
-    
+
     // Padding
     paddingStart: rtl ? 'pr' : 'pl',
     paddingEnd: rtl ? 'pl' : 'pr',
-    
+
     // Borders
     borderStart: rtl ? 'border-r' : 'border-l',
     borderEnd: rtl ? 'border-l' : 'border-r',
-    
+
     // Rounded corners
     roundedStart: rtl ? 'rounded-r' : 'rounded-l',
     roundedEnd: rtl ? 'rounded-l' : 'rounded-r',
@@ -176,16 +180,16 @@ export function getDirectionalClasses(locale: string) {
     roundedTopEnd: rtl ? 'rounded-tl' : 'rounded-tr',
     roundedBottomStart: rtl ? 'rounded-br' : 'rounded-bl',
     roundedBottomEnd: rtl ? 'rounded-bl' : 'rounded-br',
-    
+
     // Flex direction
     flexRow: rtl ? 'flex-row-reverse' : 'flex-row',
-    
+
     // Positioning
     left: rtl ? 'right' : 'left',
     right: rtl ? 'left' : 'right',
-    
+
     // Transforms
-    translateX: (value: number) => rtl ? -value : value,
+    translateX: (value: number) => (rtl ? -value : value),
   };
 }
 
@@ -193,12 +197,19 @@ export function getDirectionalClasses(locale: string) {
  * Apply RTL-aware inline styles
  */
 export function getDirectionalStyle(
-  property: 'marginLeft' | 'marginRight' | 'paddingLeft' | 'paddingRight' | 'left' | 'right' | 'textAlign',
+  property:
+    | 'marginLeft'
+    | 'marginRight'
+    | 'paddingLeft'
+    | 'paddingRight'
+    | 'left'
+    | 'right'
+    | 'textAlign',
   value: string | number,
   locale: string
 ): Record<string, string | number> {
   const rtl = isRTL(locale);
-  
+
   const propertyMap: Record<string, string> = {
     marginLeft: rtl ? 'marginRight' : 'marginLeft',
     marginRight: rtl ? 'marginLeft' : 'marginRight',
@@ -206,21 +217,33 @@ export function getDirectionalStyle(
     paddingRight: rtl ? 'paddingLeft' : 'paddingRight',
     left: rtl ? 'right' : 'left',
     right: rtl ? 'left' : 'right',
-    textAlign: value === 'left' ? (rtl ? 'right' : 'left') : value === 'right' ? (rtl ? 'left' : 'right') : value as string,
+    textAlign:
+      value === 'left'
+        ? rtl
+          ? 'right'
+          : 'left'
+        : value === 'right'
+          ? rtl
+            ? 'left'
+            : 'right'
+          : (value as string),
   };
-  
+
   const mappedProperty = propertyMap[property] || property;
   const mappedValue = property === 'textAlign' ? propertyMap[property] : value;
-  
+
   return { [mappedProperty]: mappedValue };
 }
 
 /**
  * Get icon transform for RTL (useful for directional icons like arrows)
  */
-export function getIconTransform(locale: string, shouldFlip = true): React.CSSProperties {
+export function getIconTransform(
+  locale: string,
+  shouldFlip = true
+): React.CSSProperties {
   if (!shouldFlip) return {};
-  
+
   return {
     transform: getMirrorTransform(locale),
   };

@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@/services/auth'
-import { prisma } from '@/services/prisma'
-import { parseUserAgent } from '@/utils/user-agent'
+import { NextRequest, NextResponse } from 'next/server';
+import { auth } from '@/services/auth';
+import { prisma } from '@/services/prisma';
+import { parseUserAgent } from '@/utils/user-agent';
 
 /**
  * GET /api/auth/sessions
@@ -9,18 +9,16 @@ import { parseUserAgent } from '@/utils/user-agent'
  */
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth()
+    const session = await auth();
 
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     // Get current session token from cookies
-    const currentSessionToken = request.cookies.get('authjs.session-token')?.value ||
-                                request.cookies.get('__Secure-authjs.session-token')?.value
+    const currentSessionToken =
+      request.cookies.get('authjs.session-token')?.value ||
+      request.cookies.get('__Secure-authjs.session-token')?.value;
 
     // Fetch all active sessions for the user
     const sessions = await prisma.session.findMany({
@@ -33,12 +31,12 @@ export async function GET(request: NextRequest) {
       orderBy: {
         lastActive: 'desc',
       },
-    })
+    });
 
     // Parse user agent for each session and mark current session
     const sessionsWithDetails = sessions.map((s) => {
-      const parsed = parseUserAgent(s.userAgent || '')
-      const isCurrent = s.sessionToken === currentSessionToken
+      const parsed = parseUserAgent(s.userAgent || '');
+      const isCurrent = s.sessionToken === currentSessionToken;
 
       return {
         id: s.id,
@@ -51,18 +49,18 @@ export async function GET(request: NextRequest) {
         lastActive: s.lastActive,
         createdAt: s.createdAt,
         isCurrent,
-      }
-    })
+      };
+    });
 
     return NextResponse.json({
       sessions: sessionsWithDetails,
       total: sessionsWithDetails.length,
-    })
+    });
   } catch (error) {
-    console.error('Error fetching sessions:', error)
+    console.error('Error fetching sessions:', error);
     return NextResponse.json(
       { error: 'Failed to fetch sessions' },
       { status: 500 }
-    )
+    );
   }
 }

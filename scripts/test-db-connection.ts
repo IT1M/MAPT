@@ -2,10 +2,10 @@
 
 /**
  * Database Connection Test Script
- * 
+ *
  * This script tests the database connection and verifies that the application
  * can successfully connect to and query the database.
- * 
+ *
  * Usage:
  *   npm run test:db
  *   or
@@ -35,7 +35,7 @@ async function runTest(
       name,
       status: 'pass',
       message: 'Success',
-      duration
+      duration,
     });
     console.log(`✅ ${name} (${duration}ms)`);
   } catch (error) {
@@ -45,7 +45,7 @@ async function runTest(
       name,
       status: 'fail',
       message,
-      duration
+      duration,
     });
     console.error(`❌ ${name} (${duration}ms)`);
     console.error(`   Error: ${message}`);
@@ -55,7 +55,7 @@ async function runTest(
 async function testDatabaseConnection() {
   console.log('🔍 Testing Database Connection\n');
   console.log('━'.repeat(60));
-  
+
   // Check if DATABASE_URL is set
   if (!process.env.DATABASE_URL) {
     console.error('❌ DATABASE_URL environment variable is not set');
@@ -64,19 +64,16 @@ async function testDatabaseConnection() {
   }
 
   // Mask password in URL for display
-  const maskedUrl = process.env.DATABASE_URL.replace(
-    /:[^:@]+@/,
-    ':****@'
-  );
+  const maskedUrl = process.env.DATABASE_URL.replace(/:[^:@]+@/, ':****@');
   console.log(`📊 Database URL: ${maskedUrl}\n`);
 
   const prisma = new PrismaClient({
     datasources: {
       db: {
-        url: process.env.DATABASE_URL
-      }
+        url: process.env.DATABASE_URL,
+      },
     },
-    log: ['error']
+    log: ['error'],
   });
 
   try {
@@ -102,7 +99,9 @@ async function testDatabaseConnection() {
 
     // Test 4: Database Name
     await runTest('Database Name Check', async () => {
-      const result = await prisma.$queryRaw<Array<{ current_database: string }>>`
+      const result = await prisma.$queryRaw<
+        Array<{ current_database: string }>
+      >`
         SELECT current_database()
       `;
       if (result && result[0]) {
@@ -144,39 +143,42 @@ async function testDatabaseConnection() {
     // Test 8: Write Permission Test
     await runTest('Write Permission Test', async () => {
       // Try to create a test record (will rollback)
-      await prisma.$transaction(async (tx) => {
-        const testUser = await tx.user.create({
-          data: {
-            email: `test-${Date.now()}@example.com`,
-            name: 'Test User',
-            passwordHash: 'test',
-            role: 'DATA_ENTRY'
+      await prisma
+        .$transaction(async (tx) => {
+          const testUser = await tx.user.create({
+            data: {
+              email: `test-${Date.now()}@example.com`,
+              name: 'Test User',
+              passwordHash: 'test',
+              role: 'DATA_ENTRY',
+            },
+          });
+
+          // Verify it was created
+          const found = await tx.user.findUnique({
+            where: { id: testUser.id },
+          });
+
+          if (!found) {
+            throw new Error('Failed to create test record');
+          }
+
+          // Rollback by throwing an error
+          throw new Error('ROLLBACK_TEST');
+        })
+        .catch((error) => {
+          // Expected error for rollback
+          if (error.message !== 'ROLLBACK_TEST') {
+            throw error;
           }
         });
-        
-        // Verify it was created
-        const found = await tx.user.findUnique({
-          where: { id: testUser.id }
-        });
-        
-        if (!found) {
-          throw new Error('Failed to create test record');
-        }
-        
-        // Rollback by throwing an error
-        throw new Error('ROLLBACK_TEST');
-      }).catch((error) => {
-        // Expected error for rollback
-        if (error.message !== 'ROLLBACK_TEST') {
-          throw error;
-        }
-      });
     });
 
     // Test 9: Connection Pool
     await runTest('Connection Pool Test', async () => {
-      const promises = Array.from({ length: 5 }, (_, i) =>
-        prisma.$queryRaw`SELECT ${i} as id`
+      const promises = Array.from(
+        { length: 5 },
+        (_, i) => prisma.$queryRaw`SELECT ${i} as id`
       );
       await Promise.all(promises);
     });
@@ -186,14 +188,15 @@ async function testDatabaseConnection() {
       const start = Date.now();
       await prisma.user.findMany({ take: 10 });
       const duration = Date.now() - start;
-      
+
       if (duration > 1000) {
-        console.log(`   ⚠️  Warning: Query took ${duration}ms (expected < 1000ms)`);
+        console.log(
+          `   ⚠️  Warning: Query took ${duration}ms (expected < 1000ms)`
+        );
       } else {
         console.log(`   Query time: ${duration}ms`);
       }
     });
-
   } catch (error) {
     console.error('\n❌ Unexpected error during testing:', error);
   } finally {
@@ -203,21 +206,21 @@ async function testDatabaseConnection() {
   // Print Summary
   console.log('\n' + '━'.repeat(60));
   console.log('📊 Test Summary\n');
-  
-  const passed = results.filter(r => r.status === 'pass').length;
-  const failed = results.filter(r => r.status === 'fail').length;
+
+  const passed = results.filter((r) => r.status === 'pass').length;
+  const failed = results.filter((r) => r.status === 'fail').length;
   const total = results.length;
-  
+
   console.log(`Total Tests: ${total}`);
   console.log(`✅ Passed: ${passed}`);
   console.log(`❌ Failed: ${failed}`);
-  
+
   if (failed > 0) {
     console.log('\n❌ Some tests failed. Please check the errors above.');
     console.log('\nFailed Tests:');
     results
-      .filter(r => r.status === 'fail')
-      .forEach(r => {
+      .filter((r) => r.status === 'fail')
+      .forEach((r) => {
         console.log(`  • ${r.name}: ${r.message}`);
       });
     process.exit(1);

@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 /**
  * RTL Layout Provider
@@ -34,7 +34,10 @@ export function RTLProvider({ children }: RTLProviderProps) {
 
     // Set CSS custom property for direction
     document.documentElement.style.setProperty('--text-direction', direction);
-    document.documentElement.style.setProperty('--reading-direction', rtl ? '-1' : '1');
+    document.documentElement.style.setProperty(
+      '--reading-direction',
+      rtl ? '-1' : '1'
+    );
 
     // Cleanup function
     return () => {

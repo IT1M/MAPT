@@ -4,13 +4,13 @@
  * Access at: /theme-test
  */
 
-import { ThemeCustomizer } from '@/components/settings/ThemeCustomizer'
+import { ThemeCustomizer } from '@/components/settings/ThemeCustomizer';
 import {
   ThemedCard,
   ThemedButton,
   StatusBadge,
   QuickThemeSwitcher,
-} from '@/components/settings/THEME_USAGE_EXAMPLE'
+} from '@/components/settings/THEME_USAGE_EXAMPLE';
 
 export default function ThemeTestPage() {
   return (
@@ -129,7 +129,8 @@ export default function ThemeTestPage() {
         <ThemedCard title="Density Preview">
           <div className="space-y-4">
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Change the density setting in the Layout tab to see how spacing adjusts
+              Change the density setting in the Layout tab to see how spacing
+              adjusts
             </p>
             <div className="grid grid-cols-3 gap-4">
               <div className="theme-card">
@@ -166,5 +167,5 @@ export default function ThemeTestPage() {
         </ThemedCard>
       </div>
     </div>
-  )
+  );
 }

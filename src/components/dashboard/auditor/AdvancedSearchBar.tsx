@@ -1,26 +1,30 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export function AdvancedSearchBar() {
-  const router = useRouter()
-  const [searchQuery, setSearchQuery] = useState('')
-  const [searchType, setSearchType] = useState<'all' | 'user' | 'action' | 'item'>('all')
+  const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchType, setSearchType] = useState<
+    'all' | 'user' | 'action' | 'item'
+  >('all');
 
   const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (searchQuery.trim()) {
-      router.push(`/audit?search=${encodeURIComponent(searchQuery)}&type=${searchType}`)
+      router.push(
+        `/audit?search=${encodeURIComponent(searchQuery)}&type=${searchType}`
+      );
     }
-  }
+  };
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
       <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
         Advanced Audit Search
       </h3>
-      
+
       <form onSubmit={handleSearch} className="space-y-4">
         <div className="flex gap-2">
           <div className="flex-1">
@@ -36,8 +40,18 @@ export function AdvancedSearchBar() {
             type="submit"
             className="px-6 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-colors flex items-center gap-2"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
             </svg>
             Search
           </button>
@@ -64,8 +78,8 @@ export function AdvancedSearchBar() {
           <button
             type="button"
             onClick={() => {
-              setSearchQuery('action:login')
-              setSearchType('action')
+              setSearchQuery('action:login');
+              setSearchType('action');
             }}
             className="text-sm text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 text-left"
           >
@@ -74,8 +88,8 @@ export function AdvancedSearchBar() {
           <button
             type="button"
             onClick={() => {
-              setSearchQuery('action:delete')
-              setSearchType('action')
+              setSearchQuery('action:delete');
+              setSearchType('action');
             }}
             className="text-sm text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 text-left"
           >
@@ -84,8 +98,8 @@ export function AdvancedSearchBar() {
           <button
             type="button"
             onClick={() => {
-              setSearchQuery('action:update')
-              setSearchType('action')
+              setSearchQuery('action:update');
+              setSearchType('action');
             }}
             className="text-sm text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 text-left"
           >
@@ -94,8 +108,8 @@ export function AdvancedSearchBar() {
           <button
             type="button"
             onClick={() => {
-              setSearchQuery('severity:high')
-              setSearchType('all')
+              setSearchQuery('severity:high');
+              setSearchType('all');
             }}
             className="text-sm text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 text-left"
           >
@@ -104,5 +118,5 @@ export function AdvancedSearchBar() {
         </div>
       </form>
     </div>
-  )
+  );
 }

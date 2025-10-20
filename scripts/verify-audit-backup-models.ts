@@ -29,7 +29,9 @@ async function verifyModels() {
     // Test 4: Verify ReportSchedule model
     console.log('✓ Testing ReportSchedule model...');
     const scheduleCount = await prisma.reportSchedule.count();
-    console.log(`  - ReportSchedule table accessible (${scheduleCount} records)`);
+    console.log(
+      `  - ReportSchedule table accessible (${scheduleCount} records)`
+    );
 
     // Test 5: Verify BackupConfig model
     console.log('✓ Testing BackupConfig model...');
@@ -38,24 +40,33 @@ async function verifyModels() {
 
     // Test 6: Verify enums are available
     console.log('\n✓ Verifying enums...');
-    console.log('  - ActionType enum: CREATE, UPDATE, DELETE, LOGIN, LOGOUT, EXPORT, VIEW, REVERT, BACKUP, RESTORE');
-    console.log('  - EntityType enum: InventoryItem, User, Report, Backup, Settings, AuditLog');
+    console.log(
+      '  - ActionType enum: CREATE, UPDATE, DELETE, LOGIN, LOGOUT, EXPORT, VIEW, REVERT, BACKUP, RESTORE'
+    );
+    console.log(
+      '  - EntityType enum: InventoryItem, User, Report, Backup, Settings, AuditLog'
+    );
     console.log('  - BackupType enum: MANUAL, AUTOMATIC, PRE_RESTORE');
     console.log('  - BackupFormat enum: CSV, JSON, SQL');
-    console.log('  - BackupStatus enum: IN_PROGRESS, COMPLETED, FAILED, CORRUPTED');
-    console.log('  - ReportType enum: MONTHLY_INVENTORY, YEARLY_SUMMARY, CUSTOM_RANGE, AUDIT_REPORT, USER_ACTIVITY, CATEGORY_ANALYSIS');
+    console.log(
+      '  - BackupStatus enum: IN_PROGRESS, COMPLETED, FAILED, CORRUPTED'
+    );
+    console.log(
+      '  - ReportType enum: MONTHLY_INVENTORY, YEARLY_SUMMARY, CUSTOM_RANGE, AUDIT_REPORT, USER_ACTIVITY, CATEGORY_ANALYSIS'
+    );
     console.log('  - ReportFormat enum: PDF, EXCEL, PPTX');
     console.log('  - ReportStatus enum: GENERATING, COMPLETED, FAILED');
     console.log('  - ScheduleFrequency enum: DAILY, WEEKLY, MONTHLY, YEARLY');
 
     console.log('\n✅ All models and enums verified successfully!');
     console.log('\n📊 Database Schema Summary:');
-    console.log('  - AuditLog: Tracks all user actions with cryptographic signing');
+    console.log(
+      '  - AuditLog: Tracks all user actions with cryptographic signing'
+    );
     console.log('  - Backup: Manages backup files with encryption support');
     console.log('  - Report: Stores generated reports with AI insights');
     console.log('  - ReportSchedule: Manages scheduled report generation');
     console.log('  - BackupConfig: Stores backup automation configuration');
-
   } catch (error) {
     console.error('\n❌ Verification failed:', error);
     process.exit(1);

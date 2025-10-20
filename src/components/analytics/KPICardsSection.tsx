@@ -52,9 +52,7 @@ const calculateTrend = (
   };
 };
 
-const getRejectRateColor = (
-  rate: number
-): 'success' | 'warning' | 'danger' => {
+const getRejectRateColor = (rate: number): 'success' | 'warning' | 'danger' => {
   if (rate < 5) return 'success';
   if (rate < 10) return 'warning';
   return 'danger';
@@ -115,9 +113,7 @@ export const KPICardsSection: React.FC<KPICardsSectionProps> = ({
         value={data.totalItems}
         icon="📦"
         trend={
-          trends
-            ? { ...trends.totalItems, label: 'vs prev period' }
-            : undefined
+          trends ? { ...trends.totalItems, label: 'vs prev period' } : undefined
         }
         sparklineData={generateSparklineData(data.totalItems)}
         color="primary"
@@ -157,8 +153,8 @@ export const KPICardsSection: React.FC<KPICardsSectionProps> = ({
                   trends.rejectRate.direction === 'up'
                     ? 'down'
                     : trends.rejectRate.direction === 'down'
-                    ? 'up'
-                    : 'stable',
+                      ? 'up'
+                      : 'stable',
               }
             : undefined
         }

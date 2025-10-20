@@ -1,69 +1,78 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import { useTranslations } from '@/hooks/useTranslations'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
-import { XMarkIcon } from '@heroicons/react/24/outline'
+import { useState, useEffect } from 'react';
+import { useTranslations } from '@/hooks/useTranslations';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { XMarkIcon } from '@heroicons/react/24/outline';
 
 const articleSchema = z.object({
   title: z.string().min(3).max(200),
-  slug: z.string().min(3).max(200).regex(/^[a-z0-9-]+$/),
+  slug: z
+    .string()
+    .min(3)
+    .max(200)
+    .regex(/^[a-z0-9-]+$/),
   category: z.string().min(2).max(50),
   content: z.string().min(10),
   tags: z.string(),
-  status: z.enum(['DRAFT', 'PUBLISHED'])
-})
+  status: z.enum(['DRAFT', 'PUBLISHED']),
+});
 
-type ArticleFormData = z.infer<typeof articleSchema>
+type ArticleFormData = z.infer<typeof articleSchema>;
 
 interface Article {
-  id: string
-  title: string
-  slug: string
-  category: string
-  content: string
-  tags: string[]
-  status: 'DRAFT' | 'PUBLISHED'
+  id: string;
+  title: string;
+  slug: string;
+  category: string;
+  content: string;
+  tags: string[];
+  status: 'DRAFT' | 'PUBLISHED';
 }
 
 interface HelpArticleEditorProps {
-  article: Article | null
-  onClose: (saved: boolean) => void
+  article: Article | null;
+  onClose: (saved: boolean) => void;
 }
 
-export default function HelpArticleEditor({ article, onClose }: HelpArticleEditorProps) {
-  const t = useTranslations('help.admin')
-  const [saving, setSaving] = useState(false)
-  const [preview, setPreview] = useState(false)
+export default function HelpArticleEditor({
+  article,
+  onClose,
+}: HelpArticleEditorProps) {
+  const t = useTranslations('help.admin');
+  const [saving, setSaving] = useState(false);
+  const [preview, setPreview] = useState(false);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
     watch,
-    setValue
+    setValue,
   } = useForm<ArticleFormData>({
     resolver: zodResolver(articleSchema),
-    defaultValues: article ? {
-      title: article.title,
-      slug: article.slug,
-      category: article.category,
-      content: article.content,
-      tags: article.tags.join(', '),
-      status: article.status
-    } : {
-      title: '',
-      slug: '',
-      category: '',
-      content: '',
-      tags: '',
-      status: 'DRAFT'
-    }
-  })
+    defaultValues: article
+      ? {
+          title: article.title,
+          slug: article.slug,
+          category: article.category,
+          content: article.content,
+          tags: article.tags.join(', '),
+          status: article.status,
+        }
+      : {
+          title: '',
+          slug: '',
+          category: '',
+          content: '',
+          tags: '',
+          status: 'DRAFT',
+        },
+  });
 
-  const title = watch('title')
+  const title = watch('title');
 
   // Auto-generate slug from title
   useEffect(() => {
@@ -73,43 +82,46 @@ export default function HelpArticleEditor({ article, onClose }: HelpArticleEdito
         .replace(/[^a-z0-9\s-]/g, '')
         .replace(/\s+/g, '-')
         .replace(/-+/g, '-')
-        .trim()
-      setValue('slug', slug)
+        .trim();
+      setValue('slug', slug);
     }
-  }, [title, article, setValue])
+  }, [title, article, setValue]);
 
   async function onSubmit(data: ArticleFormData) {
-    setSaving(true)
+    setSaving(true);
 
     try {
       const payload = {
         ...data,
-        tags: data.tags.split(',').map(t => t.trim()).filter(Boolean)
-      }
+        tags: data.tags
+          .split(',')
+          .map((t) => t.trim())
+          .filter(Boolean),
+      };
 
       const url = article
         ? `/api/help/articles/${article.slug}`
-        : '/api/help/articles'
-      
-      const method = article ? 'PATCH' : 'POST'
+        : '/api/help/articles';
+
+      const method = article ? 'PATCH' : 'POST';
 
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      })
+        body: JSON.stringify(payload),
+      });
 
       if (res.ok) {
-        onClose(true)
+        onClose(true);
       } else {
-        const error = await res.json()
-        alert(error.error || t('saveFailed'))
+        const error = await res.json();
+        alert(error.error || t('saveFailed'));
       }
     } catch (error) {
-      console.error('Error saving article:', error)
-      alert(t('saveFailed'))
+      console.error('Error saving article:', error);
+      alert(t('saveFailed'));
     } finally {
-      setSaving(false)
+      setSaving(false);
     }
   }
 
@@ -130,10 +142,16 @@ export default function HelpArticleEditor({ article, onClose }: HelpArticleEdito
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit(onSubmit)} className="flex-1 overflow-y-auto p-6 space-y-6">
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="flex-1 overflow-y-auto p-6 space-y-6"
+        >
           {/* Title */}
           <div>
-            <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label
+              htmlFor="title"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+            >
               {t('title')} <span className="text-red-500">*</span>
             </label>
             <input
@@ -143,13 +161,18 @@ export default function HelpArticleEditor({ article, onClose }: HelpArticleEdito
               className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-teal-500 focus:border-teal-500"
             />
             {errors.title && (
-              <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.title.message}</p>
+              <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                {errors.title.message}
+              </p>
             )}
           </div>
 
           {/* Slug */}
           <div>
-            <label htmlFor="slug" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label
+              htmlFor="slug"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+            >
               {t('slug')} <span className="text-red-500">*</span>
             </label>
             <input
@@ -159,7 +182,9 @@ export default function HelpArticleEditor({ article, onClose }: HelpArticleEdito
               className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-teal-500 focus:border-teal-500"
             />
             {errors.slug && (
-              <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.slug.message}</p>
+              <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                {errors.slug.message}
+              </p>
             )}
             <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
               {t('slugHelp')}
@@ -168,7 +193,10 @@ export default function HelpArticleEditor({ article, onClose }: HelpArticleEdito
 
           {/* Category */}
           <div>
-            <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label
+              htmlFor="category"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+            >
               {t('category')} <span className="text-red-500">*</span>
             </label>
             <input
@@ -179,13 +207,18 @@ export default function HelpArticleEditor({ article, onClose }: HelpArticleEdito
               className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-teal-500 focus:border-teal-500"
             />
             {errors.category && (
-              <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.category.message}</p>
+              <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                {errors.category.message}
+              </p>
             )}
           </div>
 
           {/* Tags */}
           <div>
-            <label htmlFor="tags" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label
+              htmlFor="tags"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+            >
               {t('tags')}
             </label>
             <input
@@ -202,7 +235,10 @@ export default function HelpArticleEditor({ article, onClose }: HelpArticleEdito
 
           {/* Content */}
           <div>
-            <label htmlFor="content" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label
+              htmlFor="content"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+            >
               {t('content')} <span className="text-red-500">*</span>
             </label>
             <textarea
@@ -213,7 +249,9 @@ export default function HelpArticleEditor({ article, onClose }: HelpArticleEdito
               className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-mono text-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500"
             />
             {errors.content && (
-              <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.content.message}</p>
+              <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                {errors.content.message}
+              </p>
             )}
             <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
               {t('markdownSupported')}
@@ -222,7 +260,10 @@ export default function HelpArticleEditor({ article, onClose }: HelpArticleEdito
 
           {/* Status */}
           <div>
-            <label htmlFor="status" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label
+              htmlFor="status"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+            >
               {t('status')} <span className="text-red-500">*</span>
             </label>
             <select
@@ -255,5 +296,5 @@ export default function HelpArticleEditor({ article, onClose }: HelpArticleEdito
         </div>
       </div>
     </div>
-  )
+  );
 }

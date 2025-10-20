@@ -1,19 +1,19 @@
-'use client'
+'use client';
 
-import { useState, useEffect, useCallback } from 'react'
-import { useTranslations } from '@/hooks/useTranslations'
-import { CheckCircle2, AlertCircle, ChevronDown } from 'lucide-react'
-import type { ColumnMapping, ParsedData } from '@/types/import'
+import { useState, useEffect, useCallback } from 'react';
+import { useTranslations } from '@/hooks/useTranslations';
+import { CheckCircle2, AlertCircle, ChevronDown } from 'lucide-react';
+import type { ColumnMapping, ParsedData } from '@/types/import';
 
 interface ColumnMappingStepProps {
-  parsedData: ParsedData
-  initialMapping: ColumnMapping
-  onComplete: (mapping: ColumnMapping) => void
-  onBack: () => void
+  parsedData: ParsedData;
+  initialMapping: ColumnMapping;
+  onComplete: (mapping: ColumnMapping) => void;
+  onBack: () => void;
 }
 
-const REQUIRED_FIELDS = ['itemName', 'batch', 'quantity', 'destination']
-const OPTIONAL_FIELDS = ['reject', 'category', 'notes']
+const REQUIRED_FIELDS = ['itemName', 'batch', 'quantity', 'destination'];
+const OPTIONAL_FIELDS = ['reject', 'category', 'notes'];
 
 export default function ColumnMappingStep({
   parsedData,
@@ -21,13 +21,13 @@ export default function ColumnMappingStep({
   onComplete,
   onBack,
 }: ColumnMappingStepProps) {
-  const t = useTranslations('import.mapping')
-  const [mapping, setMapping] = useState<ColumnMapping>(initialMapping)
-  const [autoDetected, setAutoDetected] = useState(false)
+  const t = useTranslations('import.mapping');
+  const [mapping, setMapping] = useState<ColumnMapping>(initialMapping);
+  const [autoDetected, setAutoDetected] = useState(false);
 
   // Auto-detect column mapping
   useEffect(() => {
-    if (autoDetected) return
+    if (autoDetected) return;
 
     const newMapping: ColumnMapping = {
       itemName: null,
@@ -37,105 +37,129 @@ export default function ColumnMappingStep({
       destination: null,
       category: null,
       notes: null,
-    }
+    };
 
-    const headers = parsedData.headers.map((h) => h.toLowerCase())
+    const headers = parsedData.headers.map((h) => h.toLowerCase());
 
     // Auto-detect itemName
-    const itemNameVariants = ['itemname', 'item_name', 'item name', 'name', 'product']
+    const itemNameVariants = [
+      'itemname',
+      'item_name',
+      'item name',
+      'name',
+      'product',
+    ];
     for (const variant of itemNameVariants) {
-      const index = headers.findIndex((h) => h.includes(variant))
+      const index = headers.findIndex((h) => h.includes(variant));
       if (index !== -1) {
-        newMapping.itemName = parsedData.headers[index]
-        break
+        newMapping.itemName = parsedData.headers[index];
+        break;
       }
     }
 
     // Auto-detect batch
-    const batchVariants = ['batch', 'batch number', 'batch_number', 'batchnumber', 'lot']
+    const batchVariants = [
+      'batch',
+      'batch number',
+      'batch_number',
+      'batchnumber',
+      'lot',
+    ];
     for (const variant of batchVariants) {
-      const index = headers.findIndex((h) => h.includes(variant))
+      const index = headers.findIndex((h) => h.includes(variant));
       if (index !== -1) {
-        newMapping.batch = parsedData.headers[index]
-        break
+        newMapping.batch = parsedData.headers[index];
+        break;
       }
     }
 
     // Auto-detect quantity
-    const quantityVariants = ['quantity', 'qty', 'amount', 'count']
+    const quantityVariants = ['quantity', 'qty', 'amount', 'count'];
     for (const variant of quantityVariants) {
-      const index = headers.findIndex((h) => h.includes(variant))
+      const index = headers.findIndex((h) => h.includes(variant));
       if (index !== -1) {
-        newMapping.quantity = parsedData.headers[index]
-        break
+        newMapping.quantity = parsedData.headers[index];
+        break;
       }
     }
 
     // Auto-detect reject
-    const rejectVariants = ['reject', 'rejected', 'defect', 'defective']
+    const rejectVariants = ['reject', 'rejected', 'defect', 'defective'];
     for (const variant of rejectVariants) {
-      const index = headers.findIndex((h) => h.includes(variant))
+      const index = headers.findIndex((h) => h.includes(variant));
       if (index !== -1) {
-        newMapping.reject = parsedData.headers[index]
-        break
+        newMapping.reject = parsedData.headers[index];
+        break;
       }
     }
 
     // Auto-detect destination
-    const destinationVariants = ['destination', 'dest', 'location', 'site']
+    const destinationVariants = ['destination', 'dest', 'location', 'site'];
     for (const variant of destinationVariants) {
-      const index = headers.findIndex((h) => h.includes(variant))
+      const index = headers.findIndex((h) => h.includes(variant));
       if (index !== -1) {
-        newMapping.destination = parsedData.headers[index]
-        break
+        newMapping.destination = parsedData.headers[index];
+        break;
       }
     }
 
     // Auto-detect category
-    const categoryVariants = ['category', 'cat', 'type', 'class']
+    const categoryVariants = ['category', 'cat', 'type', 'class'];
     for (const variant of categoryVariants) {
-      const index = headers.findIndex((h) => h.includes(variant))
+      const index = headers.findIndex((h) => h.includes(variant));
       if (index !== -1) {
-        newMapping.category = parsedData.headers[index]
-        break
+        newMapping.category = parsedData.headers[index];
+        break;
       }
     }
 
     // Auto-detect notes
-    const notesVariants = ['notes', 'note', 'comments', 'comment', 'remarks', 'description']
+    const notesVariants = [
+      'notes',
+      'note',
+      'comments',
+      'comment',
+      'remarks',
+      'description',
+    ];
     for (const variant of notesVariants) {
-      const index = headers.findIndex((h) => h.includes(variant))
+      const index = headers.findIndex((h) => h.includes(variant));
       if (index !== -1) {
-        newMapping.notes = parsedData.headers[index]
-        break
+        newMapping.notes = parsedData.headers[index];
+        break;
       }
     }
 
-    setMapping(newMapping)
-    setAutoDetected(true)
-  }, [parsedData.headers, autoDetected])
+    setMapping(newMapping);
+    setAutoDetected(true);
+  }, [parsedData.headers, autoDetected]);
 
-  const handleMappingChange = useCallback((field: keyof ColumnMapping, value: string | null) => {
-    setMapping((prev) => ({ ...prev, [field]: value }))
-  }, [])
+  const handleMappingChange = useCallback(
+    (field: keyof ColumnMapping, value: string | null) => {
+      setMapping((prev) => ({ ...prev, [field]: value }));
+    },
+    []
+  );
 
   const isValid = useCallback(() => {
-    return REQUIRED_FIELDS.every((field) => mapping[field as keyof ColumnMapping] !== null)
-  }, [mapping])
+    return REQUIRED_FIELDS.every(
+      (field) => mapping[field as keyof ColumnMapping] !== null
+    );
+  }, [mapping]);
 
   const handleContinue = useCallback(() => {
     if (isValid()) {
-      onComplete(mapping)
+      onComplete(mapping);
     }
-  }, [isValid, mapping, onComplete])
+  }, [isValid, mapping, onComplete]);
 
   const getExampleValue = useCallback(
     (columnName: string | null) => {
-      if (!columnName || parsedData.preview.length === 0) return null
-      return parsedData.preview[0][columnName]
+      if (!columnName || parsedData.preview.length === 0) return null;
+      return parsedData.preview[0][columnName];
     },
     [parsedData.preview]
-  )
+  );
 
   return (
     <div className="space-y-6">
@@ -143,7 +167,9 @@ export default function ColumnMappingStep({
         <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
           {t('title')}
         </h3>
-        <p className="text-sm text-gray-600 dark:text-gray-400">{t('description')}</p>
+        <p className="text-sm text-gray-600 dark:text-gray-400">
+          {t('description')}
+        </p>
       </div>
 
       {/* Mapping Table */}
@@ -164,9 +190,9 @@ export default function ColumnMappingStep({
           </thead>
           <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
             {[...REQUIRED_FIELDS, ...OPTIONAL_FIELDS].map((field) => {
-              const isRequired = REQUIRED_FIELDS.includes(field)
-              const selectedColumn = mapping[field as keyof ColumnMapping]
-              const exampleValue = getExampleValue(selectedColumn)
+              const isRequired = REQUIRED_FIELDS.includes(field);
+              const selectedColumn = mapping[field as keyof ColumnMapping];
+              const exampleValue = getExampleValue(selectedColumn);
 
               return (
                 <tr key={field}>
@@ -176,7 +202,9 @@ export default function ColumnMappingStep({
                         {t(`fields.${field}`)}
                       </span>
                       {isRequired ? (
-                        <span className="text-xs text-red-600 dark:text-red-400">*</span>
+                        <span className="text-xs text-red-600 dark:text-red-400">
+                          *
+                        </span>
                       ) : (
                         <span className="text-xs text-gray-500 dark:text-gray-400">
                           ({t('optional')})
@@ -213,11 +241,13 @@ export default function ColumnMappingStep({
                         {String(exampleValue).length > 50 ? '...' : ''}
                       </span>
                     ) : (
-                      <span className="text-sm text-gray-400 dark:text-gray-500">-</span>
+                      <span className="text-sm text-gray-400 dark:text-gray-500">
+                        -
+                      </span>
                     )}
                   </td>
                 </tr>
-              )
+              );
             })}
           </tbody>
         </table>
@@ -275,5 +305,5 @@ export default function ColumnMappingStep({
         </button>
       </div>
     </div>
-  )
+  );
 }

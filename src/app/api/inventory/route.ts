@@ -1,10 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@/services/auth'
-import { prisma } from '@/services/prisma'
-import { inventoryItemSchema } from '@/utils/validators'
-import { DEFAULT_PAGE_SIZE } from '@/utils/constants'
-import { auditInventoryAction, extractRequestMetadata } from '@/utils/audit'
-import { sanitizeString, sanitizeObject } from '@/utils/sanitize'
+import { NextRequest, NextResponse } from 'next/server';
+import { auth } from '@/services/auth';
+import { prisma } from '@/services/prisma';
+import { inventoryItemSchema } from '@/utils/validators';
+import { DEFAULT_PAGE_SIZE } from '@/utils/constants';
+import { auditInventoryAction, extractRequestMetadata } from '@/utils/audit';
+import { sanitizeString, sanitizeObject } from '@/utils/sanitize';
 import {
   successResponse,
   authRequiredError,
@@ -12,7 +12,7 @@ import {
   validationError,
   notFoundError,
   handleApiError,
-} from '@/utils/api-response'
+} from '@/utils/api-response';
 
 /**
  * GET /api/inventory
@@ -21,33 +21,41 @@ import {
 export async function GET(request: NextRequest) {
   try {
     // Check authentication
-    const session = await auth()
+    const session = await auth();
     if (!session?.user) {
-      return authRequiredError()
+      return authRequiredError();
     }
 
     // Check permissions
     if (!session.user.permissions.includes('inventory:read')) {
-      return insufficientPermissionsError()
+      return insufficientPermissionsError();
     }
 
     // Parse query parameters
-    const searchParams = request.nextUrl.searchParams
-    const page = parseInt(searchParams.get('page') || '1')
-    const limit = Math.min(parseInt(searchParams.get('limit') || String(DEFAULT_PAGE_SIZE)), 200)
-    const search = searchParams.get('search')
-    const destination = searchParams.get('destination') as 'MAIS' | 'FOZAN' | null
-    const startDate = searchParams.get('startDate')
-    const endDate = searchParams.get('endDate')
-    const sortBy = searchParams.get('sortBy') || 'createdAt'
-    const sortOrder = (searchParams.get('sortOrder') || 'desc') as 'asc' | 'desc'
+    const searchParams = request.nextUrl.searchParams;
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = Math.min(
+      parseInt(searchParams.get('limit') || String(DEFAULT_PAGE_SIZE)),
+      200
+    );
+    const search = searchParams.get('search');
+    const destination = searchParams.get('destination') as
+      | 'MAIS'
+      | 'FOZAN'
+      | null;
+    const startDate = searchParams.get('startDate');
+    const endDate = searchParams.get('endDate');
+    const sortBy = searchParams.get('sortBy') || 'createdAt';
+    const sortOrder = (searchParams.get('sortOrder') || 'desc') as
+      | 'asc'
+      | 'desc';
 
     // Build where clause
-    const where: any = {}
-    
+    const where: any = {};
+
     // Exclude soft-deleted items
-    where.deletedAt = null
-    
+    where.deletedAt = null;
+
     // Search in itemName and batch
     if (search) {
       where.OR = [
@@ -63,36 +71,36 @@ export async function GET(request: NextRequest) {
             mode: 'insensitive',
           },
         },
-      ]
+      ];
     }
-    
+
     // Filter by destination
     if (destination) {
-      where.destination = destination
+      where.destination = destination;
     }
-    
+
     // Date range filters
     if (startDate || endDate) {
-      where.createdAt = {}
+      where.createdAt = {};
       if (startDate) {
-        where.createdAt.gte = new Date(startDate)
+        where.createdAt.gte = new Date(startDate);
       }
       if (endDate) {
-        where.createdAt.lte = new Date(endDate)
+        where.createdAt.lte = new Date(endDate);
       }
     }
 
     // Role-based filtering: DATA_ENTRY users only see their own items
     if (session.user.role === 'DATA_ENTRY') {
-      where.enteredById = session.user.id
+      where.enteredById = session.user.id;
     }
 
     // Get total count
-    const total = await prisma.inventoryItem.count({ where })
+    const total = await prisma.inventoryItem.count({ where });
 
     // Build orderBy clause
-    const orderBy: any = {}
-    orderBy[sortBy] = sortOrder
+    const orderBy: any = {};
+    orderBy[sortBy] = sortOrder;
 
     // Get paginated items with user details
     const items = await prisma.inventoryItem.findMany({
@@ -109,9 +117,9 @@ export async function GET(request: NextRequest) {
       orderBy,
       skip: (page - 1) * limit,
       take: limit,
-    })
+    });
 
-    const totalPages = Math.ceil(total / limit)
+    const totalPages = Math.ceil(total / limit);
 
     return successResponse({
       items,
@@ -123,9 +131,9 @@ export async function GET(request: NextRequest) {
         hasNext: page < totalPages,
         hasPrev: page > 1,
       },
-    })
+    });
   } catch (error) {
-    return handleApiError(error)
+    return handleApiError(error);
   }
 }
 
@@ -136,27 +144,30 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     // Check authentication
-    const session = await auth()
+    const session = await auth();
     if (!session?.user) {
-      return authRequiredError()
+      return authRequiredError();
     }
 
     // Check permissions
     if (!session.user.permissions.includes('inventory:write')) {
-      return insufficientPermissionsError()
+      return insufficientPermissionsError();
     }
 
     // Parse and validate request body
-    const body = await request.json()
-    
+    const body = await request.json();
+
     // Validate with Zod schema
-    const validationResult = inventoryItemSchema.safeParse(body)
-    
+    const validationResult = inventoryItemSchema.safeParse(body);
+
     if (!validationResult.success) {
-      return validationError('Validation failed', validationResult.error.errors)
+      return validationError(
+        'Validation failed',
+        validationResult.error.errors
+      );
     }
 
-    const data = validationResult.data
+    const data = validationResult.data;
 
     // Sanitize string inputs
     const sanitizedData = {
@@ -167,7 +178,7 @@ export async function POST(request: NextRequest) {
       destination: data.destination,
       category: data.category ? sanitizeString(data.category) : undefined,
       notes: data.notes ? sanitizeString(data.notes) : undefined,
-    }
+    };
 
     // Create inventory item with auto-assigned enteredById
     const inventoryItem = await prisma.inventoryItem.create({
@@ -184,20 +195,24 @@ export async function POST(request: NextRequest) {
           },
         },
       },
-    })
+    });
 
     // Create audit log with action=CREATE
-    const metadata = extractRequestMetadata(request)
+    const metadata = extractRequestMetadata(request);
     await auditInventoryAction(
       session.user.id,
       'CREATE',
       inventoryItem,
       undefined,
       metadata
-    )
+    );
 
-    return successResponse(inventoryItem, 'Inventory item created successfully', 201)
+    return successResponse(
+      inventoryItem,
+      'Inventory item created successfully',
+      201
+    );
   } catch (error) {
-    return handleApiError(error)
+    return handleApiError(error);
   }
 }

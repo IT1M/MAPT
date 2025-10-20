@@ -2,14 +2,21 @@
 
 import React from 'react';
 import { useLocale } from '@/hooks/useLocale';
-import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer } from 'recharts';
+import {
+  PieChart,
+  Pie,
+  Cell,
+  Legend,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts';
 import { Card } from '@/components/ui/card';
 import { useTranslations } from '@/hooks/useTranslations';
-import { 
-  formatChartNumber, 
-  getChartTitleAlign, 
+import {
+  formatChartNumber,
+  getChartTitleAlign,
   getChartControlsClass,
-  getLegendConfig 
+  getLegendConfig,
 } from '@/utils/analytics-rtl';
 import { downloadCSV } from '@/utils/download-helper';
 
@@ -75,7 +82,10 @@ export const DestinationChart: React.FC<DestinationChartProps> = ({
         .map((row) => row.join(','))
         .join('\n');
 
-      downloadCSV(csv, `destination-distribution-${new Date().toISOString().split('T')[0]}.csv`);
+      downloadCSV(
+        csv,
+        `destination-distribution-${new Date().toISOString().split('T')[0]}.csv`
+      );
     }
   };
 
@@ -121,8 +131,12 @@ export const DestinationChart: React.FC<DestinationChartProps> = ({
     <Card>
       <div className="p-6" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
         {/* Header */}
-        <div className={`flex items-center justify-between mb-4 ${controlsClass}`}>
-          <h3 className={`text-lg font-semibold text-gray-900 dark:text-gray-100 ${titleAlign}`}>
+        <div
+          className={`flex items-center justify-between mb-4 ${controlsClass}`}
+        >
+          <h3
+            className={`text-lg font-semibold text-gray-900 dark:text-gray-100 ${titleAlign}`}
+          >
             {t('charts.destination')}
           </h3>
           <div className={`flex gap-2 ${controlsClass}`}>
@@ -192,7 +206,10 @@ export const DestinationChart: React.FC<DestinationChartProps> = ({
               align={legendConfig.align}
               wrapperStyle={legendConfig.wrapperStyle}
               formatter={(value, entry: any) => {
-                const percentage = ((entry.payload.value / total) * 100).toFixed(1);
+                const percentage = (
+                  (entry.payload.value / total) *
+                  100
+                ).toFixed(1);
                 return `${value}: ${formatChartNumber(entry.payload.value, locale)} (${percentage}%)`;
               }}
             />

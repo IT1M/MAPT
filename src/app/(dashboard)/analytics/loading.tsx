@@ -1,4 +1,4 @@
-import { Card } from '@/components/ui/card'
+import { Card } from '@/components/ui/card';
 
 export default function AnalyticsLoading() {
   return (
@@ -72,5 +72,5 @@ export default function AnalyticsLoading() {
         </Card.Body>
       </Card>
     </div>
-  )
+  );
 }

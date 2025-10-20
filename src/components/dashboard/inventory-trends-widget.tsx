@@ -1,55 +1,55 @@
-'use client'
+'use client';
 
-import { useEffect, useState } from 'react'
-import { Card } from '@/components/ui/card'
-import { useTranslations } from '@/hooks/useTranslations'
+import { useEffect, useState } from 'react';
+import { Card } from '@/components/ui/card';
+import { useTranslations } from '@/hooks/useTranslations';
 
 interface InventoryTrend {
-  product: string
-  trend: 'increasing' | 'decreasing' | 'stable'
-  confidence: number
-  recommendation: string
+  product: string;
+  trend: 'increasing' | 'decreasing' | 'stable';
+  confidence: number;
+  recommendation: string;
 }
 
 interface ApiResponse {
-  success: boolean
-  data?: InventoryTrend[]
+  success: boolean;
+  data?: InventoryTrend[];
   error?: {
-    code: string
-    message: string
-  }
+    code: string;
+    message: string;
+  };
 }
 
 export function InventoryTrendsWidget() {
-  const t = useTranslations()
-  const [trends, setTrends] = useState<InventoryTrend[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const t = useTranslations();
+  const [trends, setTrends] = useState<InventoryTrend[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchTrends()
-  }, [])
+    fetchTrends();
+  }, []);
 
   const fetchTrends = async () => {
     try {
-      setLoading(true)
-      setError(null)
+      setLoading(true);
+      setError(null);
 
-      const response = await fetch('/api/ai/trends')
-      const data: ApiResponse = await response.json()
+      const response = await fetch('/api/ai/trends');
+      const data: ApiResponse = await response.json();
 
       if (!response.ok || !data.success) {
-        throw new Error(data.error?.message || 'Failed to fetch trends')
+        throw new Error(data.error?.message || 'Failed to fetch trends');
       }
 
-      setTrends(data.data || [])
+      setTrends(data.data || []);
     } catch (err: any) {
-      console.error('Error fetching inventory trends:', err)
-      setError(err.message || 'Failed to load trends')
+      console.error('Error fetching inventory trends:', err);
+      setError(err.message || 'Failed to load trends');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const getTrendIcon = (trend: string) => {
     switch (trend) {
@@ -68,7 +68,7 @@ export function InventoryTrendsWidget() {
               d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
             />
           </svg>
-        )
+        );
       case 'decreasing':
         return (
           <svg
@@ -84,7 +84,7 @@ export function InventoryTrendsWidget() {
               d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"
             />
           </svg>
-        )
+        );
       case 'stable':
       default:
         return (
@@ -101,37 +101,37 @@ export function InventoryTrendsWidget() {
               d="M5 12h14"
             />
           </svg>
-        )
+        );
     }
-  }
+  };
 
   const getTrendColor = (trend: string) => {
     switch (trend) {
       case 'increasing':
-        return 'bg-accent-50 dark:bg-accent-900/20 border-accent-200 dark:border-accent-800'
+        return 'bg-accent-50 dark:bg-accent-900/20 border-accent-200 dark:border-accent-800';
       case 'decreasing':
-        return 'bg-danger-50 dark:bg-danger-900/20 border-danger-200 dark:border-danger-800'
+        return 'bg-danger-50 dark:bg-danger-900/20 border-danger-200 dark:border-danger-800';
       case 'stable':
       default:
-        return 'bg-primary-50 dark:bg-primary-900/20 border-primary-200 dark:border-primary-800'
+        return 'bg-primary-50 dark:bg-primary-900/20 border-primary-200 dark:border-primary-800';
     }
-  }
+  };
 
   const getTrendLabel = (trend: string) => {
     switch (trend) {
       case 'increasing':
-        return t('dashboard.trendIncreasing')
+        return t('dashboard.trendIncreasing');
       case 'decreasing':
-        return t('dashboard.trendDecreasing')
+        return t('dashboard.trendDecreasing');
       case 'stable':
       default:
-        return t('dashboard.trendStable')
+        return t('dashboard.trendStable');
     }
-  }
+  };
 
   const formatConfidence = (confidence: number) => {
-    return `${Math.round(confidence * 100)}%`
-  }
+    return `${Math.round(confidence * 100)}%`;
+  };
 
   return (
     <Card>
@@ -247,7 +247,8 @@ export function InventoryTrendsWidget() {
                         {trend.product}
                       </h4>
                       <span className="text-xs font-medium text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-800 px-2 py-1 rounded">
-                        {formatConfidence(trend.confidence)} {t('dashboard.confidence')}
+                        {formatConfidence(trend.confidence)}{' '}
+                        {t('dashboard.confidence')}
                       </span>
                     </div>
                     <div className="flex items-center gap-2 mb-2">
@@ -266,5 +267,5 @@ export function InventoryTrendsWidget() {
         )}
       </Card.Body>
     </Card>
-  )
+  );
 }

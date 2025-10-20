@@ -1,26 +1,26 @@
-'use client'
+'use client';
 
-import { useState, useCallback } from 'react'
-import { useTranslations } from '@/hooks/useTranslations'
-import { PasswordChangeForm, PasswordChangeData } from './PasswordChangeForm'
-import { SessionManager } from './SessionManager'
-import { SecurityAuditLog, SecurityEvent } from './SecurityAuditLog'
-import { UserSession } from './SessionCard'
+import { useState, useCallback } from 'react';
+import { useTranslations } from '@/hooks/useTranslations';
+import { PasswordChangeForm, PasswordChangeData } from './PasswordChangeForm';
+import { SessionManager } from './SessionManager';
+import { SecurityAuditLog, SecurityEvent } from './SecurityAuditLog';
+import { UserSession } from './SessionCard';
 
 interface SecuritySettingsProps {
-  userId: string
-  sessions: UserSession[]
-  currentSessionId: string
-  securityEvents: SecurityEvent[]
-  totalEvents: number
-  currentPage: number
-  pageSize: number
-  onPasswordChange: (data: PasswordChangeData) => Promise<void>
-  onSessionTerminate: (sessionId: string) => Promise<void>
-  onSessionTerminateAll: () => Promise<void>
-  onSessionsRefresh: () => Promise<void>
-  onPageChange: (page: number) => void
-  onExportLog: () => Promise<void>
+  userId: string;
+  sessions: UserSession[];
+  currentSessionId: string;
+  securityEvents: SecurityEvent[];
+  totalEvents: number;
+  currentPage: number;
+  pageSize: number;
+  onPasswordChange: (data: PasswordChangeData) => Promise<void>;
+  onSessionTerminate: (sessionId: string) => Promise<void>;
+  onSessionTerminateAll: () => Promise<void>;
+  onSessionsRefresh: () => Promise<void>;
+  onPageChange: (page: number) => void;
+  onExportLog: () => Promise<void>;
 }
 
 export function SecuritySettings({
@@ -38,7 +38,7 @@ export function SecuritySettings({
   onPageChange,
   onExportLog,
 }: SecuritySettingsProps) {
-  const t = useTranslations('settings.security')
+  const t = useTranslations('settings.security');
 
   return (
     <div className="space-y-8">
@@ -80,5 +80,5 @@ export function SecuritySettings({
         />
       </section>
     </div>
-  )
+  );
 }

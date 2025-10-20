@@ -9,6 +9,7 @@ Each user role has a customized dashboard experience with widgets and components
 ## Admin Dashboard
 
 **Components:**
+
 - `SystemHealthWidget` - Real-time system health monitoring (database, AI, backups, storage, active users)
 - `QuickActionsPanel` - Quick access buttons for common admin tasks (create user, backup, reports, settings, audit logs, analytics)
 - `UserActivityChart` - Bar chart showing user activity over the last 7 days
@@ -20,6 +21,7 @@ Each user role has a customized dashboard experience with widgets and components
 ## Manager Dashboard
 
 **Components:**
+
 - `ExecutiveSummaryCards` - High-level KPIs (total items, revenue impact, reject rate, efficiency)
 - `AnalyticsOverview` - Interactive charts with time range selection (7d, 30d, 90d)
 - `ReportsCenter` - Recent reports list with status badges and quick generation
@@ -31,6 +33,7 @@ Each user role has a customized dashboard experience with widgets and components
 ## Supervisor Dashboard
 
 **Components:**
+
 - `ItemsRequiringReview` - Flagged items needing supervisor attention with reasons
 - `TeamActivityMonitor` - Real-time feed of team member actions (live updates every 30s)
 - `QualityControlDashboard` - Quality metrics including reject rate, high reject items, and quality trends
@@ -42,6 +45,7 @@ Each user role has a customized dashboard experience with widgets and components
 ## Data Entry Dashboard
 
 **Components:**
+
 - `AddNewItemCard` - Prominent call-to-action card for adding new items with keyboard shortcuts
 - `TodaysEntries` - List of items entered by the user today
 - `PersonalStats` - Personal performance metrics (today, week, month, accuracy)
@@ -53,6 +57,7 @@ Each user role has a customized dashboard experience with widgets and components
 ## Auditor Dashboard
 
 **Components:**
+
 - `AdvancedSearchBar` - Powerful search interface for audit logs with filters and quick searches
 - `AuditOverview` - Summary cards showing total events, today's events, critical events, and unique users
 - `ActivityHeatmap` - Visual heatmap showing activity patterns by day and hour
@@ -65,18 +70,21 @@ Each user role has a customized dashboard experience with widgets and components
 Each dashboard component fetches data from specific API endpoints:
 
 ### Admin
+
 - `GET /api/dashboard/system-health` - System health status
 - `GET /api/dashboard/user-activity` - User activity data
 - `GET /api/dashboard/alerts` - System alerts
 - `GET /api/dashboard/system-stats` - System statistics
 
 ### Manager
+
 - `GET /api/dashboard/executive-summary` - Executive summary data
 - `GET /api/dashboard/analytics?range={7d|30d|90d}` - Analytics data
 - `GET /api/dashboard/recent-reports` - Recent reports
 - `GET /api/dashboard/team-performance` - Team performance metrics
 
 ### Supervisor
+
 - `GET /api/dashboard/items-for-review` - Items requiring review
 - `GET /api/dashboard/team-activity` - Team activity feed
 - `GET /api/dashboard/quality-metrics` - Quality control metrics
@@ -84,11 +92,13 @@ Each dashboard component fetches data from specific API endpoints:
 - `GET /api/dashboard/audit-highlights` - Audit highlights
 
 ### Data Entry
+
 - `GET /api/dashboard/my-entries-today` - User's entries today
 - `GET /api/dashboard/my-stats` - Personal statistics
 - `GET /api/dashboard/recent-batches` - Recent batch numbers
 
 ### Auditor
+
 - `GET /api/dashboard/audit-overview` - Audit overview statistics
 - `GET /api/dashboard/activity-heatmap` - Activity heatmap data
 - `GET /api/dashboard/user-behavior` - User behavior analysis
@@ -96,26 +106,31 @@ Each dashboard component fetches data from specific API endpoints:
 ## Features
 
 ### Real-time Updates
+
 - System health refreshes every 30 seconds
 - Team activity monitor updates every 30 seconds
 - Live indicators show when data is being updated
 
 ### Responsive Design
+
 - All components are fully responsive
 - Mobile-optimized layouts
 - Touch-friendly interactions
 
 ### Dark Mode Support
+
 - All components support dark mode
 - Proper color contrast in both themes
 - Smooth theme transitions
 
 ### Loading States
+
 - Skeleton loaders for better UX
 - Graceful error handling
 - Empty state messages
 
 ### Accessibility
+
 - ARIA labels and roles
 - Keyboard navigation support
 - Screen reader friendly
@@ -124,7 +139,7 @@ Each dashboard component fetches data from specific API endpoints:
 ## Usage Example
 
 ```tsx
-import { RoleBasedDashboard } from '@/components/dashboard'
+import { RoleBasedDashboard } from '@/components/dashboard';
 
 export default function DashboardPage() {
   const data = {
@@ -140,10 +155,10 @@ export default function DashboardPage() {
     maisPercentage: 60,
     fozanPercentage: 40,
     trendData: [10, 15, 12, 18, 20, 16, 22],
-    recentActivities: []
-  }
+    recentActivities: [],
+  };
 
-  return <RoleBasedDashboard data={data} />
+  return <RoleBasedDashboard data={data} />;
 }
 ```
 
@@ -159,6 +174,7 @@ To add new components to a role-specific dashboard:
 ## Testing
 
 Each component should be tested for:
+
 - Data loading and error states
 - User interactions
 - Responsive behavior

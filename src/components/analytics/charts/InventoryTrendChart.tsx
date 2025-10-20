@@ -20,7 +20,7 @@ import {
   getRechartsRTLConfig,
   formatChartNumber,
   getChartTitleAlign,
-  getChartControlsClass
+  getChartControlsClass,
 } from '@/utils/analytics-rtl';
 import { AccessibleChartWrapper } from '../AccessibleChartWrapper';
 import type { TableColumn } from '@/utils/accessibility';
@@ -66,10 +66,22 @@ export const InventoryTrendChart: React.FC<InventoryTrendChartProps> = ({
   const tableColumns: TableColumn[] = useMemo(
     () => [
       { key: 'date', label: 'Date' },
-      { key: 'totalQuantity', label: 'Total', format: (v) => v.toLocaleString() },
+      {
+        key: 'totalQuantity',
+        label: 'Total',
+        format: (v) => v.toLocaleString(),
+      },
       { key: 'maisQuantity', label: 'Mais', format: (v) => v.toLocaleString() },
-      { key: 'fozanQuantity', label: 'Fozan', format: (v) => v.toLocaleString() },
-      { key: 'rejectQuantity', label: 'Reject', format: (v) => v.toLocaleString() },
+      {
+        key: 'fozanQuantity',
+        label: 'Fozan',
+        format: (v) => v.toLocaleString(),
+      },
+      {
+        key: 'rejectQuantity',
+        label: 'Reject',
+        format: (v) => v.toLocaleString(),
+      },
     ],
     []
   );
@@ -97,7 +109,10 @@ export const InventoryTrendChart: React.FC<InventoryTrendChartProps> = ({
           .map((row) => row.join(','))
           .join('\n');
 
-        downloadCSV(csv, `inventory-trend-${new Date().toISOString().split('T')[0]}.csv`);
+        downloadCSV(
+          csv,
+          `inventory-trend-${new Date().toISOString().split('T')[0]}.csv`
+        );
       }
     }
   };
@@ -117,8 +132,12 @@ export const InventoryTrendChart: React.FC<InventoryTrendChartProps> = ({
     <Card>
       <div className="p-6" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
         {/* Header */}
-        <div className={`flex items-center justify-between mb-4 ${controlsClass}`}>
-          <h3 className={`text-lg font-semibold text-gray-900 dark:text-gray-100 ${titleAlign}`}>
+        <div
+          className={`flex items-center justify-between mb-4 ${controlsClass}`}
+        >
+          <h3
+            className={`text-lg font-semibold text-gray-900 dark:text-gray-100 ${titleAlign}`}
+          >
             {t('charts.inventoryTrend')}
           </h3>
           <div className={`flex gap-2 ${controlsClass}`}>
@@ -155,117 +174,130 @@ export const InventoryTrendChart: React.FC<InventoryTrendChartProps> = ({
           }
         >
           <ResponsiveContainer width="100%" height={400}>
-          <LineChart data={data} margin={chartLayout.margin}>
-            <defs>
-              <linearGradient id="totalGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
-              </linearGradient>
-              <linearGradient id="maisGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="#06b6d4" stopOpacity={0} />
-              </linearGradient>
-              <linearGradient id="fozanGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
-              </linearGradient>
-            </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" className="dark:stroke-gray-700" />
-            <XAxis
-              dataKey="date"
-              stroke="#6b7280"
-              className="dark:stroke-gray-400"
-              tick={{ fontSize: 12, textAnchor: rtlConfig.xAxis.tick.textAnchor }}
-              reversed={rtlConfig.xAxis.reversed}
-            />
-            <YAxis
-              stroke="#6b7280"
-              className="dark:stroke-gray-400"
-              tick={{ fontSize: 12 }}
-              orientation={rtlConfig.yAxis.orientation}
-            />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                border: '1px solid #e5e7eb',
-                borderRadius: '8px',
-                padding: '12px',
-                direction: locale === 'ar' ? 'rtl' : 'ltr',
-                textAlign: locale === 'ar' ? 'right' : 'left',
-              }}
-              labelStyle={{ fontWeight: 'bold', marginBottom: '8px' }}
-              formatter={(value: number) => formatChartNumber(value, locale)}
-            />
-            <Legend
-              onClick={(e) => {
-                const key = e.dataKey as keyof typeof visibleLines;
-                toggleLine(key);
-              }}
-              wrapperStyle={{
-                cursor: 'pointer',
-                paddingTop: '20px',
-                direction: locale === 'ar' ? 'rtl' : 'ltr',
-              }}
-              align={rtlConfig.legend.align}
-            />
-
-            {visibleLines.total && (
-              <Line
-                type="monotone"
-                dataKey="totalQuantity"
-                stroke="#3b82f6"
-                strokeWidth={3}
-                dot={{ r: 4, cursor: onDataPointClick ? 'pointer' : 'default' }}
-                activeDot={{ r: 6, cursor: onDataPointClick ? 'pointer' : 'default' }}
-                name="Total"
-                fill="url(#totalGradient)"
-                onClick={(data: any) => {
-                  if (onDataPointClick && data?.payload?.date) {
-                    onDataPointClick(data.payload.date)
-                  }
+            <LineChart data={data} margin={chartLayout.margin}>
+              <defs>
+                <linearGradient id="totalGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                </linearGradient>
+                <linearGradient id="maisGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="#06b6d4" stopOpacity={0} />
+                </linearGradient>
+                <linearGradient id="fozanGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="#e5e7eb"
+                className="dark:stroke-gray-700"
+              />
+              <XAxis
+                dataKey="date"
+                stroke="#6b7280"
+                className="dark:stroke-gray-400"
+                tick={{
+                  fontSize: 12,
+                  textAnchor: rtlConfig.xAxis.tick.textAnchor,
                 }}
+                reversed={rtlConfig.xAxis.reversed}
               />
-            )}
-            {visibleLines.mais && (
-              <Line
-                type="monotone"
-                dataKey="maisQuantity"
-                stroke="#06b6d4"
-                strokeWidth={2}
-                dot={{ r: 3 }}
-                activeDot={{ r: 5 }}
-                name="Mais"
-                fill="url(#maisGradient)"
+              <YAxis
+                stroke="#6b7280"
+                className="dark:stroke-gray-400"
+                tick={{ fontSize: 12 }}
+                orientation={rtlConfig.yAxis.orientation}
               />
-            )}
-            {visibleLines.fozan && (
-              <Line
-                type="monotone"
-                dataKey="fozanQuantity"
-                stroke="#10b981"
-                strokeWidth={2}
-                dot={{ r: 3 }}
-                activeDot={{ r: 5 }}
-                name="Fozan"
-                fill="url(#fozanGradient)"
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '8px',
+                  padding: '12px',
+                  direction: locale === 'ar' ? 'rtl' : 'ltr',
+                  textAlign: locale === 'ar' ? 'right' : 'left',
+                }}
+                labelStyle={{ fontWeight: 'bold', marginBottom: '8px' }}
+                formatter={(value: number) => formatChartNumber(value, locale)}
               />
-            )}
-            {visibleLines.reject && (
-              <Line
-                type="monotone"
-                dataKey="rejectQuantity"
-                stroke="#ef4444"
-                strokeWidth={2}
-                strokeDasharray="5 5"
-                dot={{ r: 3 }}
-                activeDot={{ r: 5 }}
-                name="Reject"
+              <Legend
+                onClick={(e) => {
+                  const key = e.dataKey as keyof typeof visibleLines;
+                  toggleLine(key);
+                }}
+                wrapperStyle={{
+                  cursor: 'pointer',
+                  paddingTop: '20px',
+                  direction: locale === 'ar' ? 'rtl' : 'ltr',
+                }}
+                align={rtlConfig.legend.align}
               />
-            )}
 
-            <Brush dataKey="date" height={30} stroke="#3b82f6" />
-          </LineChart>
-        </ResponsiveContainer>
+              {visibleLines.total && (
+                <Line
+                  type="monotone"
+                  dataKey="totalQuantity"
+                  stroke="#3b82f6"
+                  strokeWidth={3}
+                  dot={{
+                    r: 4,
+                    cursor: onDataPointClick ? 'pointer' : 'default',
+                  }}
+                  activeDot={{
+                    r: 6,
+                    cursor: onDataPointClick ? 'pointer' : 'default',
+                  }}
+                  name="Total"
+                  fill="url(#totalGradient)"
+                  onClick={(data: any) => {
+                    if (onDataPointClick && data?.payload?.date) {
+                      onDataPointClick(data.payload.date);
+                    }
+                  }}
+                />
+              )}
+              {visibleLines.mais && (
+                <Line
+                  type="monotone"
+                  dataKey="maisQuantity"
+                  stroke="#06b6d4"
+                  strokeWidth={2}
+                  dot={{ r: 3 }}
+                  activeDot={{ r: 5 }}
+                  name="Mais"
+                  fill="url(#maisGradient)"
+                />
+              )}
+              {visibleLines.fozan && (
+                <Line
+                  type="monotone"
+                  dataKey="fozanQuantity"
+                  stroke="#10b981"
+                  strokeWidth={2}
+                  dot={{ r: 3 }}
+                  activeDot={{ r: 5 }}
+                  name="Fozan"
+                  fill="url(#fozanGradient)"
+                />
+              )}
+              {visibleLines.reject && (
+                <Line
+                  type="monotone"
+                  dataKey="rejectQuantity"
+                  stroke="#ef4444"
+                  strokeWidth={2}
+                  strokeDasharray="5 5"
+                  dot={{ r: 3 }}
+                  activeDot={{ r: 5 }}
+                  name="Reject"
+                />
+              )}
+
+              <Brush dataKey="date" height={30} stroke="#3b82f6" />
+            </LineChart>
+          </ResponsiveContainer>
         </AccessibleChartWrapper>
       </div>
     </Card>

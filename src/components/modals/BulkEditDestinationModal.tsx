@@ -1,18 +1,18 @@
-'use client'
+'use client';
 
-import React, { useState } from 'react'
-import { useTranslations } from '@/hooks/useTranslations'
-import { Modal } from '@/components/ui/modal'
-import { Button } from '@/components/ui/button'
-import { Select } from '@/components/ui/select'
-import { Destination } from '@prisma/client'
-import type { InventoryItemWithUser } from '@/types'
+import React, { useState } from 'react';
+import { useTranslations } from '@/hooks/useTranslations';
+import { Modal } from '@/components/ui/modal';
+import { Button } from '@/components/ui/button';
+import { Select } from '@/components/ui/select';
+import { Destination } from '@prisma/client';
+import type { InventoryItemWithUser } from '@/types';
 
 interface BulkEditDestinationModalProps {
-  items: InventoryItemWithUser[]
-  isOpen: boolean
-  onClose: () => void
-  onSuccess: () => void
+  items: InventoryItemWithUser[];
+  isOpen: boolean;
+  onClose: () => void;
+  onSuccess: () => void;
 }
 
 export function BulkEditDestinationModal({
@@ -21,15 +21,15 @@ export function BulkEditDestinationModal({
   onClose,
   onSuccess,
 }: BulkEditDestinationModalProps) {
-  const t = useTranslations()
-  const [destination, setDestination] = useState<Destination>(Destination.MAIS)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const t = useTranslations();
+  const [destination, setDestination] = useState<Destination>(Destination.MAIS);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError(null)
-    setLoading(true)
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
 
     try {
       const response = await fetch('/api/inventory/bulk-update', {
@@ -43,36 +43,41 @@ export function BulkEditDestinationModal({
             destination,
           },
         }),
-      })
+      });
 
-      const result = await response.json()
+      const result = await response.json();
 
       if (!response.ok || !result.success) {
-        throw new Error(result.error?.message || 'Failed to update destinations')
+        throw new Error(
+          result.error?.message || 'Failed to update destinations'
+        );
       }
 
-      onSuccess()
-      onClose()
+      onSuccess();
+      onClose();
     } catch (err) {
-      console.error('Bulk update error:', err)
-      setError(err instanceof Error ? err.message : 'An error occurred')
+      console.error('Bulk update error:', err);
+      setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleClose = () => {
     if (!loading) {
-      setError(null)
-      onClose()
+      setError(null);
+      onClose();
     }
-  }
+  };
 
   // Count items by current destination
-  const destinationCounts = items.reduce((acc, item) => {
-    acc[item.destination] = (acc[item.destination] || 0) + 1
-    return acc
-  }, {} as Record<Destination, number>)
+  const destinationCounts = items.reduce(
+    (acc, item) => {
+      acc[item.destination] = (acc[item.destination] || 0) + 1;
+      return acc;
+    },
+    {} as Record<Destination, number>
+  );
 
   return (
     <Modal
@@ -234,5 +239,5 @@ export function BulkEditDestinationModal({
         </div>
       </form>
     </Modal>
-  )
+  );
 }

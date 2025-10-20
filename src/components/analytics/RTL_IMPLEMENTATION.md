@@ -14,32 +14,38 @@ The Analytics Dashboard has been enhanced with comprehensive RTL support for Ara
 ## Translation Keys
 
 ### Location
+
 - `messages/en.json` - English translations
 - `messages/ar.json` - Arabic translations
 
 ### Key Sections
 
 #### KPI Cards (`analytics.kpi`)
+
 - `totalItems`, `totalQuantity`, `rejectRate`, `activeUsers`, `categories`, `avgDaily`
 - `topContributor`, `mostActiveCategory`, `maisPercentage`, `fozanPercentage`
 - `trend`, `vsLastPeriod`
 
 #### Charts (`analytics.charts`)
+
 - Chart titles: `inventoryTrend`, `destination`, `category`, `rejectAnalysis`, `userActivity`, `monthlyComparison`
 - Chart elements: `total`, `mais`, `fozan`, `reject`, `accepted`, `rejected`
 - Controls: `sortByQuantity`, `sortByName`, `viewMode`, `zoomIn`, `zoomOut`, `toggleLegend`
 
 #### AI Insights (`analytics.ai`)
+
 - Panel: `insights`, `generating`, `error`, `noInsights`, `refresh`, `collapse`, `expand`
 - Sections: `keyFindings`, `alerts`, `recommendations`, `predictions`
 - Q&A: `askQuestion`, `questionPlaceholder`, `submit`, `answer`, `questionHistory`
 
 #### Filters (`analytics.filters`)
+
 - Controls: `dateRange`, `destination`, `category`, `user`, `reset`, `savePreset`
 - Options: `allDestinations`, `allCategories`, `allUsers`, `selectCategories`, `selectUsers`
 - Presets: `savedPresets`, `loadPreset`, `deletePreset`, `presetName`
 
 #### Export (`analytics.export`)
+
 - Formats: `pdf`, `png`, `csv`, `svg`
 - Actions: `dashboard`, `chart`, `exporting`, `exportSuccess`, `exportError`
 - Options: `includeCharts`, `includeData`, `includeInsights`
@@ -51,22 +57,26 @@ The Analytics Dashboard has been enhanced with comprehensive RTL support for Ara
 This utility file provides helper functions for RTL support:
 
 #### Chart Layout Functions
+
 - `getChartLayout(locale)` - Returns chart margin and layout configuration
 - `getAxisConfig(locale, axis)` - Returns axis orientation and text anchor
 - `getLegendConfig(locale)` - Returns legend alignment and wrapper styles
 - `getRechartsRTLConfig(locale)` - Complete Recharts configuration for RTL
 
 #### Layout Functions
+
 - `getChartDirectionClass(locale)` - Returns 'rtl' or 'ltr' class
 - `getChartControlsClass(locale)` - Returns flex direction for controls
 - `getChartTitleAlign(locale)` - Returns text alignment for titles
 - `getKPICardLayoutClass(locale)` - Returns flex direction for KPI cards
 
 #### Formatting Functions
+
 - `formatChartNumber(value, locale, options)` - Locale-aware number formatting
 - `formatChartDate(date, locale, format)` - Locale-aware date formatting
 
 #### Position Functions
+
 - `getHeatmapCellPosition(dayIndex, hourIndex, cellWidth, cellHeight, locale)` - RTL-aware heatmap positioning
 - `getFilterPanelPosition(locale)` - Returns 'left' or 'right' for filter panel
 
@@ -77,33 +87,39 @@ This utility file provides helper functions for RTL support:
 Custom CSS rules for RTL support:
 
 #### Container Styles
+
 ```css
-[dir="rtl"] .analytics-container {
+[dir='rtl'] .analytics-container {
   direction: rtl;
 }
 ```
 
 #### Chart Styles
+
 - Recharts wrapper maintains LTR coordinate system
 - Legend and tooltip use RTL direction
 - Axis labels have proper text anchors
 
 #### Component Styles
+
 - KPI cards: Reversed flex direction
 - Filter panel: RTL direction and reversed checkboxes
 - AI insights: Right-side border for priority indicators
 - Export buttons: Reversed button group
 
 #### Responsive Styles
+
 - Mobile header and controls reversed for RTL
 - Proper spacing adjustments for small screens
 
 ## Component Updates
 
 ### KPICard Component
+
 **File**: `src/components/analytics/KPICard.tsx`
 
 Changes:
+
 - Added `useLocale()` hook
 - Applied `dir` attribute based on locale
 - Used `getKPICardLayoutClass()` for flex direction
@@ -118,9 +134,11 @@ Changes:
 ```
 
 ### InventoryTrendChart Component
+
 **File**: `src/components/analytics/charts/InventoryTrendChart.tsx`
 
 Changes:
+
 - Added RTL configuration imports
 - Applied chart layout margins
 - Reversed X-axis for RTL
@@ -134,7 +152,7 @@ Changes:
   reversed={rtlConfig.xAxis.reversed}
   tick={{ textAnchor: rtlConfig.xAxis.tick.textAnchor }}
 />
-<YAxis 
+<YAxis
   orientation={rtlConfig.yAxis.orientation}
 />
 <Tooltip
@@ -147,9 +165,11 @@ Changes:
 ```
 
 ### GlobalFilters Component
+
 **File**: `src/components/analytics/GlobalFilters.tsx`
 
 Changes:
+
 - Added `dir` attribute to container
 - Proper RTL direction for filter lists
 - Reversed checkbox alignment
@@ -161,9 +181,11 @@ Changes:
 ```
 
 ### AIInsightsPanel Component
+
 **File**: `src/components/analytics/AIInsightsPanel.tsx`
 
 Changes:
+
 - Added `useLocale()` hook
 - Applied `dir` attribute to panel
 - RTL-aware insight card borders
@@ -177,27 +199,32 @@ Changes:
 ## Chart-Specific RTL Handling
 
 ### Line Charts
+
 - X-axis reversed for RTL
 - Y-axis moves to right side
 - Legend aligned to right
 - Tooltip text aligned right
 
 ### Bar Charts
+
 - Horizontal bars render right-to-left
 - Category labels aligned right
 - Y-axis on right side for RTL
 
 ### Pie Charts
+
 - No special handling needed (circular)
 - Labels positioned appropriately
 - Legend aligned right
 
 ### Heatmap
+
 - Day order reversed (Saturday to Sunday)
 - Cell positions calculated with RTL offset
 - Labels aligned right
 
 ### Area Charts
+
 - Same as line charts
 - Gradient fills work correctly
 - Stacking order maintained
@@ -244,24 +271,25 @@ Changes:
 Add tests for RTL utilities:
 
 ```typescript
-import { getChartLayout, formatChartNumber } from '@/utils/analytics-rtl'
+import { getChartLayout, formatChartNumber } from '@/utils/analytics-rtl';
 
 describe('Analytics RTL Utils', () => {
   it('should reverse X-axis for Arabic', () => {
-    const config = getChartLayout('ar')
-    expect(config.reverseXAxis).toBe(true)
-  })
-  
+    const config = getChartLayout('ar');
+    expect(config.reverseXAxis).toBe(true);
+  });
+
   it('should format numbers with Arabic numerals', () => {
-    const formatted = formatChartNumber(1234.56, 'ar')
-    expect(formatted).toMatch(/١٬٢٣٤٫٥٦/)
-  })
-})
+    const formatted = formatChartNumber(1234.56, 'ar');
+    expect(formatted).toMatch(/١٬٢٣٤٫٥٦/);
+  });
+});
 ```
 
 ## Browser Compatibility
 
 RTL support tested on:
+
 - Chrome 90+
 - Firefox 88+
 - Safari 14+
@@ -309,6 +337,7 @@ RTL support tested on:
 ## Support
 
 For issues or questions about RTL implementation:
+
 1. Check this documentation
 2. Review `src/utils/analytics-rtl.ts` for available utilities
 3. Inspect `src/styles/analytics-rtl.css` for CSS rules

@@ -1,15 +1,15 @@
-'use client'
+'use client';
 
-import { useState, useCallback } from 'react'
-import { useTranslations } from '@/hooks/useTranslations'
-import { Settings, Info } from 'lucide-react'
-import type { ImportOptions, ValidationError } from '@/types/import'
+import { useState, useCallback } from 'react';
+import { useTranslations } from '@/hooks/useTranslations';
+import { Settings, Info } from 'lucide-react';
+import type { ImportOptions, ValidationError } from '@/types/import';
 
 interface ImportOptionsStepProps {
-  initialOptions: ImportOptions
-  validationErrors: ValidationError[]
-  onComplete: (options: ImportOptions) => void
-  onBack: () => void
+  initialOptions: ImportOptions;
+  validationErrors: ValidationError[];
+  onComplete: (options: ImportOptions) => void;
+  onBack: () => void;
 }
 
 export default function ImportOptionsStep({
@@ -18,18 +18,22 @@ export default function ImportOptionsStep({
   onComplete,
   onBack,
 }: ImportOptionsStepProps) {
-  const t = useTranslations('import.options')
-  const [options, setOptions] = useState<ImportOptions>(initialOptions)
+  const t = useTranslations('import.options');
+  const [options, setOptions] = useState<ImportOptions>(initialOptions);
 
   const handleContinue = useCallback(() => {
-    onComplete(options)
-  }, [options, onComplete])
+    onComplete(options);
+  }, [options, onComplete]);
 
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">{t('title')}</h3>
-        <p className="text-sm text-gray-600 dark:text-gray-400">{t('description')}</p>
+        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+          {t('title')}
+        </h3>
+        <p className="text-sm text-gray-600 dark:text-gray-400">
+          {t('description')}
+        </p>
       </div>
 
       <div className="space-y-6">
@@ -50,7 +54,10 @@ export default function ImportOptionsStep({
                   value={value}
                   checked={options.duplicateHandling === value}
                   onChange={(e) =>
-                    setOptions({ ...options, duplicateHandling: e.target.value as any })
+                    setOptions({
+                      ...options,
+                      duplicateHandling: e.target.value as any,
+                    })
                   }
                   className="mt-1 w-4 h-4 text-teal-600 focus:ring-teal-500"
                 />
@@ -86,7 +93,9 @@ export default function ImportOptionsStep({
                 onChange={(e) =>
                   setOptions({
                     ...options,
-                    defaultDestination: e.target.value ? (e.target.value as any) : undefined,
+                    defaultDestination: e.target.value
+                      ? (e.target.value as any)
+                      : undefined,
                   })
                 }
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-teal-500 focus:border-transparent"
@@ -105,7 +114,10 @@ export default function ImportOptionsStep({
                 type="text"
                 value={options.defaultCategory || ''}
                 onChange={(e) =>
-                  setOptions({ ...options, defaultCategory: e.target.value || undefined })
+                  setOptions({
+                    ...options,
+                    defaultCategory: e.target.value || undefined,
+                  })
                 }
                 placeholder={t('defaultValues.categoryPlaceholder')}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-teal-500 focus:border-transparent"
@@ -146,5 +158,5 @@ export default function ImportOptionsStep({
         </button>
       </div>
     </div>
-  )
+  );
 }

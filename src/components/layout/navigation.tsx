@@ -1,67 +1,69 @@
-'use client'
+'use client';
 
-import { useSession } from 'next-auth/react'
-import { usePathname } from 'next/navigation'
-import Link from 'next/link'
-import { useLocale } from '@/hooks/useLocale'
-import { useState, useEffect } from 'react'
-import { UserRole } from '@prisma/client'
+import { useSession } from 'next-auth/react';
+import { usePathname } from 'next/navigation';
+import Link from 'next/link';
+import { useLocale } from '@/hooks/useLocale';
+import { useState, useEffect } from 'react';
+import { UserRole } from '@prisma/client';
 import {
   filterNavigationByRole,
   getNavigationLabel,
   NavigationItem,
-} from '@/config/navigation'
+} from '@/config/navigation';
 
 export function Navigation() {
-  const { data: session } = useSession()
-  const pathname = usePathname()
-  const locale = useLocale() as 'en' | 'ar'
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const { data: session } = useSession();
+  const pathname = usePathname();
+  const locale = useLocale() as 'en' | 'ar';
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Close mobile menu when route changes
   useEffect(() => {
-    setIsMobileMenuOpen(false)
-  }, [pathname])
+    setIsMobileMenuOpen(false);
+  }, [pathname]);
 
   // Prevent body scroll when mobile menu is open
   useEffect(() => {
     if (isMobileMenuOpen) {
-      document.body.style.overflow = 'hidden'
+      document.body.style.overflow = 'hidden';
     } else {
-      document.body.style.overflow = ''
+      document.body.style.overflow = '';
     }
-    
+
     return () => {
-      document.body.style.overflow = ''
-    }
-  }, [isMobileMenuOpen])
+      document.body.style.overflow = '';
+    };
+  }, [isMobileMenuOpen]);
 
   // Close menu on escape key
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isMobileMenuOpen) {
-        setIsMobileMenuOpen(false)
+        setIsMobileMenuOpen(false);
       }
-    }
+    };
 
-    document.addEventListener('keydown', handleEscape)
-    return () => document.removeEventListener('keydown', handleEscape)
-  }, [isMobileMenuOpen])
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [isMobileMenuOpen]);
 
   // Filter navigation items based on user role
-  const filteredNavItems = filterNavigationByRole(session?.user?.role as UserRole)
+  const filteredNavItems = filterNavigationByRole(
+    session?.user?.role as UserRole
+  );
 
   // Add locale prefix to href
-  const getLocalizedHref = (item: NavigationItem) => `/${locale}${item.href}`
+  const getLocalizedHref = (item: NavigationItem) => `/${locale}${item.href}`;
 
   const isActive = (item: NavigationItem) => {
-    const itemPath = getLocalizedHref(item)
-    return pathname === itemPath || pathname.startsWith(itemPath + '/')
-  }
+    const itemPath = getLocalizedHref(item);
+    return pathname === itemPath || pathname.startsWith(itemPath + '/');
+  };
 
   const closeMobileMenu = () => {
-    setIsMobileMenuOpen(false)
-  }
+    setIsMobileMenuOpen(false);
+  };
 
   return (
     <>
@@ -73,14 +75,38 @@ export function Navigation() {
         aria-expanded={isMobileMenuOpen}
         aria-controls="mobile-navigation"
       >
-        <span className="sr-only">{isMobileMenuOpen ? 'Close menu' : 'Open menu'}</span>
+        <span className="sr-only">
+          {isMobileMenuOpen ? 'Close menu' : 'Open menu'}
+        </span>
         {isMobileMenuOpen ? (
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          <svg
+            className="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M6 18L18 6M6 6l12 12"
+            />
           </svg>
         ) : (
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+          <svg
+            className="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M4 6h16M4 12h16M4 18h16"
+            />
           </svg>
         )}
       </button>
@@ -113,23 +139,44 @@ export function Navigation() {
           <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 bg-primary-500 rounded-lg flex items-center justify-center flex-shrink-0">
-                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                <svg
+                  className="w-5 h-5 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
                 </svg>
               </div>
               <span className="text-sm font-semibold text-gray-900 dark:text-gray-100 whitespace-nowrap">
                 Saudi Mais
               </span>
             </div>
-            
+
             {/* Close button for mobile */}
             <button
               onClick={closeMobileMenu}
               className="lg:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 touch-manipulation"
               aria-label="Close menu"
             >
-              <svg className="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <svg
+                className="w-5 h-5 text-gray-500 dark:text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>
@@ -138,10 +185,10 @@ export function Navigation() {
           <div className="flex-1 overflow-y-auto py-4 overscroll-contain">
             <ul className="space-y-1 px-3" role="list">
               {filteredNavItems.map((item) => {
-                const active = isActive(item)
-                const Icon = item.icon
-                const label = getNavigationLabel(item, locale)
-                
+                const active = isActive(item);
+                const Icon = item.icon;
+                const label = getNavigationLabel(item, locale);
+
                 return (
                   <li key={item.id}>
                     <Link
@@ -161,7 +208,9 @@ export function Navigation() {
                       `}
                       aria-current={active ? 'page' : undefined}
                     >
-                      <span className={`flex-shrink-0 ${active ? 'text-primary-600 dark:text-primary-400' : ''}`}>
+                      <span
+                        className={`flex-shrink-0 ${active ? 'text-primary-600 dark:text-primary-400' : ''}`}
+                      >
                         <Icon className="w-5 h-5" />
                       </span>
                       <span className="flex-1">{label}</span>
@@ -173,14 +222,16 @@ export function Navigation() {
                               item.badge.variant === 'new'
                                 ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
                                 : item.badge.variant === 'info'
-                                ? 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400'
-                                : item.badge.variant === 'warning'
-                                ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
-                                : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                                  ? 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400'
+                                  : item.badge.variant === 'warning'
+                                    ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
+                                    : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
                             }
                           `}
                         >
-                          {item.badge.count !== undefined ? item.badge.count : item.badge.text}
+                          {item.badge.count !== undefined
+                            ? item.badge.count
+                            : item.badge.text}
                         </span>
                       )}
                       {active && (
@@ -188,7 +239,7 @@ export function Navigation() {
                       )}
                     </Link>
                   </li>
-                )
+                );
               })}
             </ul>
           </div>
@@ -202,5 +253,5 @@ export function Navigation() {
         </div>
       </nav>
     </>
-  )
+  );
 }

@@ -1,138 +1,146 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import { useTranslations } from '@/hooks/useTranslations'
-import { getDeviceIcon } from '@/utils/user-agent'
+import { useState, useEffect } from 'react';
+import { useTranslations } from '@/hooks/useTranslations';
+import { getDeviceIcon } from '@/utils/user-agent';
 
 interface Session {
-  id: string
-  browser: string
-  os: string
-  deviceType: 'desktop' | 'mobile' | 'tablet' | 'unknown'
-  device: string
-  ipAddress: string | null
-  location: string
-  lastActive: string
-  createdAt: string
-  isCurrent: boolean
+  id: string;
+  browser: string;
+  os: string;
+  deviceType: 'desktop' | 'mobile' | 'tablet' | 'unknown';
+  device: string;
+  ipAddress: string | null;
+  location: string;
+  lastActive: string;
+  createdAt: string;
+  isCurrent: boolean;
 }
 
 interface SessionsResponse {
-  sessions: Session[]
-  total: number
+  sessions: Session[];
+  total: number;
 }
 
 export function SessionManager() {
-  const t = useTranslations()
-  const [sessions, setSessions] = useState<Session[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [terminatingId, setTerminatingId] = useState<string | null>(null)
-  const [terminatingAll, setTerminatingAll] = useState(false)
+  const t = useTranslations();
+  const [sessions, setSessions] = useState<Session[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [terminatingId, setTerminatingId] = useState<string | null>(null);
+  const [terminatingAll, setTerminatingAll] = useState(false);
 
   // Fetch sessions
   const fetchSessions = async () => {
     try {
-      setLoading(true)
-      setError(null)
+      setLoading(true);
+      setError(null);
 
-      const response = await fetch('/api/auth/sessions')
-      
+      const response = await fetch('/api/auth/sessions');
+
       if (!response.ok) {
-        throw new Error('Failed to fetch sessions')
+        throw new Error('Failed to fetch sessions');
       }
 
-      const data: SessionsResponse = await response.json()
-      setSessions(data.sessions)
+      const data: SessionsResponse = await response.json();
+      setSessions(data.sessions);
     } catch (err) {
-      console.error('Error fetching sessions:', err)
-      setError('Failed to load sessions')
+      console.error('Error fetching sessions:', err);
+      setError('Failed to load sessions');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   // Terminate a session
   const terminateSession = async (sessionId: string) => {
     if (!confirm('Are you sure you want to sign out this device?')) {
-      return
+      return;
     }
 
     try {
-      setTerminatingId(sessionId)
+      setTerminatingId(sessionId);
 
       const response = await fetch(`/api/auth/sessions/${sessionId}`, {
         method: 'DELETE',
-      })
+      });
 
       if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.error || 'Failed to terminate session')
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to terminate session');
       }
 
       // Remove the session from the list
-      setSessions((prev) => prev.filter((s) => s.id !== sessionId))
+      setSessions((prev) => prev.filter((s) => s.id !== sessionId));
     } catch (err) {
-      console.error('Error terminating session:', err)
-      alert(err instanceof Error ? err.message : 'Failed to terminate session')
+      console.error('Error terminating session:', err);
+      alert(err instanceof Error ? err.message : 'Failed to terminate session');
     } finally {
-      setTerminatingId(null)
+      setTerminatingId(null);
     }
-  }
+  };
 
   // Terminate all other sessions
   const terminateAllOthers = async () => {
-    const otherSessionsCount = sessions.filter((s) => !s.isCurrent).length
+    const otherSessionsCount = sessions.filter((s) => !s.isCurrent).length;
 
     if (otherSessionsCount === 0) {
-      return
+      return;
     }
 
-    if (!confirm(`Are you sure you want to sign out all ${otherSessionsCount} other device${otherSessionsCount > 1 ? 's' : ''}?`)) {
-      return
+    if (
+      !confirm(
+        `Are you sure you want to sign out all ${otherSessionsCount} other device${otherSessionsCount > 1 ? 's' : ''}?`
+      )
+    ) {
+      return;
     }
 
     try {
-      setTerminatingAll(true)
+      setTerminatingAll(true);
 
       const response = await fetch('/api/auth/sessions/terminate-others', {
         method: 'POST',
-      })
+      });
 
       if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.error || 'Failed to terminate sessions')
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to terminate sessions');
       }
 
       // Keep only the current session
-      setSessions((prev) => prev.filter((s) => s.isCurrent))
+      setSessions((prev) => prev.filter((s) => s.isCurrent));
     } catch (err) {
-      console.error('Error terminating sessions:', err)
-      alert(err instanceof Error ? err.message : 'Failed to terminate sessions')
+      console.error('Error terminating sessions:', err);
+      alert(
+        err instanceof Error ? err.message : 'Failed to terminate sessions'
+      );
     } finally {
-      setTerminatingAll(false)
+      setTerminatingAll(false);
     }
-  }
+  };
 
   // Format relative time
   const formatRelativeTime = (dateString: string) => {
-    const date = new Date(dateString)
-    const now = new Date()
-    const diffMs = now.getTime() - date.getTime()
-    const diffMins = Math.floor(diffMs / 60000)
-    const diffHours = Math.floor(diffMs / 3600000)
-    const diffDays = Math.floor(diffMs / 86400000)
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
 
-    if (diffMins < 1) return 'Just now'
-    if (diffMins < 60) return `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`
-    if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`
-    return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`
-  }
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60)
+      return `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
+    if (diffHours < 24)
+      return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+    return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+  };
 
   // Load sessions on mount
   useEffect(() => {
-    fetchSessions()
-  }, [])
+    fetchSessions();
+  }, []);
 
   if (loading) {
     return (
@@ -149,7 +157,7 @@ export function SessionManager() {
           ))}
         </div>
       </div>
-    )
+    );
   }
 
   if (error) {
@@ -168,7 +176,7 @@ export function SessionManager() {
           </button>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -274,7 +282,9 @@ export function SessionManager() {
                       disabled:opacity-50 disabled:cursor-not-allowed
                     "
                   >
-                    {terminatingId === session.id ? 'Signing out...' : 'Sign out'}
+                    {terminatingId === session.id
+                      ? 'Signing out...'
+                      : 'Sign out'}
                   </button>
                 )}
               </div>
@@ -286,11 +296,11 @@ export function SessionManager() {
       {sessions.length > 1 && (
         <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            💡 Tip: If you see a session you don&apos;t recognize, sign it out immediately
-            and change your password.
+            💡 Tip: If you see a session you don&apos;t recognize, sign it out
+            immediately and change your password.
           </p>
         </div>
       )}
     </div>
-  )
+  );
 }

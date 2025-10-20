@@ -33,7 +33,7 @@ export function OfflineBanner() {
 
     // Subscribe to queue changes
     const unsubscribe = offlineQueue.subscribe((queue) => {
-      setPendingCount(queue.filter(a => !a.synced).length);
+      setPendingCount(queue.filter((a) => !a.synced).length);
       setIsSyncing(offlineQueue.isSyncInProgress());
     });
 
@@ -73,7 +73,9 @@ export function OfflineBanner() {
               />
             </svg>
             <span>
-              You're offline. {pendingCount > 0 && `${pendingCount} action${pendingCount > 1 ? 's' : ''} pending sync.`}
+              You&apos;re offline.{' '}
+              {pendingCount > 0 &&
+                `${pendingCount} action${pendingCount > 1 ? 's' : ''} pending sync.`}
             </span>
           </>
         ) : isSyncing ? (
@@ -92,7 +94,8 @@ export function OfflineBanner() {
               />
             </svg>
             <span>
-              Syncing {pendingCount} pending action{pendingCount > 1 ? 's' : ''}...
+              Syncing {pendingCount} pending action{pendingCount > 1 ? 's' : ''}
+              ...
             </span>
           </>
         ) : (

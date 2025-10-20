@@ -1,16 +1,16 @@
-'use client'
+'use client';
 
-import React from 'react'
+import React from 'react';
 
 export interface TableEmptyStateProps {
-  title?: string
-  description?: string
-  icon?: React.ReactNode
+  title?: string;
+  description?: string;
+  icon?: React.ReactNode;
   action?: {
-    label: string
-    onClick: () => void
-  }
-  className?: string
+    label: string;
+    onClick: () => void;
+  };
+  className?: string;
 }
 
 export const TableEmptyState: React.FC<TableEmptyStateProps> = ({
@@ -52,5 +52,5 @@ export const TableEmptyState: React.FC<TableEmptyStateProps> = ({
         </button>
       )}
     </div>
-  )
-}
+  );
+};

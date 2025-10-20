@@ -1,51 +1,51 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { useTranslations } from '@/hooks/useTranslations'
-import Link from 'next/link'
-import { useParams } from 'next/navigation'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Loader2, Mail, ArrowLeft, CheckCircle } from 'lucide-react'
-import { toast } from 'react-hot-toast'
+import { useState } from 'react';
+import { useTranslations } from '@/hooks/useTranslations';
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Loader2, Mail, ArrowLeft, CheckCircle } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 
 export default function ForgotPasswordPage() {
-  const t = useTranslations()
-  const params = useParams()
-  const locale = params.locale as string
+  const t = useTranslations();
+  const params = useParams();
+  const locale = params.locale as string;
 
-  const [email, setEmail] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const [isSubmitted, setIsSubmitted] = useState(false)
-  const [error, setError] = useState('')
+  const [email, setEmail] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError('')
-    setIsLoading(true)
+    e.preventDefault();
+    setError('');
+    setIsLoading(true);
 
     try {
       const response = await fetch('/api/auth/forgot-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
-      })
+      });
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || t('errors.serverError'))
+        throw new Error(data.error || t('errors.serverError'));
       }
 
-      setIsSubmitted(true)
-      toast.success(t('auth.passwordReset.emailSent'))
+      setIsSubmitted(true);
+      toast.success(t('auth.passwordReset.emailSent'));
     } catch (err: any) {
-      setError(err.message)
-      toast.error(err.message)
+      setError(err.message);
+      toast.error(err.message);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   if (isSubmitted) {
     return (
@@ -76,7 +76,7 @@ export default function ForgotPasswordPage() {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -99,7 +99,10 @@ export default function ForgotPasswordPage() {
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >
                 {t('common.email')}
               </label>
               <Input
@@ -149,5 +152,5 @@ export default function ForgotPasswordPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

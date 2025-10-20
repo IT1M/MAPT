@@ -1,23 +1,23 @@
-'use client'
+'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react'
-import { useTranslations } from '@/hooks/useTranslations'
-import { CheckCircle2, XCircle, AlertCircle, Download } from 'lucide-react'
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { useTranslations } from '@/hooks/useTranslations';
+import { CheckCircle2, XCircle, AlertCircle, Download } from 'lucide-react';
 import type {
   ParsedData,
   ColumnMapping,
   ImportOptions,
   ValidationError,
   ImportResult,
-} from '@/types/import'
+} from '@/types/import';
 
 interface ProgressStepProps {
-  parsedData: ParsedData
-  columnMapping: ColumnMapping
-  importOptions: ImportOptions
-  validationErrors: ValidationError[]
-  onComplete: (result: ImportResult) => void
-  onClose: () => void
+  parsedData: ParsedData;
+  columnMapping: ColumnMapping;
+  importOptions: ImportOptions;
+  validationErrors: ValidationError[];
+  onComplete: (result: ImportResult) => void;
+  onClose: () => void;
 }
 
 export default function ProgressStep({
@@ -28,96 +28,116 @@ export default function ProgressStep({
   onComplete,
   onClose,
 }: ProgressStepProps) {
-  const t = useTranslations('import.progress')
-  const [status, setStatus] = useState<'processing' | 'completed' | 'error'>('processing')
-  const [progress, setProgress] = useState(0)
-  const [result, setResult] = useState<ImportResult | null>(null)
-  const [error, setError] = useState<string | null>(null)
-  const abortControllerRef = useRef<AbortController | null>(null)
+  const t = useTranslations('import.progress');
+  const [status, setStatus] = useState<'processing' | 'completed' | 'error'>(
+    'processing'
+  );
+  const [progress, setProgress] = useState(0);
+  const [result, setResult] = useState<ImportResult | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   const performImport = useCallback(async () => {
     try {
-      abortControllerRef.current = new AbortController()
+      abortControllerRef.current = new AbortController();
 
       // Prepare data for import
       const validRows = parsedData.rows.filter((_, index) => {
-        const rowNumber = index + 2
-        return !validationErrors.some((err) => err.row === rowNumber)
-      })
+        const rowNumber = index + 2;
+        return !validationErrors.some((err) => err.row === rowNumber);
+      });
 
       // Map rows to expected format
       const mappedRows = validRows.map((row) => ({
-        itemName: columnMapping.itemName ? row[columnMapping.itemName] : undefined,
+        itemName: columnMapping.itemName
+          ? row[columnMapping.itemName]
+          : undefined,
         batch: columnMapping.batch ? row[columnMapping.batch] : undefined,
-        quantity: columnMapping.quantity ? row[columnMapping.quantity] : undefined,
+        quantity: columnMapping.quantity
+          ? row[columnMapping.quantity]
+          : undefined,
         reject: columnMapping.reject ? row[columnMapping.reject] : undefined,
         destination:
-          (columnMapping.destination ? row[columnMapping.destination] : undefined) ||
-          importOptions.defaultDestination,
+          (columnMapping.destination
+            ? row[columnMapping.destination]
+            : undefined) || importOptions.defaultDestination,
         category:
           (columnMapping.category ? row[columnMapping.category] : undefined) ||
           importOptions.defaultCategory,
         notes: columnMapping.notes ? row[columnMapping.notes] : undefined,
-      }))
+      }));
 
       // Create FormData
-      const formData = new FormData()
-      const blob = new Blob([JSON.stringify(mappedRows)], { type: 'application/json' })
-      formData.append('data', blob)
-      formData.append('options', JSON.stringify(importOptions))
+      const formData = new FormData();
+      const blob = new Blob([JSON.stringify(mappedRows)], {
+        type: 'application/json',
+      });
+      formData.append('data', blob);
+      formData.append('options', JSON.stringify(importOptions));
 
       // Send import request
       const response = await fetch('/api/inventory/import', {
         method: 'POST',
         body: formData,
         signal: abortControllerRef.current.signal,
-      })
+      });
 
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || t('importFailed'))
+        const errorData = await response.json();
+        throw new Error(errorData.error || t('importFailed'));
       }
 
-      const importResult: ImportResult = await response.json()
+      const importResult: ImportResult = await response.json();
 
-      setResult(importResult)
-      setStatus('completed')
-      setProgress(100)
-      onComplete(importResult)
+      setResult(importResult);
+      setStatus('completed');
+      setProgress(100);
+      onComplete(importResult);
     } catch (err: any) {
       if (err.name === 'AbortError') {
-        setError(t('cancelled'))
+        setError(t('cancelled'));
       } else {
-        setError(err.message || t('importFailed'))
+        setError(err.message || t('importFailed'));
       }
-      setStatus('error')
+      setStatus('error');
     }
-  }, [parsedData, columnMapping, importOptions, validationErrors, onComplete, t])
+  }, [
+    parsedData,
+    columnMapping,
+    importOptions,
+    validationErrors,
+    onComplete,
+    t,
+  ]);
 
   useEffect(() => {
-    performImport()
+    performImport();
 
     // Simulate progress
     const interval = setInterval(() => {
       setProgress((prev) => {
-        if (prev >= 90) return prev
-        return prev + 10
-      })
-    }, 500)
+        if (prev >= 90) return prev;
+        return prev + 10;
+      });
+    }, 500);
 
     return () => {
-      clearInterval(interval)
+      clearInterval(interval);
       if (abortControllerRef.current) {
-        abortControllerRef.current.abort()
+        abortControllerRef.current.abort();
       }
-    }
-  }, [performImport])
+    };
+  }, [performImport]);
 
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">{t('title')}</h3>
-        <p className="text-sm text-gray-600 dark:text-gray-400">{t('description')}</p>
+        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+          {t('title')}
+        </h3>
+        <p className="text-sm text-gray-600 dark:text-gray-400">
+          {t('description')}
+        </p>
       </div>
 
       {status === 'processing' && (
@@ -143,7 +163,9 @@ export default function ProgressStep({
           {/* Processing Animation */}
           <div className="flex flex-col items-center justify-center py-12">
             <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-teal-600 mb-4"></div>
-            <p className="text-sm text-gray-600 dark:text-gray-400">{t('pleaseWait')}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              {t('pleaseWait')}
+            </p>
           </div>
         </div>
       )}
@@ -158,7 +180,9 @@ export default function ProgressStep({
             <h4 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
               {t('completed')}
             </h4>
-            <p className="text-sm text-gray-600 dark:text-gray-400">{t('completedMessage')}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              {t('completedMessage')}
+            </p>
           </div>
 
           {/* Results Summary */}
@@ -170,7 +194,9 @@ export default function ProgressStep({
                   <p className="text-3xl font-bold text-green-600 dark:text-green-400">
                     {result.successCount}
                   </p>
-                  <p className="text-sm text-green-700 dark:text-green-300">{t('successful')}</p>
+                  <p className="text-sm text-green-700 dark:text-green-300">
+                    {t('successful')}
+                  </p>
                 </div>
               </div>
             </div>
@@ -182,7 +208,9 @@ export default function ProgressStep({
                   <p className="text-3xl font-bold text-red-600 dark:text-red-400">
                     {result.failedCount}
                   </p>
-                  <p className="text-sm text-red-700 dark:text-red-300">{t('failed')}</p>
+                  <p className="text-sm text-red-700 dark:text-red-300">
+                    {t('failed')}
+                  </p>
                 </div>
               </div>
             </div>
@@ -244,5 +272,5 @@ export default function ProgressStep({
         </div>
       )}
     </div>
-  )
+  );
 }

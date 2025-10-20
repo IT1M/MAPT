@@ -11,7 +11,10 @@ interface TestResult {
 
 const results: TestResult[] = [];
 
-async function testUserRoleExists(role: UserRole, email: string): Promise<boolean> {
+async function testUserRoleExists(
+  role: UserRole,
+  email: string
+): Promise<boolean> {
   try {
     const user = await prisma.user.findUnique({
       where: { email },
@@ -51,7 +54,10 @@ async function testUserRoleExists(role: UserRole, email: string): Promise<boolea
   }
 }
 
-async function testPasswordHash(email: string, password: string): Promise<boolean> {
+async function testPasswordHash(
+  email: string,
+  password: string
+): Promise<boolean> {
   try {
     const user = await prisma.user.findUnique({
       where: { email },
@@ -71,7 +77,9 @@ async function testPasswordHash(email: string, password: string): Promise<boolea
     results.push({
       test: `Password hash for ${email}`,
       passed: isValid,
-      message: isValid ? 'Password hash is valid' : 'Password hash verification failed',
+      message: isValid
+        ? 'Password hash is valid'
+        : 'Password hash verification failed',
     });
 
     return isValid;
@@ -89,7 +97,7 @@ async function testSessionModel(): Promise<boolean> {
   try {
     // Check if Session model is accessible
     const sessionCount = await prisma.session.count();
-    
+
     results.push({
       test: 'Session model accessibility',
       passed: true,
@@ -109,7 +117,13 @@ async function testSessionModel(): Promise<boolean> {
 async function testRolePermissions(): Promise<boolean> {
   try {
     // Test that all expected roles exist in the database
-    const roles = [UserRole.ADMIN, UserRole.DATA_ENTRY, UserRole.SUPERVISOR, UserRole.MANAGER, UserRole.AUDITOR];
+    const roles = [
+      UserRole.ADMIN,
+      UserRole.DATA_ENTRY,
+      UserRole.SUPERVISOR,
+      UserRole.MANAGER,
+      UserRole.AUDITOR,
+    ];
     const users = await prisma.user.findMany({
       where: {
         role: {
@@ -121,15 +135,15 @@ async function testRolePermissions(): Promise<boolean> {
       },
     });
 
-    const foundRoles = new Set(users.map(u => u.role));
-    const allRolesPresent = roles.every(role => foundRoles.has(role));
+    const foundRoles = new Set(users.map((u) => u.role));
+    const allRolesPresent = roles.every((role) => foundRoles.has(role));
 
     results.push({
       test: 'All user roles present',
       passed: allRolesPresent,
-      message: allRolesPresent 
+      message: allRolesPresent
         ? 'All 5 user roles are present in database'
-        : `Missing roles: ${roles.filter(r => !foundRoles.has(r)).join(', ')}`,
+        : `Missing roles: ${roles.filter((r) => !foundRoles.has(r)).join(', ')}`,
     });
 
     return allRolesPresent;
@@ -183,7 +197,7 @@ async function testAuditLogRelation(): Promise<boolean> {
 
 async function main() {
   console.log('🔐 Testing Authentication Flow End-to-End\n');
-  console.log('=' .repeat(60));
+  console.log('='.repeat(60));
 
   // Test 1: Check all user roles exist
   console.log('\n📋 Test 1: Verifying user roles...');
@@ -216,11 +230,11 @@ async function main() {
   console.log('\n' + '='.repeat(60));
   console.log('\n📊 Test Summary:\n');
 
-  const passed = results.filter(r => r.passed).length;
-  const failed = results.filter(r => !r.passed).length;
+  const passed = results.filter((r) => r.passed).length;
+  const failed = results.filter((r) => !r.passed).length;
   const total = results.length;
 
-  results.forEach(result => {
+  results.forEach((result) => {
     const icon = result.passed ? '✅' : '❌';
     console.log(`${icon} ${result.test}`);
     console.log(`   ${result.message}`);
@@ -230,8 +244,12 @@ async function main() {
   console.log(`\n📈 Results: ${passed}/${total} tests passed`);
 
   if (failed > 0) {
-    console.log(`\n❌ ${failed} test(s) failed. Please review the errors above.`);
-    console.log('\n💡 Tip: Make sure you have run "npm run db:seed" to populate test data.');
+    console.log(
+      `\n❌ ${failed} test(s) failed. Please review the errors above.`
+    );
+    console.log(
+      '\n💡 Tip: Make sure you have run "npm run db:seed" to populate test data.'
+    );
     process.exit(1);
   } else {
     console.log('\n✅ All authentication tests passed!');

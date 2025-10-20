@@ -1,45 +1,49 @@
-'use client'
+'use client';
 
-import { formatDistanceToNow } from 'date-fns'
-import { parseUserAgent, formatUserAgent, getDeviceIcon } from '@/utils/user-agent'
-import { Button } from '@/components/ui/button'
+import { formatDistanceToNow } from 'date-fns';
+import {
+  parseUserAgent,
+  formatUserAgent,
+  getDeviceIcon,
+} from '@/utils/user-agent';
+import { Button } from '@/components/ui/button';
 
 export interface UserSession {
-  id: string
-  device?: string
-  browser?: string
-  os?: string
-  ipAddress?: string
-  location?: string
-  lastActive: Date
-  isCurrent: boolean
-  userAgent?: string
+  id: string;
+  device?: string;
+  browser?: string;
+  os?: string;
+  ipAddress?: string;
+  location?: string;
+  lastActive: Date;
+  isCurrent: boolean;
+  userAgent?: string;
 }
 
 interface SessionCardProps {
-  session: UserSession
-  onTerminate: (sessionId: string) => Promise<void>
-  isTerminating?: boolean
+  session: UserSession;
+  onTerminate: (sessionId: string) => Promise<void>;
+  isTerminating?: boolean;
 }
 
-export function SessionCard({ session, onTerminate, isTerminating }: SessionCardProps) {
+export function SessionCard({
+  session,
+  onTerminate,
+  isTerminating,
+}: SessionCardProps) {
   // Parse user agent if available
-  const parsedUA = session.userAgent
-    ? parseUserAgent(session.userAgent)
-    : null
+  const parsedUA = session.userAgent ? parseUserAgent(session.userAgent) : null;
 
   const deviceInfo = parsedUA
     ? formatUserAgent(parsedUA)
-    : session.device || 'Unknown Device'
+    : session.device || 'Unknown Device';
 
-  const deviceIcon = parsedUA
-    ? getDeviceIcon(parsedUA.deviceType)
-    : '🖥️'
+  const deviceIcon = parsedUA ? getDeviceIcon(parsedUA.deviceType) : '🖥️';
 
   const handleTerminate = async () => {
-    if (session.isCurrent) return
-    await onTerminate(session.id)
-  }
+    if (session.isCurrent) return;
+    await onTerminate(session.id);
+  };
 
   return (
     <div
@@ -103,5 +107,5 @@ export function SessionCard({ session, onTerminate, isTerminating }: SessionCard
         )}
       </div>
     </div>
-  )
+  );
 }

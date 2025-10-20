@@ -1,18 +1,15 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@/services/auth'
-import { z } from 'zod'
-import { sendEmail } from '@/services/email'
+import { NextRequest, NextResponse } from 'next/server';
+import { auth } from '@/services/auth';
+import { z } from 'zod';
+import { sendEmail } from '@/services/email';
 
 // POST /api/help/support - Submit support request
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth()
-    
+    const session = await auth();
+
     if (!session?.user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const supportSchema = z.object({
@@ -20,11 +17,11 @@ export async function POST(request: NextRequest) {
       subject: z.string().min(5).max(200),
       description: z.string().min(20).max(2000),
       priority: z.enum(['low', 'normal', 'high', 'urgent']).optional(),
-      attachments: z.array(z.string()).optional()
-    })
+      attachments: z.array(z.string()).optional(),
+    });
 
-    const body = await request.json()
-    const data = supportSchema.parse(body)
+    const body = await request.json();
+    const data = supportSchema.parse(body);
 
     // Send email to support team
     await sendEmail({
@@ -38,9 +35,9 @@ export async function POST(request: NextRequest) {
         subject: data.subject,
         description: data.description,
         priority: data.priority || 'normal',
-        attachments: data.attachments || []
-      }
-    })
+        attachments: data.attachments || [],
+      },
+    });
 
     // Send confirmation email to user
     await sendEmail({
@@ -51,42 +48,44 @@ export async function POST(request: NextRequest) {
         userName: session.user.name,
         subject: data.subject,
         category: data.category,
-        expectedResponseTime: getExpectedResponseTime(data.priority || 'normal')
-      }
-    })
+        expectedResponseTime: getExpectedResponseTime(
+          data.priority || 'normal'
+        ),
+      },
+    });
 
     return NextResponse.json({
       success: true,
       message: 'Support request submitted successfully',
-      expectedResponseTime: getExpectedResponseTime(data.priority || 'normal')
-    })
+      expectedResponseTime: getExpectedResponseTime(data.priority || 'normal'),
+    });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: 'Validation error', details: error.errors },
         { status: 400 }
-      )
+      );
     }
 
-    console.error('Error submitting support request:', error)
+    console.error('Error submitting support request:', error);
     return NextResponse.json(
       { error: 'Failed to submit support request' },
       { status: 500 }
-    )
+    );
   }
 }
 
 function getExpectedResponseTime(priority: string): string {
   switch (priority) {
     case 'urgent':
-      return '2-4 hours'
+      return '2-4 hours';
     case 'high':
-      return '4-8 hours'
+      return '4-8 hours';
     case 'normal':
-      return '1-2 business days'
+      return '1-2 business days';
     case 'low':
-      return '2-3 business days'
+      return '2-3 business days';
     default:
-      return '1-2 business days'
+      return '1-2 business days';
   }
 }

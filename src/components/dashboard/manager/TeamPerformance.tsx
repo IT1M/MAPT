@@ -1,36 +1,36 @@
-'use client'
+'use client';
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react';
 
 interface TeamMember {
-  id: string
-  name: string
-  role: string
-  entriesCount: number
-  accuracy: number
+  id: string;
+  name: string;
+  role: string;
+  entriesCount: number;
+  accuracy: number;
 }
 
 export function TeamPerformance() {
-  const [team, setTeam] = useState<TeamMember[]>([])
-  const [loading, setLoading] = useState(true)
+  const [team, setTeam] = useState<TeamMember[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchTeamPerformance()
-  }, [])
+    fetchTeamPerformance();
+  }, []);
 
   const fetchTeamPerformance = async () => {
     try {
-      const response = await fetch('/api/dashboard/team-performance')
+      const response = await fetch('/api/dashboard/team-performance');
       if (response.ok) {
-        const data = await response.json()
-        setTeam(data)
+        const data = await response.json();
+        setTeam(data);
       }
     } catch (error) {
-      console.error('Failed to fetch team performance:', error)
+      console.error('Failed to fetch team performance:', error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   if (loading) {
     return (
@@ -42,7 +42,7 @@ export function TeamPerformance() {
           <div className="h-16 bg-gray-200 dark:bg-gray-700 rounded"></div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -83,7 +83,9 @@ export function TeamPerformance() {
 
               <div className="space-y-1">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-gray-600 dark:text-gray-400">Accuracy</span>
+                  <span className="text-gray-600 dark:text-gray-400">
+                    Accuracy
+                  </span>
                   <span className="font-medium text-gray-900 dark:text-white">
                     {member.accuracy}%
                   </span>
@@ -91,8 +93,11 @@ export function TeamPerformance() {
                 <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                   <div
                     className={`h-2 rounded-full transition-all ${
-                      member.accuracy >= 95 ? 'bg-green-600' :
-                      member.accuracy >= 85 ? 'bg-yellow-600' : 'bg-red-600'
+                      member.accuracy >= 95
+                        ? 'bg-green-600'
+                        : member.accuracy >= 85
+                          ? 'bg-yellow-600'
+                          : 'bg-red-600'
                     }`}
                     style={{ width: `${member.accuracy}%` }}
                   />
@@ -103,5 +108,5 @@ export function TeamPerformance() {
         )}
       </div>
     </div>
-  )
+  );
 }

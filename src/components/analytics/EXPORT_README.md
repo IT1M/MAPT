@@ -11,12 +11,14 @@ This implementation provides PDF export functionality for the analytics dashboar
 Client-side component that handles the export UI and API communication.
 
 **Features:**
+
 - Export button with loading state
 - Progress indicator (0-100%)
 - Error handling with retry
 - Support for PDF and email formats
 
 **Props:**
+
 - `dashboardData`: Current dashboard snapshot with summary, charts, and insights
 - `filters`: Applied filters (date range, destinations, categories)
 - `onExportComplete`: Callback when export succeeds
@@ -26,6 +28,7 @@ Client-side component that handles the export UI and API communication.
 Wrapper component that fetches dashboard data and manages state.
 
 **Responsibilities:**
+
 - Fetches analytics summary from `/api/analytics/summary`
 - Calculates derived metrics (percentages, most active category)
 - Builds dashboard snapshot for export
@@ -38,6 +41,7 @@ Server-side API endpoint that generates PDF reports.
 **Endpoint:** `POST /api/analytics/export`
 
 **Request Body:**
+
 ```json
 {
   "summary": {
@@ -66,6 +70,7 @@ Server-side API endpoint that generates PDF reports.
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -122,6 +127,7 @@ The generated PDF includes:
 ## Styling
 
 The PDF uses professional styling with:
+
 - Blue color scheme (#2563eb primary)
 - Helvetica font family
 - Proper spacing and margins
@@ -145,14 +151,14 @@ The PDF uses professional styling with:
 ## Usage Example
 
 ```tsx
-import { DashboardExporterWrapper } from '@/components/analytics'
+import { DashboardExporterWrapper } from '@/components/analytics';
 
 export default function AnalyticsPage() {
   return (
     <div>
       <DashboardExporterWrapper />
     </div>
-  )
+  );
 }
 ```
 
@@ -188,13 +194,17 @@ To test the export functionality:
 ## Troubleshooting
 
 **Issue**: Export button not visible
+
 - **Solution**: Check user role (must be SUPERVISOR+)
 
 **Issue**: Export fails with 500 error
+
 - **Solution**: Check server logs, verify `/public/exports/` directory exists
 
 **Issue**: PDF is blank or missing data
+
 - **Solution**: Verify dashboard data is loaded before export
 
 **Issue**: Progress indicator stuck
+
 - **Solution**: Check network tab for API errors, verify API route is accessible

@@ -1,9 +1,13 @@
-import { BrandingPanel } from '@/components/auth/BrandingPanel'
-import { RegistrationForm } from '@/components/auth/RegistrationForm'
-import { useTranslations } from '@/hooks/useTranslations'
+import { BrandingPanel } from '@/components/auth/BrandingPanel';
+import { RegistrationForm } from '@/components/auth/RegistrationForm';
+import { useTranslations } from '@/hooks/useTranslations';
 
-export default async function RegisterPage({ params }: { params: Promise<{ locale: string }> }) {
-  const { locale } = await params
+export default async function RegisterPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
 
   return (
     <div className="flex min-h-screen">
@@ -37,17 +41,17 @@ export default async function RegisterPage({ params }: { params: Promise<{ local
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 // Client components for translations
 function RegisterPageTitle() {
-  'use client'
-  const t = useTranslations()
-  return <>{t('auth.signUp') || 'Create Account'}</>
+  'use client';
+  const t = useTranslations();
+  return <>{t('auth.signUp') || 'Create Account'}</>;
 }
 
 function RegisterPageSubtitle() {
-  'use client'
-  return <>Join us to start managing your medical inventory</>
+  'use client';
+  return <>Join us to start managing your medical inventory</>;
 }

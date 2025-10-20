@@ -1,4 +1,8 @@
-import { SkeletonCard, SkeletonStats, SkeletonTable } from '@/components/ui/skeleton'
+import {
+  SkeletonCard,
+  SkeletonStats,
+  SkeletonTable,
+} from '@/components/ui/skeleton';
 
 export default function DashboardLoading() {
   return (
@@ -23,5 +27,5 @@ export default function DashboardLoading() {
       {/* Recent Transactions Table Skeleton */}
       <SkeletonTable rows={10} columns={4} hasHeader />
     </div>
-  )
+  );
 }

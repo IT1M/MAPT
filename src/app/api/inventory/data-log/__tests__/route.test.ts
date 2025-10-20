@@ -1,10 +1,10 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { NextRequest } from 'next/server'
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { NextRequest } from 'next/server';
 
 // Mock dependencies
 vi.mock('@/services/auth', () => ({
   auth: vi.fn(),
-}))
+}));
 
 vi.mock('@/services/prisma', () => ({
   prisma: {
@@ -13,20 +13,20 @@ vi.mock('@/services/prisma', () => ({
       findMany: vi.fn(),
     },
   },
-}))
+}));
 
 vi.mock('@/utils/constants', () => ({
   DEFAULT_PAGE_SIZE: 25,
-}))
+}));
 
-import { auth } from '@/services/auth'
-import { prisma } from '@/services/prisma'
-import { GET } from '../route'
+import { auth } from '@/services/auth';
+import { prisma } from '@/services/prisma';
+import { GET } from '../route';
 
 describe('Data Log API Route', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
-  })
+    vi.clearAllMocks();
+  });
 
   it('should return paginated data with aggregates', async () => {
     const mockSession = {
@@ -36,7 +36,7 @@ describe('Data Log API Route', () => {
         role: 'MANAGER',
         permissions: ['inventory:read'],
       },
-    }
+    };
 
     const mockItems = [
       {
@@ -75,28 +75,30 @@ describe('Data Log API Route', () => {
           email: 'jane@example.com',
         },
       },
-    ]
+    ];
 
-    vi.mocked(auth).mockResolvedValue(mockSession as any)
-    vi.mocked(prisma.inventoryItem.count).mockResolvedValue(2)
+    vi.mocked(auth).mockResolvedValue(mockSession as any);
+    vi.mocked(prisma.inventoryItem.count).mockResolvedValue(2);
     vi.mocked(prisma.inventoryItem.findMany)
       .mockResolvedValueOnce(mockItems as any)
-      .mockResolvedValueOnce(mockItems as any)
+      .mockResolvedValueOnce(mockItems as any);
 
-    const request = new NextRequest('http://localhost:3000/api/inventory/data-log?page=1&pageSize=25')
+    const request = new NextRequest(
+      'http://localhost:3000/api/inventory/data-log?page=1&pageSize=25'
+    );
 
-    const response = await GET(request)
-    const data = await response.json()
+    const response = await GET(request);
+    const data = await response.json();
 
-    expect(response.status).toBe(200)
-    expect(data.success).toBe(true)
-    expect(data.data.items).toHaveLength(2)
-    expect(data.data.items[0].rejectPercentage).toBe(10)
-    expect(data.data.items[1].rejectPercentage).toBe(10)
-    expect(data.data.aggregates.totalQuantity).toBe(150)
-    expect(data.data.aggregates.totalRejects).toBe(15)
-    expect(data.data.aggregates.averageRejectRate).toBe(10)
-  })
+    expect(response.status).toBe(200);
+    expect(data.success).toBe(true);
+    expect(data.data.items).toHaveLength(2);
+    expect(data.data.items[0].rejectPercentage).toBe(10);
+    expect(data.data.items[1].rejectPercentage).toBe(10);
+    expect(data.data.aggregates.totalQuantity).toBe(150);
+    expect(data.data.aggregates.totalRejects).toBe(15);
+    expect(data.data.aggregates.averageRejectRate).toBe(10);
+  });
 
   it('should filter by search term', async () => {
     const mockSession = {
@@ -105,15 +107,17 @@ describe('Data Log API Route', () => {
         role: 'MANAGER',
         permissions: ['inventory:read'],
       },
-    }
+    };
 
-    vi.mocked(auth).mockResolvedValue(mockSession as any)
-    vi.mocked(prisma.inventoryItem.count).mockResolvedValue(0)
-    vi.mocked(prisma.inventoryItem.findMany).mockResolvedValue([])
+    vi.mocked(auth).mockResolvedValue(mockSession as any);
+    vi.mocked(prisma.inventoryItem.count).mockResolvedValue(0);
+    vi.mocked(prisma.inventoryItem.findMany).mockResolvedValue([]);
 
-    const request = new NextRequest('http://localhost:3000/api/inventory/data-log?search=medical')
+    const request = new NextRequest(
+      'http://localhost:3000/api/inventory/data-log?search=medical'
+    );
 
-    await GET(request)
+    await GET(request);
 
     expect(prisma.inventoryItem.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -127,8 +131,8 @@ describe('Data Log API Route', () => {
           ]),
         }),
       })
-    )
-  })
+    );
+  });
 
   it('should filter by multiple destinations', async () => {
     const mockSession = {
@@ -137,15 +141,17 @@ describe('Data Log API Route', () => {
         role: 'MANAGER',
         permissions: ['inventory:read'],
       },
-    }
+    };
 
-    vi.mocked(auth).mockResolvedValue(mockSession as any)
-    vi.mocked(prisma.inventoryItem.count).mockResolvedValue(0)
-    vi.mocked(prisma.inventoryItem.findMany).mockResolvedValue([])
+    vi.mocked(auth).mockResolvedValue(mockSession as any);
+    vi.mocked(prisma.inventoryItem.count).mockResolvedValue(0);
+    vi.mocked(prisma.inventoryItem.findMany).mockResolvedValue([]);
 
-    const request = new NextRequest('http://localhost:3000/api/inventory/data-log?destination=MAIS&destination=FOZAN')
+    const request = new NextRequest(
+      'http://localhost:3000/api/inventory/data-log?destination=MAIS&destination=FOZAN'
+    );
 
-    await GET(request)
+    await GET(request);
 
     expect(prisma.inventoryItem.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -155,8 +161,8 @@ describe('Data Log API Route', () => {
           },
         }),
       })
-    )
-  })
+    );
+  });
 
   it('should filter by reject status - none', async () => {
     const mockSession = {
@@ -165,15 +171,17 @@ describe('Data Log API Route', () => {
         role: 'MANAGER',
         permissions: ['inventory:read'],
       },
-    }
+    };
 
-    vi.mocked(auth).mockResolvedValue(mockSession as any)
-    vi.mocked(prisma.inventoryItem.count).mockResolvedValue(0)
-    vi.mocked(prisma.inventoryItem.findMany).mockResolvedValue([])
+    vi.mocked(auth).mockResolvedValue(mockSession as any);
+    vi.mocked(prisma.inventoryItem.count).mockResolvedValue(0);
+    vi.mocked(prisma.inventoryItem.findMany).mockResolvedValue([]);
 
-    const request = new NextRequest('http://localhost:3000/api/inventory/data-log?rejectFilter=none')
+    const request = new NextRequest(
+      'http://localhost:3000/api/inventory/data-log?rejectFilter=none'
+    );
 
-    await GET(request)
+    await GET(request);
 
     expect(prisma.inventoryItem.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -181,8 +189,8 @@ describe('Data Log API Route', () => {
           reject: 0,
         }),
       })
-    )
-  })
+    );
+  });
 
   it('should filter by reject status - has rejects', async () => {
     const mockSession = {
@@ -191,15 +199,17 @@ describe('Data Log API Route', () => {
         role: 'MANAGER',
         permissions: ['inventory:read'],
       },
-    }
+    };
 
-    vi.mocked(auth).mockResolvedValue(mockSession as any)
-    vi.mocked(prisma.inventoryItem.count).mockResolvedValue(0)
-    vi.mocked(prisma.inventoryItem.findMany).mockResolvedValue([])
+    vi.mocked(auth).mockResolvedValue(mockSession as any);
+    vi.mocked(prisma.inventoryItem.count).mockResolvedValue(0);
+    vi.mocked(prisma.inventoryItem.findMany).mockResolvedValue([]);
 
-    const request = new NextRequest('http://localhost:3000/api/inventory/data-log?rejectFilter=has')
+    const request = new NextRequest(
+      'http://localhost:3000/api/inventory/data-log?rejectFilter=has'
+    );
 
-    await GET(request)
+    await GET(request);
 
     expect(prisma.inventoryItem.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -209,8 +219,8 @@ describe('Data Log API Route', () => {
           },
         }),
       })
-    )
-  })
+    );
+  });
 
   it('should apply role-based filtering for DATA_ENTRY users', async () => {
     const mockSession = {
@@ -219,15 +229,17 @@ describe('Data Log API Route', () => {
         role: 'DATA_ENTRY',
         permissions: ['inventory:read'],
       },
-    }
+    };
 
-    vi.mocked(auth).mockResolvedValue(mockSession as any)
-    vi.mocked(prisma.inventoryItem.count).mockResolvedValue(0)
-    vi.mocked(prisma.inventoryItem.findMany).mockResolvedValue([])
+    vi.mocked(auth).mockResolvedValue(mockSession as any);
+    vi.mocked(prisma.inventoryItem.count).mockResolvedValue(0);
+    vi.mocked(prisma.inventoryItem.findMany).mockResolvedValue([]);
 
-    const request = new NextRequest('http://localhost:3000/api/inventory/data-log')
+    const request = new NextRequest(
+      'http://localhost:3000/api/inventory/data-log'
+    );
 
-    await GET(request)
+    await GET(request);
 
     expect(prisma.inventoryItem.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -235,8 +247,8 @@ describe('Data Log API Route', () => {
           enteredById: 'user-123',
         }),
       })
-    )
-  })
+    );
+  });
 
   it('should allow ADMIN to filter by entered by user', async () => {
     const mockSession = {
@@ -245,15 +257,17 @@ describe('Data Log API Route', () => {
         role: 'ADMIN',
         permissions: ['inventory:read', 'audit:view'],
       },
-    }
+    };
 
-    vi.mocked(auth).mockResolvedValue(mockSession as any)
-    vi.mocked(prisma.inventoryItem.count).mockResolvedValue(0)
-    vi.mocked(prisma.inventoryItem.findMany).mockResolvedValue([])
+    vi.mocked(auth).mockResolvedValue(mockSession as any);
+    vi.mocked(prisma.inventoryItem.count).mockResolvedValue(0);
+    vi.mocked(prisma.inventoryItem.findMany).mockResolvedValue([]);
 
-    const request = new NextRequest('http://localhost:3000/api/inventory/data-log?enteredBy=user-123&enteredBy=user-456')
+    const request = new NextRequest(
+      'http://localhost:3000/api/inventory/data-log?enteredBy=user-123&enteredBy=user-456'
+    );
 
-    await GET(request)
+    await GET(request);
 
     expect(prisma.inventoryItem.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -263,20 +277,22 @@ describe('Data Log API Route', () => {
           },
         }),
       })
-    )
-  })
+    );
+  });
 
   it('should reject unauthenticated request', async () => {
-    vi.mocked(auth).mockResolvedValue(null as any)
+    vi.mocked(auth).mockResolvedValue(null as any);
 
-    const request = new NextRequest('http://localhost:3000/api/inventory/data-log')
+    const request = new NextRequest(
+      'http://localhost:3000/api/inventory/data-log'
+    );
 
-    const response = await GET(request)
-    const data = await response.json()
+    const response = await GET(request);
+    const data = await response.json();
 
-    expect(response.status).toBe(401)
-    expect(data.success).toBe(false)
-  })
+    expect(response.status).toBe(401);
+    expect(data.success).toBe(false);
+  });
 
   it('should reject request without permissions', async () => {
     const mockSession = {
@@ -284,16 +300,18 @@ describe('Data Log API Route', () => {
         id: 'user-123',
         permissions: [],
       },
-    }
+    };
 
-    vi.mocked(auth).mockResolvedValue(mockSession as any)
+    vi.mocked(auth).mockResolvedValue(mockSession as any);
 
-    const request = new NextRequest('http://localhost:3000/api/inventory/data-log')
+    const request = new NextRequest(
+      'http://localhost:3000/api/inventory/data-log'
+    );
 
-    const response = await GET(request)
-    const data = await response.json()
+    const response = await GET(request);
+    const data = await response.json();
 
-    expect(response.status).toBe(403)
-    expect(data.success).toBe(false)
-  })
-})
+    expect(response.status).toBe(403);
+    expect(data.success).toBe(false);
+  });
+});

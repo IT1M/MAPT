@@ -1,46 +1,49 @@
-'use client'
+'use client';
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react'
-import { useTranslations } from '@/hooks/useTranslations'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { Select } from '@/components/ui/select'
-import { Destination, UserRole } from '@prisma/client'
-import { getDateRangeForPreset, type DatePresetType } from '@/utils/datePresets'
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useTranslations } from '@/hooks/useTranslations';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Select } from '@/components/ui/select';
+import { Destination, UserRole } from '@prisma/client';
+import {
+  getDateRangeForPreset,
+  type DatePresetType,
+} from '@/utils/datePresets';
 
 // Filter state interface
 export interface FilterState {
-  search: string
-  startDate: Date | null
-  endDate: Date | null
-  destinations: Destination[]
-  categories: string[]
-  rejectFilter: 'all' | 'none' | 'has' | 'high'
-  enteredByIds: string[]
-  sortBy: string
-  sortOrder: 'asc' | 'desc'
+  search: string;
+  startDate: Date | null;
+  endDate: Date | null;
+  destinations: Destination[];
+  categories: string[];
+  rejectFilter: 'all' | 'none' | 'has' | 'high';
+  enteredByIds: string[];
+  sortBy: string;
+  sortOrder: 'asc' | 'desc';
 }
 
 // User type for EnteredBy filter
 export interface FilterUser {
-  id: string
-  name: string
-  email: string
+  id: string;
+  name: string;
+  email: string;
 }
 
 // Component props
 export interface InventoryFiltersProps {
-  filters: FilterState
-  onFilterChange: (filters: Partial<FilterState>) => void
-  onApply: () => void
-  onReset: () => void
-  activeFilterCount: number
-  isOpen: boolean
-  onToggle: () => void
-  userRole: UserRole
-  availableCategories?: string[]
-  availableUsers?: FilterUser[]
-  isLoading?: boolean
+  filters: FilterState;
+  onFilterChange: (filters: Partial<FilterState>) => void;
+  onApply: () => void;
+  onReset: () => void;
+  activeFilterCount: number;
+  isOpen: boolean;
+  onToggle: () => void;
+  userRole: UserRole;
+  availableCategories?: string[];
+  availableUsers?: FilterUser[];
+  isLoading?: boolean;
 }
 
 export const InventoryFilters: React.FC<InventoryFiltersProps> = ({
@@ -56,84 +59,103 @@ export const InventoryFilters: React.FC<InventoryFiltersProps> = ({
   availableUsers = [],
   isLoading = false,
 }) => {
-  const t = useTranslations('dataLog.filters')
-  const tCommon = useTranslations('common')
+  const t = useTranslations('dataLog.filters');
+  const tCommon = useTranslations('common');
 
   // Local state for debounced search
-  const [searchInput, setSearchInput] = useState(filters.search)
-  const [datePreset, setDatePreset] = useState<DatePresetType>('custom')
+  const [searchInput, setSearchInput] = useState(filters.search);
+  const [datePreset, setDatePreset] = useState<DatePresetType>('custom');
 
   // Debounce search input
   useEffect(() => {
     const timer = setTimeout(() => {
       if (searchInput !== filters.search) {
-        onFilterChange({ search: searchInput })
+        onFilterChange({ search: searchInput });
       }
-    }, 300)
+    }, 300);
 
-    return () => clearTimeout(timer)
-  }, [searchInput, filters.search, onFilterChange])
+    return () => clearTimeout(timer);
+  }, [searchInput, filters.search, onFilterChange]);
 
   // Sync search input with filters
   useEffect(() => {
-    setSearchInput(filters.search)
-  }, [filters.search])
+    setSearchInput(filters.search);
+  }, [filters.search]);
 
   // Handle date preset selection
-  const handleDatePresetChange = useCallback((preset: DatePresetType) => {
-    setDatePreset(preset)
-    if (preset === 'custom') {
-      return
-    }
-    const range = getDateRangeForPreset(preset)
-    if (range) {
-      onFilterChange({
-        startDate: range.startDate,
-        endDate: range.endDate,
-      })
-    }
-  }, [onFilterChange])
+  const handleDatePresetChange = useCallback(
+    (preset: DatePresetType) => {
+      setDatePreset(preset);
+      if (preset === 'custom') {
+        return;
+      }
+      const range = getDateRangeForPreset(preset);
+      if (range) {
+        onFilterChange({
+          startDate: range.startDate,
+          endDate: range.endDate,
+        });
+      }
+    },
+    [onFilterChange]
+  );
 
   // Handle destination toggle
-  const handleDestinationToggle = useCallback((destination: Destination) => {
-    const newDestinations = filters.destinations.includes(destination)
-      ? filters.destinations.filter(d => d !== destination)
-      : [...filters.destinations, destination]
-    onFilterChange({ destinations: newDestinations })
-  }, [filters.destinations, onFilterChange])
+  const handleDestinationToggle = useCallback(
+    (destination: Destination) => {
+      const newDestinations = filters.destinations.includes(destination)
+        ? filters.destinations.filter((d) => d !== destination)
+        : [...filters.destinations, destination];
+      onFilterChange({ destinations: newDestinations });
+    },
+    [filters.destinations, onFilterChange]
+  );
 
   // Handle category toggle
-  const handleCategoryToggle = useCallback((category: string) => {
-    const newCategories = filters.categories.includes(category)
-      ? filters.categories.filter(c => c !== category)
-      : [...filters.categories, category]
-    onFilterChange({ categories: newCategories })
-  }, [filters.categories, onFilterChange])
+  const handleCategoryToggle = useCallback(
+    (category: string) => {
+      const newCategories = filters.categories.includes(category)
+        ? filters.categories.filter((c) => c !== category)
+        : [...filters.categories, category];
+      onFilterChange({ categories: newCategories });
+    },
+    [filters.categories, onFilterChange]
+  );
 
   // Handle user toggle
-  const handleUserToggle = useCallback((userId: string) => {
-    const newUserIds = filters.enteredByIds.includes(userId)
-      ? filters.enteredByIds.filter(id => id !== userId)
-      : [...filters.enteredByIds, userId]
-    onFilterChange({ enteredByIds: newUserIds })
-  }, [filters.enteredByIds, onFilterChange])
+  const handleUserToggle = useCallback(
+    (userId: string) => {
+      const newUserIds = filters.enteredByIds.includes(userId)
+        ? filters.enteredByIds.filter((id) => id !== userId)
+        : [...filters.enteredByIds, userId];
+      onFilterChange({ enteredByIds: newUserIds });
+    },
+    [filters.enteredByIds, onFilterChange]
+  );
 
   // Check if user can see EnteredBy filter
-  const canViewEnteredByFilter = userRole === UserRole.ADMIN || userRole === UserRole.SUPERVISOR
+  const canViewEnteredByFilter =
+    userRole === UserRole.ADMIN || userRole === UserRole.SUPERVISOR;
 
   // Sort field options
-  const sortFieldOptions = useMemo(() => [
-    { value: 'createdAt', label: t('sortFields.createdAt') },
-    { value: 'itemName', label: t('sortFields.itemName') },
-    { value: 'quantity', label: t('sortFields.quantity') },
-    { value: 'batch', label: t('sortFields.batch') },
-  ], [t])
+  const sortFieldOptions = useMemo(
+    () => [
+      { value: 'createdAt', label: t('sortFields.createdAt') },
+      { value: 'itemName', label: t('sortFields.itemName') },
+      { value: 'quantity', label: t('sortFields.quantity') },
+      { value: 'batch', label: t('sortFields.batch') },
+    ],
+    [t]
+  );
 
   // Sort order options
-  const sortOrderOptions = useMemo(() => [
-    { value: 'asc', label: t('ascending') },
-    { value: 'desc', label: t('descending') },
-  ], [t])
+  const sortOrderOptions = useMemo(
+    () => [
+      { value: 'asc', label: t('ascending') },
+      { value: 'desc', label: t('descending') },
+    ],
+    [t]
+  );
 
   return (
     <div
@@ -199,16 +221,41 @@ export const InventoryFilters: React.FC<InventoryFiltersProps> = ({
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
                 aria-label={t('clearSearch')}
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             )}
             {isLoading && (
               <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                <svg className="animate-spin h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                <svg
+                  className="animate-spin h-5 w-5 text-gray-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  />
                 </svg>
               </div>
             )}
@@ -220,19 +267,27 @@ export const InventoryFilters: React.FC<InventoryFiltersProps> = ({
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             {t('dateRange')}
           </label>
-          
+
           {/* Date Presets */}
           <div className="grid grid-cols-2 gap-2 mb-3">
-            {(['today', 'last7days', 'last30days', 'thisMonth'] as DatePresetType[]).map((preset) => (
+            {(
+              [
+                'today',
+                'last7days',
+                'last30days',
+                'thisMonth',
+              ] as DatePresetType[]
+            ).map((preset) => (
               <button
                 key={preset}
                 type="button"
                 onClick={() => handleDatePresetChange(preset)}
                 className={`
                   px-3 py-2 text-sm rounded-lg border transition-colors
-                  ${datePreset === preset
-                    ? 'bg-primary-500 text-white border-primary-500'
-                    : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600'
+                  ${
+                    datePreset === preset
+                      ? 'bg-primary-500 text-white border-primary-500'
+                      : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600'
                   }
                 `}
               >
@@ -246,19 +301,31 @@ export const InventoryFilters: React.FC<InventoryFiltersProps> = ({
             <Input
               type="date"
               label={t('startDate')}
-              value={filters.startDate ? filters.startDate.toISOString().split('T')[0] : ''}
+              value={
+                filters.startDate
+                  ? filters.startDate.toISOString().split('T')[0]
+                  : ''
+              }
               onChange={(e) => {
-                setDatePreset('custom')
-                onFilterChange({ startDate: e.target.value ? new Date(e.target.value) : null })
+                setDatePreset('custom');
+                onFilterChange({
+                  startDate: e.target.value ? new Date(e.target.value) : null,
+                });
               }}
             />
             <Input
               type="date"
               label={t('endDate')}
-              value={filters.endDate ? filters.endDate.toISOString().split('T')[0] : ''}
+              value={
+                filters.endDate
+                  ? filters.endDate.toISOString().split('T')[0]
+                  : ''
+              }
               onChange={(e) => {
-                setDatePreset('custom')
-                onFilterChange({ endDate: e.target.value ? new Date(e.target.value) : null })
+                setDatePreset('custom');
+                onFilterChange({
+                  endDate: e.target.value ? new Date(e.target.value) : null,
+                });
               }}
             />
           </div>
@@ -267,8 +334,8 @@ export const InventoryFilters: React.FC<InventoryFiltersProps> = ({
             <button
               type="button"
               onClick={() => {
-                setDatePreset('custom')
-                onFilterChange({ startDate: null, endDate: null })
+                setDatePreset('custom');
+                onFilterChange({ startDate: null, endDate: null });
               }}
               className="mt-2 text-sm text-primary-600 dark:text-primary-400 hover:underline"
             >
@@ -396,7 +463,9 @@ export const InventoryFilters: React.FC<InventoryFiltersProps> = ({
           <Select
             label={t('sortOrder')}
             value={filters.sortOrder}
-            onChange={(e) => onFilterChange({ sortOrder: e.target.value as 'asc' | 'desc' })}
+            onChange={(e) =>
+              onFilterChange({ sortOrder: e.target.value as 'asc' | 'desc' })
+            }
             options={sortOrderOptions}
           />
         </div>
@@ -422,5 +491,5 @@ export const InventoryFilters: React.FC<InventoryFiltersProps> = ({
         </div>
       </div>
     </div>
-  )
-}
+  );
+};

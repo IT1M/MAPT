@@ -1,52 +1,52 @@
-'use client'
+'use client';
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react'
-import { useTranslations } from '@/hooks/useTranslations'
-import { useRouter, useSearchParams, usePathname } from 'next/navigation'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { Select } from '@/components/ui/select'
-import { Destination, UserRole } from '@prisma/client'
-import { 
-  getDateRangeForPreset, 
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useTranslations } from '@/hooks/useTranslations';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Select } from '@/components/ui/select';
+import { Destination, UserRole } from '@prisma/client';
+import {
+  getDateRangeForPreset,
   type DatePresetType,
-  getPresetLabel 
-} from '@/utils/datePresets'
-import { buildSearchParams } from '@/utils/urlParams'
-import { useFilterPresets, type FilterPreset } from '@/hooks/useFilterPresets'
+  getPresetLabel,
+} from '@/utils/datePresets';
+import { buildSearchParams } from '@/utils/urlParams';
+import { useFilterPresets, type FilterPreset } from '@/hooks/useFilterPresets';
 
 // Filter state interface for analytics
 export interface AnalyticsFilterState {
   dateRange: {
-    start: Date | null
-    end: Date | null
-    preset: DatePresetType
-  }
-  destinations: Destination[]
-  categories: string[]
-  userIds: string[] // Admin only
+    start: Date | null;
+    end: Date | null;
+    preset: DatePresetType;
+  };
+  destinations: Destination[];
+  categories: string[];
+  userIds: string[]; // Admin only
 }
 
 // User type for filter
 export interface FilterUser {
-  id: string
-  name: string
-  email: string
+  id: string;
+  name: string;
+  email: string;
 }
 
 // Component props
 export interface GlobalFiltersProps {
-  filters: AnalyticsFilterState
-  onChange: (filters: Partial<AnalyticsFilterState>) => void
-  onReset: () => void
-  userRole: UserRole
-  availableCategories?: string[]
-  availableUsers?: FilterUser[]
-  isLoading?: boolean
-  autoRefresh: boolean
-  onAutoRefreshChange: (enabled: boolean) => void
-  lastUpdated: Date | null
-  onRefresh: () => void
+  filters: AnalyticsFilterState;
+  onChange: (filters: Partial<AnalyticsFilterState>) => void;
+  onReset: () => void;
+  userRole: UserRole;
+  availableCategories?: string[];
+  availableUsers?: FilterUser[];
+  isLoading?: boolean;
+  autoRefresh: boolean;
+  onAutoRefreshChange: (enabled: boolean) => void;
+  lastUpdated: Date | null;
+  onRefresh: () => void;
 }
 
 export const GlobalFilters: React.FC<GlobalFiltersProps> = ({
@@ -62,111 +62,133 @@ export const GlobalFilters: React.FC<GlobalFiltersProps> = ({
   lastUpdated,
   onRefresh,
 }) => {
-  const t = useTranslations('analytics.filters')
-  const tCommon = useTranslations('common')
-  const tDatePresets = useTranslations('dataLog.filters.datePresets')
-  const router = useRouter()
-  const pathname = usePathname()
-  const searchParams = useSearchParams()
+  const t = useTranslations('analytics.filters');
+  const tCommon = useTranslations('common');
+  const tDatePresets = useTranslations('dataLog.filters.datePresets');
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   // Filter presets hook
-  const { presets, savePreset, loadPreset, deletePreset } = useFilterPresets()
+  const { presets, savePreset, loadPreset, deletePreset } = useFilterPresets();
 
   // Local state for preset management
-  const [showPresetDialog, setShowPresetDialog] = useState(false)
-  const [presetName, setPresetName] = useState('')
-  const [selectedPresetId, setSelectedPresetId] = useState<string | null>(null)
+  const [showPresetDialog, setShowPresetDialog] = useState(false);
+  const [presetName, setPresetName] = useState('');
+  const [selectedPresetId, setSelectedPresetId] = useState<string | null>(null);
 
   // Debounce timer ref
-  const debounceTimerRef = React.useRef<NodeJS.Timeout>()
+  const debounceTimerRef = React.useRef<NodeJS.Timeout>();
 
   // Check if user can see user filter
-  const canViewUserFilter = userRole === UserRole.ADMIN
+  const canViewUserFilter = userRole === UserRole.ADMIN;
 
   // Date preset options for analytics (matching requirements: today, 7d, 30d, 90d, YTD, custom)
-  const datePresetOptions: DatePresetType[] = useMemo(() => 
-    ['today', 'last7days', 'last30days', 'last90days', 'thisYear', 'custom'],
+  const datePresetOptions: DatePresetType[] = useMemo(
+    () => [
+      'today',
+      'last7days',
+      'last30days',
+      'last90days',
+      'thisYear',
+      'custom',
+    ],
     []
-  )
+  );
 
   // Handle date preset selection
-  const handleDatePresetChange = useCallback((preset: DatePresetType) => {
-    if (preset === 'custom') {
-      onChange({
-        dateRange: {
-          ...filters.dateRange,
-          preset: 'custom',
-        },
-      })
-      return
-    }
+  const handleDatePresetChange = useCallback(
+    (preset: DatePresetType) => {
+      if (preset === 'custom') {
+        onChange({
+          dateRange: {
+            ...filters.dateRange,
+            preset: 'custom',
+          },
+        });
+        return;
+      }
 
-    const range = getDateRangeForPreset(preset)
-    if (range) {
-      onChange({
-        dateRange: {
-          start: range.startDate,
-          end: range.endDate,
-          preset,
-        },
-      })
-    }
-  }, [filters.dateRange, onChange])
+      const range = getDateRangeForPreset(preset);
+      if (range) {
+        onChange({
+          dateRange: {
+            start: range.startDate,
+            end: range.endDate,
+            preset,
+          },
+        });
+      }
+    },
+    [filters.dateRange, onChange]
+  );
 
   // Handle destination toggle
-  const handleDestinationToggle = useCallback((destination: Destination) => {
-    const newDestinations = filters.destinations.includes(destination)
-      ? filters.destinations.filter(d => d !== destination)
-      : [...filters.destinations, destination]
-    onChange({ destinations: newDestinations })
-  }, [filters.destinations, onChange])
+  const handleDestinationToggle = useCallback(
+    (destination: Destination) => {
+      const newDestinations = filters.destinations.includes(destination)
+        ? filters.destinations.filter((d) => d !== destination)
+        : [...filters.destinations, destination];
+      onChange({ destinations: newDestinations });
+    },
+    [filters.destinations, onChange]
+  );
 
   // Handle category toggle
-  const handleCategoryToggle = useCallback((category: string) => {
-    const newCategories = filters.categories.includes(category)
-      ? filters.categories.filter(c => c !== category)
-      : [...filters.categories, category]
-    onChange({ categories: newCategories })
-  }, [filters.categories, onChange])
+  const handleCategoryToggle = useCallback(
+    (category: string) => {
+      const newCategories = filters.categories.includes(category)
+        ? filters.categories.filter((c) => c !== category)
+        : [...filters.categories, category];
+      onChange({ categories: newCategories });
+    },
+    [filters.categories, onChange]
+  );
 
   // Handle user toggle
-  const handleUserToggle = useCallback((userId: string) => {
-    const newUserIds = filters.userIds.includes(userId)
-      ? filters.userIds.filter(id => id !== userId)
-      : [...filters.userIds, userId]
-    onChange({ userIds: newUserIds })
-  }, [filters.userIds, onChange])
+  const handleUserToggle = useCallback(
+    (userId: string) => {
+      const newUserIds = filters.userIds.includes(userId)
+        ? filters.userIds.filter((id) => id !== userId)
+        : [...filters.userIds, userId];
+      onChange({ userIds: newUserIds });
+    },
+    [filters.userIds, onChange]
+  );
 
   // Sync filters with URL query parameters (debounced)
   useEffect(() => {
     if (debounceTimerRef.current) {
-      clearTimeout(debounceTimerRef.current)
+      clearTimeout(debounceTimerRef.current);
     }
 
     debounceTimerRef.current = setTimeout(() => {
       const params = buildSearchParams({
         startDate: filters.dateRange.start,
         endDate: filters.dateRange.end,
-        preset: filters.dateRange.preset !== 'custom' ? filters.dateRange.preset : undefined,
+        preset:
+          filters.dateRange.preset !== 'custom'
+            ? filters.dateRange.preset
+            : undefined,
         destinations: filters.destinations,
         categories: filters.categories,
         userIds: canViewUserFilter ? filters.userIds : undefined,
-      })
+      });
 
-      const newUrl = `${pathname}?${params.toString()}`
-      router.replace(newUrl, { scroll: false })
-    }, 300) // 300ms debounce
+      const newUrl = `${pathname}?${params.toString()}`;
+      router.replace(newUrl, { scroll: false });
+    }, 300); // 300ms debounce
 
     return () => {
       if (debounceTimerRef.current) {
-        clearTimeout(debounceTimerRef.current)
+        clearTimeout(debounceTimerRef.current);
       }
-    }
-  }, [filters, pathname, router, canViewUserFilter])
+    };
+  }, [filters, pathname, router, canViewUserFilter]);
 
   // Save current filters as preset
   const handleSavePreset = useCallback(() => {
-    if (!presetName.trim()) return
+    if (!presetName.trim()) return;
 
     const preset = savePreset(presetName, {
       search: '',
@@ -178,55 +200,62 @@ export const GlobalFilters: React.FC<GlobalFiltersProps> = ({
       enteredByIds: filters.userIds,
       sortBy: 'createdAt',
       sortOrder: 'desc',
-    })
+    });
 
-    setSelectedPresetId(preset.id)
-    setPresetName('')
-    setShowPresetDialog(false)
-  }, [presetName, filters, savePreset])
+    setSelectedPresetId(preset.id);
+    setPresetName('');
+    setShowPresetDialog(false);
+  }, [presetName, filters, savePreset]);
 
   // Load a saved preset
-  const handleLoadPreset = useCallback((presetId: string) => {
-    const preset = loadPreset(presetId)
-    if (preset) {
-      onChange({
-        dateRange: {
-          start: preset.filters.startDate,
-          end: preset.filters.endDate,
-          preset: 'custom',
-        },
-        destinations: preset.filters.destinations,
-        categories: preset.filters.categories,
-        userIds: preset.filters.enteredByIds,
-      })
-      setSelectedPresetId(presetId)
-    }
-  }, [loadPreset, onChange])
+  const handleLoadPreset = useCallback(
+    (presetId: string) => {
+      const preset = loadPreset(presetId);
+      if (preset) {
+        onChange({
+          dateRange: {
+            start: preset.filters.startDate,
+            end: preset.filters.endDate,
+            preset: 'custom',
+          },
+          destinations: preset.filters.destinations,
+          categories: preset.filters.categories,
+          userIds: preset.filters.enteredByIds,
+        });
+        setSelectedPresetId(presetId);
+      }
+    },
+    [loadPreset, onChange]
+  );
 
   // Format last updated time
   const formatLastUpdated = useCallback(() => {
-    if (!lastUpdated) return tCommon('loading')
+    if (!lastUpdated) return tCommon('loading');
 
-    const now = new Date()
-    const diff = Math.floor((now.getTime() - lastUpdated.getTime()) / 1000)
+    const now = new Date();
+    const diff = Math.floor((now.getTime() - lastUpdated.getTime()) / 1000);
 
-    if (diff < 60) return `${diff}s ago`
-    if (diff < 3600) return `${Math.floor(diff / 60)}m ago`
-    return `${Math.floor(diff / 3600)}h ago`
-  }, [lastUpdated, tCommon])
+    if (diff < 60) return `${diff}s ago`;
+    if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+    return `${Math.floor(diff / 3600)}h ago`;
+  }, [lastUpdated, tCommon]);
 
   // Count active filters
   const activeFilterCount = useMemo(() => {
-    let count = 0
-    if (filters.dateRange.start || filters.dateRange.end) count++
-    if (filters.destinations.length > 0 && filters.destinations.length < 2) count++
-    if (filters.categories.length > 0) count++
-    if (filters.userIds.length > 0) count++
-    return count
-  }, [filters])
+    let count = 0;
+    if (filters.dateRange.start || filters.dateRange.end) count++;
+    if (filters.destinations.length > 0 && filters.destinations.length < 2)
+      count++;
+    if (filters.categories.length > 0) count++;
+    if (filters.userIds.length > 0) count++;
+    return count;
+  }, [filters]);
 
   return (
-    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 space-y-6" dir={pathname.includes('/ar/') ? 'rtl' : 'ltr'}>
+    <div
+      className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 space-y-6"
+      dir={pathname.includes('/ar/') ? 'rtl' : 'ltr'}
+    >
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -291,7 +320,7 @@ export const GlobalFilters: React.FC<GlobalFiltersProps> = ({
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           {t('dateRange')}
         </label>
-        
+
         <div className="grid grid-cols-2 gap-2 mb-3">
           {datePresetOptions.map((preset) => (
             <button
@@ -300,17 +329,22 @@ export const GlobalFilters: React.FC<GlobalFiltersProps> = ({
               onClick={() => handleDatePresetChange(preset)}
               className={`
                 px-3 py-2 text-sm rounded-lg border transition-colors
-                ${filters.dateRange.preset === preset
-                  ? 'bg-primary-500 text-white border-primary-500'
-                  : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600'
+                ${
+                  filters.dateRange.preset === preset
+                    ? 'bg-primary-500 text-white border-primary-500'
+                    : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600'
                 }
               `}
             >
-              {preset === 'last7days' ? '7d' : 
-               preset === 'last30days' ? '30d' :
-               preset === 'last90days' ? '90d' :
-               preset === 'thisYear' ? 'YTD' :
-               tDatePresets(preset)}
+              {preset === 'last7days'
+                ? '7d'
+                : preset === 'last30days'
+                  ? '30d'
+                  : preset === 'last90days'
+                    ? '90d'
+                    : preset === 'thisYear'
+                      ? 'YTD'
+                      : tDatePresets(preset)}
             </button>
           ))}
         </div>
@@ -320,7 +354,11 @@ export const GlobalFilters: React.FC<GlobalFiltersProps> = ({
           <Input
             type="date"
             label="Start Date"
-            value={filters.dateRange.start ? filters.dateRange.start.toISOString().split('T')[0] : ''}
+            value={
+              filters.dateRange.start
+                ? filters.dateRange.start.toISOString().split('T')[0]
+                : ''
+            }
             onChange={(e) => {
               onChange({
                 dateRange: {
@@ -328,13 +366,17 @@ export const GlobalFilters: React.FC<GlobalFiltersProps> = ({
                   start: e.target.value ? new Date(e.target.value) : null,
                   preset: 'custom',
                 },
-              })
+              });
             }}
           />
           <Input
             type="date"
             label="End Date"
-            value={filters.dateRange.end ? filters.dateRange.end.toISOString().split('T')[0] : ''}
+            value={
+              filters.dateRange.end
+                ? filters.dateRange.end.toISOString().split('T')[0]
+                : ''
+            }
             onChange={(e) => {
               onChange({
                 dateRange: {
@@ -342,7 +384,7 @@ export const GlobalFilters: React.FC<GlobalFiltersProps> = ({
                   end: e.target.value ? new Date(e.target.value) : null,
                   preset: 'custom',
                 },
-              })
+              });
             }}
           />
         </div>
@@ -444,9 +486,10 @@ export const GlobalFilters: React.FC<GlobalFiltersProps> = ({
                   onClick={() => handleLoadPreset(preset.id)}
                   className={`
                     flex-1 text-left text-sm
-                    ${selectedPresetId === preset.id
-                      ? 'text-primary-600 dark:text-primary-400 font-medium'
-                      : 'text-gray-700 dark:text-gray-300'
+                    ${
+                      selectedPresetId === preset.id
+                        ? 'text-primary-600 dark:text-primary-400 font-medium'
+                        : 'text-gray-700 dark:text-gray-300'
                     }
                   `}
                 >
@@ -458,8 +501,18 @@ export const GlobalFilters: React.FC<GlobalFiltersProps> = ({
                   className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300"
                   aria-label="Delete preset"
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
                   </svg>
                 </button>
               </div>
@@ -508,8 +561,8 @@ export const GlobalFilters: React.FC<GlobalFiltersProps> = ({
                 variant="secondary"
                 className="flex-1"
                 onClick={() => {
-                  setShowPresetDialog(false)
-                  setPresetName('')
+                  setShowPresetDialog(false);
+                  setPresetName('');
                 }}
               >
                 {tCommon('cancel')}
@@ -527,5 +580,5 @@ export const GlobalFilters: React.FC<GlobalFiltersProps> = ({
         </div>
       )}
     </div>
-  )
-}
+  );
+};

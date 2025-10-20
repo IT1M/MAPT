@@ -1,5 +1,5 @@
-import nodemailer from 'nodemailer'
-import { prisma } from './prisma'
+import nodemailer from 'nodemailer';
+import { prisma } from './prisma';
 import {
   welcomeEmailTemplate,
   passwordResetEmailTemplate,
@@ -8,8 +8,8 @@ import {
   highRejectRateAlertTemplate,
   backupStatusEmailTemplate,
   reportReadyEmailTemplate,
-  exportReadyEmailTemplate
-} from './email-templates'
+  exportReadyEmailTemplate,
+} from './email-templates';
 
 /**
  * Email service for sending notifications
@@ -17,101 +17,101 @@ import {
  */
 
 export interface EmailConfig {
-  provider: 'smtp' | 'resend'
+  provider: 'smtp' | 'resend';
   smtp?: {
-    host: string
-    port: number
-    secure: boolean
-    auth: { user: string; pass: string }
-  }
+    host: string;
+    port: number;
+    secure: boolean;
+    auth: { user: string; pass: string };
+  };
   resend?: {
-    apiKey: string
-  }
+    apiKey: string;
+  };
   from: {
-    name: string
-    email: string
-  }
+    name: string;
+    email: string;
+  };
 }
 
 export interface EmailOptions {
-  to: string | string[]
-  subject: string
-  template: string
-  data: Record<string, any>
-  priority?: 'low' | 'normal' | 'high'
+  to: string | string[];
+  subject: string;
+  template: string;
+  data: Record<string, any>;
+  priority?: 'low' | 'normal' | 'high';
   attachments?: Array<{
-    filename: string
-    content: Buffer
-    contentType: string
-  }>
+    filename: string;
+    content: Buffer;
+    contentType: string;
+  }>;
 }
 
 export interface EmailJob {
-  id: string
-  to: string
-  template: string
-  data: Record<string, any>
-  scheduledFor: Date
-  attempts: number
-  status: 'pending' | 'sent' | 'failed'
+  id: string;
+  to: string;
+  template: string;
+  data: Record<string, any>;
+  scheduledFor: Date;
+  attempts: number;
+  status: 'pending' | 'sent' | 'failed';
 }
 
 export interface SecurityAlertEmailData {
-  userName: string
-  deviceType: string
-  browser: string
-  os: string
-  ipAddress: string
-  location: string
-  timestamp: Date
+  userName: string;
+  deviceType: string;
+  browser: string;
+  os: string;
+  ipAddress: string;
+  location: string;
+  timestamp: Date;
 }
 
 export interface WelcomeEmailData {
-  userName: string
-  email: string
-  loginUrl: string
+  userName: string;
+  email: string;
+  loginUrl: string;
 }
 
 export interface PasswordResetEmailData {
-  userName: string
-  resetUrl: string
-  expiresAt: Date
+  userName: string;
+  resetUrl: string;
+  expiresAt: Date;
 }
 
 export interface DailySummaryEmailData {
-  userName: string
-  date: Date
+  userName: string;
+  date: Date;
   stats: {
-    itemsAdded: number
-    itemsUpdated: number
-    totalValue: number
-    rejectRate: number
-  }
-  topItems: Array<{ name: string; quantity: number }>
-  alerts: Array<{ message: string; severity: string }>
+    itemsAdded: number;
+    itemsUpdated: number;
+    totalValue: number;
+    rejectRate: number;
+  };
+  topItems: Array<{ name: string; quantity: number }>;
+  alerts: Array<{ message: string; severity: string }>;
 }
 
 export interface HighRejectRateAlertData {
-  rejectRate: number
-  threshold: number
-  affectedItems: Array<{ name: string; batch: string; rejectCount: number }>
-  dateRange: { from: Date; to: Date }
+  rejectRate: number;
+  threshold: number;
+  affectedItems: Array<{ name: string; batch: string; rejectCount: number }>;
+  dateRange: { from: Date; to: Date };
 }
 
 export interface BackupStatusEmailData {
-  status: 'success' | 'failed'
-  backupName: string
-  timestamp: Date
-  size?: string
-  error?: string
+  status: 'success' | 'failed';
+  backupName: string;
+  timestamp: Date;
+  size?: string;
+  error?: string;
 }
 
 export interface ReportReadyEmailData {
-  userName: string
-  reportTitle: string
-  reportType: string
-  downloadUrl: string
-  generatedAt: Date
+  userName: string;
+  reportTitle: string;
+  reportType: string;
+  downloadUrl: string;
+  generatedAt: Date;
 }
 
 // Email configuration
@@ -133,10 +133,10 @@ const emailConfig: EmailConfig = {
     name: process.env.SMTP_FROM_NAME || 'Saudi Mais Inventory System',
     email: process.env.SMTP_FROM || 'noreply@mais.sa',
   },
-}
+};
 
 // Create transporter
-let transporter: nodemailer.Transporter | null = null
+let transporter: nodemailer.Transporter | null = null;
 
 function getTransporter(): nodemailer.Transporter {
   if (!transporter && emailConfig.provider === 'smtp') {
@@ -145,15 +145,15 @@ function getTransporter(): nodemailer.Transporter {
       port: emailConfig.smtp!.port,
       secure: emailConfig.smtp!.secure,
       auth: emailConfig.smtp!.auth,
-    })
+    });
   }
-  return transporter!
+  return transporter!;
 }
 
 // Email queue for retry logic
 class EmailQueue {
-  private queue: EmailJob[] = []
-  private processing = false
+  private queue: EmailJob[] = [];
+  private processing = false;
 
   async add(job: Omit<EmailJob, 'id' | 'attempts' | 'status'>): Promise<void> {
     const emailJob: EmailJob = {
@@ -161,64 +161,69 @@ class EmailQueue {
       id: `job_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       attempts: 0,
       status: 'pending',
-    }
-    this.queue.push(emailJob)
+    };
+    this.queue.push(emailJob);
 
     if (!this.processing) {
-      this.process()
+      this.process();
     }
   }
 
   async process(): Promise<void> {
-    if (this.processing || this.queue.length === 0) return
+    if (this.processing || this.queue.length === 0) return;
 
-    this.processing = true
+    this.processing = true;
 
     while (this.queue.length > 0) {
-      const job = this.queue[0]
+      const job = this.queue[0];
 
       try {
-        await sendEmailInternal(job.to, job.template, job.data)
-        job.status = 'sent'
-        this.queue.shift()
+        await sendEmailInternal(job.to, job.template, job.data);
+        job.status = 'sent';
+        this.queue.shift();
       } catch (error) {
-        job.attempts++
+        job.attempts++;
 
         if (job.attempts >= 3) {
-          job.status = 'failed'
-          this.queue.shift()
-          console.error(`[EmailQueue] Job ${job.id} failed after 3 attempts:`, error)
+          job.status = 'failed';
+          this.queue.shift();
+          console.error(
+            `[EmailQueue] Job ${job.id} failed after 3 attempts:`,
+            error
+          );
         } else {
           // Move to end of queue for retry
-          this.queue.shift()
-          this.queue.push(job)
-          await new Promise(resolve => setTimeout(resolve, 5000 * job.attempts))
+          this.queue.shift();
+          this.queue.push(job);
+          await new Promise((resolve) =>
+            setTimeout(resolve, 5000 * job.attempts)
+          );
         }
       }
     }
 
-    this.processing = false
+    this.processing = false;
   }
 
   async retry(jobId: string): Promise<void> {
-    const job = this.queue.find(j => j.id === jobId)
+    const job = this.queue.find((j) => j.id === jobId);
     if (job) {
-      job.attempts = 0
-      job.status = 'pending'
-      this.process()
+      job.attempts = 0;
+      job.status = 'pending';
+      this.process();
     }
   }
 
   getStatus() {
     return {
-      pending: this.queue.filter(j => j.status === 'pending').length,
-      failed: this.queue.filter(j => j.status === 'failed').length,
+      pending: this.queue.filter((j) => j.status === 'pending').length,
+      failed: this.queue.filter((j) => j.status === 'failed').length,
       processing: this.processing,
-    }
+    };
   }
 }
 
-const emailQueue = new EmailQueue()
+const emailQueue = new EmailQueue();
 
 /**
  * Internal function to send email
@@ -227,12 +232,16 @@ async function sendEmailInternal(
   to: string | string[],
   template: string,
   data: Record<string, any>,
-  attachments?: Array<{ filename: string; content: Buffer; contentType: string }>
+  attachments?: Array<{
+    filename: string;
+    content: Buffer;
+    contentType: string;
+  }>
 ): Promise<void> {
-  const { html, text, subject } = getEmailTemplate(template, data)
+  const { html, text, subject } = getEmailTemplate(template, data);
 
   if (emailConfig.provider === 'smtp') {
-    const transporter = getTransporter()
+    const transporter = getTransporter();
 
     const mailOptions: any = {
       from: `"${emailConfig.from.name}" <${emailConfig.from.email}>`,
@@ -240,17 +249,17 @@ async function sendEmailInternal(
       subject,
       html,
       text,
-    }
+    };
 
     if (attachments && attachments.length > 0) {
-      mailOptions.attachments = attachments.map(att => ({
+      mailOptions.attachments = attachments.map((att) => ({
         filename: att.filename,
         content: att.content,
         contentType: att.contentType,
-      }))
+      }));
     }
 
-    await transporter.sendMail(mailOptions)
+    await transporter.sendMail(mailOptions);
   } else if (emailConfig.provider === 'resend') {
     // Resend API implementation
     const body: any = {
@@ -259,27 +268,27 @@ async function sendEmailInternal(
       subject,
       html,
       text,
-    }
+    };
 
     if (attachments && attachments.length > 0) {
-      body.attachments = attachments.map(att => ({
+      body.attachments = attachments.map((att) => ({
         filename: att.filename,
         content: att.content.toString('base64'),
         type: att.contentType,
-      }))
+      }));
     }
 
     const response = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${emailConfig.resend!.apiKey}`,
+        Authorization: `Bearer ${emailConfig.resend!.apiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(body),
-    })
+    });
 
     if (!response.ok) {
-      throw new Error(`Resend API error: ${response.statusText}`)
+      throw new Error(`Resend API error: ${response.statusText}`);
     }
   }
 }
@@ -293,23 +302,23 @@ function getEmailTemplate(
 ): { html: string; text: string; subject: string } {
   switch (template) {
     case 'welcome':
-      return welcomeEmailTemplate(data as WelcomeEmailData)
+      return welcomeEmailTemplate(data as WelcomeEmailData);
     case 'password-reset':
-      return passwordResetEmailTemplate(data as PasswordResetEmailData)
+      return passwordResetEmailTemplate(data as PasswordResetEmailData);
     case 'security-alert':
-      return securityAlertEmailTemplate(data as SecurityAlertEmailData)
+      return securityAlertEmailTemplate(data as SecurityAlertEmailData);
     case 'daily-summary':
-      return dailySummaryEmailTemplate(data as DailySummaryEmailData)
+      return dailySummaryEmailTemplate(data as DailySummaryEmailData);
     case 'high-reject-rate':
-      return highRejectRateAlertTemplate(data as HighRejectRateAlertData)
+      return highRejectRateAlertTemplate(data as HighRejectRateAlertData);
     case 'backup-status':
-      return backupStatusEmailTemplate(data as BackupStatusEmailData)
+      return backupStatusEmailTemplate(data as BackupStatusEmailData);
     case 'report-ready':
-      return reportReadyEmailTemplate(data as ReportReadyEmailData)
+      return reportReadyEmailTemplate(data as ReportReadyEmailData);
     case 'export-ready':
-      return exportReadyEmailTemplate(data as any)
+      return exportReadyEmailTemplate(data as any);
     default:
-      throw new Error(`Unknown email template: ${template}`)
+      throw new Error(`Unknown email template: ${template}`);
   }
 }
 
@@ -317,14 +326,22 @@ function getEmailTemplate(
  * Send email with logging and retry
  */
 export async function sendEmail(options: EmailOptions): Promise<void> {
-  const emailId = await logEmail(options)
+  const emailId = await logEmail(options);
 
   try {
-    await sendEmailInternal(options.to, options.template, options.data, options.attachments)
-    await markEmailAsSent(emailId)
+    await sendEmailInternal(
+      options.to,
+      options.template,
+      options.data,
+      options.attachments
+    );
+    await markEmailAsSent(emailId);
   } catch (error) {
-    console.error('[Email] Failed to send email:', error)
-    await markEmailAsFailed(emailId, error instanceof Error ? error.message : 'Unknown error')
+    console.error('[Email] Failed to send email:', error);
+    await markEmailAsFailed(
+      emailId,
+      error instanceof Error ? error.message : 'Unknown error'
+    );
 
     // Add to queue for retry
     emailQueue.add({
@@ -332,9 +349,9 @@ export async function sendEmail(options: EmailOptions): Promise<void> {
       template: options.template,
       data: options.data,
       scheduledFor: new Date(),
-    })
+    });
 
-    throw error
+    throw error;
   }
 }
 
@@ -350,7 +367,7 @@ export async function sendWelcomeEmail(
     subject: 'Welcome to Saudi Mais Inventory System',
     template: 'welcome',
     data,
-  })
+  });
 }
 
 /**
@@ -366,7 +383,7 @@ export async function sendPasswordResetEmail(
     template: 'password-reset',
     data,
     priority: 'high',
-  })
+  });
 }
 
 /**
@@ -382,7 +399,7 @@ export async function sendSecurityAlertEmail(
     template: 'security-alert',
     data,
     priority: 'high',
-  })
+  });
 }
 
 /**
@@ -397,7 +414,7 @@ export async function sendDailySummaryEmail(
     subject: 'Your Daily Inventory Summary',
     template: 'daily-summary',
     data,
-  })
+  });
 }
 
 /**
@@ -413,7 +430,7 @@ export async function sendHighRejectRateAlert(
     template: 'high-reject-rate',
     data,
     priority: 'high',
-  })
+  });
 }
 
 /**
@@ -425,13 +442,14 @@ export async function sendBackupStatusEmail(
 ): Promise<void> {
   await sendEmail({
     to: email,
-    subject: data.status === 'success'
-      ? '✅ Backup Completed Successfully'
-      : '❌ Backup Failed',
+    subject:
+      data.status === 'success'
+        ? '✅ Backup Completed Successfully'
+        : '❌ Backup Failed',
     template: 'backup-status',
     data,
     priority: data.status === 'failed' ? 'high' : 'normal',
-  })
+  });
 }
 
 /**
@@ -446,7 +464,7 @@ export async function sendReportReadyEmail(
     subject: '📊 Your Report is Ready',
     template: 'report-ready',
     data,
-  })
+  });
 }
 
 /**
@@ -455,22 +473,22 @@ export async function sendReportReadyEmail(
 export async function sendAccountLockedEmail(
   email: string,
   data: {
-    userName: string
-    lockoutEndsAt: Date
+    userName: string;
+    lockoutEndsAt: Date;
   }
 ): Promise<void> {
-  const subject = '⚠️ Account Temporarily Locked'
-  const template = 'account-locked'
+  const subject = '⚠️ Account Temporarily Locked';
+  const template = 'account-locked';
 
   await logEmail({
     to: email,
     subject,
     template,
     data,
-  })
+  });
 
-  console.log('[Email] Account locked email would be sent to:', email)
-  console.log('[Email] Lockout ends at:', data.lockoutEndsAt.toISOString())
+  console.log('[Email] Account locked email would be sent to:', email);
+  console.log('[Email] Lockout ends at:', data.lockoutEndsAt.toISOString());
 }
 
 /**
@@ -489,11 +507,11 @@ async function logEmail(options: EmailOptions): Promise<string> {
         metadata: options.data,
         attempts: 0,
       },
-    })
-    return emailLog.id
+    });
+    return emailLog.id;
   } catch (error) {
-    console.error('[Email] Failed to log email:', error)
-    return `email_${Date.now()}`
+    console.error('[Email] Failed to log email:', error);
+    return `email_${Date.now()}`;
   }
 }
 
@@ -508,9 +526,9 @@ export async function markEmailAsSent(emailId: string): Promise<void> {
         status: 'SENT',
         sentAt: new Date(),
       },
-    })
+    });
   } catch (error) {
-    console.error('[Email] Failed to mark email as sent:', error)
+    console.error('[Email] Failed to mark email as sent:', error);
   }
 }
 
@@ -532,9 +550,9 @@ export async function markEmailAsFailed(
           increment: 1,
         },
       },
-    })
+    });
   } catch (error) {
-    console.error('[Email] Failed to mark email as failed:', error)
+    console.error('[Email] Failed to mark email as failed:', error);
   }
 }
 
@@ -542,7 +560,7 @@ export async function markEmailAsFailed(
  * Get email queue status
  */
 export function getEmailQueueStatus() {
-  return emailQueue.getStatus()
+  return emailQueue.getStatus();
 }
 
 /**
@@ -551,13 +569,13 @@ export function getEmailQueueStatus() {
 export async function testEmailConfiguration(): Promise<boolean> {
   try {
     if (emailConfig.provider === 'smtp') {
-      const transporter = getTransporter()
-      await transporter.verify()
-      return true
+      const transporter = getTransporter();
+      await transporter.verify();
+      return true;
     }
-    return true
+    return true;
   } catch (error) {
-    console.error('[Email] Configuration test failed:', error)
-    return false
+    console.error('[Email] Configuration test failed:', error);
+    return false;
   }
 }

@@ -1,11 +1,8 @@
-import { NextRequest } from 'next/server'
-import { auth } from '@/services/auth'
-import { prisma } from '@/services/prisma'
-import { format } from 'date-fns'
-import {
-  handleApiError,
-  authRequiredError,
-} from '@/utils/api-response'
+import { NextRequest } from 'next/server';
+import { auth } from '@/services/auth';
+import { prisma } from '@/services/prisma';
+import { format } from 'date-fns';
+import { handleApiError, authRequiredError } from '@/utils/api-response';
 
 /**
  * GET /api/auth/security-log/export
@@ -13,14 +10,18 @@ import {
  */
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth()
+    const session = await auth();
 
     if (!session?.user?.id) {
-      return authRequiredError('You must be logged in to export security logs')
+      return authRequiredError('You must be logged in to export security logs');
     }
 
     // Get all security-related audit logs for the user
-    const securityActions: ('LOGIN' | 'LOGOUT' | 'UPDATE')[] = ['LOGIN', 'LOGOUT', 'UPDATE']
+    const securityActions: ('LOGIN' | 'LOGOUT' | 'UPDATE')[] = [
+      'LOGIN',
+      'LOGOUT',
+      'UPDATE',
+    ];
 
     const events = await prisma.auditLog.findMany({
       where: {
@@ -32,20 +33,20 @@ export async function GET(request: NextRequest) {
       orderBy: {
         timestamp: 'desc',
       },
-    })
+    });
 
     // Transform to security events
     const securityEvents = events.map((event) => {
-      let type = 'login'
-      
+      let type = 'login';
+
       if (event.action === 'LOGIN') {
-        type = 'login'
+        type = 'login';
       } else if (event.action === 'LOGOUT') {
-        type = 'session_terminated'
+        type = 'session_terminated';
       } else if (event.action === 'UPDATE' && event.entityType === 'User') {
-        const changes = event.newValue as any
+        const changes = event.newValue as any;
         if (changes?.action === 'password_change') {
-          type = 'password_change'
+          type = 'password_change';
         }
       }
 
@@ -54,24 +55,24 @@ export async function GET(request: NextRequest) {
         type,
         ipAddress: event.ipAddress || 'Unknown',
         userAgent: event.userAgent || 'Unknown',
-      }
-    })
+      };
+    });
 
     // Generate CSV
-    const headers = ['Timestamp', 'Event Type', 'IP Address', 'User Agent']
+    const headers = ['Timestamp', 'Event Type', 'IP Address', 'User Agent'];
     const rows = securityEvents.map((event) => [
       event.timestamp,
       event.type,
       event.ipAddress,
       event.userAgent,
-    ])
+    ]);
 
     const csv = [
       headers.join(','),
       ...rows.map((row) =>
         row.map((cell) => `"${cell.replace(/"/g, '""')}"`).join(',')
       ),
-    ].join('\n')
+    ].join('\n');
 
     // Return CSV file
     return new Response(csv, {
@@ -82,8 +83,8 @@ export async function GET(request: NextRequest) {
           'yyyy-MM-dd'
         )}.csv"`,
       },
-    })
+    });
   } catch (error) {
-    return handleApiError(error)
+    return handleApiError(error);
   }
 }

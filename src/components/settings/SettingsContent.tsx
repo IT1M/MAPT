@@ -1,10 +1,10 @@
-'use client'
+'use client';
 
-import React from 'react'
-import type { SettingsSection } from '@/types/settings'
+import React from 'react';
+import type { SettingsSection } from '@/types/settings';
 
 interface SettingsContentProps {
-  section: SettingsSection
+  section: SettingsSection;
 }
 
 export function SettingsContent({ section }: SettingsContentProps) {
@@ -50,7 +50,7 @@ export function SettingsContent({ section }: SettingsContentProps) {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 function getSectionTitle(section: SettingsSection): string {
@@ -62,8 +62,8 @@ function getSectionTitle(section: SettingsSection): string {
     notifications: 'Notifications',
     api: 'API & Integrations',
     system: 'System Preferences',
-  }
-  return titles[section]
+  };
+  return titles[section];
 }
 
 function getSectionDescription(section: SettingsSection): string {
@@ -75,6 +75,6 @@ function getSectionDescription(section: SettingsSection): string {
     notifications: 'Configure notification preferences',
     api: 'Manage API keys and integrations',
     system: 'Configure system-wide settings',
-  }
-  return descriptions[section]
+  };
+  return descriptions[section];
 }

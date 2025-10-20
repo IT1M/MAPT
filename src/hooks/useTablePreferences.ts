@@ -1,13 +1,13 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect } from 'react';
 
 export interface TablePreferences {
-  columnVisibility: Record<string, boolean>
-  columnWidths: Record<string, number>
-  columnOrder: string[]
-  defaultPageSize: number
+  columnVisibility: Record<string, boolean>;
+  columnWidths: Record<string, number>;
+  columnOrder: string[];
+  defaultPageSize: number;
 }
 
-const STORAGE_KEY = 'dataLog.tablePreferences'
+const STORAGE_KEY = 'dataLog.tablePreferences';
 
 const DEFAULT_PREFERENCES: TablePreferences = {
   columnVisibility: {
@@ -47,7 +47,7 @@ const DEFAULT_PREFERENCES: TablePreferences = {
     'actions',
   ],
   defaultPageSize: 25,
-}
+};
 
 /**
  * Custom hook for managing table preferences with localStorage persistence
@@ -55,71 +55,74 @@ const DEFAULT_PREFERENCES: TablePreferences = {
 export function useTablePreferences() {
   const [preferences, setPreferences] = useState<TablePreferences>(() => {
     if (typeof window === 'undefined') {
-      return DEFAULT_PREFERENCES
+      return DEFAULT_PREFERENCES;
     }
-    return loadPreferences()
-  })
+    return loadPreferences();
+  });
 
   // Save to localStorage whenever preferences change
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      savePreferences(preferences)
+      savePreferences(preferences);
     }
-  }, [preferences])
+  }, [preferences]);
 
   // Update column visibility
-  const setColumnVisibility = useCallback((column: string, visible: boolean) => {
-    setPreferences(prev => ({
-      ...prev,
-      columnVisibility: {
-        ...prev.columnVisibility,
-        [column]: visible,
-      },
-    }))
-  }, [])
+  const setColumnVisibility = useCallback(
+    (column: string, visible: boolean) => {
+      setPreferences((prev) => ({
+        ...prev,
+        columnVisibility: {
+          ...prev.columnVisibility,
+          [column]: visible,
+        },
+      }));
+    },
+    []
+  );
 
   // Toggle column visibility
   const toggleColumnVisibility = useCallback((column: string) => {
-    setPreferences(prev => ({
+    setPreferences((prev) => ({
       ...prev,
       columnVisibility: {
         ...prev.columnVisibility,
         [column]: !prev.columnVisibility[column],
       },
-    }))
-  }, [])
+    }));
+  }, []);
 
   // Update column width
   const setColumnWidth = useCallback((column: string, width: number) => {
-    setPreferences(prev => ({
+    setPreferences((prev) => ({
       ...prev,
       columnWidths: {
         ...prev.columnWidths,
         [column]: width,
       },
-    }))
-  }, [])
+    }));
+  }, []);
 
   // Update column order
   const setColumnOrder = useCallback((order: string[]) => {
-    setPreferences(prev => ({
+    setPreferences((prev) => ({
       ...prev,
       columnOrder: order,
-    }))
-  }, [])
+    }));
+  }, []);
 
   // Update default page size
   const setDefaultPageSize = useCallback((pageSize: number) => {
-    setPreferences(prev => ({
+    setPreferences((prev) => ({
       ...prev,
       defaultPageSize: pageSize,
-    }))
-  }, [])
+    }));
+  }, []);
 
   // Reset to defaults
   const resetPreferences = useCallback(() => {
-    setPreferences(DEFAULT_PREFERENCES)
-  }, [])
+    setPreferences(DEFAULT_PREFERENCES);
+  }, []);
 
   return {
     preferences,
@@ -129,7 +132,7 @@ export function useTablePreferences() {
     setColumnOrder,
     setDefaultPageSize,
     resetPreferences,
-  }
+  };
 }
 
 /**
@@ -137,9 +140,9 @@ export function useTablePreferences() {
  */
 function loadPreferences(): TablePreferences {
   try {
-    const stored = localStorage.getItem(STORAGE_KEY)
+    const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
-      const parsed = JSON.parse(stored)
+      const parsed = JSON.parse(stored);
       // Merge with defaults to handle new columns
       return {
         ...DEFAULT_PREFERENCES,
@@ -152,12 +155,12 @@ function loadPreferences(): TablePreferences {
           ...DEFAULT_PREFERENCES.columnWidths,
           ...parsed.columnWidths,
         },
-      }
+      };
     }
   } catch (error) {
-    console.error('Failed to load table preferences:', error)
+    console.error('Failed to load table preferences:', error);
   }
-  return DEFAULT_PREFERENCES
+  return DEFAULT_PREFERENCES;
 }
 
 /**
@@ -165,8 +168,8 @@ function loadPreferences(): TablePreferences {
  */
 function savePreferences(preferences: TablePreferences): void {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(preferences))
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(preferences));
   } catch (error) {
-    console.error('Failed to save table preferences:', error)
+    console.error('Failed to save table preferences:', error);
   }
 }

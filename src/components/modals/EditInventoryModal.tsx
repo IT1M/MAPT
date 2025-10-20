@@ -1,16 +1,16 @@
-'use client'
+'use client';
 
-import React, { useState, useEffect } from 'react'
-import { useTranslations } from '@/hooks/useTranslations'
-import { Modal } from '@/components/ui/modal'
-import { InventoryForm } from '@/components/forms/inventory-form'
-import type { InventoryItemWithUser, AuditHistoryEntry } from '@/types'
+import React, { useState, useEffect } from 'react';
+import { useTranslations } from '@/hooks/useTranslations';
+import { Modal } from '@/components/ui/modal';
+import { InventoryForm } from '@/components/forms/inventory-form';
+import type { InventoryItemWithUser, AuditHistoryEntry } from '@/types';
 
 interface EditInventoryModalProps {
-  item: InventoryItemWithUser | null
-  isOpen: boolean
-  onClose: () => void
-  onSuccess: () => void
+  item: InventoryItemWithUser | null;
+  isOpen: boolean;
+  onClose: () => void;
+  onSuccess: () => void;
 }
 
 export function EditInventoryModal({
@@ -19,89 +19,91 @@ export function EditInventoryModal({
   onClose,
   onSuccess,
 }: EditInventoryModalProps) {
-  const t = useTranslations()
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
-  const [showCloseConfirmation, setShowCloseConfirmation] = useState(false)
-  const [changeHistory, setChangeHistory] = useState<AuditHistoryEntry[]>([])
-  const [loadingHistory, setLoadingHistory] = useState(false)
+  const t = useTranslations();
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [showCloseConfirmation, setShowCloseConfirmation] = useState(false);
+  const [changeHistory, setChangeHistory] = useState<AuditHistoryEntry[]>([]);
+  const [loadingHistory, setLoadingHistory] = useState(false);
 
   // Fetch change history when modal opens
   useEffect(() => {
     if (isOpen && item) {
-      fetchChangeHistory()
+      fetchChangeHistory();
     } else {
-      setChangeHistory([])
-      setHasUnsavedChanges(false)
+      setChangeHistory([]);
+      setHasUnsavedChanges(false);
     }
-  }, [isOpen, item])
+  }, [isOpen, item]);
 
   const fetchChangeHistory = async () => {
-    if (!item) return
-    
-    setLoadingHistory(true)
+    if (!item) return;
+
+    setLoadingHistory(true);
     try {
-      const response = await fetch(`/api/inventory/${item.id}/audit-history?pageSize=5`)
+      const response = await fetch(
+        `/api/inventory/${item.id}/audit-history?pageSize=5`
+      );
       if (response.ok) {
-        const result = await response.json()
+        const result = await response.json();
         if (result.success && result.data?.entries) {
-          setChangeHistory(result.data.entries)
+          setChangeHistory(result.data.entries);
         }
       }
     } catch (error) {
-      console.error('Failed to fetch change history:', error)
+      console.error('Failed to fetch change history:', error);
     } finally {
-      setLoadingHistory(false)
+      setLoadingHistory(false);
     }
-  }
+  };
 
   const handleClose = () => {
     if (hasUnsavedChanges) {
-      setShowCloseConfirmation(true)
+      setShowCloseConfirmation(true);
     } else {
-      onClose()
+      onClose();
     }
-  }
+  };
 
   const handleConfirmClose = () => {
-    setShowCloseConfirmation(false)
-    setHasUnsavedChanges(false)
-    onClose()
-  }
+    setShowCloseConfirmation(false);
+    setHasUnsavedChanges(false);
+    onClose();
+  };
 
   const handleCancelClose = () => {
-    setShowCloseConfirmation(false)
-  }
+    setShowCloseConfirmation(false);
+  };
 
   const handleFormSuccess = () => {
-    setHasUnsavedChanges(false)
-    onSuccess()
-    onClose()
-  }
+    setHasUnsavedChanges(false);
+    onSuccess();
+    onClose();
+  };
 
   const formatDate = (date: Date | string): string => {
-    const d = typeof date === 'string' ? new Date(date) : date
-    const day = d.getDate().toString().padStart(2, '0')
-    const month = d.toLocaleString('en', { month: 'short' })
-    const year = d.getFullYear()
-    const hours = d.getHours().toString().padStart(2, '0')
-    const minutes = d.getMinutes().toString().padStart(2, '0')
-    return `${day} ${month} ${year}, ${hours}:${minutes}`
-  }
+    const d = typeof date === 'string' ? new Date(date) : date;
+    const day = d.getDate().toString().padStart(2, '0');
+    const month = d.toLocaleString('en', { month: 'short' });
+    const year = d.getFullYear();
+    const hours = d.getHours().toString().padStart(2, '0');
+    const minutes = d.getMinutes().toString().padStart(2, '0');
+    return `${day} ${month} ${year}, ${hours}:${minutes}`;
+  };
 
   const getActionLabel = (action: string): string => {
     switch (action) {
       case 'CREATE':
-        return 'Created'
+        return 'Created';
       case 'UPDATE':
-        return 'Updated'
+        return 'Updated';
       case 'DELETE':
-        return 'Deleted'
+        return 'Deleted';
       default:
-        return action
+        return action;
     }
-  }
+  };
 
-  if (!item) return null
+  if (!item) return null;
 
   return (
     <>
@@ -127,7 +129,7 @@ export function EditInventoryModal({
               <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
                 {t('dataLog.recentChanges')}
               </h3>
-              
+
               {loadingHistory ? (
                 <div className="space-y-3">
                   {[...Array(3)].map((_, idx) => (
@@ -157,7 +159,7 @@ export function EditInventoryModal({
                           {formatDate(entry.timestamp)}
                         </span>
                       </div>
-                      
+
                       {entry.changes && entry.changes.length > 0 && (
                         <div className="mt-2 space-y-1">
                           {entry.changes.map((change, idx) => (
@@ -165,7 +167,9 @@ export function EditInventoryModal({
                               key={idx}
                               className="text-sm text-gray-600 dark:text-gray-400"
                             >
-                              <span className="font-medium">{change.field}:</span>{' '}
+                              <span className="font-medium">
+                                {change.field}:
+                              </span>{' '}
                               <span className="line-through text-red-600 dark:text-red-400">
                                 {String(change.oldValue)}
                               </span>
@@ -216,5 +220,5 @@ export function EditInventoryModal({
         </Modal>
       )}
     </>
-  )
+  );
 }

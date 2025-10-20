@@ -1,126 +1,126 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import { useTranslations } from '@/hooks/useTranslations'
+import { useState, useEffect } from 'react';
+import { useTranslations } from '@/hooks/useTranslations';
 
 interface EmailAnalytics {
   summary: {
-    total: number
-    sent: number
-    failed: number
-    pending: number
-    successRate: number
-    avgDeliveryTime: number
-  }
+    total: number;
+    sent: number;
+    failed: number;
+    pending: number;
+    successRate: number;
+    avgDeliveryTime: number;
+  };
   templateStats: Array<{
-    template: string
-    count: number
-  }>
+    template: string;
+    count: number;
+  }>;
   deliveryRate: Array<{
-    date: Date
-    sent: number
-    failed: number
-    total: number
-    successRate: string
-  }>
+    date: Date;
+    sent: number;
+    failed: number;
+    total: number;
+    successRate: string;
+  }>;
   recentFailures: Array<{
-    id: string
-    to: string
-    subject: string
-    template: string
-    errorMessage: string | null
-    failedAt: Date | null
-    attempts: number
-  }>
+    id: string;
+    to: string;
+    subject: string;
+    template: string;
+    errorMessage: string | null;
+    failedAt: Date | null;
+    attempts: number;
+  }>;
   period: {
-    days: number
-    startDate: Date
-    endDate: Date
-  }
+    days: number;
+    startDate: Date;
+    endDate: Date;
+  };
 }
 
 export default function EmailAnalyticsDashboard() {
-  const t = useTranslations()
-  const [analytics, setAnalytics] = useState<EmailAnalytics | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [days, setDays] = useState(30)
-  const [retrying, setRetrying] = useState<string[]>([])
+  const t = useTranslations();
+  const [analytics, setAnalytics] = useState<EmailAnalytics | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [days, setDays] = useState(30);
+  const [retrying, setRetrying] = useState<string[]>([]);
 
   useEffect(() => {
-    fetchAnalytics()
-  }, [days])
+    fetchAnalytics();
+  }, [days]);
 
   const fetchAnalytics = async () => {
     try {
-      setLoading(true)
-      const response = await fetch(`/api/admin/email-analytics?days=${days}`)
-      const data = await response.json()
-      
+      setLoading(true);
+      const response = await fetch(`/api/admin/email-analytics?days=${days}`);
+      const data = await response.json();
+
       if (data.success) {
-        setAnalytics(data.data)
+        setAnalytics(data.data);
       }
     } catch (error) {
-      console.error('Failed to fetch email analytics:', error)
+      console.error('Failed to fetch email analytics:', error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const retryEmail = async (emailId: string) => {
     try {
-      setRetrying([...retrying, emailId])
-      
+      setRetrying([...retrying, emailId]);
+
       const response = await fetch('/api/admin/email-analytics/retry', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ emailIds: [emailId] }),
-      })
-      
-      const data = await response.json()
-      
+      });
+
+      const data = await response.json();
+
       if (data.success) {
         // Refresh analytics
-        fetchAnalytics()
+        fetchAnalytics();
       }
     } catch (error) {
-      console.error('Failed to retry email:', error)
+      console.error('Failed to retry email:', error);
     } finally {
-      setRetrying(retrying.filter(id => id !== emailId))
+      setRetrying(retrying.filter((id) => id !== emailId));
     }
-  }
+  };
 
   const retryAllFailed = async () => {
-    if (!analytics?.recentFailures.length) return
-    
-    const emailIds = analytics.recentFailures.map(f => f.id)
-    
+    if (!analytics?.recentFailures.length) return;
+
+    const emailIds = analytics.recentFailures.map((f) => f.id);
+
     try {
-      setRetrying(emailIds)
-      
+      setRetrying(emailIds);
+
       const response = await fetch('/api/admin/email-analytics/retry', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ emailIds }),
-      })
-      
-      const data = await response.json()
-      
+      });
+
+      const data = await response.json();
+
       if (data.success) {
-        fetchAnalytics()
+        fetchAnalytics();
       }
     } catch (error) {
-      console.error('Failed to retry emails:', error)
+      console.error('Failed to retry emails:', error);
     } finally {
-      setRetrying([])
+      setRetrying([]);
     }
-  }
+  };
 
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600"></div>
       </div>
-    )
+    );
   }
 
   if (!analytics) {
@@ -128,7 +128,7 @@ export default function EmailAnalyticsDashboard() {
       <div className="text-center p-8 text-gray-500">
         Failed to load email analytics
       </div>
-    )
+    );
   }
 
   return (
@@ -138,7 +138,7 @@ export default function EmailAnalyticsDashboard() {
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
           Email Analytics
         </h2>
-        
+
         <select
           value={days}
           onChange={(e) => setDays(parseInt(e.target.value))}
@@ -199,7 +199,10 @@ export default function EmailAnalyticsDashboard() {
         </h3>
         <div className="space-y-3">
           {analytics.templateStats.map((stat) => (
-            <div key={stat.template} className="flex items-center justify-between">
+            <div
+              key={stat.template}
+              className="flex items-center justify-between"
+            >
               <div className="flex items-center space-x-3">
                 <div className="text-sm font-medium text-gray-900 dark:text-white capitalize">
                   {stat.template.replace(/-/g, ' ')}
@@ -277,7 +280,9 @@ export default function EmailAnalyticsDashboard() {
                         disabled={retrying.includes(failure.id)}
                         className="text-teal-600 hover:text-teal-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
                       >
-                        {retrying.includes(failure.id) ? 'Retrying...' : 'Retry'}
+                        {retrying.includes(failure.id)
+                          ? 'Retrying...'
+                          : 'Retry'}
                       </button>
                     </td>
                   </tr>
@@ -295,11 +300,14 @@ export default function EmailAnalyticsDashboard() {
         </h3>
         <div className="space-y-2">
           {analytics.deliveryRate.slice(0, 10).map((day) => (
-            <div key={day.date.toString()} className="flex items-center space-x-4">
+            <div
+              key={day.date.toString()}
+              className="flex items-center space-x-4"
+            >
               <div className="text-sm text-gray-500 dark:text-gray-400 w-24">
-                {new Date(day.date).toLocaleDateString('en-US', { 
-                  month: 'short', 
-                  day: 'numeric' 
+                {new Date(day.date).toLocaleDateString('en-US', {
+                  month: 'short',
+                  day: 'numeric',
                 })}
               </div>
               <div className="flex-1">
@@ -326,5 +334,5 @@ export default function EmailAnalyticsDashboard() {
         </div>
       </div>
     </div>
-  )
+  );
 }

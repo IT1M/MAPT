@@ -1,9 +1,9 @@
 /**
  * Animation Utilities Export
- * 
+ *
  * Central export point for all animation-related components and hooks.
  * Import from this file to access animation utilities throughout the app.
- * 
+ *
  * @example
  * import { PageTransition, useModalAnimation } from '@/components/layout/animations'
  */
@@ -17,7 +17,7 @@ export {
   StaggerChildren,
   useReducedMotion as useReducedMotionFromComponent,
   useAnimationDuration as useAnimationDurationFromComponent,
-} from './PageTransition'
+} from './PageTransition';
 
 // Hooks
 export {
@@ -36,7 +36,7 @@ export {
   usePageTransition,
   useGPUAcceleration,
   useFocusRingAnimation,
-} from '@/hooks/useAnimation'
+} from '@/hooks/useAnimation';
 
 /**
  * Animation Duration Constants
@@ -47,7 +47,7 @@ export const ANIMATION_DURATION = {
   NORMAL: 200,
   SLOW: 300,
   VERY_SLOW: 500,
-} as const
+} as const;
 
 /**
  * Animation Easing Constants
@@ -59,7 +59,7 @@ export const ANIMATION_EASING = {
   EASE_IN_OUT: 'ease-in-out',
   LINEAR: 'linear',
   SPRING: 'cubic-bezier(0.68, -0.55, 0.265, 1.55)',
-} as const
+} as const;
 
 /**
  * Animation Class Names
@@ -126,13 +126,15 @@ export const ANIMATION_CLASSES = {
   GPU_ACCELERATED: 'gpu-accelerated',
   WILL_ANIMATE: 'will-animate',
   NO_ANIMATION: 'no-animation',
-} as const
+} as const;
 
 /**
  * Helper function to combine animation classes
  */
-export function combineAnimationClasses(...classes: (string | undefined | false)[]): string {
-  return classes.filter(Boolean).join(' ')
+export function combineAnimationClasses(
+  ...classes: (string | undefined | false)[]
+): string {
+  return classes.filter(Boolean).join(' ');
 }
 
 /**
@@ -142,16 +144,19 @@ export function getAnimationDuration(
   duration: number,
   prefersReducedMotion: boolean
 ): number {
-  return prefersReducedMotion ? 0 : duration
+  return prefersReducedMotion ? 0 : duration;
 }
 
 /**
  * Helper function to create stagger delay style
  */
-export function getStaggerDelay(index: number, delay = 50): React.CSSProperties {
+export function getStaggerDelay(
+  index: number,
+  delay = 50
+): React.CSSProperties {
   return {
     animationDelay: `${index * delay}ms`,
-  }
+  };
 }
 
 /**
@@ -163,6 +168,8 @@ export function createTransitionStyle(
   easing: string = ANIMATION_EASING.EASE_IN_OUT
 ): React.CSSProperties {
   return {
-    transition: properties.map((prop) => `${prop} ${duration}ms ${easing}`).join(', '),
-  }
+    transition: properties
+      .map((prop) => `${prop} ${duration}ms ${easing}`)
+      .join(', '),
+  };
 }

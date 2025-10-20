@@ -1,16 +1,27 @@
-import { NextRequest } from 'next/server'
-import { checkAuth } from '@/middleware/auth'
-import { successResponse, handleApiError, validationError } from '@/utils/api-response'
-import { Document, Page, Text, View, StyleSheet, pdf } from '@react-pdf/renderer'
-import { writeFile, mkdir } from 'fs/promises'
-import { join } from 'path'
-import { existsSync } from 'fs'
+import { NextRequest } from 'next/server';
+import { checkAuth } from '@/middleware/auth';
+import {
+  successResponse,
+  handleApiError,
+  validationError,
+} from '@/utils/api-response';
+import {
+  Document,
+  Page,
+  Text,
+  View,
+  StyleSheet,
+  pdf,
+} from '@react-pdf/renderer';
+import { writeFile, mkdir } from 'fs/promises';
+import { join } from 'path';
+import { existsSync } from 'fs';
 
 /**
  * POST /api/analytics/export
- * 
+ *
  * Generate a PDF export of the analytics dashboard
- * 
+ *
  * Request Body:
  * - summary: Analytics summary data
  * - filters: Applied filters
@@ -18,31 +29,31 @@ import { existsSync } from 'fs'
  * - insights: AI insights (optional)
  * - timestamp: Export timestamp
  * - format: 'pdf' | 'email'
- * 
+ *
  * Requirements: 12.1, 12.2, 12.3, 12.4, 12.5
  */
 export async function POST(request: NextRequest) {
   try {
     // Check authentication
-    const authResult = await checkAuth()
+    const authResult = await checkAuth();
     if ('error' in authResult) {
-      return authResult.error
+      return authResult.error;
     }
 
-    const { context } = authResult
+    const { context } = authResult;
 
     // Check permissions (SUPERVISOR+ required)
-    const allowedRoles = ['SUPERVISOR', 'MANAGER', 'ADMIN']
+    const allowedRoles = ['SUPERVISOR', 'MANAGER', 'ADMIN'];
     if (!allowedRoles.includes(context.user.role)) {
-      return validationError('Insufficient permissions to export dashboard')
+      return validationError('Insufficient permissions to export dashboard');
     }
 
     // Parse request body
-    const body = await request.json()
-    const { summary, filters, charts, insights, timestamp, format } = body
+    const body = await request.json();
+    const { summary, filters, charts, insights, timestamp, format } = body;
 
     if (!summary) {
-      return validationError('Summary data is required')
+      return validationError('Summary data is required');
     }
 
     // Generate PDF document
@@ -55,24 +66,24 @@ export async function POST(request: NextRequest) {
         timestamp={timestamp ? new Date(timestamp) : new Date()}
         generatedBy={context.user.name}
       />
-    )
+    );
 
     // Generate PDF blob
-    const pdfBlob = await pdf(pdfDoc).toBlob()
-    const pdfBuffer = Buffer.from(await pdfBlob.arrayBuffer())
+    const pdfBlob = await pdf(pdfDoc).toBlob();
+    const pdfBuffer = Buffer.from(await pdfBlob.arrayBuffer());
 
     // Save PDF to /public/exports/ directory
-    const exportsDir = join(process.cwd(), 'public', 'exports')
+    const exportsDir = join(process.cwd(), 'public', 'exports');
     if (!existsSync(exportsDir)) {
-      await mkdir(exportsDir, { recursive: true })
+      await mkdir(exportsDir, { recursive: true });
     }
 
-    const exportTimestamp = Date.now()
-    const fileName = `analytics-dashboard-${exportTimestamp}.pdf`
-    const filePath = join(exportsDir, fileName)
-    await writeFile(filePath, pdfBuffer)
+    const exportTimestamp = Date.now();
+    const fileName = `analytics-dashboard-${exportTimestamp}.pdf`;
+    const filePath = join(exportsDir, fileName);
+    await writeFile(filePath, pdfBuffer);
 
-    const fileUrl = `/exports/${fileName}`
+    const fileUrl = `/exports/${fileName}`;
 
     // If email format requested, would send email here
     // For now, just return the file URL
@@ -90,9 +101,9 @@ export async function POST(request: NextRequest) {
       },
       'Dashboard exported successfully',
       200
-    )
+    );
   } catch (error) {
-    return handleApiError(error)
+    return handleApiError(error);
   }
 }
 
@@ -254,31 +265,31 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: '#9ca3af',
   },
-})
+});
 
 interface DashboardPDFDocumentProps {
   summary: {
-    totalItems: number
-    totalQuantity: number
-    rejectRate: number
-    activeUsers: number
-    categoriesCount: number
-    avgDailyEntries: number
-    maisPercentage: number
-    fozanPercentage: number
-    topContributor?: { name: string; count: number }
-    mostActiveCategory?: string
-  }
+    totalItems: number;
+    totalQuantity: number;
+    rejectRate: number;
+    activeUsers: number;
+    categoriesCount: number;
+    avgDailyEntries: number;
+    maisPercentage: number;
+    fozanPercentage: number;
+    topContributor?: { name: string; count: number };
+    mostActiveCategory?: string;
+  };
   filters: {
-    startDate?: string | null
-    endDate?: string | null
-    destinations?: string[]
-    categories?: string[]
-  }
-  charts: any[]
-  insights: any[]
-  timestamp: Date
-  generatedBy: string
+    startDate?: string | null;
+    endDate?: string | null;
+    destinations?: string[];
+    categories?: string[];
+  };
+  charts: any[];
+  insights: any[];
+  timestamp: Date;
+  generatedBy: string;
 }
 
 function DashboardPDFDocument({
@@ -290,29 +301,37 @@ function DashboardPDFDocument({
   generatedBy,
 }: DashboardPDFDocumentProps) {
   const formatDate = (date: string | Date | null | undefined) => {
-    if (!date) return 'N/A'
-    const d = typeof date === 'string' ? new Date(date) : date
-    return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
-  }
+    if (!date) return 'N/A';
+    const d = typeof date === 'string' ? new Date(date) : date;
+    return d.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+  };
 
   const formatNumber = (num: number) => {
-    return num.toLocaleString('en-US')
-  }
+    return num.toLocaleString('en-US');
+  };
 
   return (
     <Document>
       <Page size="A4" style={styles.page}>
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.companyName}>Saudi Mais Co. Medical Inventory</Text>
+          <Text style={styles.companyName}>
+            Saudi Mais Co. Medical Inventory
+          </Text>
           <Text style={styles.title}>📊 Analytics Dashboard Report</Text>
           <Text style={styles.subtitle}>
-            Generated: {formatDate(timestamp)} at {timestamp.toLocaleTimeString()}
+            Generated: {formatDate(timestamp)} at{' '}
+            {timestamp.toLocaleTimeString()}
           </Text>
           <Text style={styles.subtitle}>Generated by: {generatedBy}</Text>
           {filters.startDate && filters.endDate && (
             <Text style={styles.subtitle}>
-              Period: {formatDate(filters.startDate)} - {formatDate(filters.endDate)}
+              Period: {formatDate(filters.startDate)} -{' '}
+              {formatDate(filters.endDate)}
             </Text>
           )}
         </View>
@@ -343,31 +362,41 @@ function DashboardPDFDocument({
             {/* Total Items */}
             <View style={styles.kpiCard}>
               <Text style={styles.kpiLabel}>📦 Total Items</Text>
-              <Text style={styles.kpiValue}>{formatNumber(summary.totalItems)}</Text>
+              <Text style={styles.kpiValue}>
+                {formatNumber(summary.totalItems)}
+              </Text>
             </View>
 
             {/* Total Quantity */}
             <View style={styles.kpiCard}>
               <Text style={styles.kpiLabel}>📊 Total Quantity</Text>
-              <Text style={styles.kpiValue}>{formatNumber(summary.totalQuantity)}</Text>
+              <Text style={styles.kpiValue}>
+                {formatNumber(summary.totalQuantity)}
+              </Text>
               <Text style={styles.kpiSubtitle}>
-                Mais: {summary.maisPercentage.toFixed(1)}% | Fozan: {summary.fozanPercentage.toFixed(1)}%
+                Mais: {summary.maisPercentage.toFixed(1)}% | Fozan:{' '}
+                {summary.fozanPercentage.toFixed(1)}%
               </Text>
             </View>
 
             {/* Reject Rate */}
             <View style={styles.kpiCard}>
               <Text style={styles.kpiLabel}>⚠️ Reject Rate</Text>
-              <Text style={styles.kpiValue}>{summary.rejectRate.toFixed(2)}%</Text>
+              <Text style={styles.kpiValue}>
+                {summary.rejectRate.toFixed(2)}%
+              </Text>
             </View>
 
             {/* Active Users */}
             <View style={styles.kpiCard}>
               <Text style={styles.kpiLabel}>👥 Active Users</Text>
-              <Text style={styles.kpiValue}>{formatNumber(summary.activeUsers)}</Text>
+              <Text style={styles.kpiValue}>
+                {formatNumber(summary.activeUsers)}
+              </Text>
               {summary.topContributor && (
                 <Text style={styles.kpiSubtitle}>
-                  Top: {summary.topContributor.name} ({summary.topContributor.count})
+                  Top: {summary.topContributor.name} (
+                  {summary.topContributor.count})
                 </Text>
               )}
             </View>
@@ -375,16 +404,22 @@ function DashboardPDFDocument({
             {/* Categories */}
             <View style={styles.kpiCard}>
               <Text style={styles.kpiLabel}>🏷️ Categories</Text>
-              <Text style={styles.kpiValue}>{formatNumber(summary.categoriesCount)}</Text>
+              <Text style={styles.kpiValue}>
+                {formatNumber(summary.categoriesCount)}
+              </Text>
               {summary.mostActiveCategory && (
-                <Text style={styles.kpiSubtitle}>Most active: {summary.mostActiveCategory}</Text>
+                <Text style={styles.kpiSubtitle}>
+                  Most active: {summary.mostActiveCategory}
+                </Text>
               )}
             </View>
 
             {/* Average Daily Entries */}
             <View style={styles.kpiCard}>
               <Text style={styles.kpiLabel}>📈 Avg Daily Entries</Text>
-              <Text style={styles.kpiValue}>{summary.avgDailyEntries.toFixed(1)}</Text>
+              <Text style={styles.kpiValue}>
+                {summary.avgDailyEntries.toFixed(1)}
+              </Text>
             </View>
           </View>
         </View>
@@ -417,8 +452,8 @@ function DashboardPDFDocument({
                   insight.type === 'alert'
                     ? [styles.insight, styles.insightAlert]
                     : insight.type === 'recommendation'
-                    ? [styles.insight, styles.insightRecommendation]
-                    : styles.insight
+                      ? [styles.insight, styles.insightRecommendation]
+                      : styles.insight
                 }
               >
                 <Text style={styles.insightText}>
@@ -429,7 +464,12 @@ function DashboardPDFDocument({
                   {insight.message}
                 </Text>
                 {insight.confidence && (
-                  <Text style={[styles.insightText, { marginTop: 4, fontSize: 9, color: '#6b7280' }]}>
+                  <Text
+                    style={[
+                      styles.insightText,
+                      { marginTop: 4, fontSize: 9, color: '#6b7280' },
+                    ]}
+                  >
                     Confidence: {(insight.confidence * 100).toFixed(0)}%
                   </Text>
                 )}
@@ -446,5 +486,5 @@ function DashboardPDFDocument({
         </View>
       </Page>
     </Document>
-  )
+  );
 }

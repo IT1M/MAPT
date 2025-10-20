@@ -1,7 +1,7 @@
-'use client'
+'use client';
 
-import useSWR, { SWRConfiguration, mutate } from 'swr'
-import { useCallback } from 'react'
+import useSWR, { SWRConfiguration, mutate } from 'swr';
+import { useCallback } from 'react';
 
 /**
  * Default SWR configuration for API data fetching
@@ -20,7 +20,7 @@ const defaultConfig: SWRConfiguration = {
   revalidateIfStale: true,
   revalidateOnMount: true,
   refreshInterval: 0, // No auto-refresh by default
-}
+};
 
 /**
  * Fetcher function for SWR
@@ -32,45 +32,42 @@ async function fetcher<T>(url: string): Promise<T> {
     headers: {
       'Content-Type': 'application/json',
     },
-  })
+  });
 
   if (!response.ok) {
-    const error = new Error('API request failed')
-    ;(error as any).status = response.status
-    ;(error as any).info = await response.json().catch(() => ({}))
-    throw error
+    const error = new Error('API request failed');
+    (error as any).status = response.status;
+    (error as any).info = await response.json().catch(() => ({}));
+    throw error;
   }
 
-  const data = await response.json()
-  
+  const data = await response.json();
+
   // Handle API response format { success: boolean, data: T }
   if (data.success === false) {
-    throw new Error(data.error || 'API request failed')
+    throw new Error(data.error || 'API request failed');
   }
 
-  return data.data || data
+  return data.data || data;
 }
 
 /**
  * Hook for fetching API data with SWR caching
- * 
+ *
  * @param url - API endpoint URL (null to skip fetching)
  * @param config - Optional SWR configuration overrides
  * @returns SWR response with data, error, loading state, and mutate function
- * 
+ *
  * @example
  * ```typescript
  * const { data, error, isLoading, mutate } = useApiData<User[]>('/api/users')
- * 
+ *
  * if (isLoading) return <Loading />
  * if (error) return <Error error={error} />
  * return <UserList users={data} />
  * ```
  */
-export function useApiData<T>(
-  url: string | null,
-  config?: SWRConfiguration
-) {
+export function useApiData<T>(url: string | null, config?: SWRConfiguration) {
   const { data, error, isLoading, isValidating, mutate } = useSWR<T>(
     url,
     fetcher,
@@ -78,7 +75,7 @@ export function useApiData<T>(
       ...defaultConfig,
       ...config,
     }
-  )
+  );
 
   return {
     data,
@@ -86,16 +83,16 @@ export function useApiData<T>(
     isLoading,
     isValidating,
     mutate,
-  }
+  };
 }
 
 /**
  * Hook for fetching API data with custom cache time
- * 
+ *
  * @param url - API endpoint URL
  * @param cacheTimeMs - Cache time in milliseconds (default: 5 minutes)
  * @returns SWR response
- * 
+ *
  * @example
  * ```typescript
  * // Cache for 10 minutes
@@ -108,16 +105,16 @@ export function useApiDataWithCache<T>(
 ) {
   return useApiData<T>(url, {
     dedupingInterval: cacheTimeMs,
-  })
+  });
 }
 
 /**
  * Hook for fetching API data with auto-refresh
- * 
+ *
  * @param url - API endpoint URL
  * @param refreshIntervalMs - Refresh interval in milliseconds
  * @returns SWR response
- * 
+ *
  * @example
  * ```typescript
  * // Refresh every 30 seconds
@@ -130,17 +127,17 @@ export function useApiDataWithRefresh<T>(
 ) {
   return useApiData<T>(url, {
     refreshInterval: refreshIntervalMs,
-  })
+  });
 }
 
 /**
  * Hook for paginated API data
- * 
+ *
  * @param baseUrl - Base API endpoint URL
  * @param page - Current page number
  * @param pageSize - Items per page
  * @returns SWR response with pagination helpers
- * 
+ *
  * @example
  * ```typescript
  * const { data, goToPage, nextPage, prevPage } = usePaginatedApiData(
@@ -155,23 +152,26 @@ export function usePaginatedApiData<T>(
   page: number,
   pageSize: number
 ) {
-  const url = `${baseUrl}?page=${page}&pageSize=${pageSize}`
-  const result = useApiData<T>(url)
+  const url = `${baseUrl}?page=${page}&pageSize=${pageSize}`;
+  const result = useApiData<T>(url);
 
-  const goToPage = useCallback((newPage: number) => {
-    const newUrl = `${baseUrl}?page=${newPage}&pageSize=${pageSize}`
-    mutate(newUrl)
-  }, [baseUrl, pageSize])
+  const goToPage = useCallback(
+    (newPage: number) => {
+      const newUrl = `${baseUrl}?page=${newPage}&pageSize=${pageSize}`;
+      mutate(newUrl);
+    },
+    [baseUrl, pageSize]
+  );
 
   const nextPage = useCallback(() => {
-    goToPage(page + 1)
-  }, [page, goToPage])
+    goToPage(page + 1);
+  }, [page, goToPage]);
 
   const prevPage = useCallback(() => {
     if (page > 1) {
-      goToPage(page - 1)
+      goToPage(page - 1);
     }
-  }, [page, goToPage])
+  }, [page, goToPage]);
 
   return {
     ...result,
@@ -180,14 +180,14 @@ export function usePaginatedApiData<T>(
     goToPage,
     nextPage,
     prevPage,
-  }
+  };
 }
 
 /**
  * Manually revalidate cached data for a specific URL
- * 
+ *
  * @param url - API endpoint URL to revalidate
- * 
+ *
  * @example
  * ```typescript
  * // After creating a new item, revalidate the list
@@ -196,13 +196,13 @@ export function usePaginatedApiData<T>(
  * ```
  */
 export function revalidateApiData(url: string) {
-  return mutate(url)
+  return mutate(url);
 }
 
 /**
  * Clear all cached data
  * Useful for logout or when switching users
- * 
+ *
  * @example
  * ```typescript
  * // On logout
@@ -211,19 +211,19 @@ export function revalidateApiData(url: string) {
  * ```
  */
 export function clearAllCache() {
-  return mutate(() => true, undefined, { revalidate: false })
+  return mutate(() => true, undefined, { revalidate: false });
 }
 
 /**
  * Preload data into cache
  * Useful for prefetching data before navigation
- * 
+ *
  * @param url - API endpoint URL to preload
- * 
+ *
  * @example
  * ```typescript
  * // Preload analytics data on hover
- * <Link 
+ * <Link
  *   href="/analytics"
  *   onMouseEnter={() => preloadApiData('/api/analytics/summary')}
  * >
@@ -232,5 +232,5 @@ export function clearAllCache() {
  * ```
  */
 export async function preloadApiData(url: string) {
-  return mutate(url, fetcher(url), { revalidate: false })
+  return mutate(url, fetcher(url), { revalidate: false });
 }

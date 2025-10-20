@@ -21,3 +21,46 @@ npm run db:studio
  git add .         
   git commit -m "first commit"  
   git push -u origin main     
+
+  ## Useful Commands
+
+
+
+### 2. Run Migrations
+
+Create the database schema:
+
+```bash
+npm run db:migrate
+```
+
+This will:
+- Create all tables defined in `schema.prisma`
+- Apply any pending migrations
+- Generate the Prisma Client
+
+### 3. Seed Database
+
+Populate with test data:
+
+```bash
+npm run db:seed
+```bash
+# Generate Prisma Client (after schema changes)
+npm run db:generate
+
+# Push schema changes without migrations (development)
+npm run db:push
+
+# Create a new migration
+npm run db:migrate
+
+# Open Prisma Studio (database GUI)
+npm run db:studio
+
+# Seed database with test data
+npm run db:seed
+
+# Verify database connection
+npm run db:verify
+

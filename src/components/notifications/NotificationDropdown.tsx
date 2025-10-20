@@ -1,33 +1,41 @@
-'use client'
+'use client';
 
-import { useNotifications } from '@/context/NotificationContext'
-import { NotificationItem } from './NotificationItem'
-import { useTranslations } from '@/hooks/useTranslations'
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useNotifications } from '@/context/NotificationContext';
+import { NotificationItem } from './NotificationItem';
+import { useTranslations } from '@/hooks/useTranslations';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface NotificationDropdownProps {
-  onClose: () => void
+  onClose: () => void;
 }
 
 export function NotificationDropdown({ onClose }: NotificationDropdownProps) {
-  const { notifications, unreadCount, markAsRead, markAllAsRead, removeNotification, clearAll } = useNotifications()
-  const t = useTranslations()
-  const router = useRouter()
-  const [activeTab, setActiveTab] = useState<'all' | 'unread'>('all')
+  const {
+    notifications,
+    unreadCount,
+    markAsRead,
+    markAllAsRead,
+    removeNotification,
+    clearAll,
+  } = useNotifications();
+  const t = useTranslations();
+  const router = useRouter();
+  const [activeTab, setActiveTab] = useState<'all' | 'unread'>('all');
 
   // Filter notifications based on active tab
-  const filteredNotifications = activeTab === 'unread' 
-    ? notifications.filter(n => !n.read)
-    : notifications
+  const filteredNotifications =
+    activeTab === 'unread'
+      ? notifications.filter((n) => !n.read)
+      : notifications;
 
   // Show only the most recent 20 notifications in dropdown
-  const recentNotifications = filteredNotifications.slice(0, 20)
+  const recentNotifications = filteredNotifications.slice(0, 20);
 
   const handleViewAll = () => {
-    router.push('/notifications')
-    onClose()
-  }
+    router.push('/notifications');
+    onClose();
+  };
 
   return (
     <div className="absolute right-0 rtl:right-auto rtl:left-0 mt-2 w-96 max-w-[calc(100vw-2rem)] rounded-lg shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-50 animate-fade-in">
@@ -98,7 +106,7 @@ export function NotificationDropdown({ onClose }: NotificationDropdownProps) {
               />
             </svg>
             <p className="mt-2 text-sm font-medium text-gray-900 dark:text-gray-100">
-              {activeTab === 'unread' 
+              {activeTab === 'unread'
                 ? t('notifications.empty.noUnread')
                 : t('notifications.empty.title')}
             </p>
@@ -135,5 +143,5 @@ export function NotificationDropdown({ onClose }: NotificationDropdownProps) {
         </div>
       )}
     </div>
-  )
+  );
 }

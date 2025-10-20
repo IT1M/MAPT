@@ -1,11 +1,13 @@
-'use client'
+'use client';
 
-import { ProfileSettings } from '../ProfileSettings'
+import { ProfileSettings } from '../ProfileSettings';
 
 interface ProfileSettingsContainerProps {
-  userId: string
+  userId: string;
 }
 
-export function ProfileSettingsContainer({ userId }: ProfileSettingsContainerProps) {
-  return <ProfileSettings userId={userId} />
+export function ProfileSettingsContainer({
+  userId,
+}: ProfileSettingsContainerProps) {
+  return <ProfileSettings userId={userId} />;
 }

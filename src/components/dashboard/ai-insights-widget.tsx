@@ -1,67 +1,67 @@
-'use client'
+'use client';
 
-import { useEffect, useState } from 'react'
-import { Card } from '@/components/ui/card'
-import { useTranslations } from '@/hooks/useTranslations'
+import { useEffect, useState } from 'react';
+import { Card } from '@/components/ui/card';
+import { useTranslations } from '@/hooks/useTranslations';
 
 interface InventoryInsight {
-  type: 'warning' | 'info' | 'success'
-  message: string
-  priority: 'high' | 'medium' | 'low'
+  type: 'warning' | 'info' | 'success';
+  message: string;
+  priority: 'high' | 'medium' | 'low';
 }
 
 interface ApiResponse {
-  success: boolean
-  data?: InventoryInsight[]
+  success: boolean;
+  data?: InventoryInsight[];
   error?: {
-    code: string
-    message: string
-  }
+    code: string;
+    message: string;
+  };
 }
 
 export function AIInsightsWidget() {
-  const t = useTranslations()
-  const [insights, setInsights] = useState<InventoryInsight[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const t = useTranslations();
+  const [insights, setInsights] = useState<InventoryInsight[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchInsights()
-  }, [])
+    fetchInsights();
+  }, []);
 
   const fetchInsights = async () => {
     try {
-      setLoading(true)
-      setError(null)
+      setLoading(true);
+      setError(null);
 
-      const response = await fetch('/api/ai/insights')
-      const data: ApiResponse = await response.json()
+      const response = await fetch('/api/ai/insights');
+      const data: ApiResponse = await response.json();
 
       if (!response.ok || !data.success) {
-        throw new Error(data.error?.message || 'Failed to fetch insights')
+        throw new Error(data.error?.message || 'Failed to fetch insights');
       }
 
-      setInsights(data.data || [])
+      setInsights(data.data || []);
     } catch (err: any) {
-      console.error('Error fetching AI insights:', err)
-      setError(err.message || 'Failed to load insights')
+      console.error('Error fetching AI insights:', err);
+      setError(err.message || 'Failed to load insights');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'high':
-        return 'bg-danger-100 text-danger-800 dark:bg-danger-900/30 dark:text-danger-400 border-danger-200 dark:border-danger-800'
+        return 'bg-danger-100 text-danger-800 dark:bg-danger-900/30 dark:text-danger-400 border-danger-200 dark:border-danger-800';
       case 'medium':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400 border-yellow-200 dark:border-yellow-800'
+        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400 border-yellow-200 dark:border-yellow-800';
       case 'low':
-        return 'bg-accent-100 text-accent-800 dark:bg-accent-900/30 dark:text-accent-400 border-accent-200 dark:border-accent-800'
+        return 'bg-accent-100 text-accent-800 dark:bg-accent-900/30 dark:text-accent-400 border-accent-200 dark:border-accent-800';
       default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-600'
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-600';
     }
-  }
+  };
 
   const getTypeIcon = (type: string) => {
     switch (type) {
@@ -80,7 +80,7 @@ export function AIInsightsWidget() {
               d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
             />
           </svg>
-        )
+        );
       case 'success':
         return (
           <svg
@@ -96,7 +96,7 @@ export function AIInsightsWidget() {
               d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
             />
           </svg>
-        )
+        );
       case 'info':
       default:
         return (
@@ -113,9 +113,9 @@ export function AIInsightsWidget() {
               d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
             />
           </svg>
-        )
+        );
     }
-  }
+  };
 
   return (
     <Card>
@@ -240,5 +240,5 @@ export function AIInsightsWidget() {
         )}
       </Card.Body>
     </Card>
-  )
+  );
 }

@@ -20,12 +20,16 @@ export function validateAuditConfig(): ConfigValidationResult {
   if (!process.env.AUDIT_SIGNING_SECRET) {
     errors.push('AUDIT_SIGNING_SECRET is required for tamper-proof audit logs');
   } else if (process.env.AUDIT_SIGNING_SECRET.length < 32) {
-    warnings.push('AUDIT_SIGNING_SECRET should be at least 32 characters for security');
+    warnings.push(
+      'AUDIT_SIGNING_SECRET should be at least 32 characters for security'
+    );
   }
 
   // Check optional queue configuration
   if (!process.env.AUDIT_QUEUE_REDIS_URL) {
-    warnings.push('AUDIT_QUEUE_REDIS_URL not set - audit logging will be synchronous');
+    warnings.push(
+      'AUDIT_QUEUE_REDIS_URL not set - audit logging will be synchronous'
+    );
   }
 
   return {
@@ -49,9 +53,13 @@ export function validateBackupConfig(): ConfigValidationResult {
 
   // Check backup encryption key
   if (!process.env.BACKUP_ENCRYPTION_KEY) {
-    warnings.push('BACKUP_ENCRYPTION_KEY not set - encrypted backups will not be available');
+    warnings.push(
+      'BACKUP_ENCRYPTION_KEY not set - encrypted backups will not be available'
+    );
   } else if (process.env.BACKUP_ENCRYPTION_KEY.length < 32) {
-    warnings.push('BACKUP_ENCRYPTION_KEY should be at least 32 characters for security');
+    warnings.push(
+      'BACKUP_ENCRYPTION_KEY should be at least 32 characters for security'
+    );
   }
 
   // Check max storage
@@ -80,7 +88,9 @@ export function validateReportConfig(): ConfigValidationResult {
 
   // Check Gemini API key (for AI insights)
   if (!process.env.GEMINI_API_KEY) {
-    warnings.push('GEMINI_API_KEY not set - AI insights will not be available in reports');
+    warnings.push(
+      'GEMINI_API_KEY not set - AI insights will not be available in reports'
+    );
   }
 
   return {
@@ -99,7 +109,9 @@ export function validateEmailConfig(): ConfigValidationResult {
 
   // Check SMTP configuration
   if (!process.env.SMTP_HOST) {
-    warnings.push('SMTP_HOST not set - email notifications will not be available');
+    warnings.push(
+      'SMTP_HOST not set - email notifications will not be available'
+    );
   }
 
   if (!process.env.SMTP_PORT) {
@@ -107,7 +119,9 @@ export function validateEmailConfig(): ConfigValidationResult {
   }
 
   if (!process.env.SMTP_USER || !process.env.SMTP_PASSWORD) {
-    warnings.push('SMTP credentials not set - email notifications will not work');
+    warnings.push(
+      'SMTP credentials not set - email notifications will not work'
+    );
   }
 
   if (!process.env.SMTP_FROM) {
@@ -115,7 +129,9 @@ export function validateEmailConfig(): ConfigValidationResult {
   }
 
   if (!process.env.ADMIN_EMAIL) {
-    warnings.push('ADMIN_EMAIL not set - system notifications will not be sent');
+    warnings.push(
+      'ADMIN_EMAIL not set - system notifications will not be sent'
+    );
   }
 
   return {
@@ -176,7 +192,9 @@ export function validateAllConfigs(): {
 /**
  * Print validation results to console
  */
-export function printValidationResults(results: ReturnType<typeof validateAllConfigs>): void {
+export function printValidationResults(
+  results: ReturnType<typeof validateAllConfigs>
+): void {
   console.log('\n=== Configuration Validation ===\n');
 
   const sections = [
@@ -189,18 +207,23 @@ export function printValidationResults(results: ReturnType<typeof validateAllCon
 
   for (const section of sections) {
     console.log(`\n${section.name}:`);
-    
+
     if (section.result.errors.length > 0) {
       console.log('  ❌ Errors:');
       section.result.errors.forEach((error) => console.log(`     - ${error}`));
     }
-    
+
     if (section.result.warnings.length > 0) {
       console.log('  ⚠️  Warnings:');
-      section.result.warnings.forEach((warning) => console.log(`     - ${warning}`));
+      section.result.warnings.forEach((warning) =>
+        console.log(`     - ${warning}`)
+      );
     }
-    
-    if (section.result.errors.length === 0 && section.result.warnings.length === 0) {
+
+    if (
+      section.result.errors.length === 0 &&
+      section.result.warnings.length === 0
+    ) {
       console.log('  ✅ Configuration valid');
     }
   }
@@ -208,7 +231,9 @@ export function printValidationResults(results: ReturnType<typeof validateAllCon
   console.log('\n================================\n');
 
   if (!results.valid) {
-    console.log('❌ Configuration validation failed. Please fix the errors above.\n');
+    console.log(
+      '❌ Configuration validation failed. Please fix the errors above.\n'
+    );
   } else {
     console.log('✅ All configurations are valid!\n');
   }
@@ -247,15 +272,21 @@ export const CONFIG = {
   // Audit
   AUDIT_SIGNING_SECRET: getConfig('AUDIT_SIGNING_SECRET'),
   AUDIT_QUEUE_REDIS_URL: getConfig('AUDIT_QUEUE_REDIS_URL'),
-  
+
   // Backup
-  BACKUP_STORAGE_PATH: getConfig('BACKUP_STORAGE_PATH', '/var/backups/mais-inventory'),
+  BACKUP_STORAGE_PATH: getConfig(
+    'BACKUP_STORAGE_PATH',
+    '/var/backups/mais-inventory'
+  ),
   BACKUP_ENCRYPTION_KEY: getConfig('BACKUP_ENCRYPTION_KEY'),
   BACKUP_MAX_STORAGE_GB: getConfigNumber('BACKUP_MAX_STORAGE_GB', 100),
-  
+
   // Report
-  REPORT_STORAGE_PATH: getConfig('REPORT_STORAGE_PATH', '/var/reports/mais-inventory'),
-  
+  REPORT_STORAGE_PATH: getConfig(
+    'REPORT_STORAGE_PATH',
+    '/var/reports/mais-inventory'
+  ),
+
   // Email
   SMTP_HOST: getConfig('SMTP_HOST'),
   SMTP_PORT: getConfigNumber('SMTP_PORT', 587),
@@ -265,21 +296,21 @@ export const CONFIG = {
   SMTP_FROM: getConfig('SMTP_FROM', 'noreply@mais-inventory.com'),
   SMTP_FROM_NAME: getConfig('SMTP_FROM_NAME', 'Saudi Mais Inventory System'),
   ADMIN_EMAIL: getConfig('ADMIN_EMAIL'),
-  
+
   // Cron
   CRON_TIMEZONE: getConfig('CRON_TIMEZONE', 'Asia/Riyadh'),
-  
+
   // Security
   RATE_LIMIT_PER_MINUTE: getConfigNumber('RATE_LIMIT_PER_MINUTE', 60),
   SESSION_TIMEOUT: getConfigNumber('SESSION_TIMEOUT', 30),
   MAX_LOGIN_ATTEMPTS: getConfigNumber('MAX_LOGIN_ATTEMPTS', 5),
-  
+
   // Feature Flags
   ENABLE_AUDIT_SYSTEM: getConfigBoolean('ENABLE_AUDIT_SYSTEM', true),
   ENABLE_BACKUP_SYSTEM: getConfigBoolean('ENABLE_BACKUP_SYSTEM', true),
   ENABLE_REPORT_SYSTEM: getConfigBoolean('ENABLE_REPORT_SYSTEM', true),
   ENABLE_AI_INSIGHTS: getConfigBoolean('ENABLE_AI_INSIGHTS', true),
-  
+
   // Debug
   DEBUG_MODE: getConfigBoolean('DEBUG_MODE', false),
   LOG_LEVEL: getConfig('LOG_LEVEL', 'info'),

@@ -1,7 +1,11 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { KPICardsSection, AnalyticsSummary, FilterType } from './KPICardsSection';
+import {
+  KPICardsSection,
+  AnalyticsSummary,
+  FilterType,
+} from './KPICardsSection';
 
 export interface KPICardsSectionWrapperProps {
   onFilterChange?: (filterType: FilterType) => void;
@@ -11,7 +15,9 @@ export const KPICardsSectionWrapper: React.FC<KPICardsSectionWrapperProps> = ({
   onFilterChange,
 }) => {
   const [data, setData] = useState<AnalyticsSummary | null>(null);
-  const [previousData, setPreviousData] = useState<AnalyticsSummary | null>(null);
+  const [previousData, setPreviousData] = useState<AnalyticsSummary | null>(
+    null
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -23,7 +29,7 @@ export const KPICardsSectionWrapper: React.FC<KPICardsSectionWrapperProps> = ({
 
         // Fetch current period data
         const response = await fetch('/api/analytics/summary');
-        
+
         if (!response.ok) {
           throw new Error('Failed to fetch analytics data');
         }
@@ -42,10 +48,14 @@ export const KPICardsSectionWrapper: React.FC<KPICardsSectionWrapperProps> = ({
             topContributor: result.data.topContributor,
             mostActiveCategory: result.data.byCategory?.[0]?.category,
             maisPercentage: result.data.byDestination?.MAIS
-              ? (result.data.byDestination.MAIS.quantity / result.data.totalQuantity) * 100
+              ? (result.data.byDestination.MAIS.quantity /
+                  result.data.totalQuantity) *
+                100
               : 0,
             fozanPercentage: result.data.byDestination?.FOZAN
-              ? (result.data.byDestination.FOZAN.quantity / result.data.totalQuantity) * 100
+              ? (result.data.byDestination.FOZAN.quantity /
+                  result.data.totalQuantity) *
+                100
               : 0,
           };
 

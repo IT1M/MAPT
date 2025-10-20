@@ -1,6 +1,11 @@
 import { prisma } from './prisma';
 import { AuditService } from './audit';
-import { createCipheriv, createDecipheriv, createHash, randomBytes } from 'crypto';
+import {
+  createCipheriv,
+  createDecipheriv,
+  createHash,
+  randomBytes,
+} from 'crypto';
 import { promises as fs } from 'fs';
 import { join } from 'path';
 import * as ExcelJS from 'exceljs';
@@ -102,7 +107,11 @@ export interface BackupConfig {
 
 // Error class
 export class BackupError extends Error {
-  constructor(message: string, public code: string, public recoverable: boolean = false) {
+  constructor(
+    message: string,
+    public code: string,
+    public recoverable: boolean = false
+  ) {
     super(message);
     this.name = 'BackupError';
   }
@@ -110,7 +119,7 @@ export class BackupError extends Error {
 
 /**
  * BackupService - Comprehensive backup and restore management
- * 
+ *
  * Features:
  * - Multiple format support (CSV, JSON, SQL)
  * - AES-256-GCM encryption
@@ -121,9 +130,13 @@ export class BackupError extends Error {
  */
 export class BackupService {
   private static readonly ENCRYPTION_ALGORITHM = 'aes-256-gcm';
-  private static readonly ENCRYPTION_KEY = process.env.BACKUP_ENCRYPTION_KEY || 'default-key-change-in-production-32b';
-  private static readonly STORAGE_PATH = process.env.BACKUP_STORAGE_PATH || './backups';
-  private static readonly MAX_STORAGE_GB = parseInt(process.env.BACKUP_MAX_STORAGE_GB || '100');
+  private static readonly ENCRYPTION_KEY =
+    process.env.BACKUP_ENCRYPTION_KEY || 'default-key-change-in-production-32b';
+  private static readonly STORAGE_PATH =
+    process.env.BACKUP_STORAGE_PATH || './backups';
+  private static readonly MAX_STORAGE_GB = parseInt(
+    process.env.BACKUP_MAX_STORAGE_GB || '100'
+  );
 
   /**
    * Ensure storage directory exists
@@ -132,7 +145,11 @@ export class BackupService {
     try {
       await fs.mkdir(this.STORAGE_PATH, { recursive: true });
     } catch (error) {
-      throw new BackupError('Failed to create storage directory', 'BACKUP_STORAGE_ERROR', true);
+      throw new BackupError(
+        'Failed to create storage directory',
+        'BACKUP_STORAGE_ERROR',
+        true
+      );
     }
   }
 
@@ -144,14 +161,21 @@ export class BackupService {
       const fileBuffer = await fs.readFile(filePath);
       return createHash('sha256').update(fileBuffer).digest('hex');
     } catch (error) {
-      throw new BackupError('Failed to calculate checksum', 'BACKUP_CHECKSUM_ERROR', true);
+      throw new BackupError(
+        'Failed to calculate checksum',
+        'BACKUP_CHECKSUM_ERROR',
+        true
+      );
     }
   }
 
   /**
    * Verify file checksum
    */
-  private static async verifyChecksum(filePath: string, expectedChecksum: string): Promise<boolean> {
+  private static async verifyChecksum(
+    filePath: string,
+    expectedChecksum: string
+  ): Promise<boolean> {
     try {
       const actualChecksum = await this.calculateChecksum(filePath);
       return actualChecksum === expectedChecksum;
@@ -163,7 +187,10 @@ export class BackupService {
   /**
    * Encrypt backup file using AES-256-GCM
    */
-  private static async encryptBackup(filePath: string, password: string): Promise<string> {
+  private static async encryptBackup(
+    filePath: string,
+    password: string
+  ): Promise<string> {
     try {
       // Read the file
       const data = await fs.readFile(filePath);
@@ -195,14 +222,21 @@ export class BackupService {
 
       return encryptedPath;
     } catch (error) {
-      throw new BackupError('Failed to encrypt backup', 'BACKUP_ENCRYPT_FAILED', false);
+      throw new BackupError(
+        'Failed to encrypt backup',
+        'BACKUP_ENCRYPT_FAILED',
+        false
+      );
     }
   }
 
   /**
    * Decrypt backup file using AES-256-GCM
    */
-  private static async decryptBackup(filePath: string, password: string): Promise<string> {
+  private static async decryptBackup(
+    filePath: string,
+    password: string
+  ): Promise<string> {
     try {
       // Read encrypted file
       const data = await fs.readFile(filePath);
@@ -220,7 +254,10 @@ export class BackupService {
       decipher.setAuthTag(authTag);
 
       // Decrypt data
-      const decrypted = Buffer.concat([decipher.update(encrypted), decipher.final()]);
+      const decrypted = Buffer.concat([
+        decipher.update(encrypted),
+        decipher.final(),
+      ]);
 
       // Write decrypted file
       const decryptedPath = filePath.replace('.encrypted', '');
@@ -228,7 +265,11 @@ export class BackupService {
 
       return decryptedPath;
     } catch (error) {
-      throw new BackupError('Failed to decrypt backup - wrong password?', 'BACKUP_DECRYPT_FAILED', false);
+      throw new BackupError(
+        'Failed to decrypt backup - wrong password?',
+        'BACKUP_DECRYPT_FAILED',
+        false
+      );
     }
   }
 
@@ -273,20 +314,22 @@ export class BackupService {
     const filePath = join(this.STORAGE_PATH, filename);
 
     // Convert inventory data to CSV
-    const inventoryCSV = Papa.unparse(data.map(item => ({
-      id: item.id,
-      itemName: item.itemName,
-      batch: item.batch,
-      quantity: item.quantity,
-      reject: item.reject,
-      destination: item.destination,
-      category: item.category || '',
-      notes: item.notes || '',
-      enteredById: item.enteredById,
-      enteredByName: item.enteredBy?.name || '',
-      createdAt: item.createdAt.toISOString(),
-      updatedAt: item.updatedAt.toISOString(),
-    })));
+    const inventoryCSV = Papa.unparse(
+      data.map((item) => ({
+        id: item.id,
+        itemName: item.itemName,
+        batch: item.batch,
+        quantity: item.quantity,
+        reject: item.reject,
+        destination: item.destination,
+        category: item.category || '',
+        notes: item.notes || '',
+        enteredById: item.enteredById,
+        enteredByName: item.enteredBy?.name || '',
+        createdAt: item.createdAt.toISOString(),
+        updatedAt: item.updatedAt.toISOString(),
+      }))
+    );
 
     let csvContent = '=== INVENTORY ITEMS ===\n' + inventoryCSV;
 
@@ -297,17 +340,19 @@ export class BackupService {
           user: { select: { name: true, email: true } },
         },
       });
-      const auditCSV = Papa.unparse(auditLogs.map((log: any) => ({
-        id: log.id,
-        timestamp: log.timestamp.toISOString(),
-        userId: log.userId,
-        userName: log.user.name,
-        action: log.action,
-        entityType: log.entityType,
-        entityId: log.entityId,
-        changes: JSON.stringify(log.changes || {}),
-        ipAddress: log.ipAddress,
-      })));
+      const auditCSV = Papa.unparse(
+        auditLogs.map((log: any) => ({
+          id: log.id,
+          timestamp: log.timestamp.toISOString(),
+          userId: log.userId,
+          userName: log.user.name,
+          action: log.action,
+          entityType: log.entityType,
+          entityId: log.entityId,
+          changes: JSON.stringify(log.changes || {}),
+          ipAddress: log.ipAddress,
+        }))
+      );
       csvContent += '\n\n=== AUDIT LOGS ===\n' + auditCSV;
     }
 
@@ -330,12 +375,14 @@ export class BackupService {
     // Add settings if requested
     if (includeSettings) {
       const settings = await prisma.systemSettings.findMany();
-      const settingsCSV = Papa.unparse(settings.map(s => ({
-        key: s.key,
-        value: JSON.stringify(s.value),
-        category: s.category,
-        updatedAt: s.updatedAt.toISOString(),
-      })));
+      const settingsCSV = Papa.unparse(
+        settings.map((s) => ({
+          key: s.key,
+          value: JSON.stringify(s.value),
+          category: s.category,
+          updatedAt: s.updatedAt.toISOString(),
+        }))
+      );
       csvContent += '\n\n=== SETTINGS ===\n' + settingsCSV;
     }
 
@@ -454,16 +501,21 @@ export class BackupService {
       // Check storage space
       const storageInfo = await this.getStorageInfo();
       if (storageInfo.usedGB >= this.MAX_STORAGE_GB * 0.95) {
-        throw new BackupError('Storage almost full', 'BACKUP_STORAGE_FULL', true);
+        throw new BackupError(
+          'Storage almost full',
+          'BACKUP_STORAGE_FULL',
+          true
+        );
       }
 
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-      const formats = config.format === 'all' ? ['CSV', 'JSON', 'SQL'] : [config.format];
+      const formats =
+        config.format === 'all' ? ['CSV', 'JSON', 'SQL'] : [config.format];
       const backups: Backup[] = [];
 
       for (const format of formats) {
         // Create backup record in database (IN_PROGRESS)
-        const backup = await prisma.backup.create({
+        const backup = (await prisma.backup.create({
           data: {
             filename: `${config.name}-${timestamp}.${format.toLowerCase()}`,
             type: config.type || 'MANUAL',
@@ -482,7 +534,7 @@ export class BackupService {
             checksum: '',
             validated: false,
           },
-        }) as any as Backup;
+        })) as any as Backup;
 
         try {
           // Create backup file
@@ -516,7 +568,11 @@ export class BackupService {
               );
               break;
             default:
-              throw new BackupError('Invalid format', 'BACKUP_INVALID_FORMAT', false);
+              throw new BackupError(
+                'Invalid format',
+                'BACKUP_INVALID_FORMAT',
+                false
+              );
           }
 
           // Encrypt if requested
@@ -532,14 +588,14 @@ export class BackupService {
           const fileSize = stats.size;
 
           // Update backup record
-          const updatedBackup = await prisma.backup.update({
+          const updatedBackup = (await prisma.backup.update({
             where: { id: backup.id },
             data: {
               status: 'COMPLETED',
               fileSize: fileSize,
               checksum,
             },
-          }) as any as Backup;
+          })) as any as Backup;
 
           backups.push(updatedBackup);
 
@@ -572,7 +628,11 @@ export class BackupService {
       if (error instanceof BackupError) {
         throw error;
       }
-      throw new BackupError('Backup creation failed', 'BACKUP_CREATE_FAILED', true);
+      throw new BackupError(
+        'Backup creation failed',
+        'BACKUP_CREATE_FAILED',
+        true
+      );
     }
   }
 
@@ -593,23 +653,31 @@ export class BackupService {
       });
 
       if (!admin || admin.role !== 'ADMIN') {
-        throw new BackupError('Unauthorized: Only admins can restore backups', 'BACKUP_UNAUTHORIZED', false);
+        throw new BackupError(
+          'Unauthorized: Only admins can restore backups',
+          'BACKUP_UNAUTHORIZED',
+          false
+        );
       }
 
       // Verify admin password (simplified - in production, use bcrypt.compare)
       // This is a placeholder - actual password verification should be done in the API route
 
       // Get backup record
-      const backup = await prisma.backup.findUnique({
+      const backup = (await prisma.backup.findUnique({
         where: { id: backupId },
-      }) as any as Backup | null;
+      })) as any as Backup | null;
 
       if (!backup) {
         throw new BackupError('Backup not found', 'BACKUP_NOT_FOUND', false);
       }
 
       if (backup.status !== 'COMPLETED') {
-        throw new BackupError('Cannot restore incomplete backup', 'BACKUP_RESTORE_FAILED', false);
+        throw new BackupError(
+          'Cannot restore incomplete backup',
+          'BACKUP_RESTORE_FAILED',
+          false
+        );
       }
 
       // Get file path
@@ -622,7 +690,11 @@ export class BackupService {
       try {
         await fs.access(filePath);
       } catch {
-        throw new BackupError('Backup file not found', 'BACKUP_NOT_FOUND', false);
+        throw new BackupError(
+          'Backup file not found',
+          'BACKUP_NOT_FOUND',
+          false
+        );
       }
 
       // Verify checksum
@@ -631,13 +703,21 @@ export class BackupService {
         backup.checksum
       );
       if (!checksumValid && !backup.encrypted) {
-        throw new BackupError('Backup file corrupted', 'BACKUP_CORRUPTED', false);
+        throw new BackupError(
+          'Backup file corrupted',
+          'BACKUP_CORRUPTED',
+          false
+        );
       }
 
       // Decrypt if needed
       if (backup.encrypted) {
         if (!options.password) {
-          throw new BackupError('Password required for encrypted backup', 'BACKUP_DECRYPT_FAILED', false);
+          throw new BackupError(
+            'Password required for encrypted backup',
+            'BACKUP_DECRYPT_FAILED',
+            false
+          );
         }
         filePath = await this.decryptBackup(filePath, options.password);
       }
@@ -663,10 +743,18 @@ export class BackupService {
         backupData = JSON.parse(fileContent);
       } else if (backup.format === 'CSV') {
         // Parse CSV (simplified)
-        throw new BackupError('CSV restore not yet implemented', 'BACKUP_RESTORE_FAILED', false);
+        throw new BackupError(
+          'CSV restore not yet implemented',
+          'BACKUP_RESTORE_FAILED',
+          false
+        );
       } else if (backup.format === 'SQL') {
         // Parse SQL (simplified)
-        throw new BackupError('SQL restore not yet implemented', 'BACKUP_RESTORE_FAILED', false);
+        throw new BackupError(
+          'SQL restore not yet implemented',
+          'BACKUP_RESTORE_FAILED',
+          false
+        );
       }
 
       const summary: RestoreSummary = {
@@ -755,7 +843,9 @@ export class BackupService {
             }
           } catch (error: any) {
             summary.itemsSkipped++;
-            summary.errors.push(`Failed to restore item ${item.id}: ${error.message}`);
+            summary.errors.push(
+              `Failed to restore item ${item.id}: ${error.message}`
+            );
           }
         }
       });
@@ -804,9 +894,9 @@ export class BackupService {
 
     try {
       // Get backup record
-      const backup = await prisma.backup.findUnique({
+      const backup = (await prisma.backup.findUnique({
         where: { id: backupId },
-      }) as any as Backup | null;
+      })) as any as Backup | null;
 
       if (!backup) {
         result.valid = false;
@@ -831,7 +921,10 @@ export class BackupService {
 
       // Check 1: Verify checksum
       try {
-        result.checks.checksum = await this.verifyChecksum(filePath, backup.checksum);
+        result.checks.checksum = await this.verifyChecksum(
+          filePath,
+          backup.checksum
+        );
         if (!result.checks.checksum) {
           result.errors.push('Checksum verification failed');
           result.valid = false;
@@ -931,16 +1024,22 @@ export class BackupService {
 
       // Calculate retention dates
       const dailyRetentionDate = new Date(now);
-      dailyRetentionDate.setDate(dailyRetentionDate.getDate() - config.retentionDailyDays);
+      dailyRetentionDate.setDate(
+        dailyRetentionDate.getDate() - config.retentionDailyDays
+      );
 
       const weeklyRetentionDate = new Date(now);
-      weeklyRetentionDate.setDate(weeklyRetentionDate.getDate() - (config.retentionWeeklyWeeks * 7));
+      weeklyRetentionDate.setDate(
+        weeklyRetentionDate.getDate() - config.retentionWeeklyWeeks * 7
+      );
 
       const monthlyRetentionDate = new Date(now);
-      monthlyRetentionDate.setMonth(monthlyRetentionDate.getMonth() - config.retentionMonthlyMonths);
+      monthlyRetentionDate.setMonth(
+        monthlyRetentionDate.getMonth() - config.retentionMonthlyMonths
+      );
 
       // Get backups to delete
-      const backupsToDelete = await prisma.backup.findMany({
+      const backupsToDelete = (await prisma.backup.findMany({
         where: {
           type: 'AUTOMATIC',
           createdAt: {
@@ -948,7 +1047,7 @@ export class BackupService {
           },
           status: 'COMPLETED',
         },
-      }) as any as Backup[];
+      })) as any as Backup[];
 
       // Delete old backups
       for (const backup of backupsToDelete) {
@@ -984,14 +1083,18 @@ export class BackupService {
   /**
    * Get storage information
    */
-  private static async getStorageInfo(): Promise<{ usedGB: number; totalGB: number; freeGB: number }> {
+  private static async getStorageInfo(): Promise<{
+    usedGB: number;
+    totalGB: number;
+    freeGB: number;
+  }> {
     try {
       await this.ensureStorageDir();
 
       // Get all backup files
-      const backups = await prisma.backup.findMany({
+      const backups = (await prisma.backup.findMany({
         where: { status: 'COMPLETED' },
-      }) as any as Backup[];
+      })) as any as Backup[];
 
       let totalBytes = 0;
       for (const backup of backups) {
@@ -1004,7 +1107,11 @@ export class BackupService {
 
       return { usedGB, totalGB, freeGB };
     } catch (error) {
-      return { usedGB: 0, totalGB: this.MAX_STORAGE_GB, freeGB: this.MAX_STORAGE_GB };
+      return {
+        usedGB: 0,
+        totalGB: this.MAX_STORAGE_GB,
+        freeGB: this.MAX_STORAGE_GB,
+      };
     }
   }
 
@@ -1018,10 +1125,10 @@ export class BackupService {
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
       // Get last successful backup
-      const lastBackup = await prisma.backup.findFirst({
+      const lastBackup = (await prisma.backup.findFirst({
         where: { status: 'COMPLETED' },
         orderBy: { createdAt: 'desc' },
-      }) as any as Backup | null;
+      })) as any as Backup | null;
 
       // Get backup config for next backup time
       const config = await prisma.backupConfig.findFirst();
@@ -1040,13 +1147,13 @@ export class BackupService {
       }
 
       // Calculate backup streak (consecutive successful backups)
-      const recentBackups = await prisma.backup.findMany({
+      const recentBackups = (await prisma.backup.findMany({
         where: {
           type: 'AUTOMATIC',
           createdAt: { gte: thirtyDaysAgo },
         },
         orderBy: { createdAt: 'desc' },
-      }) as any as Backup[];
+      })) as any as Backup[];
 
       let backupStreak = 0;
       for (const backup of recentBackups) {
@@ -1066,16 +1173,19 @@ export class BackupService {
       });
 
       // Calculate average backup duration (simplified - using file size as proxy)
-      const completedBackups = await prisma.backup.findMany({
+      const completedBackups = (await prisma.backup.findMany({
         where: {
           status: 'COMPLETED',
           createdAt: { gte: thirtyDaysAgo },
         },
-      }) as any as Backup[];
+      })) as any as Backup[];
 
-      const avgDuration = completedBackups.length > 0
-        ? completedBackups.reduce((sum, b) => sum + Number(b.fileSize), 0) / completedBackups.length / 1000000
-        : 0;
+      const avgDuration =
+        completedBackups.length > 0
+          ? completedBackups.reduce((sum, b) => sum + Number(b.fileSize), 0) /
+            completedBackups.length /
+            1000000
+          : 0;
 
       // Get storage info
       const storageInfo = await this.getStorageInfo();
@@ -1085,7 +1195,8 @@ export class BackupService {
 
       // Alert if last backup was more than 24 hours ago
       if (lastBackup) {
-        const hoursSinceLastBackup = (now.getTime() - lastBackup.createdAt.getTime()) / (1000 * 60 * 60);
+        const hoursSinceLastBackup =
+          (now.getTime() - lastBackup.createdAt.getTime()) / (1000 * 60 * 60);
         if (hoursSinceLastBackup > 24) {
           alerts.push({
             type: 'warning',
@@ -1126,14 +1237,21 @@ export class BackupService {
         alerts,
       };
     } catch (error) {
-      throw new BackupError('Failed to get health metrics', 'BACKUP_HEALTH_ERROR', true);
+      throw new BackupError(
+        'Failed to get health metrics',
+        'BACKUP_HEALTH_ERROR',
+        true
+      );
     }
   }
 
   /**
    * Get backup file path
    */
-  static getBackupFilePath(filename: string, encrypted: boolean = false): string {
+  static getBackupFilePath(
+    filename: string,
+    encrypted: boolean = false
+  ): string {
     const filePath = join(this.STORAGE_PATH, filename);
     return encrypted ? `${filePath}.encrypted` : filePath;
   }
@@ -1149,13 +1267,17 @@ export class BackupService {
       });
 
       if (!admin || admin.role !== 'ADMIN') {
-        throw new BackupError('Unauthorized: Only admins can delete backups', 'BACKUP_UNAUTHORIZED', false);
+        throw new BackupError(
+          'Unauthorized: Only admins can delete backups',
+          'BACKUP_UNAUTHORIZED',
+          false
+        );
       }
 
       // Get backup
-      const backup = await prisma.backup.findUnique({
+      const backup = (await prisma.backup.findUnique({
         where: { id: backupId },
-      }) as any as Backup | null;
+      })) as any as Backup | null;
 
       if (!backup) {
         throw new BackupError('Backup not found', 'BACKUP_NOT_FOUND', false);
@@ -1165,7 +1287,9 @@ export class BackupService {
       const config = await prisma.backupConfig.findFirst();
       if (config && backup.type === 'AUTOMATIC') {
         const retentionDate = new Date();
-        retentionDate.setDate(retentionDate.getDate() - config.retentionDailyDays);
+        retentionDate.setDate(
+          retentionDate.getDate() - config.retentionDailyDays
+        );
 
         if (backup.createdAt > retentionDate) {
           throw new BackupError(
@@ -1177,7 +1301,10 @@ export class BackupService {
       }
 
       // Delete file
-      const filePath = this.getBackupFilePath(backup.filename, backup.encrypted);
+      const filePath = this.getBackupFilePath(
+        backup.filename,
+        backup.encrypted
+      );
       try {
         await fs.unlink(filePath);
       } catch {
@@ -1203,7 +1330,11 @@ export class BackupService {
       if (error instanceof BackupError) {
         throw error;
       }
-      throw new BackupError('Failed to delete backup', 'BACKUP_DELETE_FAILED', false);
+      throw new BackupError(
+        'Failed to delete backup',
+        'BACKUP_DELETE_FAILED',
+        false
+      );
     }
   }
 }

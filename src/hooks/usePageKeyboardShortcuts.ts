@@ -3,7 +3,7 @@
  * Provides shortcuts for specific pages like data-log, analytics, etc.
  */
 
-import { useKeyboardShortcuts, KeyboardShortcut } from './useKeyboardShortcuts'
+import { useKeyboardShortcuts, KeyboardShortcut } from './useKeyboardShortcuts';
 
 /**
  * Data Log page keyboard shortcuts
@@ -17,15 +17,15 @@ export function useDataLogKeyboardShortcuts({
   onSelectItem,
   enabled = true,
 }: {
-  onFilter?: () => void
-  onExport?: () => void
-  onRefresh?: () => void
-  onNavigateUp?: () => void
-  onNavigateDown?: () => void
-  onSelectItem?: () => void
-  enabled?: boolean
+  onFilter?: () => void;
+  onExport?: () => void;
+  onRefresh?: () => void;
+  onNavigateUp?: () => void;
+  onNavigateDown?: () => void;
+  onSelectItem?: () => void;
+  enabled?: boolean;
 }) {
-  const shortcuts: KeyboardShortcut[] = []
+  const shortcuts: KeyboardShortcut[] = [];
 
   if (onFilter) {
     shortcuts.push({
@@ -34,7 +34,7 @@ export function useDataLogKeyboardShortcuts({
       description: 'Open filters',
       category: 'Actions',
       preventDefault: true,
-    })
+    });
   }
 
   if (onExport) {
@@ -44,7 +44,7 @@ export function useDataLogKeyboardShortcuts({
       description: 'Export data',
       category: 'Actions',
       preventDefault: true,
-    })
+    });
   }
 
   if (onRefresh) {
@@ -54,7 +54,7 @@ export function useDataLogKeyboardShortcuts({
       description: 'Refresh data',
       category: 'Actions',
       preventDefault: true,
-    })
+    });
   }
 
   if (onNavigateUp) {
@@ -64,7 +64,7 @@ export function useDataLogKeyboardShortcuts({
       description: 'Navigate up in table',
       category: 'Table',
       preventDefault: true,
-    })
+    });
   }
 
   if (onNavigateDown) {
@@ -74,7 +74,7 @@ export function useDataLogKeyboardShortcuts({
       description: 'Navigate down in table',
       category: 'Table',
       preventDefault: true,
-    })
+    });
   }
 
   if (onSelectItem) {
@@ -84,12 +84,12 @@ export function useDataLogKeyboardShortcuts({
       description: 'Select/open item',
       category: 'Table',
       preventDefault: true,
-    })
+    });
   }
 
-  useKeyboardShortcuts({ shortcuts, enabled })
+  useKeyboardShortcuts({ shortcuts, enabled });
 
-  return { shortcuts }
+  return { shortcuts };
 }
 
 /**
@@ -101,12 +101,12 @@ export function useAnalyticsKeyboardShortcuts({
   onRefresh,
   enabled = true,
 }: {
-  onFilter?: () => void
-  onExport?: () => void
-  onRefresh?: () => void
-  enabled?: boolean
+  onFilter?: () => void;
+  onExport?: () => void;
+  onRefresh?: () => void;
+  enabled?: boolean;
 }) {
-  const shortcuts: KeyboardShortcut[] = []
+  const shortcuts: KeyboardShortcut[] = [];
 
   if (onFilter) {
     shortcuts.push({
@@ -115,7 +115,7 @@ export function useAnalyticsKeyboardShortcuts({
       description: 'Open filters',
       category: 'Actions',
       preventDefault: true,
-    })
+    });
   }
 
   if (onExport) {
@@ -125,7 +125,7 @@ export function useAnalyticsKeyboardShortcuts({
       description: 'Export data',
       category: 'Actions',
       preventDefault: true,
-    })
+    });
   }
 
   if (onRefresh) {
@@ -135,12 +135,12 @@ export function useAnalyticsKeyboardShortcuts({
       description: 'Refresh data',
       category: 'Actions',
       preventDefault: true,
-    })
+    });
   }
 
-  useKeyboardShortcuts({ shortcuts, enabled })
+  useKeyboardShortcuts({ shortcuts, enabled });
 
-  return { shortcuts }
+  return { shortcuts };
 }
 
 /**
@@ -152,12 +152,12 @@ export function useDataEntryKeyboardShortcuts({
   onClear,
   enabled = true,
 }: {
-  onNewItem?: () => void
-  onSave?: () => void
-  onClear?: () => void
-  enabled?: boolean
+  onNewItem?: () => void;
+  onSave?: () => void;
+  onClear?: () => void;
+  enabled?: boolean;
 }) {
-  const shortcuts: KeyboardShortcut[] = []
+  const shortcuts: KeyboardShortcut[] = [];
 
   if (onNewItem) {
     shortcuts.push({
@@ -168,7 +168,7 @@ export function useDataEntryKeyboardShortcuts({
       description: 'Create new item',
       category: 'Actions',
       preventDefault: true,
-    })
+    });
   }
 
   if (onSave) {
@@ -180,7 +180,7 @@ export function useDataEntryKeyboardShortcuts({
       description: 'Save form',
       category: 'Forms',
       preventDefault: true,
-    })
+    });
   }
 
   if (onClear) {
@@ -190,12 +190,12 @@ export function useDataEntryKeyboardShortcuts({
       description: 'Clear form',
       category: 'Forms',
       preventDefault: false,
-    })
+    });
   }
 
-  useKeyboardShortcuts({ shortcuts, enabled })
+  useKeyboardShortcuts({ shortcuts, enabled });
 
-  return { shortcuts }
+  return { shortcuts };
 }
 
 /**
@@ -210,15 +210,15 @@ export function useAuditKeyboardShortcuts({
   onSelectItem,
   enabled = true,
 }: {
-  onFilter?: () => void
-  onExport?: () => void
-  onRefresh?: () => void
-  onNavigateUp?: () => void
-  onNavigateDown?: () => void
-  onSelectItem?: () => void
-  enabled?: boolean
+  onFilter?: () => void;
+  onExport?: () => void;
+  onRefresh?: () => void;
+  onNavigateUp?: () => void;
+  onNavigateDown?: () => void;
+  onSelectItem?: () => void;
+  enabled?: boolean;
 }) {
-  const shortcuts: KeyboardShortcut[] = []
+  const shortcuts: KeyboardShortcut[] = [];
 
   if (onFilter) {
     shortcuts.push({
@@ -227,7 +227,7 @@ export function useAuditKeyboardShortcuts({
       description: 'Open filters',
       category: 'Actions',
       preventDefault: true,
-    })
+    });
   }
 
   if (onExport) {
@@ -237,7 +237,7 @@ export function useAuditKeyboardShortcuts({
       description: 'Export data',
       category: 'Actions',
       preventDefault: true,
-    })
+    });
   }
 
   if (onRefresh) {
@@ -247,7 +247,7 @@ export function useAuditKeyboardShortcuts({
       description: 'Refresh data',
       category: 'Actions',
       preventDefault: true,
-    })
+    });
   }
 
   if (onNavigateUp) {
@@ -257,7 +257,7 @@ export function useAuditKeyboardShortcuts({
       description: 'Navigate up in table',
       category: 'Table',
       preventDefault: true,
-    })
+    });
   }
 
   if (onNavigateDown) {
@@ -267,7 +267,7 @@ export function useAuditKeyboardShortcuts({
       description: 'Navigate down in table',
       category: 'Table',
       preventDefault: true,
-    })
+    });
   }
 
   if (onSelectItem) {
@@ -277,12 +277,12 @@ export function useAuditKeyboardShortcuts({
       description: 'Select/open item',
       category: 'Table',
       preventDefault: true,
-    })
+    });
   }
 
-  useKeyboardShortcuts({ shortcuts, enabled })
+  useKeyboardShortcuts({ shortcuts, enabled });
 
-  return { shortcuts }
+  return { shortcuts };
 }
 
 /**
@@ -297,15 +297,15 @@ export function useTableKeyboardShortcuts({
   onSelectAll,
   enabled = true,
 }: {
-  onNavigateUp?: () => void
-  onNavigateDown?: () => void
-  onNavigateLeft?: () => void
-  onNavigateRight?: () => void
-  onSelectItem?: () => void
-  onSelectAll?: () => void
-  enabled?: boolean
+  onNavigateUp?: () => void;
+  onNavigateDown?: () => void;
+  onNavigateLeft?: () => void;
+  onNavigateRight?: () => void;
+  onSelectItem?: () => void;
+  onSelectAll?: () => void;
+  enabled?: boolean;
 }) {
-  const shortcuts: KeyboardShortcut[] = []
+  const shortcuts: KeyboardShortcut[] = [];
 
   if (onNavigateUp) {
     shortcuts.push({
@@ -314,7 +314,7 @@ export function useTableKeyboardShortcuts({
       description: 'Navigate up',
       category: 'Table',
       preventDefault: true,
-    })
+    });
   }
 
   if (onNavigateDown) {
@@ -324,7 +324,7 @@ export function useTableKeyboardShortcuts({
       description: 'Navigate down',
       category: 'Table',
       preventDefault: true,
-    })
+    });
   }
 
   if (onNavigateLeft) {
@@ -334,7 +334,7 @@ export function useTableKeyboardShortcuts({
       description: 'Navigate left',
       category: 'Table',
       preventDefault: true,
-    })
+    });
   }
 
   if (onNavigateRight) {
@@ -344,7 +344,7 @@ export function useTableKeyboardShortcuts({
       description: 'Navigate right',
       category: 'Table',
       preventDefault: true,
-    })
+    });
   }
 
   if (onSelectItem) {
@@ -354,7 +354,7 @@ export function useTableKeyboardShortcuts({
       description: 'Select/open item',
       category: 'Table',
       preventDefault: true,
-    })
+    });
   }
 
   if (onSelectAll) {
@@ -366,12 +366,12 @@ export function useTableKeyboardShortcuts({
       description: 'Select all',
       category: 'Table',
       preventDefault: true,
-    })
+    });
   }
 
-  useKeyboardShortcuts({ shortcuts, enabled })
+  useKeyboardShortcuts({ shortcuts, enabled });
 
-  return { shortcuts }
+  return { shortcuts };
 }
 
 /**
@@ -383,12 +383,12 @@ export function useFormKeyboardShortcuts({
   onReset,
   enabled = true,
 }: {
-  onSave?: () => void
-  onCancel?: () => void
-  onReset?: () => void
-  enabled?: boolean
+  onSave?: () => void;
+  onCancel?: () => void;
+  onReset?: () => void;
+  enabled?: boolean;
 }) {
-  const shortcuts: KeyboardShortcut[] = []
+  const shortcuts: KeyboardShortcut[] = [];
 
   if (onSave) {
     shortcuts.push({
@@ -399,7 +399,7 @@ export function useFormKeyboardShortcuts({
       description: 'Save form',
       category: 'Forms',
       preventDefault: true,
-    })
+    });
   }
 
   if (onCancel) {
@@ -409,7 +409,7 @@ export function useFormKeyboardShortcuts({
       description: 'Cancel',
       category: 'Forms',
       preventDefault: false,
-    })
+    });
   }
 
   if (onReset) {
@@ -421,10 +421,10 @@ export function useFormKeyboardShortcuts({
       description: 'Reset form',
       category: 'Forms',
       preventDefault: true,
-    })
+    });
   }
 
-  useKeyboardShortcuts({ shortcuts, enabled })
+  useKeyboardShortcuts({ shortcuts, enabled });
 
-  return { shortcuts }
+  return { shortcuts };
 }

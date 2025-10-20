@@ -1,13 +1,13 @@
-'use client'
+'use client';
 
-import React, { useRef, useEffect } from 'react'
-import { Input, InputProps } from '@/components/ui/input'
-import { useAutocomplete } from '@/hooks/useAutocomplete'
+import React, { useRef, useEffect } from 'react';
+import { Input, InputProps } from '@/components/ui/input';
+import { useAutocomplete } from '@/hooks/useAutocomplete';
 
 interface ItemNameInputProps extends Omit<InputProps, 'onChange'> {
-  value: string
-  onChange: (value: string) => void
-  onSelect?: (value: string) => void
+  value: string;
+  onChange: (value: string) => void;
+  onSelect?: (value: string) => void;
 }
 
 export function ItemNameInput({
@@ -17,8 +17,8 @@ export function ItemNameInput({
   error,
   ...props
 }: ItemNameInputProps) {
-  const inputRef = useRef<HTMLInputElement>(null)
-  const dropdownRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const {
     suggestions,
@@ -33,31 +33,31 @@ export function ItemNameInput({
     type: 'itemName',
     debounceMs: 300,
     minChars: 2,
-  })
+  });
 
-  const charCount = value.length
-  const maxChars = 100
-  const minChars = 2
+  const charCount = value.length;
+  const maxChars = 100;
+  const minChars = 2;
 
   // Handle suggestion selection
   const handleSelectSuggestion = (index: number) => {
-    const selected = selectSuggestion(index)
+    const selected = selectSuggestion(index);
     if (selected) {
-      onChange(selected)
-      onSelect?.(selected)
-      inputRef.current?.focus()
+      onChange(selected);
+      onSelect?.(selected);
+      inputRef.current?.focus();
     }
-  }
+  };
 
   // Handle keyboard events
   const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && selectedIndex >= 0 && suggestions.length > 0) {
-      e.preventDefault()
-      handleSelectSuggestion(selectedIndex)
+      e.preventDefault();
+      handleSelectSuggestion(selectedIndex);
     } else {
-      handleKeyDown(e)
+      handleKeyDown(e);
     }
-  }
+  };
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -68,15 +68,15 @@ export function ItemNameInput({
         inputRef.current &&
         !inputRef.current.contains(event.target as Node)
       ) {
-        clearSuggestions()
+        clearSuggestions();
       }
-    }
+    };
 
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [clearSuggestions])
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [clearSuggestions]);
 
-  const showDropdown = suggestions.length > 0 || isLoading
+  const showDropdown = suggestions.length > 0 || isLoading;
 
   return (
     <div className="relative w-full">
@@ -167,5 +167,5 @@ export function ItemNameInput({
         </div>
       )}
     </div>
-  )
+  );
 }

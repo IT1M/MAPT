@@ -1,4 +1,4 @@
-import type { NextAuthConfig } from 'next-auth'
+import type { NextAuthConfig } from 'next-auth';
 
 /**
  * Auth configuration for middleware (Edge Runtime compatible)
@@ -17,9 +17,10 @@ export const authConfig: NextAuthConfig = {
   },
   cookies: {
     sessionToken: {
-      name: process.env.NODE_ENV === 'production' 
-        ? '__Secure-authjs.session-token' 
-        : 'authjs.session-token',
+      name:
+        process.env.NODE_ENV === 'production'
+          ? '__Secure-authjs.session-token'
+          : 'authjs.session-token',
       options: {
         httpOnly: true, // Prevent JavaScript access to cookies
         sameSite: 'lax', // CSRF protection
@@ -30,26 +31,26 @@ export const authConfig: NextAuthConfig = {
   },
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
-      const isLoggedIn = !!auth?.user
-      const isOnLoginPage = nextUrl.pathname.includes('/login')
-      
+      const isLoggedIn = !!auth?.user;
+      const isOnLoginPage = nextUrl.pathname.includes('/login');
+
       if (isOnLoginPage) {
         if (isLoggedIn) {
           // Get callback URL from query params
-          const callbackUrl = nextUrl.searchParams.get('callbackUrl')
-          
+          const callbackUrl = nextUrl.searchParams.get('callbackUrl');
+
           // Redirect to root page which will handle role-based routing
-          const redirectUrl = new URL('/', nextUrl)
+          const redirectUrl = new URL('/', nextUrl);
           if (callbackUrl) {
-            redirectUrl.searchParams.set('callbackUrl', callbackUrl)
+            redirectUrl.searchParams.set('callbackUrl', callbackUrl);
           }
-          return Response.redirect(redirectUrl)
+          return Response.redirect(redirectUrl);
         }
-        return true
+        return true;
       }
-      
-      return isLoggedIn
+
+      return isLoggedIn;
     },
   },
   providers: [], // Providers are added in auth.ts
-}
+};

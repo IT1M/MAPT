@@ -63,7 +63,9 @@ class CronService {
       this.backupJob = cron.schedule(
         cronExpression,
         async () => {
-          console.log(`[CRON] Starting automatic backup at ${new Date().toISOString()}`);
+          console.log(
+            `[CRON] Starting automatic backup at ${new Date().toISOString()}`
+          );
           await this.executeAutomaticBackup();
         },
         {
@@ -71,7 +73,9 @@ class CronService {
         }
       );
 
-      console.log(`Automatic backup scheduled at ${config.scheduleTime} (${cronExpression})`);
+      console.log(
+        `Automatic backup scheduled at ${config.scheduleTime} (${cronExpression})`
+      );
     } catch (error) {
       console.error('Failed to initialize backup cron job:', error);
     }
@@ -89,7 +93,9 @@ class CronService {
       this.reportJob = cron.schedule(
         cronExpression,
         async () => {
-          console.log(`[CRON] Checking for scheduled reports at ${new Date().toISOString()}`);
+          console.log(
+            `[CRON] Checking for scheduled reports at ${new Date().toISOString()}`
+          );
           await this.executeScheduledReports();
         },
         {
@@ -115,7 +121,9 @@ class CronService {
       this.cleanupJob = cron.schedule(
         cronExpression,
         async () => {
-          console.log(`[CRON] Starting daily cleanup at ${new Date().toISOString()}`);
+          console.log(
+            `[CRON] Starting daily cleanup at ${new Date().toISOString()}`
+          );
           await this.executeDailyCleanup();
         },
         {
@@ -221,11 +229,16 @@ class CronService {
       for (const schedule of dueSchedules) {
         try {
           console.log(`Executing scheduled report: ${schedule.name}`);
-          const report = await reportService.executeScheduledReport(schedule.id);
+          const report = await reportService.executeScheduledReport(
+            schedule.id
+          );
 
           console.log(`Scheduled report generated: ${report.title}`);
         } catch (error) {
-          console.error(`Failed to execute scheduled report ${schedule.name}:`, error);
+          console.error(
+            `Failed to execute scheduled report ${schedule.name}:`,
+            error
+          );
         }
       }
     } catch (error) {
@@ -380,7 +393,10 @@ class CronService {
       }
 
       // Send email (implementation depends on email service)
-      console.log('Backup success email would be sent to:', admins.map(a => a.email).join(', '));
+      console.log(
+        'Backup success email would be sent to:',
+        admins.map((a) => a.email).join(', ')
+      );
       // TODO: Implement actual email sending using nodemailer
     } catch (error) {
       console.error('Failed to send backup success email:', error);
@@ -403,7 +419,10 @@ class CronService {
       }
 
       // Send alert email
-      console.log('Backup failure email would be sent to:', admins.map(a => a.email).join(', '));
+      console.log(
+        'Backup failure email would be sent to:',
+        admins.map((a) => a.email).join(', ')
+      );
       console.log('Error details:', error.message);
       // TODO: Implement actual email sending using nodemailer
     } catch (error) {

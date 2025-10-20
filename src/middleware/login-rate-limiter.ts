@@ -1,5 +1,5 @@
-import { NextRequest } from 'next/server'
-import { RateLimiter } from './rate-limiter'
+import { NextRequest } from 'next/server';
+import { RateLimiter } from './rate-limiter';
 
 /**
  * Specialized rate limiter for login attempts
@@ -14,12 +14,13 @@ export const loginRateLimiter = new RateLimiter({
   maxRequests: 5,
   keyGenerator: (req: NextRequest) => {
     // Use IP address as the primary key
-    const ip = req.headers.get('x-forwarded-for') || 
-               req.headers.get('x-real-ip') || 
-               'unknown'
-    return `login:${ip}`
-  }
-})
+    const ip =
+      req.headers.get('x-forwarded-for') ||
+      req.headers.get('x-real-ip') ||
+      'unknown';
+    return `login:${ip}`;
+  },
+});
 
 /**
  * Per-email rate limiter - prevents targeting specific accounts
@@ -30,9 +31,9 @@ export const emailRateLimiter = new RateLimiter({
   maxRequests: 10,
   keyGenerator: (req: NextRequest) => {
     // This will be set by the login handler after parsing the request body
-    return 'email:unknown'
-  }
-})
+    return 'email:unknown';
+  },
+});
 
 /**
  * Check rate limit for login attempts
@@ -45,25 +46,27 @@ export function checkLoginRateLimit(
   email?: string
 ): Response | null {
   // Check IP-based rate limit
-  const ip = req.headers.get('x-forwarded-for') || 
-             req.headers.get('x-real-ip') || 
-             'unknown'
-  const ipKey = `login:${ip}`
-  
+  const ip =
+    req.headers.get('x-forwarded-for') ||
+    req.headers.get('x-real-ip') ||
+    'unknown';
+  const ipKey = `login:${ip}`;
+
   if (!loginRateLimiter.check(ipKey)) {
     console.warn('[LoginRateLimit] IP rate limit exceeded:', {
       ip,
       path: req.nextUrl.pathname,
       timestamp: new Date().toISOString(),
-    })
-    
+    });
+
     return new Response(
       JSON.stringify({
         success: false,
         error: {
           code: 'RATE_LIMIT_EXCEEDED',
-          message: 'Too many login attempts from this IP address. Please try again in 15 minutes.',
-        }
+          message:
+            'Too many login attempts from this IP address. Please try again in 15 minutes.',
+        },
       }),
       {
         status: 429,
@@ -73,29 +76,30 @@ export function checkLoginRateLimit(
           'X-RateLimit-Limit': '5',
           'X-RateLimit-Remaining': '0',
           'X-RateLimit-Reset': String(Date.now() + 15 * 60 * 1000),
-        }
+        },
       }
-    )
+    );
   }
-  
+
   // Check email-based rate limit if email is provided
   if (email) {
-    const emailKey = `login:email:${email.toLowerCase()}`
-    
+    const emailKey = `login:email:${email.toLowerCase()}`;
+
     if (!emailRateLimiter.check(emailKey)) {
       console.warn('[LoginRateLimit] Email rate limit exceeded:', {
         email,
         ip,
         timestamp: new Date().toISOString(),
-      })
-      
+      });
+
       return new Response(
         JSON.stringify({
           success: false,
           error: {
             code: 'RATE_LIMIT_EXCEEDED',
-            message: 'Too many login attempts for this account. Please try again in 15 minutes.',
-          }
+            message:
+              'Too many login attempts for this account. Please try again in 15 minutes.',
+          },
         }),
         {
           status: 429,
@@ -105,13 +109,13 @@ export function checkLoginRateLimit(
             'X-RateLimit-Limit': '10',
             'X-RateLimit-Remaining': '0',
             'X-RateLimit-Reset': String(Date.now() + 15 * 60 * 1000),
-          }
+          },
         }
-      )
+      );
     }
   }
-  
-  return null
+
+  return null;
 }
 
 /**
@@ -119,13 +123,13 @@ export function checkLoginRateLimit(
  * Useful after successful login
  */
 export function resetLoginRateLimit(ip: string, email?: string): void {
-  const ipKey = `login:${ip}`
-  loginRateLimiter.reset(ipKey)
-  
+  const ipKey = `login:${ip}`;
+  loginRateLimiter.reset(ipKey);
+
   if (email) {
-    const emailKey = `login:email:${email.toLowerCase()}`
-    emailRateLimiter.reset(emailKey)
+    const emailKey = `login:email:${email.toLowerCase()}`;
+    emailRateLimiter.reset(emailKey);
   }
-  
-  console.log('[LoginRateLimit] Rate limits reset for:', { ip, email })
+
+  console.log('[LoginRateLimit] Rate limits reset for:', { ip, email });
 }

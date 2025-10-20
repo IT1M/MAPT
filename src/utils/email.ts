@@ -1,6 +1,6 @@
 /**
  * Email utility functions
- * 
+ *
  * Note: This is a basic implementation. In production, you should:
  * - Use a proper email service (SendGrid, AWS SES, Resend, etc.)
  * - Add email templates
@@ -9,10 +9,10 @@
  */
 
 interface SendEmailOptions {
-  to: string
-  subject: string
-  text: string
-  html?: string
+  to: string;
+  subject: string;
+  text: string;
+  html?: string;
 }
 
 /**
@@ -27,8 +27,8 @@ export async function sendEmail(options: SendEmailOptions): Promise<void> {
       to: options.to,
       subject: options.subject,
       text: options.text,
-    })
-    return
+    });
+    return;
   }
 
   // In production, integrate with your email service
@@ -56,7 +56,7 @@ export async function sendEmail(options: SendEmailOptions): Promise<void> {
   */
 
   // For now, just log
-  console.log('📧 Email sent:', options.to, options.subject)
+  console.log('📧 Email sent:', options.to, options.subject);
 }
 
 /**
@@ -67,8 +67,8 @@ export async function sendWelcomeEmail(
   name: string,
   password: string
 ): Promise<void> {
-  const subject = 'Welcome to Inventory Management System'
-  
+  const subject = 'Welcome to Inventory Management System';
+
   const text = `
 Hello ${name},
 
@@ -87,7 +87,7 @@ If you have any questions, please contact your system administrator.
 
 Best regards,
 Inventory Management Team
-  `.trim()
+  `.trim();
 
   const html = `
 <!DOCTYPE html>
@@ -132,14 +132,14 @@ Inventory Management Team
   </div>
 </body>
 </html>
-  `.trim()
+  `.trim();
 
   await sendEmail({
     to: email,
     subject,
     text,
     html,
-  })
+  });
 }
 
 /**
@@ -150,10 +150,10 @@ export async function sendPasswordResetEmail(
   name: string,
   resetToken: string
 ): Promise<void> {
-  const resetUrl = `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/reset-password?token=${resetToken}`
-  
-  const subject = 'Password Reset Request'
-  
+  const resetUrl = `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/reset-password?token=${resetToken}`;
+
+  const subject = 'Password Reset Request';
+
   const text = `
 Hello ${name},
 
@@ -168,7 +168,7 @@ If you did not request this password reset, please ignore this email.
 
 Best regards,
 Inventory Management Team
-  `.trim()
+  `.trim();
 
   const html = `
 <!DOCTYPE html>
@@ -203,12 +203,12 @@ Inventory Management Team
   </div>
 </body>
 </html>
-  `.trim()
+  `.trim();
 
   await sendEmail({
     to: email,
     subject,
     text,
     html,
-  })
+  });
 }

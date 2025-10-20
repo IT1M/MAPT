@@ -6,14 +6,14 @@
 
 ```tsx
 // src/app/[locale]/settings/appearance/page.tsx
-import { ThemeCustomizer } from '@/components/settings/ThemeCustomizer'
+import { ThemeCustomizer } from '@/components/settings/ThemeCustomizer';
 
 export default function AppearanceSettingsPage() {
   return (
     <div className="max-w-6xl mx-auto p-6">
       <ThemeCustomizer />
     </div>
-  )
+  );
 }
 ```
 
@@ -21,7 +21,7 @@ export default function AppearanceSettingsPage() {
 
 ```tsx
 // src/components/layout/Header.tsx
-import { QuickThemeSwitcher } from '@/components/settings/THEME_USAGE_EXAMPLE'
+import { QuickThemeSwitcher } from '@/components/settings/THEME_USAGE_EXAMPLE';
 
 export function Header() {
   return (
@@ -32,7 +32,7 @@ export function Header() {
         {/* Other header items */}
       </div>
     </header>
-  )
+  );
 }
 ```
 
@@ -46,7 +46,7 @@ export function MyComponent() {
       <h2 className="theme-primary">Title</h2>
       <button className="theme-button-primary">Action</button>
     </div>
-  )
+  );
 }
 ```
 
@@ -75,14 +75,14 @@ const navigationItems = [
     icon: '🎨',
     href: '/settings/appearance',
   },
-]
+];
 ```
 
 ### Step 3: Create Appearance Settings Page
 
 ```tsx
 // src/app/[locale]/settings/appearance/page.tsx
-import { ThemeCustomizer } from '@/components/settings/ThemeCustomizer'
+import { ThemeCustomizer } from '@/components/settings/ThemeCustomizer';
 
 export default function AppearanceSettingsPage() {
   return (
@@ -93,10 +93,10 @@ export default function AppearanceSettingsPage() {
           Customize how the application looks and feels
         </p>
       </div>
-      
+
       <ThemeCustomizer />
     </div>
-  )
+  );
 }
 ```
 
@@ -105,20 +105,19 @@ export default function AppearanceSettingsPage() {
 Replace hardcoded colors with theme variables:
 
 **Before:**
+
 ```tsx
-<button className="bg-blue-600 text-white px-4 py-2 rounded">
-  Click me
-</button>
+<button className="bg-blue-600 text-white px-4 py-2 rounded">Click me</button>
 ```
 
 **After:**
+
 ```tsx
-<button className="theme-button-primary">
-  Click me
-</button>
+<button className="theme-button-primary">Click me</button>
 ```
 
 Or use CSS variables:
+
 ```tsx
 <button
   style={{
@@ -137,11 +136,11 @@ Or use CSS variables:
 Make charts use theme colors:
 
 ```tsx
-import { useThemeCustomization } from '@/hooks/useThemeCustomization'
+import { useThemeCustomization } from '@/hooks/useThemeCustomization';
 
 function MyChart() {
-  const { currentTheme } = useThemeCustomization()
-  
+  const { currentTheme } = useThemeCustomization();
+
   const chartOptions = {
     colors: [
       currentTheme.colors.primary,
@@ -149,9 +148,9 @@ function MyChart() {
       currentTheme.colors.accent,
     ],
     // ... other options
-  }
-  
-  return <Chart options={chartOptions} />
+  };
+
+  return <Chart options={chartOptions} />;
 }
 ```
 
@@ -175,36 +174,36 @@ If you need theme context throughout your app:
 
 ```tsx
 // src/contexts/ThemeContext.tsx
-'use client'
+'use client';
 
-import React, { createContext, useContext } from 'react'
-import { useThemeCustomization } from '@/hooks/useThemeCustomization'
-import type { Theme } from '@/config/themes'
+import React, { createContext, useContext } from 'react';
+import { useThemeCustomization } from '@/hooks/useThemeCustomization';
+import type { Theme } from '@/config/themes';
 
 interface ThemeContextValue {
-  theme: Theme
-  updateTheme: (theme: Theme) => void
+  theme: Theme;
+  updateTheme: (theme: Theme) => void;
   // ... other methods
 }
 
-const ThemeContext = createContext<ThemeContextValue | null>(null)
+const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const themeCustomization = useThemeCustomization()
-  
+  const themeCustomization = useThemeCustomization();
+
   return (
     <ThemeContext.Provider value={themeCustomization}>
       {children}
     </ThemeContext.Provider>
-  )
+  );
 }
 
 export function useTheme() {
-  const context = useContext(ThemeContext)
+  const context = useContext(ThemeContext);
   if (!context) {
-    throw new Error('useTheme must be used within ThemeProvider')
+    throw new Error('useTheme must be used within ThemeProvider');
   }
-  return context
+  return context;
 }
 ```
 
@@ -212,41 +211,35 @@ Then wrap your app:
 
 ```tsx
 // src/app/layout.tsx
-import { ThemeProvider } from '@/contexts/ThemeContext'
+import { ThemeProvider } from '@/contexts/ThemeContext';
 
 export default function RootLayout({ children }) {
   return (
     <html>
       <body>
-        <ThemeProvider>
-          {children}
-        </ThemeProvider>
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
-  )
+  );
 }
 ```
 
 ### Programmatic Theme Updates
 
 ```tsx
-import { useThemeCustomization } from '@/hooks/useThemeCustomization'
+import { useThemeCustomization } from '@/hooks/useThemeCustomization';
 
 function AdminPanel() {
-  const { updateColors, selectPreset } = useThemeCustomization()
-  
+  const { updateColors, selectPreset } = useThemeCustomization();
+
   const applyCompanyBranding = () => {
     updateColors({
       primary: '#company-primary',
       secondary: '#company-secondary',
-    })
-  }
-  
-  return (
-    <button onClick={applyCompanyBranding}>
-      Apply Company Branding
-    </button>
-  )
+    });
+  };
+
+  return <button onClick={applyCompanyBranding}>Apply Company Branding</button>;
 }
 ```
 
@@ -259,27 +252,27 @@ function AnimatedComponent() {
       {/* This will respect animation settings */}
       Hover me
     </div>
-  )
+  );
 }
 ```
 
 ### Responsive Theme Adjustments
 
 ```tsx
-import { useThemeCustomization } from '@/hooks/useThemeCustomization'
-import { useMediaQuery } from '@/hooks/useMediaQuery'
+import { useThemeCustomization } from '@/hooks/useThemeCustomization';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 
 function ResponsiveComponent() {
-  const { updateDensity } = useThemeCustomization()
-  const isMobile = useMediaQuery('(max-width: 768px)')
-  
+  const { updateDensity } = useThemeCustomization();
+  const isMobile = useMediaQuery('(max-width: 768px)');
+
   React.useEffect(() => {
     if (isMobile) {
-      updateDensity('compact')
+      updateDensity('compact');
     }
-  }, [isMobile, updateDensity])
-  
-  return <div>Content</div>
+  }, [isMobile, updateDensity]);
+
+  return <div>Content</div>;
 }
 ```
 
@@ -288,6 +281,7 @@ function ResponsiveComponent() {
 ### Migrating Existing Components
 
 1. **Identify hardcoded colors:**
+
    ```bash
    # Search for hardcoded Tailwind colors
    grep -r "bg-blue-" src/components
@@ -300,12 +294,13 @@ function ResponsiveComponent() {
    - `border-blue-600` → `theme-border-primary`
 
 3. **Update custom styles:**
+
    ```css
    /* Before */
    .my-component {
      background-color: #0d9488;
    }
-   
+
    /* After */
    .my-component {
      background-color: var(--theme-primary);
@@ -322,19 +317,19 @@ function ResponsiveComponent() {
 
 ```tsx
 // Before
-const chartColors = ['#0d9488', '#06b6d4', '#3b82f6']
+const chartColors = ['#0d9488', '#06b6d4', '#3b82f6'];
 
 // After
-import { useThemeCustomization } from '@/hooks/useThemeCustomization'
+import { useThemeCustomization } from '@/hooks/useThemeCustomization';
 
 function MyChart() {
-  const { currentTheme } = useThemeCustomization()
+  const { currentTheme } = useThemeCustomization();
   const chartColors = [
     currentTheme.colors.primary,
     currentTheme.colors.secondary,
     currentTheme.colors.accent,
-  ]
-  
+  ];
+
   // Use chartColors in your chart
 }
 ```
@@ -367,6 +362,7 @@ function MyChart() {
 **Problem:** Theme changes don't appear
 
 **Solutions:**
+
 1. Check if CSS file is imported in globals.css
 2. Clear browser cache
 3. Check browser console for errors
@@ -377,6 +373,7 @@ function MyChart() {
 **Problem:** Color changes don't take effect
 
 **Solutions:**
+
 1. Check if CSS variables are being overridden
 2. Verify color format is valid hex
 3. Inspect element to see computed styles
@@ -387,6 +384,7 @@ function MyChart() {
 **Problem:** Theme changes don't sync across tabs
 
 **Solutions:**
+
 1. Check if localStorage is enabled
 2. Verify same origin policy
 3. Check browser console for errors
@@ -397,6 +395,7 @@ function MyChart() {
 **Problem:** Theme changes are slow
 
 **Solutions:**
+
 1. Disable animations temporarily
 2. Reduce number of themed elements
 3. Use CSS classes instead of inline styles
@@ -405,15 +404,17 @@ function MyChart() {
 ## Best Practices
 
 1. **Use theme classes when possible:**
+
    ```tsx
    // Good
    <button className="theme-button-primary">Click</button>
-   
+
    // Avoid
    <button style={{ backgroundColor: currentTheme.colors.primary }}>Click</button>
    ```
 
 2. **Group theme-related styles:**
+
    ```css
    .my-component {
      background-color: var(--theme-card);
@@ -441,6 +442,7 @@ function MyChart() {
 ## Support
 
 For issues or questions:
+
 1. Check the README: `THEME_CUSTOMIZATION_README.md`
 2. Review usage examples: `THEME_USAGE_EXAMPLE.tsx`
 3. Test on the demo page: `/theme-test`
@@ -450,6 +452,7 @@ For issues or questions:
 ## Future Enhancements
 
 Planned features:
+
 - [ ] Dark mode variants for each preset
 - [ ] More preset themes
 - [ ] Theme marketplace

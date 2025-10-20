@@ -1,37 +1,43 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import { signIn } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
-import { useTranslations } from '@/hooks/useTranslations'
-import { toast } from 'react-hot-toast'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { loginSchema, type LoginFormData } from '@/utils/validators'
-import { Eye, EyeOff, Loader2, AlertTriangle, Lock } from 'lucide-react'
-import Link from 'next/link'
-import { SimpleCaptcha } from './SimpleCaptcha'
+import { useState, useEffect } from 'react';
+import { signIn } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import { useTranslations } from '@/hooks/useTranslations';
+import { toast } from 'react-hot-toast';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { loginSchema, type LoginFormData } from '@/utils/validators';
+import { Eye, EyeOff, Loader2, AlertTriangle, Lock } from 'lucide-react';
+import Link from 'next/link';
+import { SimpleCaptcha } from './SimpleCaptcha';
 
 interface LoginFormProps {
-  locale: string
+  locale: string;
 }
 
 export function LoginForm({ locale }: LoginFormProps) {
-  const t = useTranslations()
-  const router = useRouter()
-  const [isLoading, setIsLoading] = useState(false)
-  const [showPassword, setShowPassword] = useState(false)
-  const [formData, setFormData] = useState<LoginFormData & { rememberMe: boolean }>({
+  const t = useTranslations();
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [formData, setFormData] = useState<
+    LoginFormData & { rememberMe: boolean }
+  >({
     email: '',
     password: '',
     rememberMe: false,
-  })
-  const [errors, setErrors] = useState<Partial<Record<keyof LoginFormData, string>>>({})
-  const [requiresCaptcha, setRequiresCaptcha] = useState(false)
-  const [captchaVerified, setCaptchaVerified] = useState(false)
-  const [isLocked, setIsLocked] = useState(false)
-  const [lockoutEndsAt, setLockoutEndsAt] = useState<Date | null>(null)
-  const [attemptsRemaining, setAttemptsRemaining] = useState<number | null>(null)
+  });
+  const [errors, setErrors] = useState<
+    Partial<Record<keyof LoginFormData, string>>
+  >({});
+  const [requiresCaptcha, setRequiresCaptcha] = useState(false);
+  const [captchaVerified, setCaptchaVerified] = useState(false);
+  const [isLocked, setIsLocked] = useState(false);
+  const [lockoutEndsAt, setLockoutEndsAt] = useState<Date | null>(null);
+  const [attemptsRemaining, setAttemptsRemaining] = useState<number | null>(
+    null
+  );
 
   // Check security status when email changes
   useEffect(() => {
@@ -42,65 +48,69 @@ export function LoginForm({ locale }: LoginFormProps) {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email: formData.email }),
-          })
-          
+          });
+
           if (response.ok) {
-            const result = await response.json()
+            const result = await response.json();
             if (result.success && result.data) {
-              setRequiresCaptcha(result.data.requiresCaptcha)
-              setIsLocked(result.data.isLocked)
-              setLockoutEndsAt(result.data.lockoutEndsAt ? new Date(result.data.lockoutEndsAt) : null)
-              setAttemptsRemaining(result.data.attemptsRemaining)
-              
+              setRequiresCaptcha(result.data.requiresCaptcha);
+              setIsLocked(result.data.isLocked);
+              setLockoutEndsAt(
+                result.data.lockoutEndsAt
+                  ? new Date(result.data.lockoutEndsAt)
+                  : null
+              );
+              setAttemptsRemaining(result.data.attemptsRemaining);
+
               // Reset captcha verification if requirements change
               if (!result.data.requiresCaptcha) {
-                setCaptchaVerified(false)
+                setCaptchaVerified(false);
               }
             }
           }
         } catch (error) {
-          console.error('Failed to check security status:', error)
+          console.error('Failed to check security status:', error);
         }
       }
-    }
+    };
 
-    const debounceTimer = setTimeout(checkSecurityStatus, 500)
-    return () => clearTimeout(debounceTimer)
-  }, [formData.email])
+    const debounceTimer = setTimeout(checkSecurityStatus, 500);
+    return () => clearTimeout(debounceTimer);
+  }, [formData.email]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target
-    setFormData((prev) => ({ 
-      ...prev, 
-      [name]: type === 'checkbox' ? checked : value 
-    }))
+    const { name, value, type, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value,
+    }));
     // Clear error for this field when user starts typing
     if (errors[name as keyof LoginFormData]) {
-      setErrors((prev) => ({ ...prev, [name]: undefined }))
+      setErrors((prev) => ({ ...prev, [name]: undefined }));
     }
-  }
+  };
 
   const handleCaptchaVerify = (isValid: boolean) => {
-    setCaptchaVerified(isValid)
+    setCaptchaVerified(isValid);
     if (isValid) {
       toast.success('CAPTCHA verified successfully', {
         duration: 2000,
         position: 'top-center',
-      })
+      });
     }
-  }
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setErrors({})
+    e.preventDefault();
+    setErrors({});
 
     // Check if account is locked
     if (isLocked) {
       toast.error('Account is locked. Please try again later.', {
         duration: 4000,
         position: 'top-center',
-      })
-      return
+      });
+      return;
     }
 
     // Check CAPTCHA verification if required
@@ -108,42 +118,44 @@ export function LoginForm({ locale }: LoginFormProps) {
       toast.error('Please complete the security check', {
         duration: 3000,
         position: 'top-center',
-      })
-      return
+      });
+      return;
     }
 
-    setIsLoading(true)
+    setIsLoading(true);
 
     try {
       // Validate form data with Zod
       const validatedData = loginSchema.parse({
         email: formData.email,
         password: formData.password,
-      })
+      });
 
       // Attempt to sign in with NextAuth
       const result = await signIn('credentials', {
         email: validatedData.email,
         password: validatedData.password,
         redirect: false,
-      })
+      });
 
       if (result?.error) {
         // Authentication failed - show specific error messages
-        const errorMessage = t('errors.invalidCredentials') || 'البريد الإلكتروني أو كلمة المرور غير صحيحة'
-        
+        const errorMessage =
+          t('errors.invalidCredentials') ||
+          'البريد الإلكتروني أو كلمة المرور غير صحيحة';
+
         toast.error(errorMessage, {
           duration: 4000,
           position: 'top-center',
-        })
-        
-        setErrors({ 
+        });
+
+        setErrors({
           email: ' ',
-          password: errorMessage
-        })
+          password: errorMessage,
+        });
 
         // Reset captcha verification to require new verification
-        setCaptchaVerified(false)
+        setCaptchaVerified(false);
 
         // Refresh security status after failed attempt
         setTimeout(async () => {
@@ -152,71 +164,85 @@ export function LoginForm({ locale }: LoginFormProps) {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ email: formData.email }),
-            })
-            
+            });
+
             if (response.ok) {
-              const result = await response.json()
+              const result = await response.json();
               if (result.success && result.data) {
-                setRequiresCaptcha(result.data.requiresCaptcha)
-                setIsLocked(result.data.isLocked)
-                setLockoutEndsAt(result.data.lockoutEndsAt ? new Date(result.data.lockoutEndsAt) : null)
-                setAttemptsRemaining(result.data.attemptsRemaining)
+                setRequiresCaptcha(result.data.requiresCaptcha);
+                setIsLocked(result.data.isLocked);
+                setLockoutEndsAt(
+                  result.data.lockoutEndsAt
+                    ? new Date(result.data.lockoutEndsAt)
+                    : null
+                );
+                setAttemptsRemaining(result.data.attemptsRemaining);
               }
             }
           } catch (error) {
-            console.error('Failed to refresh security status:', error)
+            console.error('Failed to refresh security status:', error);
           }
-        }, 500)
+        }, 500);
       } else if (result?.ok) {
         // Authentication successful - show success message
-        const successMessage = t('auth.loginSuccess') || 'تم تسجيل الدخول بنجاح'
-        
+        const successMessage =
+          t('auth.loginSuccess') || 'تم تسجيل الدخول بنجاح';
+
         toast.success(successMessage, {
           duration: 2000,
           position: 'top-center',
-        })
-        
+        });
+
         // Redirect to dashboard after short delay for better UX
         setTimeout(() => {
-          router.push(`/dashboard`)
-          router.refresh()
-        }, 500)
+          router.push(`/dashboard`);
+          router.refresh();
+        }, 500);
       }
     } catch (error: any) {
       // Handle Zod validation errors
       if (error.errors) {
-        const fieldErrors: Partial<Record<keyof LoginFormData, string>> = {}
+        const fieldErrors: Partial<Record<keyof LoginFormData, string>> = {};
         error.errors.forEach((err: any) => {
-          const field = err.path[0] as keyof LoginFormData
+          const field = err.path[0] as keyof LoginFormData;
           if (field) {
             // Provide user-friendly error messages
             if (field === 'email') {
-              fieldErrors[field] = t('errors.invalidEmail') || 'البريد الإلكتروني غير صالح'
+              fieldErrors[field] =
+                t('errors.invalidEmail') || 'البريد الإلكتروني غير صالح';
             } else if (field === 'password') {
-              fieldErrors[field] = t('errors.passwordRequired') || 'كلمة المرور مطلوبة'
+              fieldErrors[field] =
+                t('errors.passwordRequired') || 'كلمة المرور مطلوبة';
             } else {
-              fieldErrors[field] = err.message
+              fieldErrors[field] = err.message;
             }
           }
-        })
-        setErrors(fieldErrors)
-        
+        });
+        setErrors(fieldErrors);
+
         // Show toast for validation errors
-        toast.error(t('errors.validationError') || 'يرجى التحقق من البيانات المدخلة', {
-          duration: 3000,
-          position: 'top-center',
-        })
+        toast.error(
+          t('errors.validationError') || 'يرجى التحقق من البيانات المدخلة',
+          {
+            duration: 3000,
+            position: 'top-center',
+          }
+        );
       } else {
         // Handle unexpected errors
-        toast.error(t('errors.serverError') || 'حدث خطأ في الخادم، يرجى المحاولة مرة أخرى', {
-          duration: 4000,
-          position: 'top-center',
-        })
+        toast.error(
+          t('errors.serverError') ||
+            'حدث خطأ في الخادم، يرجى المحاولة مرة أخرى',
+          {
+            duration: 4000,
+            position: 'top-center',
+          }
+        );
       }
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -229,31 +255,40 @@ export function LoginForm({ locale }: LoginFormProps) {
               Account Locked
             </h3>
             <p className="text-sm text-red-700 dark:text-red-400">
-              Your account has been temporarily locked due to multiple failed login attempts.
-              It will be automatically unlocked at {lockoutEndsAt.toLocaleTimeString()}.
+              Your account has been temporarily locked due to multiple failed
+              login attempts. It will be automatically unlocked at{' '}
+              {lockoutEndsAt.toLocaleTimeString()}.
             </p>
           </div>
         </div>
       )}
 
       {/* Security Warning */}
-      {!isLocked && attemptsRemaining !== null && attemptsRemaining <= 5 && attemptsRemaining > 0 && (
-        <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 flex items-start gap-3">
-          <AlertTriangle className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
-          <div className="flex-1">
-            <h3 className="text-sm font-semibold text-yellow-800 dark:text-yellow-300 mb-1">
-              Security Warning
-            </h3>
-            <p className="text-sm text-yellow-700 dark:text-yellow-400">
-              {attemptsRemaining} login {attemptsRemaining === 1 ? 'attempt' : 'attempts'} remaining before account lockout.
-            </p>
+      {!isLocked &&
+        attemptsRemaining !== null &&
+        attemptsRemaining <= 5 &&
+        attemptsRemaining > 0 && (
+          <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 flex items-start gap-3">
+            <AlertTriangle className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <h3 className="text-sm font-semibold text-yellow-800 dark:text-yellow-300 mb-1">
+                Security Warning
+              </h3>
+              <p className="text-sm text-yellow-700 dark:text-yellow-400">
+                {attemptsRemaining} login{' '}
+                {attemptsRemaining === 1 ? 'attempt' : 'attempts'} remaining
+                before account lockout.
+              </p>
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
       {/* Email Input */}
       <div>
-        <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        <label
+          htmlFor="email"
+          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+        >
           {t('common.email')}
         </label>
         <Input
@@ -273,7 +308,10 @@ export function LoginForm({ locale }: LoginFormProps) {
 
       {/* Password Input with Toggle */}
       <div>
-        <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        <label
+          htmlFor="password"
+          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+        >
           {t('common.password')}
         </label>
         <div className="relative">
@@ -308,7 +346,7 @@ export function LoginForm({ locale }: LoginFormProps) {
 
       {/* CAPTCHA Challenge */}
       {requiresCaptcha && !isLocked && (
-        <SimpleCaptcha 
+        <SimpleCaptcha
           onVerify={handleCaptchaVerify}
           className="animate-in fade-in slide-in-from-top-2 duration-300"
         />
@@ -343,7 +381,9 @@ export function LoginForm({ locale }: LoginFormProps) {
         type="submit"
         variant="primary"
         size="large"
-        disabled={isLoading || isLocked || (requiresCaptcha && !captchaVerified)}
+        disabled={
+          isLoading || isLocked || (requiresCaptcha && !captchaVerified)
+        }
         className="w-full"
       >
         {isLoading ? (
@@ -372,5 +412,5 @@ export function LoginForm({ locale }: LoginFormProps) {
         </Link>
       </div>
     </form>
-  )
+  );
 }

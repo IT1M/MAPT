@@ -10,10 +10,13 @@ export function formatDate(
   locale: 'en' | 'ar' = 'en',
   options?: Intl.DateTimeFormatOptions
 ): string {
-  const dateObj = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date
+  const dateObj =
+    typeof date === 'string' || typeof date === 'number'
+      ? new Date(date)
+      : date;
 
   if (isNaN(dateObj.getTime())) {
-    return 'Invalid Date'
+    return 'Invalid Date';
   }
 
   const defaultOptions: Intl.DateTimeFormatOptions = {
@@ -21,11 +24,11 @@ export function formatDate(
     month: 'long',
     day: 'numeric',
     ...options,
-  }
+  };
 
-  const localeCode = locale === 'ar' ? 'ar-SA' : 'en-US'
+  const localeCode = locale === 'ar' ? 'ar-SA' : 'en-US';
 
-  return new Intl.DateTimeFormat(localeCode, defaultOptions).format(dateObj)
+  return new Intl.DateTimeFormat(localeCode, defaultOptions).format(dateObj);
 }
 
 /**
@@ -44,7 +47,7 @@ export function formatDateTime(
     day: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
-  })
+  });
 }
 
 /**
@@ -61,7 +64,7 @@ export function formatShortDate(
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
-  })
+  });
 }
 
 /**
@@ -77,12 +80,12 @@ export function formatNumber(
   options?: Intl.NumberFormatOptions
 ): string {
   if (typeof value !== 'number' || isNaN(value)) {
-    return '0'
+    return '0';
   }
 
-  const localeCode = locale === 'ar' ? 'ar-SA' : 'en-US'
+  const localeCode = locale === 'ar' ? 'ar-SA' : 'en-US';
 
-  return new Intl.NumberFormat(localeCode, options).format(value)
+  return new Intl.NumberFormat(localeCode, options).format(value);
 }
 
 /**
@@ -97,13 +100,13 @@ export function formatPercentage(
   locale: 'en' | 'ar' = 'en',
   asDecimal: boolean = true
 ): string {
-  const percentValue = asDecimal ? value : value / 100
+  const percentValue = asDecimal ? value : value / 100;
 
   return formatNumber(percentValue, locale, {
     style: 'percent',
     minimumFractionDigits: 0,
     maximumFractionDigits: 2,
-  })
+  });
 }
 
 /**
@@ -117,17 +120,17 @@ export function formatCurrency(
   locale: 'en' | 'ar' = 'en'
 ): string {
   if (typeof amount !== 'number' || isNaN(amount)) {
-    return locale === 'ar' ? '٠٫٠٠ ر.س' : 'SAR 0.00'
+    return locale === 'ar' ? '٠٫٠٠ ر.س' : 'SAR 0.00';
   }
 
-  const localeCode = locale === 'ar' ? 'ar-SA' : 'en-US'
+  const localeCode = locale === 'ar' ? 'ar-SA' : 'en-US';
 
   return new Intl.NumberFormat(localeCode, {
     style: 'currency',
     currency: 'SAR',
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-  }).format(amount)
+  }).format(amount);
 }
 
 /**
@@ -141,16 +144,16 @@ export function formatCompactNumber(
   locale: 'en' | 'ar' = 'en'
 ): string {
   if (typeof value !== 'number' || isNaN(value)) {
-    return '0'
+    return '0';
   }
 
-  const localeCode = locale === 'ar' ? 'ar-SA' : 'en-US'
+  const localeCode = locale === 'ar' ? 'ar-SA' : 'en-US';
 
   return new Intl.NumberFormat(localeCode, {
     notation: 'compact',
     compactDisplay: 'short',
     maximumFractionDigits: 1,
-  }).format(value)
+  }).format(value);
 }
 
 /**
@@ -163,17 +166,20 @@ export function formatRelativeTime(
   date: Date | string | number,
   locale: 'en' | 'ar' = 'en'
 ): string {
-  const dateObj = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date
+  const dateObj =
+    typeof date === 'string' || typeof date === 'number'
+      ? new Date(date)
+      : date;
 
   if (isNaN(dateObj.getTime())) {
-    return 'Invalid Date'
+    return 'Invalid Date';
   }
 
-  const now = new Date()
-  const diffInSeconds = Math.floor((now.getTime() - dateObj.getTime()) / 1000)
+  const now = new Date();
+  const diffInSeconds = Math.floor((now.getTime() - dateObj.getTime()) / 1000);
 
-  const localeCode = locale === 'ar' ? 'ar-SA' : 'en-US'
-  const rtf = new Intl.RelativeTimeFormat(localeCode, { numeric: 'auto' })
+  const localeCode = locale === 'ar' ? 'ar-SA' : 'en-US';
+  const rtf = new Intl.RelativeTimeFormat(localeCode, { numeric: 'auto' });
 
   const units: { unit: Intl.RelativeTimeFormatUnit; seconds: number }[] = [
     { unit: 'year', seconds: 31536000 },
@@ -183,14 +189,14 @@ export function formatRelativeTime(
     { unit: 'hour', seconds: 3600 },
     { unit: 'minute', seconds: 60 },
     { unit: 'second', seconds: 1 },
-  ]
+  ];
 
   for (const { unit, seconds } of units) {
-    const value = Math.floor(Math.abs(diffInSeconds) / seconds)
+    const value = Math.floor(Math.abs(diffInSeconds) / seconds);
     if (value >= 1) {
-      return rtf.format(diffInSeconds < 0 ? value : -value, unit)
+      return rtf.format(diffInSeconds < 0 ? value : -value, unit);
     }
   }
 
-  return rtf.format(0, 'second')
+  return rtf.format(0, 'second');
 }

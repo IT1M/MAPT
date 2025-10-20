@@ -1,15 +1,15 @@
-'use client'
+'use client';
 
 /**
  * Animation Examples Component
- * 
+ *
  * This file demonstrates how to use the animation system.
  * Use these examples as reference when implementing animations in your components.
- * 
+ *
  * DO NOT import this file in production code - it's for reference only.
  */
 
-import { useState } from 'react'
+import { useState } from 'react';
 import {
   PageTransition,
   FadeTransition,
@@ -24,7 +24,7 @@ import {
   useScrollAnimation,
   ANIMATION_CLASSES,
   ANIMATION_DURATION,
-} from './animations'
+} from './animations';
 
 // ============================================
 // Example 1: Page Transition
@@ -37,17 +37,18 @@ export function PageTransitionExample() {
         <p>This content fades in when the route changes.</p>
       </div>
     </PageTransition>
-  )
+  );
 }
 
 // ============================================
 // Example 2: Modal with Animation
 // ============================================
 export function ModalExample() {
-  const [isOpen, setIsOpen] = useState(false)
-  const { shouldRender, backdropClass, contentClass } = useModalAnimation(isOpen)
+  const [isOpen, setIsOpen] = useState(false);
+  const { shouldRender, backdropClass, contentClass } =
+    useModalAnimation(isOpen);
 
-  if (!shouldRender) return null
+  if (!shouldRender) return null;
 
   return (
     <>
@@ -72,15 +73,15 @@ export function ModalExample() {
         </div>
       </div>
     </>
-  )
+  );
 }
 
 // ============================================
 // Example 3: Dropdown with Animation
 // ============================================
 export function DropdownExample() {
-  const [isOpen, setIsOpen] = useState(false)
-  const { shouldRender, animationClass } = useDropdownAnimation(isOpen)
+  const [isOpen, setIsOpen] = useState(false);
+  const { shouldRender, animationClass } = useDropdownAnimation(isOpen);
 
   return (
     <div className="relative">
@@ -107,24 +108,27 @@ export function DropdownExample() {
         </div>
       )}
     </div>
-  )
+  );
 }
 
 // ============================================
 // Example 4: Toast Notification
 // ============================================
 export function ToastExample() {
-  const [isVisible, setIsVisible] = useState(false)
-  const { shouldRender, animationClass } = useToastAnimation(isVisible)
+  const [isVisible, setIsVisible] = useState(false);
+  const { shouldRender, animationClass } = useToastAnimation(isVisible);
 
   const showToast = () => {
-    setIsVisible(true)
-    setTimeout(() => setIsVisible(false), 3000)
-  }
+    setIsVisible(true);
+    setTimeout(() => setIsVisible(false), 3000);
+  };
 
   return (
     <>
-      <button onClick={showToast} className="px-4 py-2 bg-primary-500 text-white rounded">
+      <button
+        onClick={showToast}
+        className="px-4 py-2 bg-primary-500 text-white rounded"
+      >
         Show Toast
       </button>
 
@@ -136,18 +140,21 @@ export function ToastExample() {
         </div>
       )}
     </>
-  )
+  );
 }
 
 // ============================================
 // Example 5: Fade Transition
 // ============================================
 export function FadeTransitionExample() {
-  const [show, setShow] = useState(true)
+  const [show, setShow] = useState(true);
 
   return (
     <div>
-      <button onClick={() => setShow(!show)} className="px-4 py-2 bg-primary-500 text-white rounded mb-4">
+      <button
+        onClick={() => setShow(!show)}
+        className="px-4 py-2 bg-primary-500 text-white rounded mb-4"
+      >
         Toggle Content
       </button>
 
@@ -157,20 +164,25 @@ export function FadeTransitionExample() {
         </div>
       </FadeTransition>
     </div>
-  )
+  );
 }
 
 // ============================================
 // Example 6: Slide Transition
 // ============================================
 export function SlideTransitionExample() {
-  const [show, setShow] = useState(true)
-  const [direction, setDirection] = useState<'up' | 'down' | 'left' | 'right'>('down')
+  const [show, setShow] = useState(true);
+  const [direction, setDirection] = useState<'up' | 'down' | 'left' | 'right'>(
+    'down'
+  );
 
   return (
     <div>
       <div className="flex gap-2 mb-4">
-        <button onClick={() => setShow(!show)} className="px-4 py-2 bg-primary-500 text-white rounded">
+        <button
+          onClick={() => setShow(!show)}
+          className="px-4 py-2 bg-primary-500 text-white rounded"
+        >
           Toggle
         </button>
         <select
@@ -185,34 +197,45 @@ export function SlideTransitionExample() {
         </select>
       </div>
 
-      <SlideTransition show={show} direction={direction} duration={ANIMATION_DURATION.SLOW}>
+      <SlideTransition
+        show={show}
+        direction={direction}
+        duration={ANIMATION_DURATION.SLOW}
+      >
         <div className="p-4 bg-gray-100 dark:bg-gray-800 rounded">
           This content slides in from {direction}.
         </div>
       </SlideTransition>
     </div>
-  )
+  );
 }
 
 // ============================================
 // Example 7: Scale Transition
 // ============================================
 export function ScaleTransitionExample() {
-  const [show, setShow] = useState(true)
+  const [show, setShow] = useState(true);
 
   return (
     <div>
-      <button onClick={() => setShow(!show)} className="px-4 py-2 bg-primary-500 text-white rounded mb-4">
+      <button
+        onClick={() => setShow(!show)}
+        className="px-4 py-2 bg-primary-500 text-white rounded mb-4"
+      >
         Toggle Content
       </button>
 
-      <ScaleTransition show={show} origin="top" duration={ANIMATION_DURATION.NORMAL}>
+      <ScaleTransition
+        show={show}
+        origin="top"
+        duration={ANIMATION_DURATION.NORMAL}
+      >
         <div className="p-4 bg-gray-100 dark:bg-gray-800 rounded">
           This content scales in and out.
         </div>
       </ScaleTransition>
     </div>
-  )
+  );
 }
 
 // ============================================
@@ -225,55 +248,66 @@ export function StaggerChildrenExample() {
     { id: 3, title: 'Item 3', description: 'Third item' },
     { id: 4, title: 'Item 4', description: 'Fourth item' },
     { id: 5, title: 'Item 5', description: 'Fifth item' },
-  ]
+  ];
 
   return (
     <StaggerChildren staggerDelay={50} className="space-y-2">
       {items.map((item) => (
-        <div key={item.id} className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow">
+        <div
+          key={item.id}
+          className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow"
+        >
           <h3 className="font-bold">{item.title}</h3>
-          <p className="text-sm text-gray-600 dark:text-gray-400">{item.description}</p>
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            {item.description}
+          </p>
         </div>
       ))}
     </StaggerChildren>
-  )
+  );
 }
 
 // ============================================
 // Example 9: Shake Animation (Error Feedback)
 // ============================================
 export function ShakeAnimationExample() {
-  const { className, shake } = useShakeAnimation()
+  const { className, shake } = useShakeAnimation();
 
   return (
     <div className={className}>
-      <button onClick={shake} className="px-4 py-2 bg-red-500 text-white rounded">
+      <button
+        onClick={shake}
+        className="px-4 py-2 bg-red-500 text-white rounded"
+      >
         Trigger Error Shake
       </button>
     </div>
-  )
+  );
 }
 
 // ============================================
 // Example 10: Bounce Animation (Attention)
 // ============================================
 export function BounceAnimationExample() {
-  const { className, bounce } = useBounceAnimation()
+  const { className, bounce } = useBounceAnimation();
 
   return (
     <div className={className}>
-      <button onClick={bounce} className="px-4 py-2 bg-blue-500 text-white rounded">
+      <button
+        onClick={bounce}
+        className="px-4 py-2 bg-blue-500 text-white rounded"
+      >
         Trigger Attention Bounce
       </button>
     </div>
-  )
+  );
 }
 
 // ============================================
 // Example 11: Scroll Animation (Sticky Header)
 // ============================================
 export function ScrollAnimationExample() {
-  const hasScrolled = useScrollAnimation(100)
+  const hasScrolled = useScrollAnimation(100);
 
   return (
     <>
@@ -283,26 +317,28 @@ export function ScrollAnimationExample() {
         }`}
       >
         <h1>Sticky Header</h1>
-        <p className="text-sm text-gray-600">Scroll down to see shadow appear</p>
+        <p className="text-sm text-gray-600">
+          Scroll down to see shadow appear
+        </p>
       </header>
 
       <div className="h-[200vh] p-8">
         <p>Scroll down to see the header shadow appear...</p>
       </div>
     </>
-  )
+  );
 }
 
 // ============================================
 // Example 12: Button with Press Animation
 // ============================================
 export function ButtonPressExample() {
-  const [isPressed, setIsPressed] = useState(false)
+  const [isPressed, setIsPressed] = useState(false);
 
   const handleClick = () => {
-    setIsPressed(true)
-    setTimeout(() => setIsPressed(false), 150)
-  }
+    setIsPressed(true);
+    setTimeout(() => setIsPressed(false), 150);
+  };
 
   return (
     <button
@@ -313,7 +349,7 @@ export function ButtonPressExample() {
     >
       Click Me
     </button>
-  )
+  );
 }
 
 // ============================================
@@ -321,13 +357,15 @@ export function ButtonPressExample() {
 // ============================================
 export function HoverLiftExample() {
   return (
-    <div className={`p-6 bg-white dark:bg-gray-800 rounded-lg ${ANIMATION_CLASSES.HOVER_LIFT}`}>
+    <div
+      className={`p-6 bg-white dark:bg-gray-800 rounded-lg ${ANIMATION_CLASSES.HOVER_LIFT}`}
+    >
       <h3 className="font-bold mb-2">Hover over me</h3>
       <p className="text-sm text-gray-600 dark:text-gray-400">
         This card lifts up when you hover over it.
       </p>
     </div>
-  )
+  );
 }
 
 // ============================================
@@ -336,11 +374,17 @@ export function HoverLiftExample() {
 export function SkeletonExample() {
   return (
     <div className="space-y-4">
-      <div className={`h-4 bg-gray-200 dark:bg-gray-700 rounded ${ANIMATION_CLASSES.SKELETON_PULSE}`} />
-      <div className={`h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 ${ANIMATION_CLASSES.SKELETON_PULSE}`} />
-      <div className={`h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2 ${ANIMATION_CLASSES.SKELETON_PULSE}`} />
+      <div
+        className={`h-4 bg-gray-200 dark:bg-gray-700 rounded ${ANIMATION_CLASSES.SKELETON_PULSE}`}
+      />
+      <div
+        className={`h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 ${ANIMATION_CLASSES.SKELETON_PULSE}`}
+      />
+      <div
+        className={`h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2 ${ANIMATION_CLASSES.SKELETON_PULSE}`}
+      />
     </div>
-  )
+  );
 }
 
 // ============================================
@@ -349,10 +393,12 @@ export function SkeletonExample() {
 export function SpinnerExample() {
   return (
     <div className="flex items-center gap-4">
-      <div className={`w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full ${ANIMATION_CLASSES.SPIN}`} />
+      <div
+        className={`w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full ${ANIMATION_CLASSES.SPIN}`}
+      />
       <span>Loading...</span>
     </div>
-  )
+  );
 }
 
 // ============================================
@@ -364,23 +410,25 @@ export function BadgePulseExample() {
       <button className="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded">
         Notifications
       </button>
-      <span className={`absolute -top-2 -right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full ${ANIMATION_CLASSES.BADGE_PULSE}`}>
+      <span
+        className={`absolute -top-2 -right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full ${ANIMATION_CLASSES.BADGE_PULSE}`}
+      >
         3
       </span>
     </div>
-  )
+  );
 }
 
 // ============================================
 // Example 17: Bell Ring Animation
 // ============================================
 export function BellRingExample() {
-  const [isRinging, setIsRinging] = useState(false)
+  const [isRinging, setIsRinging] = useState(false);
 
   const ring = () => {
-    setIsRinging(true)
-    setTimeout(() => setIsRinging(false), 500)
-  }
+    setIsRinging(true);
+    setTimeout(() => setIsRinging(false), 500);
+  };
 
   return (
     <button
@@ -389,7 +437,7 @@ export function BellRingExample() {
     >
       🔔
     </button>
-  )
+  );
 }
 
 // ============================================
@@ -475,5 +523,5 @@ export function AnimationExamplesDemo() {
         <BellRingExample />
       </section>
     </div>
-  )
+  );
 }

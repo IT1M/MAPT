@@ -41,7 +41,9 @@ export const MonthlyComparisonChart: React.FC<MonthlyComparisonChartProps> = ({
   onExport,
 }) => {
   const t = useTranslations('analytics');
-  const [metric, setMetric] = useState<'quantity' | 'items' | 'rejectRate'>(initialMetric);
+  const [metric, setMetric] = useState<'quantity' | 'items' | 'rejectRate'>(
+    initialMetric
+  );
   const [selectedMonths, setSelectedMonths] = useState<string[]>(
     initialSelectedMonths || data.slice(-6).map((d) => d.month)
   );
@@ -50,7 +52,10 @@ export const MonthlyComparisonChart: React.FC<MonthlyComparisonChartProps> = ({
   const formatMonth = (monthStr: string): string => {
     const [year, month] = monthStr.split('-');
     const date = new Date(parseInt(year), parseInt(month) - 1);
-    return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+    return date.toLocaleDateString('en-US', {
+      month: 'short',
+      year: 'numeric',
+    });
   };
 
   // Get current month
@@ -70,13 +75,20 @@ export const MonthlyComparisonChart: React.FC<MonthlyComparisonChartProps> = ({
   const chartData = useMemo(() => {
     return filteredData.map((d) => ({
       month: formatMonth(d.month),
-      value: metric === 'quantity' ? d.quantity : metric === 'items' ? d.items : d.rejectRate,
+      value:
+        metric === 'quantity'
+          ? d.quantity
+          : metric === 'items'
+            ? d.items
+            : d.rejectRate,
       isCurrentMonth: d.month === currentMonth,
       rawMonth: d.month,
     }));
   }, [filteredData, metric, currentMonth]);
 
-  const handleMetricChange = (newMetric: 'quantity' | 'items' | 'rejectRate') => {
+  const handleMetricChange = (
+    newMetric: 'quantity' | 'items' | 'rejectRate'
+  ) => {
     setMetric(newMetric);
     if (onMetricChange) {
       onMetricChange(newMetric);
@@ -101,12 +113,20 @@ export const MonthlyComparisonChart: React.FC<MonthlyComparisonChartProps> = ({
     } else if (format === 'csv') {
       const csv = [
         ['Month', 'Quantity', 'Items', 'Reject Rate (%)'],
-        ...filteredData.map((d) => [formatMonth(d.month), d.quantity, d.items, d.rejectRate]),
+        ...filteredData.map((d) => [
+          formatMonth(d.month),
+          d.quantity,
+          d.items,
+          d.rejectRate,
+        ]),
       ]
         .map((row) => row.join(','))
         .join('\n');
 
-      downloadCSV(csv, `monthly-comparison-${new Date().toISOString().split('T')[0]}.csv`);
+      downloadCSV(
+        csv,
+        `monthly-comparison-${new Date().toISOString().split('T')[0]}.csv`
+      );
     }
   };
 
@@ -228,8 +248,15 @@ export const MonthlyComparisonChart: React.FC<MonthlyComparisonChartProps> = ({
 
         {/* Chart */}
         <ResponsiveContainer width="100%" height={400}>
-          <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" className="dark:stroke-gray-700" />
+          <BarChart
+            data={chartData}
+            margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+          >
+            <CartesianGrid
+              strokeDasharray="3 3"
+              stroke="#e5e7eb"
+              className="dark:stroke-gray-700"
+            />
             <XAxis
               dataKey="month"
               stroke="#6b7280"
@@ -255,7 +282,9 @@ export const MonthlyComparisonChart: React.FC<MonthlyComparisonChartProps> = ({
                 padding: '12px',
               }}
               formatter={(value: number) => [
-                metric === 'rejectRate' ? `${value.toFixed(2)}%` : value.toLocaleString(),
+                metric === 'rejectRate'
+                  ? `${value.toFixed(2)}%`
+                  : value.toLocaleString(),
                 getMetricLabel(),
               ]}
             />
@@ -300,7 +329,8 @@ export const MonthlyComparisonChart: React.FC<MonthlyComparisonChartProps> = ({
                           : 'text-red-600 dark:text-red-400'
                       }`}
                     >
-                      {Math.abs(change).toFixed(1)}% {isPositive ? 'higher' : 'lower'}
+                      {Math.abs(change).toFixed(1)}%{' '}
+                      {isPositive ? 'higher' : 'lower'}
                     </span>{' '}
                     than the previous month
                   </>

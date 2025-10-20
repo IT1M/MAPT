@@ -1,19 +1,22 @@
-'use client'
+'use client';
 
-import React, { useState, useEffect, useRef } from 'react'
-import { UserRole } from '@prisma/client'
-import type { SettingsSection } from '@/types/settings'
-import { SettingsNavigation } from './SettingsNavigation'
-import { SettingsSearch } from './SettingsSearch'
-import { KeyboardShortcutsHelp } from './KeyboardShortcutsHelp'
-import { useSettingsKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts'
-import { ensureAriaLiveRegion, announceToScreenReader } from '@/utils/accessibility-settings'
+import React, { useState, useEffect, useRef } from 'react';
+import { UserRole } from '@prisma/client';
+import type { SettingsSection } from '@/types/settings';
+import { SettingsNavigation } from './SettingsNavigation';
+import { SettingsSearch } from './SettingsSearch';
+import { KeyboardShortcutsHelp } from './KeyboardShortcutsHelp';
+import { useSettingsKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
+import {
+  ensureAriaLiveRegion,
+  announceToScreenReader,
+} from '@/utils/accessibility-settings';
 
 interface SettingsLayoutProps {
-  children: React.ReactNode
-  activeSection: SettingsSection
-  onSectionChange: (section: SettingsSection) => void
-  userRole: UserRole
+  children: React.ReactNode;
+  activeSection: SettingsSection;
+  onSectionChange: (section: SettingsSection) => void;
+  userRole: UserRole;
 }
 
 export function SettingsLayout({
@@ -22,28 +25,28 @@ export function SettingsLayout({
   onSectionChange,
   userRole,
 }: SettingsLayoutProps) {
-  const [isMobile, setIsMobile] = useState(false)
-  const [searchQuery, setSearchQuery] = useState('')
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-  const searchInputRef = useRef<HTMLInputElement>(null)
-  const mainContentRef = useRef<HTMLDivElement>(null)
+  const [isMobile, setIsMobile] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const mainContentRef = useRef<HTMLDivElement>(null);
 
   // Detect mobile viewport
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768)
-    }
+      setIsMobile(window.innerWidth < 768);
+    };
 
-    checkMobile()
-    window.addEventListener('resize', checkMobile)
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
 
-    return () => window.removeEventListener('resize', checkMobile)
-  }, [])
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Initialize ARIA live region
   useEffect(() => {
-    ensureAriaLiveRegion()
-  }, [])
+    ensureAriaLiveRegion();
+  }, []);
 
   // Announce section changes to screen readers
   useEffect(() => {
@@ -55,80 +58,80 @@ export function SettingsLayout({
       notifications: 'Notification Settings',
       api: 'API & Integrations',
       system: 'System Preferences',
-    }
-    announceToScreenReader(`Navigated to ${sectionNames[activeSection]}`)
-  }, [activeSection])
+    };
+    announceToScreenReader(`Navigated to ${sectionNames[activeSection]}`);
+  }, [activeSection]);
 
   // Keyboard shortcuts
   useSettingsKeyboardShortcuts({
     onSearch: () => {
-      searchInputRef.current?.focus()
+      searchInputRef.current?.focus();
     },
     onEscape: () => {
       if (sidebarOpen) {
-        setSidebarOpen(false)
+        setSidebarOpen(false);
       }
     },
     enabled: true,
-  })
+  });
 
   // Close sidebar when section changes on mobile
   useEffect(() => {
     if (isMobile) {
-      setSidebarOpen(false)
+      setSidebarOpen(false);
     }
-  }, [activeSection, isMobile])
+  }, [activeSection, isMobile]);
 
   const handleSearch = (query: string) => {
-    setSearchQuery(query)
+    setSearchQuery(query);
     // TODO: Implement search filtering logic
     if (query) {
-      announceToScreenReader(`Searching for ${query}`)
+      announceToScreenReader(`Searching for ${query}`);
     }
-  }
+  };
 
   // Handle swipe gestures on mobile
   useEffect(() => {
-    if (!isMobile) return
+    if (!isMobile) return;
 
-    let touchStartX = 0
-    let touchEndX = 0
+    let touchStartX = 0;
+    let touchEndX = 0;
 
     const handleTouchStart = (e: TouchEvent) => {
-      touchStartX = e.changedTouches[0].screenX
-    }
+      touchStartX = e.changedTouches[0].screenX;
+    };
 
     const handleTouchEnd = (e: TouchEvent) => {
-      touchEndX = e.changedTouches[0].screenX
-      handleSwipe()
-    }
+      touchEndX = e.changedTouches[0].screenX;
+      handleSwipe();
+    };
 
     const handleSwipe = () => {
-      const swipeThreshold = 50
-      const diff = touchStartX - touchEndX
+      const swipeThreshold = 50;
+      const diff = touchStartX - touchEndX;
 
       if (Math.abs(diff) > swipeThreshold) {
         if (diff > 0) {
           // Swipe left - close sidebar
-          setSidebarOpen(false)
+          setSidebarOpen(false);
         } else {
           // Swipe right - open sidebar
-          setSidebarOpen(true)
+          setSidebarOpen(true);
         }
       }
-    }
+    };
 
-    const mainContent = mainContentRef.current
+    const mainContent = mainContentRef.current;
     if (mainContent) {
-      mainContent.addEventListener('touchstart', handleTouchStart)
-      mainContent.addEventListener('touchend', handleTouchEnd)
+      mainContent.addEventListener('touchstart', handleTouchStart);
+      mainContent.addEventListener('touchend', handleTouchEnd);
 
       return () => {
-        mainContent.removeEventListener('touchstart', handleTouchStart)
-        mainContent.removeEventListener('touchend', handleTouchEnd)
-      }
+        mainContent.removeEventListener('touchstart', handleTouchStart);
+        mainContent.removeEventListener('touchend', handleTouchEnd);
+      };
     }
-  }, [isMobile])
+  }, [isMobile]);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -164,20 +167,42 @@ export function SettingsLayout({
                 <button
                   onClick={() => setSidebarOpen(!sidebarOpen)}
                   className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 min-h-[44px] min-w-[44px] focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  aria-label={sidebarOpen ? 'Close navigation menu' : 'Open navigation menu'}
+                  aria-label={
+                    sidebarOpen
+                      ? 'Close navigation menu'
+                      : 'Open navigation menu'
+                  }
                   aria-expanded={sidebarOpen}
                   aria-controls="settings-navigation"
                 >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <svg
+                    className="w-6 h-6"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
                     {sidebarOpen ? (
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
                     ) : (
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M4 6h16M4 12h16M4 18h16"
+                      />
                     )}
                   </svg>
                 </button>
               )}
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Settings</h1>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                Settings
+              </h1>
             </div>
             <div className="w-full max-w-md hidden md:block">
               <SettingsSearch onSearch={handleSearch} ref={searchInputRef} />
@@ -192,7 +217,10 @@ export function SettingsLayout({
       </header>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" ref={mainContentRef}>
+      <div
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
+        ref={mainContentRef}
+      >
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Sidebar Navigation */}
           {isMobile ? (
@@ -215,14 +243,27 @@ export function SettingsLayout({
                   >
                     <div className="p-4">
                       <div className="flex items-center justify-between mb-4">
-                        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Navigation</h2>
+                        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                          Navigation
+                        </h2>
                         <button
                           onClick={() => setSidebarOpen(false)}
                           className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 min-h-[44px] min-w-[44px] focus:outline-none focus:ring-2 focus:ring-primary-500"
                           aria-label="Close navigation menu"
                         >
-                          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          <svg
+                            className="w-6 h-6"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M6 18L18 6M6 6l12 12"
+                            />
                           </svg>
                         </button>
                       </div>
@@ -239,7 +280,11 @@ export function SettingsLayout({
             </>
           ) : (
             // Desktop: Always visible sidebar
-            <aside className="w-64 flex-shrink-0" role="complementary" aria-label="Settings sections">
+            <aside
+              className="w-64 flex-shrink-0"
+              role="complementary"
+              aria-label="Settings sections"
+            >
               <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 sticky top-24">
                 <SettingsNavigation
                   activeSection={activeSection}
@@ -278,5 +323,5 @@ export function SettingsLayout({
       {/* Keyboard Shortcuts Help */}
       <KeyboardShortcutsHelp />
     </div>
-  )
+  );
 }

@@ -1,44 +1,44 @@
-'use client'
+'use client';
 
-import { useEffect, useState } from 'react'
-import { toast } from 'react-hot-toast'
+import { useEffect, useState } from 'react';
+import { toast } from 'react-hot-toast';
 
 interface SecurityScore {
-  total: number
+  total: number;
   factors: {
-    passwordStrength: number
-    twoFactorEnabled: number
-    activeSessions: number
-    recentSecurityEvents: number
-    lastPasswordChange: number
-  }
-  level: 'critical' | 'low' | 'medium' | 'good' | 'excellent'
-  recommendations: string[]
-  color: string
+    passwordStrength: number;
+    twoFactorEnabled: number;
+    activeSessions: number;
+    recentSecurityEvents: number;
+    lastPasswordChange: number;
+  };
+  level: 'critical' | 'low' | 'medium' | 'good' | 'excellent';
+  recommendations: string[];
+  color: string;
 }
 
 export default function SecurityScoreDashboard() {
-  const [score, setScore] = useState<SecurityScore | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [score, setScore] = useState<SecurityScore | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchSecurityScore()
-  }, [])
+    fetchSecurityScore();
+  }, []);
 
   const fetchSecurityScore = async () => {
     try {
-      const response = await fetch('/api/security/score')
-      const data = await response.json()
+      const response = await fetch('/api/security/score');
+      const data = await response.json();
 
       if (data.success) {
-        setScore(data.data.score)
+        setScore(data.data.score);
       }
     } catch (error) {
-      toast.error('Failed to load security score')
+      toast.error('Failed to load security score');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   if (loading) {
     return (
@@ -46,7 +46,7 @@ export default function SecurityScoreDashboard() {
         <div className="h-32 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
         <div className="h-64 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
       </div>
-    )
+    );
   }
 
   if (!score) {
@@ -54,21 +54,46 @@ export default function SecurityScoreDashboard() {
       <div className="text-center py-8 text-gray-500">
         Failed to load security score
       </div>
-    )
+    );
   }
 
   const getLevelBadge = () => {
     const badges = {
-      excellent: { text: 'Excellent', icon: '🛡️', bg: 'bg-green-100 dark:bg-green-900/30', text: 'text-green-800 dark:text-green-200' },
-      good: { text: 'Good', icon: '✅', bg: 'bg-blue-100 dark:bg-blue-900/30', text: 'text-blue-800 dark:text-blue-200' },
-      medium: { text: 'Medium', icon: '⚠️', bg: 'bg-amber-100 dark:bg-amber-900/30', text: 'text-amber-800 dark:text-amber-200' },
-      low: { text: 'Low', icon: '⚠️', bg: 'bg-red-100 dark:bg-red-900/30', text: 'text-red-800 dark:text-red-200' },
-      critical: { text: 'Critical', icon: '🚨', bg: 'bg-red-100 dark:bg-red-900/30', text: 'text-red-800 dark:text-red-200' }
-    }
-    return badges[score.level]
-  }
+      excellent: {
+        text: 'Excellent',
+        icon: '🛡️',
+        bg: 'bg-green-100 dark:bg-green-900/30',
+        text: 'text-green-800 dark:text-green-200',
+      },
+      good: {
+        text: 'Good',
+        icon: '✅',
+        bg: 'bg-blue-100 dark:bg-blue-900/30',
+        text: 'text-blue-800 dark:text-blue-200',
+      },
+      medium: {
+        text: 'Medium',
+        icon: '⚠️',
+        bg: 'bg-amber-100 dark:bg-amber-900/30',
+        text: 'text-amber-800 dark:text-amber-200',
+      },
+      low: {
+        text: 'Low',
+        icon: '⚠️',
+        bg: 'bg-red-100 dark:bg-red-900/30',
+        text: 'text-red-800 dark:text-red-200',
+      },
+      critical: {
+        text: 'Critical',
+        icon: '🚨',
+        bg: 'bg-red-100 dark:bg-red-900/30',
+        text: 'text-red-800 dark:text-red-200',
+      },
+    };
+    return badges[score.level];
+  };
 
-  const badge = getLevelBadge()
+  const badge = getLevelBadge();
 
   return (
     <div className="space-y-6">
@@ -105,7 +130,7 @@ export default function SecurityScoreDashboard() {
             className="h-full transition-all duration-500 rounded-full"
             style={{
               width: `${score.total}%`,
-              backgroundColor: score.color
+              backgroundColor: score.color,
             }}
           />
         </div>
@@ -124,19 +149,19 @@ export default function SecurityScoreDashboard() {
               twoFactorEnabled: 25,
               activeSessions: 15,
               recentSecurityEvents: 15,
-              lastPasswordChange: 15
-            }
+              lastPasswordChange: 15,
+            };
 
             const labels: Record<string, string> = {
               passwordStrength: 'Password Strength',
               twoFactorEnabled: 'Two-Factor Authentication',
               activeSessions: 'Active Sessions',
               recentSecurityEvents: 'Security Events',
-              lastPasswordChange: 'Password Age'
-            }
+              lastPasswordChange: 'Password Age',
+            };
 
-            const max = maxValues[key]
-            const percentage = (value / max) * 100
+            const max = maxValues[key];
+            const percentage = (value / max) * 100;
 
             return (
               <div key={key}>
@@ -155,7 +180,7 @@ export default function SecurityScoreDashboard() {
                   />
                 </div>
               </div>
-            )
+            );
           })}
         </div>
       </div>
@@ -169,9 +194,10 @@ export default function SecurityScoreDashboard() {
 
           <div className="space-y-3">
             {score.recommendations.map((recommendation, index) => {
-              const isHighPriority = recommendation.includes('immediately') || 
-                                     recommendation.includes('Enable two-factor')
-              
+              const isHighPriority =
+                recommendation.includes('immediately') ||
+                recommendation.includes('Enable two-factor');
+
               return (
                 <div
                   key={index}
@@ -184,19 +210,21 @@ export default function SecurityScoreDashboard() {
                   <span className="text-lg">
                     {isHighPriority ? '🚨' : '💡'}
                   </span>
-                  <p className={`text-sm ${
-                    isHighPriority
-                      ? 'text-red-800 dark:text-red-200'
-                      : 'text-gray-700 dark:text-gray-300'
-                  }`}>
+                  <p
+                    className={`text-sm ${
+                      isHighPriority
+                        ? 'text-red-800 dark:text-red-200'
+                        : 'text-gray-700 dark:text-gray-300'
+                    }`}
+                  >
                     {recommendation}
                   </p>
                 </div>
-              )
+              );
             })}
           </div>
         </div>
       )}
     </div>
-  )
+  );
 }

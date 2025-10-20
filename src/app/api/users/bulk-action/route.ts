@@ -1,10 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@/services/auth'
-import { prisma } from '@/services/prisma'
-import { API_ERROR_CODES } from '@/utils/constants'
-import { z } from 'zod'
-import { UserRole } from '@prisma/client'
-import { createAuditLog } from '@/utils/audit'
+import { NextRequest, NextResponse } from 'next/server';
+import { auth } from '@/services/auth';
+import { prisma } from '@/services/prisma';
+import { API_ERROR_CODES } from '@/utils/constants';
+import { z } from 'zod';
+import { UserRole } from '@prisma/client';
+import { createAuditLog } from '@/utils/audit';
 
 /**
  * Validation schema for bulk actions
@@ -17,7 +17,7 @@ const bulkActionSchema = z.object({
       role: z.nativeEnum(UserRole).optional(),
     })
     .optional(),
-})
+});
 
 /**
  * POST /api/users/bulk-action
@@ -26,7 +26,7 @@ const bulkActionSchema = z.object({
 export async function POST(request: NextRequest) {
   try {
     // Check authentication
-    const session = await auth()
+    const session = await auth();
     if (!session?.user) {
       return NextResponse.json(
         {
@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
           },
         },
         { status: 401 }
-      )
+      );
     }
 
     // Check permissions - only Admin can manage users
@@ -51,12 +51,12 @@ export async function POST(request: NextRequest) {
           },
         },
         { status: 403 }
-      )
+      );
     }
 
     // Parse and validate request body
-    const body = await request.json()
-    const validation = bulkActionSchema.safeParse(body)
+    const body = await request.json();
+    const validation = bulkActionSchema.safeParse(body);
 
     if (!validation.success) {
       return NextResponse.json(
@@ -69,13 +69,13 @@ export async function POST(request: NextRequest) {
           },
         },
         { status: 400 }
-      )
+      );
     }
 
-    const { action, userIds, data } = validation.data
+    const { action, userIds, data } = validation.data;
 
     // Filter out current user from operations
-    const validUserIds = userIds.filter((id) => id !== session.user.id)
+    const validUserIds = userIds.filter((id) => id !== session.user.id);
 
     if (validUserIds.length === 0) {
       return NextResponse.json(
@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
           },
         },
         { status: 400 }
-      )
+      );
     }
 
     // Verify all users exist
@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
         role: true,
         isActive: true,
       },
-    })
+    });
 
     if (existingUsers.length !== validUserIds.length) {
       return NextResponse.json(
@@ -114,12 +114,15 @@ export async function POST(request: NextRequest) {
           },
         },
         { status: 404 }
-      )
+      );
     }
 
-    let result: any
-    const ipAddress = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || undefined
-    const userAgent = request.headers.get('user-agent') || undefined
+    let result: any;
+    const ipAddress =
+      request.headers.get('x-forwarded-for') ||
+      request.headers.get('x-real-ip') ||
+      undefined;
+    const userAgent = request.headers.get('user-agent') || undefined;
 
     switch (action) {
       case 'activate':
@@ -131,7 +134,7 @@ export async function POST(request: NextRequest) {
           data: {
             isActive: true,
           },
-        })
+        });
 
         // Create audit logs
         for (const user of existingUsers) {
@@ -149,9 +152,9 @@ export async function POST(request: NextRequest) {
               userAgent,
               bulkAction: 'activate',
             },
-          })
+          });
         }
-        break
+        break;
 
       case 'deactivate':
         // Deactivate users
@@ -162,14 +165,14 @@ export async function POST(request: NextRequest) {
           data: {
             isActive: false,
           },
-        })
+        });
 
         // Terminate all sessions for deactivated users
         await prisma.session.deleteMany({
           where: {
             userId: { in: validUserIds },
           },
-        })
+        });
 
         // Create audit logs
         for (const user of existingUsers) {
@@ -187,9 +190,9 @@ export async function POST(request: NextRequest) {
               userAgent,
               bulkAction: 'deactivate',
             },
-          })
+          });
         }
-        break
+        break;
 
       case 'changeRole':
         if (!data?.role) {
@@ -202,7 +205,7 @@ export async function POST(request: NextRequest) {
               },
             },
             { status: 400 }
-          )
+          );
         }
 
         // Change user roles
@@ -213,7 +216,7 @@ export async function POST(request: NextRequest) {
           data: {
             role: data.role,
           },
-        })
+        });
 
         // Create audit logs
         for (const user of existingUsers) {
@@ -231,9 +234,9 @@ export async function POST(request: NextRequest) {
               userAgent,
               bulkAction: 'changeRole',
             },
-          })
+          });
         }
-        break
+        break;
 
       case 'delete':
         // Delete users
@@ -241,7 +244,7 @@ export async function POST(request: NextRequest) {
           where: {
             id: { in: validUserIds },
           },
-        })
+        });
 
         // Create audit logs
         for (const user of existingUsers) {
@@ -262,9 +265,9 @@ export async function POST(request: NextRequest) {
               userAgent,
               bulkAction: 'delete',
             },
-          })
+          });
         }
-        break
+        break;
     }
 
     return NextResponse.json({
@@ -275,9 +278,9 @@ export async function POST(request: NextRequest) {
         userIds: validUserIds,
       },
       message: `Successfully ${action}d ${validUserIds.length} user(s)`,
-    })
+    });
   } catch (error) {
-    console.error('Error performing bulk action:', error)
+    console.error('Error performing bulk action:', error);
     return NextResponse.json(
       {
         success: false,
@@ -287,6 +290,6 @@ export async function POST(request: NextRequest) {
         },
       },
       { status: 500 }
-    )
+    );
   }
 }

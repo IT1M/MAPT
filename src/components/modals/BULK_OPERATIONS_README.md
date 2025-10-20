@@ -13,6 +13,7 @@ The bulk operations system allows users to perform actions on multiple inventory
 Enhanced bulk edit modal that supports multiple fields and modes.
 
 **Features:**
+
 - Field selection (destination, category, notes)
 - Notes mode (replace or append)
 - Preview of items to be updated
@@ -21,18 +22,19 @@ Enhanced bulk edit modal that supports multiple fields and modes.
 - Error reporting
 
 **Usage:**
-```tsx
-import { BulkEditModal } from '@/components/modals'
 
-const [bulkEditItems, setBulkEditItems] = useState<InventoryItemWithUser[]>([])
-const [showBulkEdit, setShowBulkEdit] = useState(false)
+```tsx
+import { BulkEditModal } from '@/components/modals';
+
+const [bulkEditItems, setBulkEditItems] = useState<InventoryItemWithUser[]>([]);
+const [showBulkEdit, setShowBulkEdit] = useState(false);
 
 // Open modal with selected items
 const handleBulkEdit = () => {
-  const selectedItems = items.filter(item => selectedIds.has(item.id))
-  setBulkEditItems(selectedItems)
-  setShowBulkEdit(true)
-}
+  const selectedItems = items.filter((item) => selectedIds.has(item.id));
+  setBulkEditItems(selectedItems);
+  setShowBulkEdit(true);
+};
 
 // Render modal
 <BulkEditModal
@@ -40,11 +42,11 @@ const handleBulkEdit = () => {
   isOpen={showBulkEdit}
   onClose={() => setShowBulkEdit(false)}
   onSuccess={() => {
-    refresh() // Refresh data
-    setSelectedIds(new Set()) // Clear selection
-    toast.success('Items updated successfully')
+    refresh(); // Refresh data
+    setSelectedIds(new Set()); // Clear selection
+    toast.success('Items updated successfully');
   }}
-/>
+/>;
 ```
 
 ### 2. BulkDeleteModal
@@ -52,6 +54,7 @@ const handleBulkEdit = () => {
 Enhanced bulk delete modal with "DELETE" typing confirmation.
 
 **Features:**
+
 - Requires typing "DELETE" to confirm
 - Shows item list with details
 - Displays total quantity
@@ -60,18 +63,21 @@ Enhanced bulk delete modal with "DELETE" typing confirmation.
 - Error reporting
 
 **Usage:**
-```tsx
-import { BulkDeleteModal } from '@/components/modals'
 
-const [bulkDeleteItems, setBulkDeleteItems] = useState<InventoryItemWithUser[]>([])
-const [showBulkDelete, setShowBulkDelete] = useState(false)
+```tsx
+import { BulkDeleteModal } from '@/components/modals';
+
+const [bulkDeleteItems, setBulkDeleteItems] = useState<InventoryItemWithUser[]>(
+  []
+);
+const [showBulkDelete, setShowBulkDelete] = useState(false);
 
 // Open modal with selected items
 const handleBulkDelete = () => {
-  const selectedItems = items.filter(item => selectedIds.has(item.id))
-  setBulkDeleteItems(selectedItems)
-  setShowBulkDelete(true)
-}
+  const selectedItems = items.filter((item) => selectedIds.has(item.id));
+  setBulkDeleteItems(selectedItems);
+  setShowBulkDelete(true);
+};
 
 // Render modal
 <BulkDeleteModal
@@ -79,11 +85,11 @@ const handleBulkDelete = () => {
   isOpen={showBulkDelete}
   onClose={() => setShowBulkDelete(false)}
   onSuccess={() => {
-    refresh() // Refresh data
-    setSelectedIds(new Set()) // Clear selection
-    toast.success('Items deleted successfully')
+    refresh(); // Refresh data
+    setSelectedIds(new Set()); // Clear selection
+    toast.success('Items deleted successfully');
   }}
-/>
+/>;
 ```
 
 ### 3. BulkActionsToolbar
@@ -91,6 +97,7 @@ const handleBulkDelete = () => {
 Toolbar that appears when items are selected, providing quick access to bulk actions.
 
 **Features:**
+
 - Shows selected count
 - Export, Edit, and Delete buttons
 - Responsive design (dropdown on mobile)
@@ -98,8 +105,9 @@ Toolbar that appears when items are selected, providing quick access to bulk act
 - Clear selection button
 
 **Usage:**
+
 ```tsx
-import { BulkActionsToolbar } from '@/components/tables'
+import { BulkActionsToolbar } from '@/components/tables';
 
 <BulkActionsToolbar
   selectedCount={selectedIds.size}
@@ -109,7 +117,7 @@ import { BulkActionsToolbar } from '@/components/tables'
   onBulkDelete={handleBulkDelete}
   onClearSelection={() => setSelectedIds(new Set())}
   userPermissions={session?.user?.permissions || []}
-/>
+/>;
 ```
 
 ## API Endpoints
@@ -119,6 +127,7 @@ import { BulkActionsToolbar } from '@/components/tables'
 Bulk edit inventory items with support for multiple fields and modes.
 
 **Request Body:**
+
 ```json
 {
   "ids": ["item-id-1", "item-id-2"],
@@ -132,6 +141,7 @@ Bulk edit inventory items with support for multiple fields and modes.
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -146,6 +156,7 @@ Bulk edit inventory items with support for multiple fields and modes.
 ```
 
 **Features:**
+
 - Validates at least one field is provided
 - Supports notes append mode
 - Role-based filtering (DATA_ENTRY can only edit their own items)
@@ -158,6 +169,7 @@ Bulk edit inventory items with support for multiple fields and modes.
 Bulk delete inventory items (soft delete).
 
 **Request Body:**
+
 ```json
 {
   "ids": ["item-id-1", "item-id-2"]
@@ -165,6 +177,7 @@ Bulk delete inventory items (soft delete).
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -179,6 +192,7 @@ Bulk delete inventory items (soft delete).
 ```
 
 **Features:**
+
 - Requires SUPERVISOR or ADMIN role
 - Soft delete (sets deletedAt timestamp)
 - Individual item processing for proper error handling
@@ -188,11 +202,13 @@ Bulk delete inventory items (soft delete).
 ## Permissions
 
 ### Bulk Edit
+
 - Requires `inventory:write` permission
 - DATA_ENTRY users can only edit items they created
 - SUPERVISOR, MANAGER, and ADMIN can edit all items
 
 ### Bulk Delete
+
 - Requires `inventory:delete` permission
 - Only SUPERVISOR and ADMIN roles can delete
 - DATA_ENTRY and MANAGER cannot delete
@@ -209,6 +225,7 @@ All bulk operations are fully audited:
 - **Individual Logs**: One audit log per item
 
 Audit logs can be viewed in:
+
 - Audit log page (`/audit`)
 - Item-specific audit history modal
 - System-wide audit reports
@@ -225,6 +242,7 @@ The system provides comprehensive error handling:
 ## Best Practices
 
 ### 1. Always Refresh After Success
+
 ```tsx
 onSuccess={() => {
   refresh() // Refresh data
@@ -234,88 +252,97 @@ onSuccess={() => {
 ```
 
 ### 2. Limit Batch Size
+
 The API enforces a maximum of 100 items per operation. For larger datasets:
+
 - Process in batches
 - Show progress indicator
 - Allow cancellation
 
 ### 3. Provide Clear Feedback
+
 ```tsx
 // Before operation
-toast.loading('Updating items...')
+toast.loading('Updating items...');
 
 // After success
-toast.success(`Updated ${count} items`)
+toast.success(`Updated ${count} items`);
 
 // After partial failure
-toast.warning(`Updated ${success} items, ${failed} failed`)
+toast.warning(`Updated ${success} items, ${failed} failed`);
 
 // After complete failure
-toast.error('Failed to update items')
+toast.error('Failed to update items');
 ```
 
 ### 4. Handle Permissions Gracefully
-```tsx
-const canDelete = session?.user?.permissions?.includes('inventory:delete')
-const canBulkDelete = canDelete && ['SUPERVISOR', 'ADMIN'].includes(session?.user?.role)
 
-{canBulkDelete && (
-  <Button onClick={handleBulkDelete}>Delete</Button>
-)}
+```tsx
+const canDelete = session?.user?.permissions?.includes('inventory:delete');
+const canBulkDelete =
+  canDelete && ['SUPERVISOR', 'ADMIN'].includes(session?.user?.role);
+
+{
+  canBulkDelete && <Button onClick={handleBulkDelete}>Delete</Button>;
+}
 ```
 
 ## Complete Integration Example
 
 ```tsx
-'use client'
+'use client';
 
-import React, { useState } from 'react'
-import { useSession } from 'next-auth/react'
-import { BulkActionsToolbar } from '@/components/tables'
-import { BulkEditModal, BulkDeleteModal } from '@/components/modals'
-import { InventoryTable } from '@/components/tables'
-import { toast } from '@/utils/toast'
+import React, { useState } from 'react';
+import { useSession } from 'next-auth/react';
+import { BulkActionsToolbar } from '@/components/tables';
+import { BulkEditModal, BulkDeleteModal } from '@/components/modals';
+import { InventoryTable } from '@/components/tables';
+import { toast } from '@/utils/toast';
 
 export default function DataLogPage() {
-  const { data: session } = useSession()
-  const [items, setItems] = useState<InventoryItemWithUser[]>([])
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
-  
+  const { data: session } = useSession();
+  const [items, setItems] = useState<InventoryItemWithUser[]>([]);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
   // Bulk edit state
-  const [bulkEditItems, setBulkEditItems] = useState<InventoryItemWithUser[]>([])
-  const [showBulkEdit, setShowBulkEdit] = useState(false)
-  
+  const [bulkEditItems, setBulkEditItems] = useState<InventoryItemWithUser[]>(
+    []
+  );
+  const [showBulkEdit, setShowBulkEdit] = useState(false);
+
   // Bulk delete state
-  const [bulkDeleteItems, setBulkDeleteItems] = useState<InventoryItemWithUser[]>([])
-  const [showBulkDelete, setShowBulkDelete] = useState(false)
-  
+  const [bulkDeleteItems, setBulkDeleteItems] = useState<
+    InventoryItemWithUser[]
+  >([]);
+  const [showBulkDelete, setShowBulkDelete] = useState(false);
+
   const handleBulkEdit = () => {
-    const selectedItems = items.filter(item => selectedIds.has(item.id))
+    const selectedItems = items.filter((item) => selectedIds.has(item.id));
     if (selectedItems.length === 0) {
-      toast.error('No items selected')
-      return
+      toast.error('No items selected');
+      return;
     }
-    setBulkEditItems(selectedItems)
-    setShowBulkEdit(true)
-  }
-  
+    setBulkEditItems(selectedItems);
+    setShowBulkEdit(true);
+  };
+
   const handleBulkDelete = () => {
-    const selectedItems = items.filter(item => selectedIds.has(item.id))
+    const selectedItems = items.filter((item) => selectedIds.has(item.id));
     if (selectedItems.length === 0) {
-      toast.error('No items selected')
-      return
+      toast.error('No items selected');
+      return;
     }
-    setBulkDeleteItems(selectedItems)
-    setShowBulkDelete(true)
-  }
-  
+    setBulkDeleteItems(selectedItems);
+    setShowBulkDelete(true);
+  };
+
   const handleBulkSuccess = () => {
     // Refresh data
-    fetchData()
+    fetchData();
     // Clear selection
-    setSelectedIds(new Set())
-  }
-  
+    setSelectedIds(new Set());
+  };
+
   return (
     <div>
       {/* Bulk Actions Toolbar */}
@@ -323,14 +350,18 @@ export default function DataLogPage() {
         <BulkActionsToolbar
           selectedCount={selectedIds.size}
           onBulkEdit={handleBulkEdit}
-          onBulkEditDestination={() => {/* ... */}}
-          onBulkExport={() => {/* ... */}}
+          onBulkEditDestination={() => {
+            /* ... */
+          }}
+          onBulkExport={() => {
+            /* ... */
+          }}
           onBulkDelete={handleBulkDelete}
           onClearSelection={() => setSelectedIds(new Set())}
           userPermissions={session?.user?.permissions || []}
         />
       )}
-      
+
       {/* Inventory Table */}
       <InventoryTable
         items={items}
@@ -338,7 +369,7 @@ export default function DataLogPage() {
         onSelectionChange={setSelectedIds}
         userPermissions={session?.user?.permissions || []}
       />
-      
+
       {/* Bulk Edit Modal */}
       <BulkEditModal
         items={bulkEditItems}
@@ -346,7 +377,7 @@ export default function DataLogPage() {
         onClose={() => setShowBulkEdit(false)}
         onSuccess={handleBulkSuccess}
       />
-      
+
       {/* Bulk Delete Modal */}
       <BulkDeleteModal
         items={bulkDeleteItems}
@@ -355,7 +386,7 @@ export default function DataLogPage() {
         onSuccess={handleBulkSuccess}
       />
     </div>
-  )
+  );
 }
 ```
 
@@ -407,15 +438,19 @@ curl -X POST http://localhost:3000/api/inventory/bulk-delete \
 ## Troubleshooting
 
 ### Issue: "You can only update items you created"
+
 **Solution**: DATA_ENTRY users can only edit their own items. Use a SUPERVISOR or ADMIN account, or filter selection to only include items created by the current user.
 
 ### Issue: "Only supervisors and administrators can delete"
+
 **Solution**: Bulk delete requires SUPERVISOR or ADMIN role. DATA_ENTRY and MANAGER users cannot delete items.
 
 ### Issue: Progress bar not updating
+
 **Solution**: The current implementation shows progress at 0% and 100%. For real-time progress, implement server-sent events or polling.
 
 ### Issue: Audit logs not created
+
 **Solution**: Check that the audit service is properly configured and the database has the audit_logs table.
 
 ## Future Enhancements

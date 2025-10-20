@@ -125,6 +125,7 @@ enum HelpArticleStatus {
 ### Accessing the Help Center
 
 Users can access the help center at `/help`. The page displays:
+
 - Search bar
 - Category navigation
 - Article list
@@ -132,6 +133,7 @@ Users can access the help center at `/help`. The page displays:
 ### Viewing an Article
 
 Navigate to `/help/[slug]` to view a specific article. Features include:
+
 - Markdown-rendered content
 - Related articles
 - Feedback buttons
@@ -140,6 +142,7 @@ Navigate to `/help/[slug]` to view a specific article. Features include:
 ### Contacting Support
 
 Users can submit support requests at `/help/support`. The form includes:
+
 - Category selection
 - Priority level
 - Subject and description
@@ -148,6 +151,7 @@ Users can submit support requests at `/help/support`. The form includes:
 ### Admin Management
 
 Admins can manage articles at `/admin/help`. Features include:
+
 - Create new articles
 - Edit existing articles
 - Delete articles
@@ -170,6 +174,7 @@ The search system includes:
 ## Markdown Support
 
 Articles support full Markdown syntax including:
+
 - Headers
 - Lists (ordered and unordered)
 - Links
@@ -182,6 +187,7 @@ Articles support full Markdown syntax including:
 ## Internationalization
 
 The help center is fully internationalized with support for:
+
 - English (en)
 - Arabic (ar)
 

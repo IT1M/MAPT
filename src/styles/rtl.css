@@ -16,13 +16,13 @@ body.ltr {
 
 /* Ensure numbers and dates remain LTR in RTL context */
 .rtl .ltr-content,
-.rtl [data-ltr="true"],
+.rtl [data-ltr='true'],
 .rtl .number,
 .rtl .date,
 .rtl .time,
-.rtl input[type="number"],
-.rtl input[type="date"],
-.rtl input[type="time"] {
+.rtl input[type='number'],
+.rtl input[type='date'],
+.rtl input[type='time'] {
   direction: ltr;
   text-align: left;
   unicode-bidi: embed;
@@ -63,8 +63,14 @@ body.ltr {
 }
 
 /* RTL-aware padding */
-.rtl .pl-0 { padding-left: 0; padding-right: 0; }
-.rtl .pr-0 { padding-right: 0; padding-left: 0; }
+.rtl .pl-0 {
+  padding-left: 0;
+  padding-right: 0;
+}
+.rtl .pr-0 {
+  padding-right: 0;
+  padding-left: 0;
+}
 
 /* RTL-aware borders */
 .rtl .border-l {
@@ -125,13 +131,13 @@ body.ltr {
 
 /* RTL-aware transforms for icons */
 .rtl .flip-icon,
-.rtl [data-flip-rtl="true"] {
+.rtl [data-flip-rtl='true'] {
   transform: scaleX(-1);
 }
 
 /* Prevent flipping for certain icons */
 .rtl .no-flip,
-.rtl [data-flip-rtl="false"] {
+.rtl [data-flip-rtl='false'] {
   transform: none;
 }
 
@@ -152,16 +158,16 @@ body.ltr {
   text-align: right;
 }
 
-.rtl input[type="email"],
-.rtl input[type="url"],
-.rtl input[type="tel"] {
+.rtl input[type='email'],
+.rtl input[type='url'],
+.rtl input[type='tel'] {
   direction: ltr;
   text-align: left;
 }
 
 /* RTL-aware checkboxes and radio buttons */
-.rtl input[type="checkbox"],
-.rtl input[type="radio"] {
+.rtl input[type='checkbox'],
+.rtl input[type='radio'] {
   margin-right: 0;
   margin-left: 0.5rem;
 }
@@ -219,7 +225,7 @@ body.ltr {
 .rtl .breadcrumb-item + .breadcrumb-item::before {
   padding-right: 0.5rem;
   padding-left: 0.5rem;
-  content: "/";
+  content: '/';
 }
 
 /* RTL-aware pagination */

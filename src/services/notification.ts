@@ -1,15 +1,15 @@
-import { prisma } from './prisma'
-import { NotificationType, NotificationPriority } from '@prisma/client'
+import { prisma } from './prisma';
+import { NotificationType, NotificationPriority } from '@prisma/client';
 
 interface CreateNotificationOptions {
-  userId: string
-  type: NotificationType
-  title: string
-  message: string
-  link?: string
-  priority?: NotificationPriority
-  metadata?: any
-  expiresAt?: Date
+  userId: string;
+  type: NotificationType;
+  title: string;
+  message: string;
+  link?: string;
+  priority?: NotificationPriority;
+  metadata?: any;
+  expiresAt?: Date;
 }
 
 /**
@@ -27,14 +27,14 @@ export async function createNotification(options: CreateNotificationOptions) {
         link: options.link,
         priority: options.priority || 'NORMAL',
         metadata: options.metadata,
-        expiresAt: options.expiresAt
-      }
-    })
+        expiresAt: options.expiresAt,
+      },
+    });
 
-    return notification
+    return notification;
   } catch (error) {
-    console.error('Error creating notification:', error)
-    throw error
+    console.error('Error creating notification:', error);
+    throw error;
   }
 }
 
@@ -56,14 +56,14 @@ export async function createBulkNotifications(
         link: options.link,
         priority: options.priority || 'NORMAL',
         metadata: options.metadata,
-        expiresAt: options.expiresAt
-      }))
-    })
+        expiresAt: options.expiresAt,
+      })),
+    });
 
-    return notifications
+    return notifications;
   } catch (error) {
-    console.error('Error creating bulk notifications:', error)
-    throw error
+    console.error('Error creating bulk notifications:', error);
+    throw error;
   }
 }
 
@@ -72,13 +72,16 @@ export async function createBulkNotifications(
  */
 
 // System notifications
-export async function notifySystemMaintenance(userIds: string[], scheduledTime: Date) {
+export async function notifySystemMaintenance(
+  userIds: string[],
+  scheduledTime: Date
+) {
   return createBulkNotifications(userIds, {
     type: 'SYSTEM',
     title: 'Scheduled Maintenance',
     message: `System maintenance is scheduled for ${scheduledTime.toLocaleString()}. The system will be unavailable during this time.`,
-    priority: 'HIGH'
-  })
+    priority: 'HIGH',
+  });
 }
 
 export async function notifySystemUpdate(userIds: string[], version: string) {
@@ -87,31 +90,39 @@ export async function notifySystemUpdate(userIds: string[], version: string) {
     title: 'System Update',
     message: `The system has been updated to version ${version}. Check out the new features!`,
     link: '/help/whats-new',
-    priority: 'NORMAL'
-  })
+    priority: 'NORMAL',
+  });
 }
 
 // Activity notifications
-export async function notifyItemAdded(userId: string, itemName: string, itemId: string) {
+export async function notifyItemAdded(
+  userId: string,
+  itemName: string,
+  itemId: string
+) {
   return createNotification({
     userId,
     type: 'ACTIVITY',
     title: 'Item Added',
     message: `Successfully added "${itemName}" to inventory`,
     link: `/inventory/${itemId}`,
-    priority: 'LOW'
-  })
+    priority: 'LOW',
+  });
 }
 
-export async function notifyItemUpdated(userId: string, itemName: string, itemId: string) {
+export async function notifyItemUpdated(
+  userId: string,
+  itemName: string,
+  itemId: string
+) {
   return createNotification({
     userId,
     type: 'ACTIVITY',
     title: 'Item Updated',
     message: `"${itemName}" has been updated`,
     link: `/inventory/${itemId}`,
-    priority: 'LOW'
-  })
+    priority: 'LOW',
+  });
 }
 
 export async function notifyBulkOperationComplete(
@@ -126,8 +137,8 @@ export async function notifyBulkOperationComplete(
     title: 'Bulk Operation Complete',
     message: `${operation}: ${successCount} successful, ${failedCount} failed`,
     priority: failedCount > 0 ? 'NORMAL' : 'LOW',
-    metadata: { operation, successCount, failedCount }
-  })
+    metadata: { operation, successCount, failedCount },
+  });
 }
 
 // Approval notifications
@@ -141,8 +152,8 @@ export async function notifyApprovalRequired(
     title: 'Approval Required',
     message: `${requestedBy} has requested approval for "${itemName}"`,
     link: '/approvals',
-    priority: 'HIGH'
-  })
+    priority: 'HIGH',
+  });
 }
 
 export async function notifyApprovalDecision(
@@ -156,8 +167,8 @@ export async function notifyApprovalDecision(
     type: 'APPROVAL',
     title: approved ? 'Request Approved' : 'Request Rejected',
     message: `${approver} has ${approved ? 'approved' : 'rejected'} your request for "${itemName}"`,
-    priority: 'NORMAL'
-  })
+    priority: 'NORMAL',
+  });
 }
 
 // Alert notifications
@@ -172,19 +183,23 @@ export async function notifyHighRejectRate(
     message: `Reject rate has reached ${rejectRate.toFixed(1)}%${category ? ` in ${category}` : ''}. Immediate attention required.`,
     link: '/analytics',
     priority: 'URGENT',
-    metadata: { rejectRate, category }
-  })
+    metadata: { rejectRate, category },
+  });
 }
 
-export async function notifyLowStock(managerIds: string[], itemName: string, quantity: number) {
+export async function notifyLowStock(
+  managerIds: string[],
+  itemName: string,
+  quantity: number
+) {
   return createBulkNotifications(managerIds, {
     type: 'ALERT',
     title: 'Low Stock Alert',
     message: `"${itemName}" is running low (${quantity} units remaining)`,
     link: '/inventory',
     priority: 'HIGH',
-    metadata: { itemName, quantity }
-  })
+    metadata: { itemName, quantity },
+  });
 }
 
 export async function notifyBackupFailed(adminIds: string[], error: string) {
@@ -194,31 +209,39 @@ export async function notifyBackupFailed(adminIds: string[], error: string) {
     message: `Scheduled backup failed: ${error}`,
     link: '/backup',
     priority: 'URGENT',
-    metadata: { error }
-  })
+    metadata: { error },
+  });
 }
 
-export async function notifyBackupComplete(adminIds: string[], filename: string, size: number) {
+export async function notifyBackupComplete(
+  adminIds: string[],
+  filename: string,
+  size: number
+) {
   return createBulkNotifications(adminIds, {
     type: 'SYSTEM',
     title: 'Backup Complete',
     message: `Database backup completed successfully (${(size / 1024 / 1024).toFixed(2)} MB)`,
     link: '/backup',
     priority: 'LOW',
-    metadata: { filename, size }
-  })
+    metadata: { filename, size },
+  });
 }
 
 // Report notifications
-export async function notifyReportReady(userId: string, reportTitle: string, reportId: string) {
+export async function notifyReportReady(
+  userId: string,
+  reportTitle: string,
+  reportId: string
+) {
   return createNotification({
     userId,
     type: 'ACTIVITY',
     title: 'Report Ready',
     message: `Your report "${reportTitle}" is ready for download`,
     link: `/reports/${reportId}`,
-    priority: 'NORMAL'
-  })
+    priority: 'NORMAL',
+  });
 }
 
 // Security notifications
@@ -233,8 +256,8 @@ export async function notifyNewDeviceLogin(
     message: `Login detected from ${deviceInfo.deviceType} (${deviceInfo.browser}) in ${deviceInfo.location}`,
     link: '/settings/security',
     priority: 'HIGH',
-    metadata: deviceInfo
-  })
+    metadata: deviceInfo,
+  });
 }
 
 export async function notifyPasswordChanged(userId: string) {
@@ -242,10 +265,11 @@ export async function notifyPasswordChanged(userId: string) {
     userId,
     type: 'ALERT',
     title: 'Password Changed',
-    message: 'Your password has been changed successfully. If this wasn\'t you, please contact support immediately.',
+    message:
+      "Your password has been changed successfully. If this wasn't you, please contact support immediately.",
     link: '/settings/security',
-    priority: 'HIGH'
-  })
+    priority: 'HIGH',
+  });
 }
 
 export async function notifyAccountLocked(userId: string, unlockTime: Date) {
@@ -254,8 +278,8 @@ export async function notifyAccountLocked(userId: string, unlockTime: Date) {
     type: 'ALERT',
     title: 'Account Locked',
     message: `Your account has been locked due to multiple failed login attempts. It will be unlocked at ${unlockTime.toLocaleString()}.`,
-    priority: 'URGENT'
-  })
+    priority: 'URGENT',
+  });
 }
 
 /**
@@ -266,16 +290,16 @@ export async function cleanupExpiredNotifications() {
     const result = await prisma.notification.deleteMany({
       where: {
         expiresAt: {
-          lt: new Date()
-        }
-      }
-    })
+          lt: new Date(),
+        },
+      },
+    });
 
-    console.log(`Cleaned up ${result.count} expired notifications`)
-    return result.count
+    console.log(`Cleaned up ${result.count} expired notifications`);
+    return result.count;
   } catch (error) {
-    console.error('Error cleaning up expired notifications:', error)
-    throw error
+    console.error('Error cleaning up expired notifications:', error);
+    throw error;
   }
 }
 
@@ -284,22 +308,22 @@ export async function cleanupExpiredNotifications() {
  */
 export async function cleanupOldNotifications() {
   try {
-    const thirtyDaysAgo = new Date()
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
     const result = await prisma.notification.deleteMany({
       where: {
         read: true,
         readAt: {
-          lt: thirtyDaysAgo
-        }
-      }
-    })
+          lt: thirtyDaysAgo,
+        },
+      },
+    });
 
-    console.log(`Cleaned up ${result.count} old notifications`)
-    return result.count
+    console.log(`Cleaned up ${result.count} old notifications`);
+    return result.count;
   } catch (error) {
-    console.error('Error cleaning up old notifications:', error)
-    throw error
+    console.error('Error cleaning up old notifications:', error);
+    throw error;
   }
 }

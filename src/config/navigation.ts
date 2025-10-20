@@ -1,4 +1,4 @@
-import { UserRole } from '@prisma/client'
+import { UserRole } from '@prisma/client';
 import {
   LayoutDashboard,
   ClipboardEdit,
@@ -9,36 +9,36 @@ import {
   Shield,
   Settings,
   LucideIcon,
-} from 'lucide-react'
+} from 'lucide-react';
 
 /**
  * Badge variant types for navigation items
  */
-export type BadgeVariant = 'new' | 'info' | 'warning' | 'error'
+export type BadgeVariant = 'new' | 'info' | 'warning' | 'error';
 
 /**
  * Badge configuration for navigation items
  */
 export interface NavigationBadge {
-  text: string
-  variant: BadgeVariant
-  count?: number
+  text: string;
+  variant: BadgeVariant;
+  count?: number;
 }
 
 /**
  * Navigation item configuration
  */
 export interface NavigationItem {
-  id: string
+  id: string;
   label: {
-    en: string
-    ar: string
-  }
-  icon: LucideIcon
-  href: string
-  roles: UserRole[]
-  badge?: NavigationBadge
-  children?: NavigationItem[] // For nested menus (future)
+    en: string;
+    ar: string;
+  };
+  icon: LucideIcon;
+  href: string;
+  roles: UserRole[];
+  badge?: NavigationBadge;
+  children?: NavigationItem[]; // For nested menus (future)
 }
 
 /**
@@ -136,7 +136,7 @@ export const navigationConfig: NavigationItem[] = [
     href: '/settings',
     roles: ['ADMIN', 'MANAGER', 'SUPERVISOR', 'DATA_ENTRY', 'AUDITOR'],
   },
-]
+];
 
 /**
  * Filter navigation items based on user role
@@ -146,9 +146,9 @@ export const navigationConfig: NavigationItem[] = [
 export function filterNavigationByRole(
   userRole: UserRole | undefined
 ): NavigationItem[] {
-  if (!userRole) return []
-  
-  return navigationConfig.filter((item) => item.roles.includes(userRole))
+  if (!userRole) return [];
+
+  return navigationConfig.filter((item) => item.roles.includes(userRole));
 }
 
 /**
@@ -156,10 +156,8 @@ export function filterNavigationByRole(
  * @param id - The ID of the navigation item
  * @returns The navigation item or undefined if not found
  */
-export function getNavigationItemById(
-  id: string
-): NavigationItem | undefined {
-  return navigationConfig.find((item) => item.id === id)
+export function getNavigationItemById(id: string): NavigationItem | undefined {
+  return navigationConfig.find((item) => item.id === id);
 }
 
 /**
@@ -171,8 +169,8 @@ export function getNavigationItemByHref(
   href: string
 ): NavigationItem | undefined {
   // Remove locale prefix from href for matching
-  const pathWithoutLocale = href.replace(/^\/(en|ar)/, '')
-  return navigationConfig.find((item) => item.href === pathWithoutLocale)
+  const pathWithoutLocale = href.replace(/^\/(en|ar)/, '');
+  return navigationConfig.find((item) => item.href === pathWithoutLocale);
 }
 
 /**
@@ -185,12 +183,12 @@ export function hasAccessToNavigationItem(
   itemId: string,
   userRole: UserRole | undefined
 ): boolean {
-  if (!userRole) return false
-  
-  const item = getNavigationItemById(itemId)
-  if (!item) return false
-  
-  return item.roles.includes(userRole)
+  if (!userRole) return false;
+
+  const item = getNavigationItemById(itemId);
+  if (!item) return false;
+
+  return item.roles.includes(userRole);
 }
 
 /**
@@ -203,5 +201,5 @@ export function getNavigationLabel(
   item: NavigationItem,
   locale: 'en' | 'ar'
 ): string {
-  return item.label[locale]
+  return item.label[locale];
 }

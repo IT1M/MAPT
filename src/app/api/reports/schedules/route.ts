@@ -1,36 +1,38 @@
-import { NextRequest } from 'next/server'
-import { reportService, ReportConfig } from '@/services/report'
-import { prisma } from '@/services/prisma'
-import { checkAuth } from '@/middleware/auth'
-import { 
+import { NextRequest } from 'next/server';
+import { reportService, ReportConfig } from '@/services/report';
+import { prisma } from '@/services/prisma';
+import { checkAuth } from '@/middleware/auth';
+import {
   successResponse,
   handleApiError,
-  insufficientPermissionsError 
-} from '@/utils/api-response'
-import { z } from 'zod'
-import { ReportType, ReportFormat, ScheduleFrequency } from '@prisma/client'
+  insufficientPermissionsError,
+} from '@/utils/api-response';
+import { z } from 'zod';
+import { ReportType, ReportFormat, ScheduleFrequency } from '@prisma/client';
 
 /**
  * GET /api/reports/schedules
- * 
+ *
  * List all scheduled reports
- * 
+ *
  * Requirements: 26
  */
 export async function GET(request: NextRequest) {
   try {
     // Check authentication
-    const authResult = await checkAuth()
+    const authResult = await checkAuth();
     if ('error' in authResult) {
-      return authResult.error
+      return authResult.error;
     }
 
-    const { context } = authResult
+    const { context } = authResult;
 
     // Check permissions (ADMIN, MANAGER can view schedules)
-    const allowedRoles = ['ADMIN', 'MANAGER']
+    const allowedRoles = ['ADMIN', 'MANAGER'];
     if (!allowedRoles.includes(context.user.role)) {
-      return insufficientPermissionsError('Permission to view report schedules required')
+      return insufficientPermissionsError(
+        'Permission to view report schedules required'
+      );
     }
 
     // Get all schedules
@@ -47,21 +49,21 @@ export async function GET(request: NextRequest) {
       orderBy: {
         createdAt: 'desc',
       },
-    })
+    });
 
     return successResponse({
       schedules,
-    })
+    });
   } catch (error) {
-    return handleApiError(error)
+    return handleApiError(error);
   }
 }
 
 /**
  * POST /api/reports/schedules
- * 
+ *
  * Create a new scheduled report (ADMIN only)
- * 
+ *
  * Body:
  * - name: string
  * - reportType: ReportType
@@ -70,39 +72,54 @@ export async function GET(request: NextRequest) {
  * - recipients: string[]
  * - enabled: boolean
  * - config: ReportConfig
- * 
+ *
  * Requirements: 26
  */
 export async function POST(request: NextRequest) {
   try {
     // Check authentication
-    const authResult = await checkAuth()
+    const authResult = await checkAuth();
     if ('error' in authResult) {
-      return authResult.error
+      return authResult.error;
     }
 
-    const { context } = authResult
+    const { context } = authResult;
 
     // Check permissions (ADMIN only)
     if (context.user.role !== 'ADMIN') {
-      return insufficientPermissionsError('ADMIN role required to create scheduled reports')
+      return insufficientPermissionsError(
+        'ADMIN role required to create scheduled reports'
+      );
     }
 
     // Parse request body
-    const body = await request.json()
+    const body = await request.json();
 
     const scheduleSchema = z.object({
       name: z.string().min(1, 'Name is required'),
       reportType: z.nativeEnum(ReportType),
       frequency: z.nativeEnum(ScheduleFrequency),
-      time: z.string().regex(/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/, 'Time must be in HH:mm format'),
-      recipients: z.array(z.string().email()).min(1, 'At least one recipient required'),
+      time: z
+        .string()
+        .regex(
+          /^([0-1][0-9]|2[0-3]):[0-5][0-9]$/,
+          'Time must be in HH:mm format'
+        ),
+      recipients: z
+        .array(z.string().email())
+        .min(1, 'At least one recipient required'),
       enabled: z.boolean().default(true),
       config: z.object({
         type: z.nativeEnum(ReportType),
         dateRange: z.object({
-          from: z.string().datetime().transform(str => new Date(str)),
-          to: z.string().datetime().transform(str => new Date(str)),
+          from: z
+            .string()
+            .datetime()
+            .transform((str) => new Date(str)),
+          to: z
+            .string()
+            .datetime()
+            .transform((str) => new Date(str)),
         }),
         content: z.object({
           summary: z.boolean().default(true),
@@ -125,18 +142,18 @@ export async function POST(request: NextRequest) {
           orientation: z.enum(['portrait', 'landscape']).default('portrait'),
         }),
       }),
-    })
+    });
 
-    const scheduleResult = scheduleSchema.safeParse(body)
+    const scheduleResult = scheduleSchema.safeParse(body);
 
     if (!scheduleResult.success) {
-      return handleApiError(scheduleResult.error)
+      return handleApiError(scheduleResult.error);
     }
 
-    const scheduleData = scheduleResult.data
+    const scheduleData = scheduleResult.data;
 
     // Calculate next run time
-    const nextRun = calculateNextRun(scheduleData.frequency, scheduleData.time)
+    const nextRun = calculateNextRun(scheduleData.frequency, scheduleData.time);
 
     // Create schedule in database
     const schedule = await prisma.reportSchedule.create({
@@ -160,11 +177,11 @@ export async function POST(request: NextRequest) {
           },
         },
       },
-    })
+    });
 
     // Schedule the report in the service
     if (schedule.enabled) {
-      reportService.scheduleReport(schedule.id, schedule)
+      reportService.scheduleReport(schedule.id, schedule);
     }
 
     return successResponse(
@@ -173,41 +190,41 @@ export async function POST(request: NextRequest) {
       },
       'Scheduled report created successfully',
       201
-    )
+    );
   } catch (error) {
-    return handleApiError(error)
+    return handleApiError(error);
   }
 }
 
 // Helper function to calculate next run time
 function calculateNextRun(frequency: ScheduleFrequency, time: string): Date {
-  const [hours, minutes] = time.split(':').map(Number)
-  const now = new Date()
-  const next = new Date(now)
+  const [hours, minutes] = time.split(':').map(Number);
+  const now = new Date();
+  const next = new Date(now);
 
-  next.setHours(hours, minutes, 0, 0)
+  next.setHours(hours, minutes, 0, 0);
 
   switch (frequency) {
     case 'DAILY':
       if (next <= now) {
-        next.setDate(next.getDate() + 1)
+        next.setDate(next.getDate() + 1);
       }
-      break
+      break;
     case 'WEEKLY':
-      next.setDate(next.getDate() + ((1 + 7 - next.getDay()) % 7 || 7))
+      next.setDate(next.getDate() + ((1 + 7 - next.getDay()) % 7 || 7));
       if (next <= now) {
-        next.setDate(next.getDate() + 7)
+        next.setDate(next.getDate() + 7);
       }
-      break
+      break;
     case 'MONTHLY':
-      next.setDate(1)
-      next.setMonth(next.getMonth() + 1)
-      break
+      next.setDate(1);
+      next.setMonth(next.getMonth() + 1);
+      break;
     case 'YEARLY':
-      next.setMonth(0, 1)
-      next.setFullYear(next.getFullYear() + 1)
-      break
+      next.setMonth(0, 1);
+      next.setFullYear(next.getFullYear() + 1);
+      break;
   }
 
-  return next
+  return next;
 }

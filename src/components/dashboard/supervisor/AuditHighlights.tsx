@@ -1,50 +1,50 @@
-'use client'
+'use client';
 
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface AuditHighlight {
-  id: string
-  action: string
-  userName: string
-  details: string
-  timestamp: string
-  severity: 'low' | 'medium' | 'high'
+  id: string;
+  action: string;
+  userName: string;
+  details: string;
+  timestamp: string;
+  severity: 'low' | 'medium' | 'high';
 }
 
 export function AuditHighlights() {
-  const router = useRouter()
-  const [highlights, setHighlights] = useState<AuditHighlight[]>([])
-  const [loading, setLoading] = useState(true)
+  const router = useRouter();
+  const [highlights, setHighlights] = useState<AuditHighlight[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchAuditHighlights()
-  }, [])
+    fetchAuditHighlights();
+  }, []);
 
   const fetchAuditHighlights = async () => {
     try {
-      const response = await fetch('/api/dashboard/audit-highlights')
+      const response = await fetch('/api/dashboard/audit-highlights');
       if (response.ok) {
-        const data = await response.json()
-        setHighlights(data)
+        const data = await response.json();
+        setHighlights(data);
       }
     } catch (error) {
-      console.error('Failed to fetch audit highlights:', error)
+      console.error('Failed to fetch audit highlights:', error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
       case 'high':
-        return 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400'
+        return 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400';
       case 'medium':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
+        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400';
       default:
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400'
+        return 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400';
     }
-  }
+  };
 
   if (loading) {
     return (
@@ -55,7 +55,7 @@ export function AuditHighlights() {
           <div className="h-16 bg-gray-200 dark:bg-gray-700 rounded"></div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -86,7 +86,9 @@ export function AuditHighlights() {
               <div className="flex items-start justify-between mb-2">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${getSeverityColor(highlight.severity)}`}>
+                    <span
+                      className={`px-2 py-1 text-xs font-medium rounded-full ${getSeverityColor(highlight.severity)}`}
+                    >
                       {highlight.severity}
                     </span>
                     <span className="text-sm font-medium text-gray-900 dark:text-white">
@@ -106,5 +108,5 @@ export function AuditHighlights() {
         )}
       </div>
     </div>
-  )
+  );
 }

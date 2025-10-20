@@ -22,12 +22,10 @@ A comprehensive notification system for the application with support for multipl
 The main context provider that manages notification state.
 
 ```tsx
-import { NotificationProvider } from '@/context/NotificationContext'
+import { NotificationProvider } from '@/context/NotificationContext';
 
 // Wrap your app with the provider
-<NotificationProvider>
-  {children}
-</NotificationProvider>
+<NotificationProvider>{children}</NotificationProvider>;
 ```
 
 ### useNotifications Hook
@@ -35,18 +33,18 @@ import { NotificationProvider } from '@/context/NotificationContext'
 Access notification functionality from any component:
 
 ```tsx
-import { useNotifications } from '@/context/NotificationContext'
+import { useNotifications } from '@/context/NotificationContext';
 
 function MyComponent() {
-  const { 
+  const {
     notifications,
     unreadCount,
     addNotification,
     markAsRead,
     markAllAsRead,
     removeNotification,
-    clearAll 
-  } = useNotifications()
+    clearAll,
+  } = useNotifications();
 
   // Add a notification
   const handleSuccess = () => {
@@ -55,11 +53,11 @@ function MyComponent() {
       title: 'Success!',
       message: 'Item saved successfully',
       actionUrl: '/data-log',
-      actionLabel: 'View Item'
-    })
-  }
+      actionLabel: 'View Item',
+    });
+  };
 
-  return <button onClick={handleSuccess}>Save</button>
+  return <button onClick={handleSuccess}>Save</button>;
 }
 ```
 
@@ -68,76 +66,82 @@ function MyComponent() {
 The bell icon component that displays in the header:
 
 ```tsx
-import { NotificationBell } from '@/components/notifications'
+import { NotificationBell } from '@/components/notifications';
 
-<NotificationBell />
+<NotificationBell />;
 ```
 
 ## Notification Types
 
 ### Info
+
 ```tsx
 addNotification({
   type: 'info',
   title: 'Information',
-  message: 'This is an informational message'
-})
+  message: 'This is an informational message',
+});
 ```
 
 ### Success
+
 ```tsx
 addNotification({
   type: 'success',
   title: 'Success!',
   message: 'Operation completed successfully',
   actionUrl: '/dashboard',
-  actionLabel: 'View Dashboard'
-})
+  actionLabel: 'View Dashboard',
+});
 ```
 
 ### Warning
+
 ```tsx
 addNotification({
   type: 'warning',
   title: 'Warning',
-  message: 'High reject rate detected'
-})
+  message: 'High reject rate detected',
+});
 ```
 
 ### Error
+
 ```tsx
 addNotification({
   type: 'error',
   title: 'Error',
-  message: 'Failed to save item'
-})
+  message: 'Failed to save item',
+});
 ```
 
 ## Usage Examples
 
 ### After Form Submission
+
 ```tsx
 const handleSubmit = async (data) => {
   try {
-    await saveItem(data)
+    await saveItem(data);
     addNotification({
       type: 'success',
       title: t('success.saved'),
       message: t('dataEntry.itemSaved'),
       actionUrl: `/${locale}/data-log`,
-      actionLabel: t('dataEntry.viewInLog')
-    })
+      actionLabel: t('dataEntry.viewInLog'),
+    });
   } catch (error) {
     addNotification({
       type: 'error',
       title: t('errors.saveFailed'),
-      message: error.message
-    })
+      message: error.message,
+    });
   }
-}
+};
 ```
 
 ### System Alerts
+
 ```tsx
 // High reject rate alert
 if (rejectRate > 10) {
@@ -146,12 +150,13 @@ if (rejectRate > 10) {
     title: t('alerts.highRejectRate'),
     message: t('alerts.rejectRateMessage', { rate: rejectRate }),
     actionUrl: `/${locale}/analytics`,
-    actionLabel: t('alerts.viewAnalytics')
-  })
+    actionLabel: t('alerts.viewAnalytics'),
+  });
 }
 ```
 
 ### Background Tasks
+
 ```tsx
 // Report generation complete
 addNotification({
@@ -159,8 +164,8 @@ addNotification({
   title: t('reports.ready'),
   message: t('reports.generationComplete'),
   actionUrl: `/${locale}/reports`,
-  actionLabel: t('reports.download')
-})
+  actionLabel: t('reports.download'),
+});
 ```
 
 ## API Reference
@@ -169,13 +174,15 @@ addNotification({
 
 ```typescript
 interface NotificationContextValue {
-  notifications: Notification[]
-  unreadCount: number
-  addNotification: (notification: Omit<Notification, 'id' | 'timestamp' | 'read'>) => void
-  markAsRead: (id: string) => void
-  markAllAsRead: () => void
-  removeNotification: (id: string) => void
-  clearAll: () => void
+  notifications: Notification[];
+  unreadCount: number;
+  addNotification: (
+    notification: Omit<Notification, 'id' | 'timestamp' | 'read'>
+  ) => void;
+  markAsRead: (id: string) => void;
+  markAllAsRead: () => void;
+  removeNotification: (id: string) => void;
+  clearAll: () => void;
 }
 ```
 
@@ -183,14 +190,14 @@ interface NotificationContextValue {
 
 ```typescript
 interface Notification {
-  id: string                    // Auto-generated
-  type: 'info' | 'success' | 'warning' | 'error'
-  title: string
-  message: string
-  timestamp: Date               // Auto-generated
-  read: boolean                 // Auto-set to false
-  actionUrl?: string           // Optional navigation URL
-  actionLabel?: string         // Optional action button label
+  id: string; // Auto-generated
+  type: 'info' | 'success' | 'warning' | 'error';
+  title: string;
+  message: string;
+  timestamp: Date; // Auto-generated
+  read: boolean; // Auto-set to false
+  actionUrl?: string; // Optional navigation URL
+  actionLabel?: string; // Optional action button label
 }
 ```
 
@@ -209,6 +216,7 @@ Notifications are automatically persisted to localStorage under the key `app-not
 ## RTL Support
 
 The notification system fully supports RTL layouts:
+
 - Dropdown positioning adjusts automatically
 - Icons and badges flip for RTL
 - Text alignment follows locale direction
@@ -218,10 +226,10 @@ The notification system fully supports RTL layouts:
 Use the `NotificationDemo` component to test the notification system:
 
 ```tsx
-import { NotificationDemo } from '@/components/notifications/NotificationDemo'
+import { NotificationDemo } from '@/components/notifications/NotificationDemo';
 
 // Add to any page temporarily
-<NotificationDemo />
+<NotificationDemo />;
 ```
 
 ## Future Enhancements

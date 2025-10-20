@@ -25,13 +25,12 @@ export default function OfflinePage() {
           </svg>
         </div>
 
-        <h1 className="text-3xl font-bold text-white mb-4">
-          You're Offline
-        </h1>
+        <h1 className="text-3xl font-bold text-white mb-4">You're Offline</h1>
 
         <p className="text-slate-300 mb-8">
-          It looks like you've lost your internet connection. Don't worry, you can still view cached data.
-          Any changes you make will be saved and synced when you're back online.
+          It looks like you've lost your internet connection. Don't worry, you
+          can still view cached data. Any changes you make will be saved and
+          synced when you're back online.
         </p>
 
         <div className="space-y-4">

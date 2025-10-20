@@ -1,19 +1,23 @@
-import { auth } from '@/services/auth'
-import { redirect } from 'next/navigation'
-import { prisma } from '@/services/prisma'
-import { DataEntryFormWithStats } from '@/components/forms/DataEntryFormWithStats'
-import { Destination } from '@prisma/client'
+import { auth } from '@/services/auth';
+import { redirect } from 'next/navigation';
+import { prisma } from '@/services/prisma';
+import { DataEntryFormWithStats } from '@/components/forms/DataEntryFormWithStats';
+import { Destination } from '@prisma/client';
 
-export default async function DataEntryPage({ params }: { params: Promise<{ locale: string }> }) {
-  const { locale } = await params
+export default async function DataEntryPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
   // Get user session
-  const session = await auth()
-  
+  const session = await auth();
+
   if (!session?.user) {
-    redirect(`/${locale}/login`)
+    redirect(`/${locale}/login`);
   }
 
-  const userId = session.user.id
+  const userId = session.user.id;
 
   // Fetch recent items for autocomplete (last 20 distinct itemNames)
   const recentItems = await prisma.inventoryItem.findMany({
@@ -30,7 +34,7 @@ export default async function DataEntryPage({ params }: { params: Promise<{ loca
       createdAt: 'desc',
     },
     take: 20,
-  })
+  });
 
   // Fetch recent categories for autocomplete
   const recentCategories = await prisma.inventoryItem.findMany({
@@ -47,11 +51,11 @@ export default async function DataEntryPage({ params }: { params: Promise<{ loca
       createdAt: 'desc',
     },
     take: 20,
-  })
+  });
 
   // Fetch today's entry count for current user
-  const todayStart = new Date()
-  todayStart.setHours(0, 0, 0, 0)
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
 
   const todayCount = await prisma.inventoryItem.count({
     where: {
@@ -59,7 +63,7 @@ export default async function DataEntryPage({ params }: { params: Promise<{ loca
       createdAt: { gte: todayStart },
       deletedAt: null,
     },
-  })
+  });
 
   // Fetch last 5 entries for QuickStatsWidget
   const recentEntries = await prisma.inventoryItem.findMany({
@@ -79,7 +83,7 @@ export default async function DataEntryPage({ params }: { params: Promise<{ loca
       createdAt: 'desc',
     },
     take: 5,
-  })
+  });
 
   // Get user's last used destination from most recent entry
   const lastEntry = await prisma.inventoryItem.findFirst({
@@ -93,9 +97,9 @@ export default async function DataEntryPage({ params }: { params: Promise<{ loca
     orderBy: {
       createdAt: 'desc',
     },
-  })
+  });
 
-  const userLastDestination = lastEntry?.destination || ('MAIS' as Destination)
+  const userLastDestination = lastEntry?.destination || ('MAIS' as Destination);
 
   return (
     <DataEntryFormWithStats
@@ -105,5 +109,5 @@ export default async function DataEntryPage({ params }: { params: Promise<{ loca
       userLastDestination={userLastDestination}
       userId={userId}
     />
-  )
+  );
 }

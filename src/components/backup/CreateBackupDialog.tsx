@@ -11,13 +11,17 @@ interface CreateBackupDialogProps {
   onComplete: () => void;
 }
 
-export default function CreateBackupDialog({ isOpen, onClose, onComplete }: CreateBackupDialogProps) {
+export default function CreateBackupDialog({
+  isOpen,
+  onClose,
+  onComplete,
+}: CreateBackupDialogProps) {
   const t = useTranslations('backup');
   const [step, setStep] = useState(1);
   const [creating, setCreating] = useState(false);
   const [progress, setProgress] = useState(0);
   const [currentStep, setCurrentStepText] = useState('');
-  
+
   const [formData, setFormData] = useState<BackupCreateConfig>({
     name: `mais-inventory-backup-${new Date().toISOString().split('T')[0]}`,
     includeAuditLogs: false,
@@ -45,7 +49,7 @@ export default function CreateBackupDialog({ isOpen, onClose, onComplete }: Crea
       }
 
       const result = await res.json();
-      
+
       // Simulate progress updates
       const progressInterval = setInterval(() => {
         setProgress((prev) => {
@@ -137,8 +141,18 @@ export default function CreateBackupDialog({ isOpen, onClose, onComplete }: Crea
                 onClick={handleClose}
                 className="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
@@ -152,8 +166,8 @@ export default function CreateBackupDialog({ isOpen, onClose, onComplete }: Crea
                       s === step
                         ? 'bg-blue-600 text-white'
                         : s < step
-                        ? 'bg-green-600 text-white'
-                        : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
+                          ? 'bg-green-600 text-white'
+                          : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
                     }`}
                   >
                     {s < step ? '✓' : s}
@@ -161,7 +175,9 @@ export default function CreateBackupDialog({ isOpen, onClose, onComplete }: Crea
                   {s < 3 && (
                     <div
                       className={`w-12 h-1 ${
-                        s < step ? 'bg-green-600' : 'bg-gray-200 dark:bg-gray-700'
+                        s < step
+                          ? 'bg-green-600'
+                          : 'bg-gray-200 dark:bg-gray-700'
                       }`}
                     />
                   )}
@@ -182,7 +198,9 @@ export default function CreateBackupDialog({ isOpen, onClose, onComplete }: Crea
                   <input
                     type="text"
                     value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, name: e.target.value })
+                    }
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   />
                 </div>
@@ -193,7 +211,9 @@ export default function CreateBackupDialog({ isOpen, onClose, onComplete }: Crea
                   </label>
                   <textarea
                     value={formData.notes}
-                    onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, notes: e.target.value })
+                    }
                     rows={3}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     placeholder={t('notesPlaceholder')}
@@ -231,7 +251,12 @@ export default function CreateBackupDialog({ isOpen, onClose, onComplete }: Crea
                     <input
                       type="checkbox"
                       checked={formData.includeAuditLogs}
-                      onChange={(e) => setFormData({ ...formData, includeAuditLogs: e.target.checked })}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          includeAuditLogs: e.target.checked,
+                        })
+                      }
                       className="mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded"
                     />
                     <div className="ml-3">
@@ -248,7 +273,12 @@ export default function CreateBackupDialog({ isOpen, onClose, onComplete }: Crea
                     <input
                       type="checkbox"
                       checked={formData.includeUserData}
-                      onChange={(e) => setFormData({ ...formData, includeUserData: e.target.checked })}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          includeUserData: e.target.checked,
+                        })
+                      }
                       className="mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded"
                     />
                     <div className="ml-3">
@@ -265,7 +295,12 @@ export default function CreateBackupDialog({ isOpen, onClose, onComplete }: Crea
                     <input
                       type="checkbox"
                       checked={formData.includeSettings}
-                      onChange={(e) => setFormData({ ...formData, includeSettings: e.target.checked })}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          includeSettings: e.target.checked,
+                        })
+                      }
                       className="mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded"
                     />
                     <div className="ml-3">
@@ -290,7 +325,11 @@ export default function CreateBackupDialog({ isOpen, onClose, onComplete }: Crea
                   </label>
                   <div className="space-y-2">
                     {[
-                      { value: 'all', label: t('allFormats'), desc: t('allFormatsDesc') },
+                      {
+                        value: 'all',
+                        label: t('allFormats'),
+                        desc: t('allFormatsDesc'),
+                      },
                       { value: 'csv', label: 'CSV', desc: t('csvDesc') },
                       { value: 'json', label: 'JSON', desc: t('jsonDesc') },
                       { value: 'sql', label: 'SQL', desc: t('sqlDesc') },
@@ -304,7 +343,12 @@ export default function CreateBackupDialog({ isOpen, onClose, onComplete }: Crea
                           name="format"
                           value={format.value}
                           checked={formData.format === format.value}
-                          onChange={(e) => setFormData({ ...formData, format: e.target.value as any })}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              format: e.target.value as any,
+                            })
+                          }
                           className="mt-1 w-4 h-4 text-blue-600 border-gray-300"
                         />
                         <div className="ml-3">
@@ -325,7 +369,12 @@ export default function CreateBackupDialog({ isOpen, onClose, onComplete }: Crea
                     <input
                       type="checkbox"
                       checked={formData.encrypted}
-                      onChange={(e) => setFormData({ ...formData, encrypted: e.target.checked })}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          encrypted: e.target.checked,
+                        })
+                      }
                       className="w-4 h-4 text-blue-600 border-gray-300 rounded"
                     />
                     <span className="ml-2 text-sm text-gray-900 dark:text-white">
@@ -345,7 +394,9 @@ export default function CreateBackupDialog({ isOpen, onClose, onComplete }: Crea
                     <input
                       type="password"
                       value={formData.password || ''}
-                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({ ...formData, password: e.target.value })
+                      }
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                       placeholder={t('enterPassword')}
                     />
@@ -359,13 +410,13 @@ export default function CreateBackupDialog({ isOpen, onClose, onComplete }: Crea
           <div className="px-6 py-4 bg-gray-50 dark:bg-gray-700/50 border-t border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between">
               <button
-                onClick={() => step > 1 ? setStep(step - 1) : handleClose()}
+                onClick={() => (step > 1 ? setStep(step - 1) : handleClose())}
                 className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
               >
                 {step === 1 ? t('cancel') : t('back')}
               </button>
               <button
-                onClick={() => step < 3 ? setStep(step + 1) : handleCreate()}
+                onClick={() => (step < 3 ? setStep(step + 1) : handleCreate())}
                 disabled={step === 1 && !formData.name}
                 className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >

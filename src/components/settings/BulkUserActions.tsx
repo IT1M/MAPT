@@ -1,19 +1,19 @@
-'use client'
+'use client';
 
-import React, { useState } from 'react'
-import { UserRole } from '@prisma/client'
-import { Button } from '@/components/ui/button'
-import { Select } from '@/components/ui/select'
-import { Modal } from '@/components/ui/modal'
+import React, { useState } from 'react';
+import { UserRole } from '@prisma/client';
+import { Button } from '@/components/ui/button';
+import { Select } from '@/components/ui/select';
+import { Modal } from '@/components/ui/modal';
 
 export interface BulkUserActionsProps {
-  selectedUsers: string[]
-  currentUserId: string
-  onActivate: (userIds: string[]) => Promise<void>
-  onDeactivate: (userIds: string[]) => Promise<void>
-  onChangeRole: (userIds: string[], role: UserRole) => Promise<void>
-  onDelete: (userIds: string[]) => Promise<void>
-  onClearSelection: () => void
+  selectedUsers: string[];
+  currentUserId: string;
+  onActivate: (userIds: string[]) => Promise<void>;
+  onDeactivate: (userIds: string[]) => Promise<void>;
+  onChangeRole: (userIds: string[], role: UserRole) => Promise<void>;
+  onDelete: (userIds: string[]) => Promise<void>;
+  onClearSelection: () => void;
 }
 
 export function BulkUserActions({
@@ -25,113 +25,115 @@ export function BulkUserActions({
   onDelete,
   onClearSelection,
 }: BulkUserActionsProps) {
-  const [isProcessing, setIsProcessing] = useState(false)
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
-  const [showRoleChange, setShowRoleChange] = useState(false)
-  const [selectedRole, setSelectedRole] = useState<UserRole>(UserRole.DATA_ENTRY)
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showRoleChange, setShowRoleChange] = useState(false);
+  const [selectedRole, setSelectedRole] = useState<UserRole>(
+    UserRole.DATA_ENTRY
+  );
   const [operationResult, setOperationResult] = useState<{
-    success: number
-    failed: number
-    message?: string
-  } | null>(null)
+    success: number;
+    failed: number;
+    message?: string;
+  } | null>(null);
 
   // Filter out current user from selected users
-  const validSelectedUsers = selectedUsers.filter((id) => id !== currentUserId)
-  const selectedCount = validSelectedUsers.length
+  const validSelectedUsers = selectedUsers.filter((id) => id !== currentUserId);
+  const selectedCount = validSelectedUsers.length;
 
   if (selectedCount === 0) {
-    return null
+    return null;
   }
 
   const handleActivate = async () => {
-    setIsProcessing(true)
-    setOperationResult(null)
+    setIsProcessing(true);
+    setOperationResult(null);
     try {
-      await onActivate(validSelectedUsers)
+      await onActivate(validSelectedUsers);
       setOperationResult({
         success: validSelectedUsers.length,
         failed: 0,
         message: `Successfully activated ${validSelectedUsers.length} user(s)`,
-      })
-      onClearSelection()
+      });
+      onClearSelection();
     } catch (error) {
       setOperationResult({
         success: 0,
         failed: validSelectedUsers.length,
         message: 'Failed to activate users',
-      })
+      });
     } finally {
-      setIsProcessing(false)
+      setIsProcessing(false);
     }
-  }
+  };
 
   const handleDeactivate = async () => {
-    setIsProcessing(true)
-    setOperationResult(null)
+    setIsProcessing(true);
+    setOperationResult(null);
     try {
-      await onDeactivate(validSelectedUsers)
+      await onDeactivate(validSelectedUsers);
       setOperationResult({
         success: validSelectedUsers.length,
         failed: 0,
         message: `Successfully deactivated ${validSelectedUsers.length} user(s)`,
-      })
-      onClearSelection()
+      });
+      onClearSelection();
     } catch (error) {
       setOperationResult({
         success: 0,
         failed: validSelectedUsers.length,
         message: 'Failed to deactivate users',
-      })
+      });
     } finally {
-      setIsProcessing(false)
+      setIsProcessing(false);
     }
-  }
+  };
 
   const handleRoleChange = async () => {
-    setIsProcessing(true)
-    setOperationResult(null)
+    setIsProcessing(true);
+    setOperationResult(null);
     try {
-      await onChangeRole(validSelectedUsers, selectedRole)
+      await onChangeRole(validSelectedUsers, selectedRole);
       setOperationResult({
         success: validSelectedUsers.length,
         failed: 0,
         message: `Successfully changed role for ${validSelectedUsers.length} user(s)`,
-      })
-      setShowRoleChange(false)
-      onClearSelection()
+      });
+      setShowRoleChange(false);
+      onClearSelection();
     } catch (error) {
       setOperationResult({
         success: 0,
         failed: validSelectedUsers.length,
         message: 'Failed to change user roles',
-      })
+      });
     } finally {
-      setIsProcessing(false)
+      setIsProcessing(false);
     }
-  }
+  };
 
   const handleDelete = async () => {
-    setIsProcessing(true)
-    setOperationResult(null)
+    setIsProcessing(true);
+    setOperationResult(null);
     try {
-      await onDelete(validSelectedUsers)
+      await onDelete(validSelectedUsers);
       setOperationResult({
         success: validSelectedUsers.length,
         failed: 0,
         message: `Successfully deleted ${validSelectedUsers.length} user(s)`,
-      })
-      setShowDeleteConfirm(false)
-      onClearSelection()
+      });
+      setShowDeleteConfirm(false);
+      onClearSelection();
     } catch (error) {
       setOperationResult({
         success: 0,
         failed: validSelectedUsers.length,
         message: 'Failed to delete users',
-      })
+      });
     } finally {
-      setIsProcessing(false)
+      setIsProcessing(false);
     }
-  }
+  };
 
   const roleOptions = [
     { value: UserRole.DATA_ENTRY, label: 'Data Entry' },
@@ -139,7 +141,7 @@ export function BulkUserActions({
     { value: UserRole.MANAGER, label: 'Manager' },
     { value: UserRole.AUDITOR, label: 'Auditor' },
     { value: UserRole.ADMIN, label: 'Admin' },
-  ]
+  ];
 
   return (
     <>
@@ -260,7 +262,8 @@ export function BulkUserActions({
                 </p>
                 {operationResult.failed > 0 && (
                   <p className="text-xs text-red-700 dark:text-red-300 mt-1">
-                    {operationResult.success} succeeded, {operationResult.failed} failed
+                    {operationResult.success} succeeded,{' '}
+                    {operationResult.failed} failed
                   </p>
                 )}
               </div>
@@ -298,8 +301,8 @@ export function BulkUserActions({
                 Delete {selectedCount} user{selectedCount !== 1 ? 's' : ''}?
               </h3>
               <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                This action cannot be undone. All data associated with these users will be
-                permanently deleted.
+                This action cannot be undone. All data associated with these
+                users will be permanently deleted.
               </p>
             </div>
           </div>
@@ -312,7 +315,11 @@ export function BulkUserActions({
             >
               Cancel
             </Button>
-            <Button variant="danger" onClick={handleDelete} loading={isProcessing}>
+            <Button
+              variant="danger"
+              onClick={handleDelete}
+              loading={isProcessing}
+            >
               Delete Users
             </Button>
           </div>
@@ -328,7 +335,8 @@ export function BulkUserActions({
       >
         <div className="space-y-4">
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            Change the role for {selectedCount} selected user{selectedCount !== 1 ? 's' : ''}.
+            Change the role for {selectedCount} selected user
+            {selectedCount !== 1 ? 's' : ''}.
           </p>
 
           <Select
@@ -346,12 +354,16 @@ export function BulkUserActions({
             >
               Cancel
             </Button>
-            <Button variant="primary" onClick={handleRoleChange} loading={isProcessing}>
+            <Button
+              variant="primary"
+              onClick={handleRoleChange}
+              loading={isProcessing}
+            >
               Change Role
             </Button>
           </div>
         </div>
       </Modal>
     </>
-  )
+  );
 }

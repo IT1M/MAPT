@@ -16,7 +16,7 @@ export interface ErrorStateProps {
 
 /**
  * ErrorState Component
- * 
+ *
  * Displays user-friendly error messages with recovery options
  */
 export const ErrorState: React.FC<ErrorStateProps> = ({
@@ -30,10 +30,13 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
 }) => {
   const router = useRouter();
   const errorMessage = typeof error === 'string' ? error : error?.message;
-  const errorStack = typeof error === 'object' && error ? error.stack : undefined;
+  const errorStack =
+    typeof error === 'object' && error ? error.stack : undefined;
 
   return (
-    <div className={`flex flex-col items-center justify-center py-12 px-4 text-center ${className}`}>
+    <div
+      className={`flex flex-col items-center justify-center py-12 px-4 text-center ${className}`}
+    >
       {/* Error Icon */}
       <div className="mb-6">
         <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-100 dark:bg-red-900/20">
@@ -86,11 +89,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
       {/* Action Buttons */}
       <div className="flex flex-col sm:flex-row gap-3">
         {retry && (
-          <Button
-            onClick={retry}
-            variant="primary"
-            size="medium"
-          >
+          <Button onClick={retry} variant="primary" size="medium">
             <svg
               className="w-4 h-4 mr-2 rtl:mr-0 rtl:ml-2"
               fill="none"
@@ -107,7 +106,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
             Try Again
           </Button>
         )}
-        
+
         {showHomeButton && (
           <Button
             onClick={() => router.push('/')}
@@ -137,7 +136,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
 
 /**
  * PageErrorState Component
- * 
+ *
  * Full-page error state with consistent styling
  */
 export const PageErrorState: React.FC<ErrorStateProps> = (props) => {
@@ -152,7 +151,7 @@ export const PageErrorState: React.FC<ErrorStateProps> = (props) => {
 
 /**
  * InlineErrorState Component
- * 
+ *
  * Compact error state for inline use within components
  */
 export interface InlineErrorStateProps {
@@ -171,7 +170,9 @@ export const InlineErrorState: React.FC<InlineErrorStateProps> = ({
   const errorMessage = typeof error === 'string' ? error : error?.message;
 
   return (
-    <div className={`p-4 bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-800 rounded-lg ${className}`}>
+    <div
+      className={`p-4 bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-800 rounded-lg ${className}`}
+    >
       <div className="flex items-start">
         <div className="flex-shrink-0">
           <svg

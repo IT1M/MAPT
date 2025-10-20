@@ -1,65 +1,66 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import { signIn } from 'next-auth/react'
-import { useTranslations } from '@/hooks/useTranslations'
-import { toast } from 'react-hot-toast'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { PasswordStrengthMeter } from './PasswordStrengthMeter'
-import { PasswordRequirementsChecklist } from './PasswordRequirementsChecklist'
-import { Eye, EyeOff, Loader2, AlertCircle } from 'lucide-react'
-import Link from 'next/link'
-import { z } from 'zod'
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { signIn } from 'next-auth/react';
+import { useTranslations } from '@/hooks/useTranslations';
+import { toast } from 'react-hot-toast';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { PasswordStrengthMeter } from './PasswordStrengthMeter';
+import { PasswordRequirementsChecklist } from './PasswordRequirementsChecklist';
+import { Eye, EyeOff, Loader2, AlertCircle } from 'lucide-react';
+import Link from 'next/link';
+import { z } from 'zod';
 
 interface RegistrationFormProps {
-  locale: string
+  locale: string;
 }
 
 // Registration schema with confirm password
-const registrationFormSchema = z.object({
-  name: z
-    .string()
-    .min(2, 'Name must be at least 2 characters')
-    .max(100, 'Name must not exceed 100 characters'),
-  email: z
-    .string()
-    .min(1, 'Email is required')
-    .email('Invalid email address'),
-  phone: z
-    .string()
-    .optional(),
-  password: z
-    .string()
-    .min(8, 'Password must be at least 8 characters')
-    .regex(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-      'Password must contain at least one uppercase letter, one lowercase letter, and one number'
-    ),
-  confirmPassword: z
-    .string()
-    .min(1, 'Please confirm your password'),
-  acceptTerms: z
-    .boolean()
-    .refine((val) => val === true, 'You must accept the terms and conditions'),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: 'Passwords do not match',
-  path: ['confirmPassword'],
-})
+const registrationFormSchema = z
+  .object({
+    name: z
+      .string()
+      .min(2, 'Name must be at least 2 characters')
+      .max(100, 'Name must not exceed 100 characters'),
+    email: z
+      .string()
+      .min(1, 'Email is required')
+      .email('Invalid email address'),
+    phone: z.string().optional(),
+    password: z
+      .string()
+      .min(8, 'Password must be at least 8 characters')
+      .regex(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
+        'Password must contain at least one uppercase letter, one lowercase letter, and one number'
+      ),
+    confirmPassword: z.string().min(1, 'Please confirm your password'),
+    acceptTerms: z
+      .boolean()
+      .refine(
+        (val) => val === true,
+        'You must accept the terms and conditions'
+      ),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'Passwords do not match',
+    path: ['confirmPassword'],
+  });
 
-type RegistrationFormData = z.infer<typeof registrationFormSchema>
+type RegistrationFormData = z.infer<typeof registrationFormSchema>;
 
 export function RegistrationForm({ locale }: RegistrationFormProps) {
-  const t = useTranslations()
-  const router = useRouter()
-  const [isLoading, setIsLoading] = useState(false)
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [showTermsModal, setShowTermsModal] = useState(false)
-  const [emailCheckLoading, setEmailCheckLoading] = useState(false)
-  const [emailAvailable, setEmailAvailable] = useState<boolean | null>(null)
-  
+  const t = useTranslations();
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showTermsModal, setShowTermsModal] = useState(false);
+  const [emailCheckLoading, setEmailCheckLoading] = useState(false);
+  const [emailAvailable, setEmailAvailable] = useState<boolean | null>(null);
+
   const [formData, setFormData] = useState<RegistrationFormData>({
     name: '',
     email: '',
@@ -67,62 +68,66 @@ export function RegistrationForm({ locale }: RegistrationFormProps) {
     password: '',
     confirmPassword: '',
     acceptTerms: false,
-  })
-  
-  const [errors, setErrors] = useState<Partial<Record<keyof RegistrationFormData, string>>>({})
+  });
+
+  const [errors, setErrors] = useState<
+    Partial<Record<keyof RegistrationFormData, string>>
+  >({});
 
   // Debounced email uniqueness check
   useEffect(() => {
     const checkEmailUniqueness = async () => {
       if (!formData.email || !formData.email.includes('@')) {
-        setEmailAvailable(null)
-        return
+        setEmailAvailable(null);
+        return;
       }
 
-      setEmailCheckLoading(true)
+      setEmailCheckLoading(true);
       try {
-        const response = await fetch(`/api/auth/check-email?email=${encodeURIComponent(formData.email)}`)
-        const data = await response.json()
-        setEmailAvailable(data.available)
+        const response = await fetch(
+          `/api/auth/check-email?email=${encodeURIComponent(formData.email)}`
+        );
+        const data = await response.json();
+        setEmailAvailable(data.available);
       } catch (error) {
-        console.error('Email check failed:', error)
-        setEmailAvailable(null)
+        console.error('Email check failed:', error);
+        setEmailAvailable(null);
       } finally {
-        setEmailCheckLoading(false)
+        setEmailCheckLoading(false);
       }
-    }
+    };
 
-    const timeoutId = setTimeout(checkEmailUniqueness, 500)
-    return () => clearTimeout(timeoutId)
-  }, [formData.email])
+    const timeoutId = setTimeout(checkEmailUniqueness, 500);
+    return () => clearTimeout(timeoutId);
+  }, [formData.email]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target
+    const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value,
-    }))
-    
+    }));
+
     // Clear error for this field when user starts typing
     if (errors[name as keyof RegistrationFormData]) {
-      setErrors((prev) => ({ ...prev, [name]: undefined }))
+      setErrors((prev) => ({ ...prev, [name]: undefined }));
     }
-  }
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setErrors({})
-    setIsLoading(true)
+    e.preventDefault();
+    setErrors({});
+    setIsLoading(true);
 
     try {
       // Validate form data with Zod
-      const validatedData = registrationFormSchema.parse(formData)
+      const validatedData = registrationFormSchema.parse(formData);
 
       // Check if email is available
       if (emailAvailable === false) {
-        setErrors({ email: 'This email is already registered' })
-        setIsLoading(false)
-        return
+        setErrors({ email: 'This email is already registered' });
+        setIsLoading(false);
+        return;
       }
 
       // Register user via API
@@ -134,67 +139,75 @@ export function RegistrationForm({ locale }: RegistrationFormProps) {
           email: validatedData.email,
           password: validatedData.password,
         }),
-      })
+      });
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (!response.ok) {
         if (data.errors) {
-          const fieldErrors: Partial<Record<keyof RegistrationFormData, string>> = {}
+          const fieldErrors: Partial<
+            Record<keyof RegistrationFormData, string>
+          > = {};
           data.errors.forEach((err: any) => {
             if (err.field) {
-              fieldErrors[err.field as keyof RegistrationFormData] = err.message
+              fieldErrors[err.field as keyof RegistrationFormData] =
+                err.message;
             }
-          })
-          setErrors(fieldErrors)
+          });
+          setErrors(fieldErrors);
         } else {
-          toast.error(data.message || 'Registration failed')
+          toast.error(data.message || 'Registration failed');
         }
-        setIsLoading(false)
-        return
+        setIsLoading(false);
+        return;
       }
 
       // Registration successful - auto-login
-      toast.success('Registration successful! Logging you in...')
-      
+      toast.success('Registration successful! Logging you in...');
+
       const signInResult = await signIn('credentials', {
         email: validatedData.email,
         password: validatedData.password,
         redirect: false,
-      })
+      });
 
       if (signInResult?.ok) {
-        router.push(`/dashboard`)
-        router.refresh()
+        router.push(`/dashboard`);
+        router.refresh();
       } else {
         // If auto-login fails, redirect to login page
-        toast.success('Registration successful! Please log in.')
-        router.push(`/login`)
+        toast.success('Registration successful! Please log in.');
+        router.push(`/login`);
       }
     } catch (error: any) {
       // Handle Zod validation errors
       if (error.errors) {
-        const fieldErrors: Partial<Record<keyof RegistrationFormData, string>> = {}
+        const fieldErrors: Partial<Record<keyof RegistrationFormData, string>> =
+          {};
         error.errors.forEach((err: any) => {
           if (err.path[0]) {
-            fieldErrors[err.path[0] as keyof RegistrationFormData] = err.message
+            fieldErrors[err.path[0] as keyof RegistrationFormData] =
+              err.message;
           }
-        })
-        setErrors(fieldErrors)
+        });
+        setErrors(fieldErrors);
       } else {
-        toast.error('An unexpected error occurred')
+        toast.error('An unexpected error occurred');
       }
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <>
       <form onSubmit={handleSubmit} className="space-y-5">
         {/* Name Input */}
         <div>
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label
+            htmlFor="name"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+          >
             Full Name <span className="text-red-500">*</span>
           </label>
           <Input
@@ -214,7 +227,10 @@ export function RegistrationForm({ locale }: RegistrationFormProps) {
 
         {/* Email Input with availability check */}
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label
+            htmlFor="email"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+          >
             {t('common.email')} <span className="text-red-500">*</span>
           </label>
           <div className="relative">
@@ -251,8 +267,12 @@ export function RegistrationForm({ locale }: RegistrationFormProps) {
 
         {/* Phone Input (Optional) */}
         <div>
-          <label htmlFor="phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Phone Number <span className="text-xs text-gray-500">(Optional)</span>
+          <label
+            htmlFor="phone"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+          >
+            Phone Number{' '}
+            <span className="text-xs text-gray-500">(Optional)</span>
           </label>
           <Input
             id="phone"
@@ -270,7 +290,10 @@ export function RegistrationForm({ locale }: RegistrationFormProps) {
 
         {/* Password Input with strength meter */}
         <div>
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label
+            htmlFor="password"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+          >
             {t('common.password')} <span className="text-red-500">*</span>
           </label>
           <div className="relative">
@@ -307,7 +330,10 @@ export function RegistrationForm({ locale }: RegistrationFormProps) {
 
         {/* Confirm Password Input */}
         <div>
-          <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label
+            htmlFor="confirmPassword"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+          >
             Confirm Password <span className="text-red-500">*</span>
           </label>
           <div className="relative">
@@ -329,7 +355,9 @@ export function RegistrationForm({ locale }: RegistrationFormProps) {
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
               tabIndex={-1}
-              aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+              aria-label={
+                showConfirmPassword ? 'Hide password' : 'Show password'
+              }
             >
               {showConfirmPassword ? (
                 <EyeOff className="w-5 h-5" />
@@ -359,8 +387,8 @@ export function RegistrationForm({ locale }: RegistrationFormProps) {
                 className="text-teal-600 hover:text-teal-700 dark:text-teal-400 dark:hover:text-teal-300 font-medium underline"
               >
                 Terms & Conditions
-              </button>
-              {' '}<span className="text-red-500">*</span>
+              </button>{' '}
+              <span className="text-red-500">*</span>
             </span>
           </label>
           {errors.acceptTerms && (
@@ -413,32 +441,44 @@ export function RegistrationForm({ locale }: RegistrationFormProps) {
               <div className="prose dark:prose-invert max-w-none">
                 <h3>1. Acceptance of Terms</h3>
                 <p>
-                  By accessing and using the Saudi Mais Medical Inventory System, you accept and agree to be bound by the terms and provision of this agreement.
+                  By accessing and using the Saudi Mais Medical Inventory
+                  System, you accept and agree to be bound by the terms and
+                  provision of this agreement.
                 </p>
-                
+
                 <h3>2. Use License</h3>
                 <p>
-                  Permission is granted to temporarily access the system for personal, non-transferable use only. This is the grant of a license, not a transfer of title.
+                  Permission is granted to temporarily access the system for
+                  personal, non-transferable use only. This is the grant of a
+                  license, not a transfer of title.
                 </p>
-                
+
                 <h3>3. User Responsibilities</h3>
                 <p>
-                  Users are responsible for maintaining the confidentiality of their account credentials and for all activities that occur under their account.
+                  Users are responsible for maintaining the confidentiality of
+                  their account credentials and for all activities that occur
+                  under their account.
                 </p>
-                
+
                 <h3>4. Data Privacy</h3>
                 <p>
-                  We are committed to protecting your privacy. All personal information collected will be handled in accordance with applicable data protection laws.
+                  We are committed to protecting your privacy. All personal
+                  information collected will be handled in accordance with
+                  applicable data protection laws.
                 </p>
-                
+
                 <h3>5. Prohibited Activities</h3>
                 <p>
-                  Users must not attempt to gain unauthorized access to the system, interfere with system operations, or use the system for any unlawful purpose.
+                  Users must not attempt to gain unauthorized access to the
+                  system, interfere with system operations, or use the system
+                  for any unlawful purpose.
                 </p>
-                
+
                 <h3>6. Limitation of Liability</h3>
                 <p>
-                  The system is provided &quot;as is&quot; without warranties of any kind. We shall not be liable for any damages arising from the use or inability to use the system.
+                  The system is provided &quot;as is&quot; without warranties of
+                  any kind. We shall not be liable for any damages arising from
+                  the use or inability to use the system.
                 </p>
               </div>
             </div>
@@ -452,9 +492,9 @@ export function RegistrationForm({ locale }: RegistrationFormProps) {
               <Button
                 variant="primary"
                 onClick={() => {
-                  setFormData(prev => ({ ...prev, acceptTerms: true }))
-                  setShowTermsModal(false)
-                  setErrors(prev => ({ ...prev, acceptTerms: undefined }))
+                  setFormData((prev) => ({ ...prev, acceptTerms: true }));
+                  setShowTermsModal(false);
+                  setErrors((prev) => ({ ...prev, acceptTerms: undefined }));
                 }}
               >
                 Accept Terms
@@ -464,5 +504,5 @@ export function RegistrationForm({ locale }: RegistrationFormProps) {
         </div>
       )}
     </>
-  )
+  );
 }

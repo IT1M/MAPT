@@ -141,7 +141,9 @@ export default function ReportScheduleDialog({
                 <input
                   type="text"
                   value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
                   required
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
@@ -154,15 +156,29 @@ export default function ReportScheduleDialog({
                 </label>
                 <select
                   value={formData.reportType}
-                  onChange={(e) => setFormData({ ...formData, reportType: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, reportType: e.target.value })
+                  }
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 >
-                  <option value="MONTHLY_INVENTORY">{t('../reportTypes.MONTHLY_INVENTORY')}</option>
-                  <option value="YEARLY_SUMMARY">{t('../reportTypes.YEARLY_SUMMARY')}</option>
-                  <option value="CUSTOM_RANGE">{t('../reportTypes.CUSTOM_RANGE')}</option>
-                  <option value="AUDIT_REPORT">{t('../reportTypes.AUDIT_REPORT')}</option>
-                  <option value="USER_ACTIVITY">{t('../reportTypes.USER_ACTIVITY')}</option>
-                  <option value="CATEGORY_ANALYSIS">{t('../reportTypes.CATEGORY_ANALYSIS')}</option>
+                  <option value="MONTHLY_INVENTORY">
+                    {t('../reportTypes.MONTHLY_INVENTORY')}
+                  </option>
+                  <option value="YEARLY_SUMMARY">
+                    {t('../reportTypes.YEARLY_SUMMARY')}
+                  </option>
+                  <option value="CUSTOM_RANGE">
+                    {t('../reportTypes.CUSTOM_RANGE')}
+                  </option>
+                  <option value="AUDIT_REPORT">
+                    {t('../reportTypes.AUDIT_REPORT')}
+                  </option>
+                  <option value="USER_ACTIVITY">
+                    {t('../reportTypes.USER_ACTIVITY')}
+                  </option>
+                  <option value="CATEGORY_ANALYSIS">
+                    {t('../reportTypes.CATEGORY_ANALYSIS')}
+                  </option>
                 </select>
               </div>
 
@@ -174,7 +190,9 @@ export default function ReportScheduleDialog({
                   </label>
                   <select
                     value={formData.frequency}
-                    onChange={(e) => setFormData({ ...formData, frequency: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, frequency: e.target.value })
+                    }
                     className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   >
                     <option value="DAILY">{t('daily')}</option>
@@ -190,7 +208,9 @@ export default function ReportScheduleDialog({
                   <input
                     type="time"
                     value={formData.time}
-                    onChange={(e) => setFormData({ ...formData, time: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, time: e.target.value })
+                    }
                     className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   />
                 </div>
@@ -242,7 +262,9 @@ export default function ReportScheduleDialog({
                   <input
                     type="checkbox"
                     checked={formData.enabled}
-                    onChange={(e) => setFormData({ ...formData, enabled: e.target.checked })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, enabled: e.target.checked })
+                    }
                     className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                   />
                   <span className="text-sm text-gray-700 dark:text-gray-300">

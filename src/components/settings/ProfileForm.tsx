@@ -1,27 +1,27 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import { UserProfile } from '@/types/settings'
-import { profileSchema } from '@/utils/settings-validation'
-import { useAutoSave } from '@/hooks/useAutosave'
-import { toast } from 'react-hot-toast'
+import { useState, useEffect } from 'react';
+import { UserProfile } from '@/types/settings';
+import { profileSchema } from '@/utils/settings-validation';
+import { useAutoSave } from '@/hooks/useAutosave';
+import { toast } from 'react-hot-toast';
 
 interface ProfileFormProps {
-  profile: UserProfile
-  onUpdate: (data: Partial<UserProfile>) => Promise<void>
+  profile: UserProfile;
+  onUpdate: (data: Partial<UserProfile>) => Promise<void>;
 }
 
 interface FormData {
-  name: string
-  employeeId: string
-  department: string
-  phoneNumber: string
-  workLocation: string
+  name: string;
+  employeeId: string;
+  department: string;
+  phoneNumber: string;
+  workLocation: string;
 }
 
 interface FormErrors {
-  name?: string
-  phoneNumber?: string
+  name?: string;
+  phoneNumber?: string;
 }
 
 export function ProfileForm({ profile, onUpdate }: ProfileFormProps) {
@@ -31,33 +31,33 @@ export function ProfileForm({ profile, onUpdate }: ProfileFormProps) {
     department: profile.department || '',
     phoneNumber: profile.phoneNumber || '',
     workLocation: profile.workLocation || '',
-  })
+  });
 
-  const [errors, setErrors] = useState<FormErrors>({})
-  const [isSaving, setIsSaving] = useState(false)
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [isSaving, setIsSaving] = useState(false);
 
   // Auto-save functionality
   const { status: saveStatus } = useAutoSave({
     data: formData,
     onSave: async (data) => {
       // Validate before saving
-      const validation = profileSchema.safeParse(data)
+      const validation = profileSchema.safeParse(data);
       if (!validation.success) {
-        const fieldErrors: FormErrors = {}
+        const fieldErrors: FormErrors = {};
         validation.error.errors.forEach((err) => {
-          const field = err.path[0] as keyof FormErrors
-          fieldErrors[field] = err.message
-        })
-        setErrors(fieldErrors)
-        throw new Error('Validation failed')
+          const field = err.path[0] as keyof FormErrors;
+          fieldErrors[field] = err.message;
+        });
+        setErrors(fieldErrors);
+        throw new Error('Validation failed');
       }
 
-      setErrors({})
-      await onUpdate(data)
+      setErrors({});
+      await onUpdate(data);
     },
     delay: 500,
     enabled: true,
-  })
+  });
 
   // Update form data when profile changes
   useEffect(() => {
@@ -67,55 +67,60 @@ export function ProfileForm({ profile, onUpdate }: ProfileFormProps) {
       department: profile.department || '',
       phoneNumber: profile.phoneNumber || '',
       workLocation: profile.workLocation || '',
-    })
-  }, [profile])
+    });
+  }, [profile]);
 
   const handleChange = (field: keyof FormData, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
+    setFormData((prev) => ({ ...prev, [field]: value }));
     // Clear error for this field
     if (errors[field as keyof FormErrors]) {
-      setErrors((prev) => ({ ...prev, [field]: undefined }))
+      setErrors((prev) => ({ ...prev, [field]: undefined }));
     }
-  }
+  };
 
   const handleManualSave = async () => {
     try {
-      setIsSaving(true)
-      const validation = profileSchema.safeParse(formData)
-      
+      setIsSaving(true);
+      const validation = profileSchema.safeParse(formData);
+
       if (!validation.success) {
-        const fieldErrors: FormErrors = {}
+        const fieldErrors: FormErrors = {};
         validation.error.errors.forEach((err) => {
-          const field = err.path[0] as keyof FormErrors
-          fieldErrors[field] = err.message
-        })
-        setErrors(fieldErrors)
-        toast.error('Please fix validation errors')
-        return
+          const field = err.path[0] as keyof FormErrors;
+          fieldErrors[field] = err.message;
+        });
+        setErrors(fieldErrors);
+        toast.error('Please fix validation errors');
+        return;
       }
 
-      setErrors({})
-      await onUpdate(formData)
-      toast.success('Profile updated successfully')
+      setErrors({});
+      await onUpdate(formData);
+      toast.success('Profile updated successfully');
     } catch (error) {
-      console.error('Error saving profile:', error)
-      toast.error('Failed to update profile')
+      console.error('Error saving profile:', error);
+      toast.error('Failed to update profile');
     } finally {
-      setIsSaving(false)
+      setIsSaving(false);
     }
-  }
+  };
 
   // Get role badge color
   const getRoleBadgeColor = (role: string) => {
     const colors: Record<string, string> = {
-      ADMIN: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
-      SUPERVISOR: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
-      MANAGER: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-      DATA_ENTRY: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200',
-      AUDITOR: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
-    }
-    return colors[role] || colors.DATA_ENTRY
-  }
+      ADMIN:
+        'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
+      SUPERVISOR:
+        'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
+      MANAGER:
+        'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+      DATA_ENTRY:
+        'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200',
+      AUDITOR:
+        'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
+    };
+    return colors[role] || colors.DATA_ENTRY;
+  };
 
   return (
     <div className="space-y-6">
@@ -155,7 +160,10 @@ export function ProfileForm({ profile, onUpdate }: ProfileFormProps) {
             htmlFor="name"
             className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
           >
-            Full Name <span className="text-red-500" aria-label="required">*</span>
+            Full Name{' '}
+            <span className="text-red-500" aria-label="required">
+              *
+            </span>
           </label>
           <input
             id="name"
@@ -172,7 +180,11 @@ export function ProfileForm({ profile, onUpdate }: ProfileFormProps) {
             aria-describedby={errors.name ? 'name-error' : undefined}
           />
           {errors.name && (
-            <p id="name-error" className="mt-1 text-sm text-red-600 dark:text-red-400" role="alert">
+            <p
+              id="name-error"
+              className="mt-1 text-sm text-red-600 dark:text-red-400"
+              role="alert"
+            >
               {errors.name}
             </p>
           )}
@@ -195,7 +207,10 @@ export function ProfileForm({ profile, onUpdate }: ProfileFormProps) {
             aria-readonly="true"
             aria-describedby="email-help"
           />
-          <p id="email-help" className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+          <p
+            id="email-help"
+            className="mt-1 text-xs text-gray-500 dark:text-gray-400"
+          >
             Email cannot be changed
           </p>
         </div>
@@ -278,7 +293,11 @@ export function ProfileForm({ profile, onUpdate }: ProfileFormProps) {
             aria-describedby={errors.phoneNumber ? 'phone-error' : undefined}
           />
           {errors.phoneNumber && (
-            <p id="phone-error" className="mt-1 text-sm text-red-600 dark:text-red-400" role="alert">
+            <p
+              id="phone-error"
+              className="mt-1 text-sm text-red-600 dark:text-red-400"
+              role="alert"
+            >
               {errors.phoneNumber}
             </p>
           )}
@@ -317,5 +336,5 @@ export function ProfileForm({ profile, onUpdate }: ProfileFormProps) {
         </button>
       </div>
     </div>
-  )
+  );
 }

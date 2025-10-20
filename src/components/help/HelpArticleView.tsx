@@ -1,89 +1,89 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import Link from 'next/link'
-import { useTranslations } from '@/hooks/useTranslations'
-import ReactMarkdown from 'react-markdown'
-import { 
-  HandThumbUpIcon, 
+import { useState } from 'react';
+import Link from 'next/link';
+import { useTranslations } from '@/hooks/useTranslations';
+import ReactMarkdown from 'react-markdown';
+import {
+  HandThumbUpIcon,
   HandThumbDownIcon,
   PrinterIcon,
   ShareIcon,
-  ClockIcon
-} from '@heroicons/react/24/outline'
-import { HandThumbUpIcon as HandThumbUpSolidIcon } from '@heroicons/react/24/solid'
+  ClockIcon,
+} from '@heroicons/react/24/outline';
+import { HandThumbUpIcon as HandThumbUpSolidIcon } from '@heroicons/react/24/solid';
 
 interface Article {
-  id: string
-  title: string
-  slug: string
-  category: string
-  content: string
-  tags: string[]
-  views: number
-  helpful: number
-  notHelpful: number
-  publishedAt: string
-  updatedAt: string
+  id: string;
+  title: string;
+  slug: string;
+  category: string;
+  content: string;
+  tags: string[];
+  views: number;
+  helpful: number;
+  notHelpful: number;
+  publishedAt: string;
+  updatedAt: string;
   relatedArticles?: Array<{
-    id: string
-    title: string
-    slug: string
-    category: string
-  }>
+    id: string;
+    title: string;
+    slug: string;
+    category: string;
+  }>;
 }
 
 interface HelpArticleViewProps {
-  article: Article
+  article: Article;
 }
 
 export default function HelpArticleView({ article }: HelpArticleViewProps) {
-  const t = useTranslations('help')
-  const [feedbackGiven, setFeedbackGiven] = useState(false)
-  const [helpful, setHelpful] = useState(article.helpful)
-  const [notHelpful, setNotHelpful] = useState(article.notHelpful)
+  const t = useTranslations('help');
+  const [feedbackGiven, setFeedbackGiven] = useState(false);
+  const [helpful, setHelpful] = useState(article.helpful);
+  const [notHelpful, setNotHelpful] = useState(article.notHelpful);
 
   async function submitFeedback(isHelpful: boolean) {
-    if (feedbackGiven) return
+    if (feedbackGiven) return;
 
     try {
       const res = await fetch(`/api/help/articles/${article.slug}/feedback`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ helpful: isHelpful })
-      })
+        body: JSON.stringify({ helpful: isHelpful }),
+      });
 
       if (res.ok) {
-        const data = await res.json()
-        setHelpful(data.helpful)
-        setNotHelpful(data.notHelpful)
-        setFeedbackGiven(true)
+        const data = await res.json();
+        setHelpful(data.helpful);
+        setNotHelpful(data.notHelpful);
+        setFeedbackGiven(true);
       }
     } catch (error) {
-      console.error('Error submitting feedback:', error)
+      console.error('Error submitting feedback:', error);
     }
   }
 
   function handlePrint() {
-    window.print()
+    window.print();
   }
 
   async function handleShare() {
-    const url = window.location.href
-    
+    const url = window.location.href;
+
     if (navigator.share) {
       try {
         await navigator.share({
           title: article.title,
-          url
-        })
+          url,
+        });
       } catch (error) {
         // User cancelled or error occurred
       }
     } else {
       // Fallback: copy to clipboard
-      await navigator.clipboard.writeText(url)
-      alert(t('linkCopied'))
+      await navigator.clipboard.writeText(url);
+      alert(t('linkCopied'));
     }
   }
 
@@ -101,7 +101,9 @@ export default function HelpArticleView({ article }: HelpArticleViewProps) {
             {new Date(article.updatedAt).toLocaleDateString()}
           </span>
           <span>•</span>
-          <span>{article.views} {t('views')}</span>
+          <span>
+            {article.views} {t('views')}
+          </span>
         </div>
 
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
@@ -110,7 +112,7 @@ export default function HelpArticleView({ article }: HelpArticleViewProps) {
 
         {article.tags.length > 0 && (
           <div className="flex flex-wrap gap-2 mb-4">
-            {article.tags.map(tag => (
+            {article.tags.map((tag) => (
               <span
                 key={tag}
                 className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
@@ -195,7 +197,7 @@ export default function HelpArticleView({ article }: HelpArticleViewProps) {
           </h3>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {article.relatedArticles.map(related => (
+            {article.relatedArticles.map((related) => (
               <Link
                 key={related.id}
                 href={`/help/${related.slug}`}
@@ -213,5 +215,5 @@ export default function HelpArticleView({ article }: HelpArticleViewProps) {
         </div>
       )}
     </article>
-  )
+  );
 }

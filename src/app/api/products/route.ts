@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@/services/auth'
-import { prisma } from '@/services/prisma'
-import { API_ERROR_CODES } from '@/utils/constants'
+import { NextRequest, NextResponse } from 'next/server';
+import { auth } from '@/services/auth';
+import { prisma } from '@/services/prisma';
+import { API_ERROR_CODES } from '@/utils/constants';
 
 /**
  * GET /api/products
@@ -10,7 +10,7 @@ import { API_ERROR_CODES } from '@/utils/constants'
 export async function GET(request: NextRequest) {
   try {
     // Check authentication
-    const session = await auth()
+    const session = await auth();
     if (!session?.user) {
       return NextResponse.json(
         {
@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
           },
         },
         { status: 401 }
-      )
+      );
     }
 
     // Check permissions
@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
           },
         },
         { status: 403 }
-      )
+      );
     }
 
     // Get all products
@@ -43,14 +43,14 @@ export async function GET(request: NextRequest) {
       orderBy: {
         name: 'asc',
       },
-    })
+    });
 
     return NextResponse.json({
       success: true,
       data: products,
-    })
+    });
   } catch (error) {
-    console.error('Error fetching products:', error)
+    console.error('Error fetching products:', error);
     return NextResponse.json(
       {
         success: false,
@@ -60,6 +60,6 @@ export async function GET(request: NextRequest) {
         },
       },
       { status: 500 }
-    )
+    );
   }
 }

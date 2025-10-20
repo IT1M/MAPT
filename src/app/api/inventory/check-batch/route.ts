@@ -1,35 +1,35 @@
-import { NextRequest } from 'next/server'
-import { auth } from '@/services/auth'
-import { prisma } from '@/services/prisma'
+import { NextRequest } from 'next/server';
+import { auth } from '@/services/auth';
+import { prisma } from '@/services/prisma';
 import {
   successResponse,
   authRequiredError,
   validationError,
   handleApiError,
-} from '@/utils/api-response'
+} from '@/utils/api-response';
 
 /**
  * GET /api/inventory/check-batch
  * Check if a batch number already exists in the database
- * 
+ *
  * Query parameters:
  * - batch: batch number to check (required)
  */
 export async function GET(request: NextRequest) {
   try {
     // Check authentication
-    const session = await auth()
+    const session = await auth();
     if (!session?.user) {
-      return authRequiredError()
+      return authRequiredError();
     }
 
     // Parse query parameters
-    const searchParams = request.nextUrl.searchParams
-    const batch = searchParams.get('batch')
+    const searchParams = request.nextUrl.searchParams;
+    const batch = searchParams.get('batch');
 
     // Validate required parameter
     if (!batch) {
-      return validationError('Query parameter "batch" is required')
+      return validationError('Query parameter "batch" is required');
     }
 
     // Check if batch exists (excluding soft-deleted items)
@@ -51,13 +51,13 @@ export async function GET(request: NextRequest) {
       orderBy: {
         createdAt: 'desc',
       },
-    })
+    });
 
     return successResponse({
       exists: !!existingItem,
       item: existingItem || undefined,
-    })
+    });
   } catch (error) {
-    return handleApiError(error)
+    return handleApiError(error);
   }
 }

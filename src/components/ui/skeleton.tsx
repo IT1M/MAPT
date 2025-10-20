@@ -16,25 +16,26 @@ export const Skeleton: React.FC<SkeletonProps> = ({
   animation = 'pulse',
 }) => {
   const baseStyles = 'bg-gray-200 dark:bg-gray-700';
-  
+
   const animationStyles = {
     pulse: 'animate-pulse',
     wave: 'animate-shimmer',
     none: '',
   };
-  
+
   const variantStyles = {
     text: 'rounded',
     circular: 'rounded-full',
     rectangular: 'rounded-lg',
   };
-  
+
   const style: React.CSSProperties = {};
   if (width) style.width = typeof width === 'number' ? `${width}px` : width;
-  if (height) style.height = typeof height === 'number' ? `${height}px` : height;
-  
+  if (height)
+    style.height = typeof height === 'number' ? `${height}px` : height;
+
   const combinedClassName = `${baseStyles} ${animationStyles[animation]} ${variantStyles[variant]} ${className}`;
-  
+
   return <div className={combinedClassName} style={style} />;
 };
 
@@ -53,7 +54,9 @@ export const SkeletonCard: React.FC<SkeletonCardProps> = ({
   lines = 3,
 }) => {
   return (
-    <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 ${className}`}>
+    <div
+      className={`bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 ${className}`}
+    >
       {hasHeader && (
         <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
           <Skeleton width="60%" height={24} />
@@ -93,7 +96,9 @@ export const SkeletonTable: React.FC<SkeletonTableProps> = ({
   hasHeader = true,
 }) => {
   return (
-    <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 overflow-hidden ${className}`}>
+    <div
+      className={`bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 overflow-hidden ${className}`}
+    >
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
           {hasHeader && (
@@ -164,7 +169,9 @@ export const SkeletonStats: React.FC<SkeletonStatsProps> = ({
   count = 4,
 }) => {
   return (
-    <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 ${className}`}>
+    <div
+      className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 ${className}`}
+    >
       {Array.from({ length: count }).map((_, index) => (
         <div
           key={index}
@@ -223,7 +230,9 @@ export const SkeletonList: React.FC<SkeletonListProps> = ({
   hasAvatar = true,
 }) => {
   return (
-    <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 divide-y divide-gray-200 dark:divide-gray-700 ${className}`}>
+    <div
+      className={`bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 divide-y divide-gray-200 dark:divide-gray-700 ${className}`}
+    >
       {Array.from({ length: items }).map((_, index) => (
         <SkeletonListItem key={index} hasAvatar={hasAvatar} />
       ))}
@@ -254,7 +263,12 @@ export const SkeletonPage: React.FC<SkeletonPageProps> = ({
         {hasSidebar && (
           <div className="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 p-4 space-y-4">
             {Array.from({ length: 8 }).map((_, i) => (
-              <Skeleton key={i} width="100%" height={40} variant="rectangular" />
+              <Skeleton
+                key={i}
+                width="100%"
+                height={40}
+                variant="rectangular"
+              />
             ))}
           </div>
         )}

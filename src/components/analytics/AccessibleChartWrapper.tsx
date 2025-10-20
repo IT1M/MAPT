@@ -99,7 +99,9 @@ export const AccessibleChartWrapper: React.FC<AccessibleChartWrapperProps> = ({
         <button
           onClick={toggleDataTable}
           className="text-sm text-blue-600 dark:text-blue-400 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-2 py-1"
-          aria-label={showDataTable ? 'Show chart view' : 'Show data table view'}
+          aria-label={
+            showDataTable ? 'Show chart view' : 'Show data table view'
+          }
         >
           {showDataTable ? '📊 Show Chart' : '📋 Show Data Table'}
         </button>
@@ -125,9 +127,9 @@ export const AccessibleChartWrapper: React.FC<AccessibleChartWrapperProps> = ({
       {/* Screen Reader Only Instructions */}
       <div className="sr-only">
         <p>
-          Use left and right arrow keys to navigate through data points.
-          Press Escape to exit chart navigation.
-          Press the &quot;Show Data Table&quot; button to view data in an accessible table format.
+          Use left and right arrow keys to navigate through data points. Press
+          Escape to exit chart navigation. Press the &quot;Show Data Table&quot;
+          button to view data in an accessible table format.
         </p>
       </div>
     </div>
@@ -144,7 +146,11 @@ interface DataTableViewProps {
   title: string;
 }
 
-const DataTableView: React.FC<DataTableViewProps> = ({ data, columns, title }) => {
+const DataTableView: React.FC<DataTableViewProps> = ({
+  data,
+  columns,
+  title,
+}) => {
   return (
     <div className="overflow-x-auto">
       <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -164,10 +170,15 @@ const DataTableView: React.FC<DataTableViewProps> = ({ data, columns, title }) =
         </thead>
         <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
           {data.map((row, rowIndex) => (
-            <tr key={rowIndex} className="hover:bg-gray-50 dark:hover:bg-gray-800">
+            <tr
+              key={rowIndex}
+              className="hover:bg-gray-50 dark:hover:bg-gray-800"
+            >
               {columns.map((column) => {
                 const value = row[column.key];
-                const formatted = column.format ? column.format(value) : String(value);
+                const formatted = column.format
+                  ? column.format(value)
+                  : String(value);
                 return (
                   <td
                     key={column.key}

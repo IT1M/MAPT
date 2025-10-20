@@ -1,31 +1,38 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { useSession } from 'next-auth/react'
-import { CompanyInfo } from './CompanyInfo'
-import { InventorySettings } from './InventorySettings'
-import { BackupConfig } from './BackupConfig'
-import { SystemLimits } from './SystemLimits'
-import { DeveloperSettings } from './DeveloperSettings'
+import { useState } from 'react';
+import { useSession } from 'next-auth/react';
+import { CompanyInfo } from './CompanyInfo';
+import { InventorySettings } from './InventorySettings';
+import { BackupConfig } from './BackupConfig';
+import { SystemLimits } from './SystemLimits';
+import { DeveloperSettings } from './DeveloperSettings';
 
-type SystemPreferencesTab = 'company' | 'inventory' | 'backup' | 'limits' | 'developer'
+type SystemPreferencesTab =
+  | 'company'
+  | 'inventory'
+  | 'backup'
+  | 'limits'
+  | 'developer';
 
 export function SystemPreferences() {
-  const { data: session } = useSession()
-  const [activeTab, setActiveTab] = useState<SystemPreferencesTab>('company')
+  const { data: session } = useSession();
+  const [activeTab, setActiveTab] = useState<SystemPreferencesTab>('company');
 
   // Check if user has access (ADMIN or MANAGER)
-  const hasAccess = session?.user?.role === 'ADMIN' || session?.user?.role === 'MANAGER'
-  const isAdmin = session?.user?.role === 'ADMIN'
+  const hasAccess =
+    session?.user?.role === 'ADMIN' || session?.user?.role === 'MANAGER';
+  const isAdmin = session?.user?.role === 'ADMIN';
 
   if (!hasAccess) {
     return (
       <div className="rounded-md bg-yellow-50 dark:bg-yellow-900/20 p-4">
         <p className="text-sm text-yellow-800 dark:text-yellow-400">
-          You do not have permission to access system preferences. This section is only available to administrators and managers.
+          You do not have permission to access system preferences. This section
+          is only available to administrators and managers.
         </p>
       </div>
-    )
+    );
   }
 
   const tabs = [
@@ -33,8 +40,10 @@ export function SystemPreferences() {
     { id: 'inventory' as const, label: 'Inventory', icon: '📦' },
     { id: 'backup' as const, label: 'Backup', icon: '💾' },
     { id: 'limits' as const, label: 'System Limits', icon: '⚙️' },
-    ...(isAdmin ? [{ id: 'developer' as const, label: 'Developer', icon: '🔧' }] : []),
-  ]
+    ...(isAdmin
+      ? [{ id: 'developer' as const, label: 'Developer', icon: '🔧' }]
+      : []),
+  ];
 
   return (
     <div className="space-y-6">
@@ -79,5 +88,5 @@ export function SystemPreferences() {
         {activeTab === 'developer' && isAdmin && <DeveloperSettings />}
       </div>
     </div>
-  )
+  );
 }

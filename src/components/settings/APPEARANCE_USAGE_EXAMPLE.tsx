@@ -1,28 +1,29 @@
 /**
  * Example: How to integrate AppearanceSettings into your settings page
- * 
+ *
  * This file demonstrates the proper way to use the AppearanceSettings component
  * in a settings page with navigation and other sections.
  */
 
-'use client'
+'use client';
 
-import React, { useState } from 'react'
-import { AppearanceSettings } from '@/components/settings/AppearanceSettings'
-import { ProfileSettings } from '@/components/settings/ProfileSettings'
-import { SecuritySettings } from '@/components/settings/SecuritySettings'
+import React, { useState } from 'react';
+import { AppearanceSettings } from '@/components/settings/AppearanceSettings';
+import { ProfileSettings } from '@/components/settings/ProfileSettings';
+import { SecuritySettings } from '@/components/settings/SecuritySettings';
 
-type SettingsSection = 'profile' | 'security' | 'appearance' | 'notifications'
+type SettingsSection = 'profile' | 'security' | 'appearance' | 'notifications';
 
 export default function SettingsPageExample() {
-  const [activeSection, setActiveSection] = useState<SettingsSection>('appearance')
+  const [activeSection, setActiveSection] =
+    useState<SettingsSection>('appearance');
 
   const sections = [
     { id: 'profile' as const, label: 'Profile', icon: '👤' },
     { id: 'security' as const, label: 'Security', icon: '🔒' },
     { id: 'appearance' as const, label: 'Appearance', icon: '🎨' },
     { id: 'notifications' as const, label: 'Notifications', icon: '🔔' },
-  ]
+  ];
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -73,12 +74,12 @@ export default function SettingsPageExample() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 /**
  * Alternative: Standalone usage
- * 
+ *
  * You can also use AppearanceSettings as a standalone component
  * on its own page or in a modal.
  */
@@ -87,12 +88,12 @@ export function StandaloneAppearanceExample() {
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       <AppearanceSettings />
     </div>
-  )
+  );
 }
 
 /**
  * Alternative: With custom wrapper
- * 
+ *
  * You can wrap AppearanceSettings with your own layout and styling
  */
 export function CustomWrapperExample() {
@@ -108,22 +109,22 @@ export function CustomWrapperExample() {
               Make the interface your own with these personalization options
             </p>
           </div>
-          
+
           <AppearanceSettings />
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 /**
  * Alternative: Programmatic control
- * 
+ *
  * You can also control the appearance settings programmatically
  * using the useUserPreferences hook directly
  */
 export function ProgrammaticControlExample() {
-  const { preferences, updatePreferences } = useUserPreferences()
+  const { preferences, updatePreferences } = useUserPreferences();
 
   const quickActions = [
     {
@@ -142,7 +143,7 @@ export function ProgrammaticControlExample() {
       label: 'Spacious View',
       action: () => updatePreferences({ uiDensity: 'spacious' }),
     },
-  ]
+  ];
 
   return (
     <div className="space-y-4">
@@ -157,11 +158,11 @@ export function ProgrammaticControlExample() {
           </button>
         ))}
       </div>
-      
+
       <AppearanceSettings />
     </div>
-  )
+  );
 }
 
 // Import statement needed for the programmatic example
-import { useUserPreferences } from '@/hooks/useUserPreferences'
+import { useUserPreferences } from '@/hooks/useUserPreferences';

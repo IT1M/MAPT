@@ -9,7 +9,12 @@ import DashboardStatsCards from './DashboardStatsCards';
 import CreateBackupDialog from './CreateBackupDialog';
 import RestoreBackupDialog from './RestoreBackupDialog';
 import BackupValidationPanel from './BackupValidationPanel';
-import { BackupConfig, Backup, BackupHealth, ValidationResult } from '@/types/backup';
+import {
+  BackupConfig,
+  Backup,
+  BackupHealth,
+  ValidationResult,
+} from '@/types/backup';
 import { downloadBlob } from '@/utils/download-helper';
 
 interface BackupManagementPageProps {
@@ -17,7 +22,10 @@ interface BackupManagementPageProps {
   userRole: string;
 }
 
-export default function BackupManagementPage({ locale, userRole }: BackupManagementPageProps) {
+export default function BackupManagementPage({
+  locale,
+  userRole,
+}: BackupManagementPageProps) {
   const t = useTranslations('backup');
   const [config, setConfig] = useState<BackupConfig | null>(null);
   const [backups, setBackups] = useState<Backup[]>([]);
@@ -26,7 +34,8 @@ export default function BackupManagementPage({ locale, userRole }: BackupManagem
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [restoreDialogOpen, setRestoreDialogOpen] = useState(false);
   const [selectedBackup, setSelectedBackup] = useState<Backup | null>(null);
-  const [validationResult, setValidationResult] = useState<ValidationResult | null>(null);
+  const [validationResult, setValidationResult] =
+    useState<ValidationResult | null>(null);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
@@ -39,7 +48,7 @@ export default function BackupManagementPage({ locale, userRole }: BackupManagem
   const loadData = async () => {
     try {
       setLoading(true);
-      
+
       // Load config
       const configRes = await fetch('/api/backup/config');
       if (configRes.ok) {
@@ -169,9 +178,7 @@ export default function BackupManagementPage({ locale, userRole }: BackupManagem
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
           {t('title')}
         </h1>
-        <p className="text-gray-600 dark:text-gray-400">
-          {t('subtitle')}
-        </p>
+        <p className="text-gray-600 dark:text-gray-400">{t('subtitle')}</p>
       </div>
 
       {/* Dashboard Stats */}

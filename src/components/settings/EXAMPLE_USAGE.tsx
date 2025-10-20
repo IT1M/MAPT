@@ -1,20 +1,21 @@
 /**
  * EXAMPLE: Settings Page Integration
- * 
+ *
  * This file demonstrates how to integrate the settings infrastructure
  * into your application. Copy and adapt this code to your settings page.
  */
 
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { useSession } from 'next-auth/react'
-import { SettingsLayout, SettingsContent } from '@/components/settings'
-import type { SettingsSection } from '@/types/settings'
+import { useState } from 'react';
+import { useSession } from 'next-auth/react';
+import { SettingsLayout, SettingsContent } from '@/components/settings';
+import type { SettingsSection } from '@/types/settings';
 
 export default function SettingsPageExample() {
-  const { data: session } = useSession()
-  const [activeSection, setActiveSection] = useState<SettingsSection>('profile')
+  const { data: session } = useSession();
+  const [activeSection, setActiveSection] =
+    useState<SettingsSection>('profile');
 
   // Redirect if not authenticated
   if (!session?.user) {
@@ -29,7 +30,7 @@ export default function SettingsPageExample() {
           </p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -51,7 +52,7 @@ export default function SettingsPageExample() {
       */}
       <SettingsContent section={activeSection} />
     </SettingsLayout>
-  )
+  );
 }
 
 /**

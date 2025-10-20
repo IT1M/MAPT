@@ -1,6 +1,6 @@
 /**
  * useApiErrorHandler Hook
- * 
+ *
  * React hook for handling API errors with toast notifications and navigation
  */
 
@@ -9,14 +9,20 @@
 import { useRouter } from 'next/navigation';
 import { useLocale } from '@/hooks/useLocale';
 import { useCallback } from 'react';
-import { handleApiError, ApiErrorHandlerOptions } from '@/utils/api-error-handler-client';
+import {
+  handleApiError,
+  ApiErrorHandlerOptions,
+} from '@/utils/api-error-handler-client';
 
 // Simple toast function (can be replaced with your toast library)
-function showToast(message: string, type: 'error' | 'success' | 'warning' | 'info' = 'error') {
+function showToast(
+  message: string,
+  type: 'error' | 'success' | 'warning' | 'info' = 'error'
+) {
   // This is a simple implementation - replace with your toast library
   if (typeof window !== 'undefined') {
     console.log(`[${type.toUpperCase()}]:`, message);
-    
+
     // You can integrate with react-hot-toast, sonner, or any other toast library here
     // Example with react-hot-toast:
     // import toast from 'react-hot-toast';
@@ -45,7 +51,7 @@ export function useApiErrorHandler() {
 
 /**
  * useNetworkStatus Hook
- * 
+ *
  * Monitor network connectivity status
  */
 
@@ -61,7 +67,7 @@ export function useNetworkStatus() {
 
     const unsubscribe = monitor.subscribe((status) => {
       setIsOnline(status);
-      
+
       // Show toast when status changes
       if (status) {
         showToast('You are back online', 'success');
@@ -78,7 +84,7 @@ export function useNetworkStatus() {
 
 /**
  * useApiRequest Hook
- * 
+ *
  * Hook for making API requests with automatic error handling
  */
 

@@ -1,20 +1,22 @@
-'use client'
+'use client';
 
 /**
  * Search Button Component
  * Displays a button to trigger global search with keyboard shortcut hint
  */
 
-import { useGlobalSearchContext } from './GlobalSearchProvider'
-import { useTranslations } from '@/hooks/useTranslations'
+import { useGlobalSearchContext } from './GlobalSearchProvider';
+import { useTranslations } from '@/hooks/useTranslations';
 
 export function SearchButton() {
-  const { openSearch } = useGlobalSearchContext()
-  const t = useTranslations()
+  const { openSearch } = useGlobalSearchContext();
+  const t = useTranslations();
 
   // Detect platform for keyboard shortcut display
-  const isMac = typeof window !== 'undefined' && navigator.platform.toUpperCase().indexOf('MAC') >= 0
-  const shortcutKey = isMac ? '⌘' : 'Ctrl'
+  const isMac =
+    typeof window !== 'undefined' &&
+    navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+  const shortcutKey = isMac ? '⌘' : 'Ctrl';
 
   return (
     <button
@@ -40,5 +42,5 @@ export function SearchButton() {
         {shortcutKey} K
       </kbd>
     </button>
-  )
+  );
 }

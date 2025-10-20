@@ -16,11 +16,11 @@ This animation system provides a comprehensive set of animations and transitions
 ### Import Animations
 
 ```typescript
-import { 
-  PageTransition, 
+import {
+  PageTransition,
   useModalAnimation,
-  ANIMATION_CLASSES 
-} from '@/components/layout/animations'
+  ANIMATION_CLASSES,
+} from '@/components/layout/animations';
 ```
 
 ### Basic Usage
@@ -28,52 +28,43 @@ import {
 #### Page Transitions
 
 ```tsx
-import { PageTransition } from '@/components/layout/animations'
+import { PageTransition } from '@/components/layout/animations';
 
 export default function Layout({ children }) {
-  return (
-    <PageTransition>
-      {children}
-    </PageTransition>
-  )
+  return <PageTransition>{children}</PageTransition>;
 }
 ```
 
 #### Modal Animations
 
 ```tsx
-import { useModalAnimation } from '@/components/layout/animations'
+import { useModalAnimation } from '@/components/layout/animations';
 
 function Modal({ isOpen, onClose, children }) {
-  const { shouldRender, backdropClass, contentClass } = useModalAnimation(isOpen)
+  const { shouldRender, backdropClass, contentClass } =
+    useModalAnimation(isOpen);
 
-  if (!shouldRender) return null
+  if (!shouldRender) return null;
 
   return (
     <div className={`fixed inset-0 z-50 ${backdropClass}`}>
-      <div className={`modal-content ${contentClass}`}>
-        {children}
-      </div>
+      <div className={`modal-content ${contentClass}`}>{children}</div>
     </div>
-  )
+  );
 }
 ```
 
 #### Dropdown Animations
 
 ```tsx
-import { useDropdownAnimation } from '@/components/layout/animations'
+import { useDropdownAnimation } from '@/components/layout/animations';
 
 function Dropdown({ isOpen, children }) {
-  const { shouldRender, animationClass } = useDropdownAnimation(isOpen)
+  const { shouldRender, animationClass } = useDropdownAnimation(isOpen);
 
-  if (!shouldRender) return null
+  if (!shouldRender) return null;
 
-  return (
-    <div className={`dropdown ${animationClass}`}>
-      {children}
-    </div>
-  )
+  return <div className={`dropdown ${animationClass}`}>{children}</div>;
 }
 ```
 
@@ -90,6 +81,7 @@ Provides smooth fade transitions between page navigations.
 ```
 
 **Props:**
+
 - `children: ReactNode` - Content to animate
 - `className?: string` - Additional CSS classes
 
@@ -104,6 +96,7 @@ Simple fade transition for conditional content.
 ```
 
 **Props:**
+
 - `children: ReactNode` - Content to animate
 - `show?: boolean` - Whether to show content (default: true)
 - `duration?: number` - Animation duration in ms (default: 200)
@@ -120,6 +113,7 @@ Slide and fade transition for panels and drawers.
 ```
 
 **Props:**
+
 - `children: ReactNode` - Content to animate
 - `show?: boolean` - Whether to show content (default: true)
 - `direction?: 'up' | 'down' | 'left' | 'right'` - Slide direction (default: 'down')
@@ -137,6 +131,7 @@ Scale transition for modals and popovers.
 ```
 
 **Props:**
+
 - `children: ReactNode` - Content to animate
 - `show?: boolean` - Whether to show content (default: true)
 - `duration?: number` - Animation duration in ms (default: 200)
@@ -149,13 +144,14 @@ Animates list items with a delay between each.
 
 ```tsx
 <StaggerChildren staggerDelay={50}>
-  {items.map(item => (
+  {items.map((item) => (
     <ListItem key={item.id} {...item} />
   ))}
 </StaggerChildren>
 ```
 
 **Props:**
+
 - `children: ReactNode` - List items to animate
 - `staggerDelay?: number` - Delay between items in ms (default: 50)
 - `className?: string` - Additional CSS classes
@@ -167,7 +163,7 @@ Animates list items with a delay between each.
 Detects if user prefers reduced motion.
 
 ```tsx
-const prefersReducedMotion = useReducedMotion()
+const prefersReducedMotion = useReducedMotion();
 
 if (prefersReducedMotion) {
   // Skip animations
@@ -181,11 +177,12 @@ if (prefersReducedMotion) {
 Gets animation duration based on reduced motion preference.
 
 ```tsx
-const duration = useAnimationDuration(200)
+const duration = useAnimationDuration(200);
 // Returns 0 if user prefers reduced motion, 200 otherwise
 ```
 
 **Parameters:**
+
 - `defaultDuration: number` - Default duration in ms
 
 **Returns:** `number` - Duration in ms (0 if reduced motion)
@@ -195,13 +192,15 @@ const duration = useAnimationDuration(200)
 Manages modal animation state.
 
 ```tsx
-const { shouldRender, backdropClass, contentClass } = useModalAnimation(isOpen)
+const { shouldRender, backdropClass, contentClass } = useModalAnimation(isOpen);
 ```
 
 **Parameters:**
+
 - `isOpen: boolean` - Whether modal is open
 
 **Returns:**
+
 - `shouldRender: boolean` - Whether to render modal in DOM
 - `backdropClass: string` - CSS class for backdrop animation
 - `contentClass: string` - CSS class for content animation
@@ -211,13 +210,15 @@ const { shouldRender, backdropClass, contentClass } = useModalAnimation(isOpen)
 Manages dropdown animation state.
 
 ```tsx
-const { shouldRender, animationClass } = useDropdownAnimation(isOpen)
+const { shouldRender, animationClass } = useDropdownAnimation(isOpen);
 ```
 
 **Parameters:**
+
 - `isOpen: boolean` - Whether dropdown is open
 
 **Returns:**
+
 - `shouldRender: boolean` - Whether to render dropdown in DOM
 - `animationClass: string` - CSS class for animation
 
@@ -226,13 +227,15 @@ const { shouldRender, animationClass } = useDropdownAnimation(isOpen)
 Manages toast notification animation state.
 
 ```tsx
-const { shouldRender, animationClass } = useToastAnimation(isVisible)
+const { shouldRender, animationClass } = useToastAnimation(isVisible);
 ```
 
 **Parameters:**
+
 - `isVisible: boolean` - Whether toast is visible
 
 **Returns:**
+
 - `shouldRender: boolean` - Whether to render toast in DOM
 - `animationClass: string` - CSS class for animation
 
@@ -241,17 +244,18 @@ const { shouldRender, animationClass } = useToastAnimation(isVisible)
 Triggers shake animation (useful for errors).
 
 ```tsx
-const { isShaking, shake, className } = useShakeAnimation()
+const { isShaking, shake, className } = useShakeAnimation();
 
 // Trigger shake on error
 if (error) {
-  shake()
+  shake();
 }
 
-return <div className={className}>...</div>
+return <div className={className}>...</div>;
 ```
 
 **Returns:**
+
 - `isShaking: boolean` - Whether currently shaking
 - `shake: () => void` - Function to trigger shake
 - `className: string` - CSS class to apply
@@ -261,17 +265,18 @@ return <div className={className}>...</div>
 Triggers bounce animation (useful for attention).
 
 ```tsx
-const { isBouncing, bounce, className } = useBounceAnimation()
+const { isBouncing, bounce, className } = useBounceAnimation();
 
 // Trigger bounce on new notification
 if (newNotification) {
-  bounce()
+  bounce();
 }
 
-return <div className={className}>...</div>
+return <div className={className}>...</div>;
 ```
 
 **Returns:**
+
 - `isBouncing: boolean` - Whether currently bouncing
 - `bounce: () => void` - Function to trigger bounce
 - `className: string` - CSS class to apply
@@ -281,16 +286,13 @@ return <div className={className}>...</div>
 Adds animation class when scrolled past threshold.
 
 ```tsx
-const hasScrolled = useScrollAnimation(100)
+const hasScrolled = useScrollAnimation(100);
 
-return (
-  <header className={hasScrolled ? 'shadow-lg' : ''}>
-    ...
-  </header>
-)
+return <header className={hasScrolled ? 'shadow-lg' : ''}>...</header>;
 ```
 
 **Parameters:**
+
 - `threshold?: number` - Scroll threshold in pixels (default: 100)
 
 **Returns:** `boolean` - True if scrolled past threshold
@@ -300,20 +302,21 @@ return (
 Manages stagger animation for list items.
 
 ```tsx
-const visibleItems = useStaggerAnimation(items.length, 50)
+const visibleItems = useStaggerAnimation(items.length, 50);
 
 return (
   <ul>
-    {items.slice(0, visibleItems).map(item => (
+    {items.slice(0, visibleItems).map((item) => (
       <li key={item.id} className="list-item-enter">
         {item.name}
       </li>
     ))}
   </ul>
-)
+);
 ```
 
 **Parameters:**
+
 - `itemCount: number` - Total number of items
 - `staggerDelay?: number` - Delay between items in ms (default: 50)
 
@@ -398,24 +401,24 @@ return (
 ### Animation Durations
 
 ```typescript
-import { ANIMATION_DURATION } from '@/components/layout/animations'
+import { ANIMATION_DURATION } from '@/components/layout/animations';
 
-ANIMATION_DURATION.FAST        // 150ms
-ANIMATION_DURATION.NORMAL      // 200ms
-ANIMATION_DURATION.SLOW        // 300ms
-ANIMATION_DURATION.VERY_SLOW   // 500ms
+ANIMATION_DURATION.FAST; // 150ms
+ANIMATION_DURATION.NORMAL; // 200ms
+ANIMATION_DURATION.SLOW; // 300ms
+ANIMATION_DURATION.VERY_SLOW; // 500ms
 ```
 
 ### Animation Easing
 
 ```typescript
-import { ANIMATION_EASING } from '@/components/layout/animations'
+import { ANIMATION_EASING } from '@/components/layout/animations';
 
-ANIMATION_EASING.EASE_IN       // 'ease-in'
-ANIMATION_EASING.EASE_OUT      // 'ease-out'
-ANIMATION_EASING.EASE_IN_OUT   // 'ease-in-out'
-ANIMATION_EASING.LINEAR        // 'linear'
-ANIMATION_EASING.SPRING        // 'cubic-bezier(0.68, -0.55, 0.265, 1.55)'
+ANIMATION_EASING.EASE_IN; // 'ease-in'
+ANIMATION_EASING.EASE_OUT; // 'ease-out'
+ANIMATION_EASING.EASE_IN_OUT; // 'ease-in-out'
+ANIMATION_EASING.LINEAR; // 'linear'
+ANIMATION_EASING.SPRING; // 'cubic-bezier(0.68, -0.55, 0.265, 1.55)'
 ```
 
 ## Utility Functions
@@ -425,13 +428,13 @@ ANIMATION_EASING.SPRING        // 'cubic-bezier(0.68, -0.55, 0.265, 1.55)'
 Combines multiple animation classes, filtering out falsy values.
 
 ```typescript
-import { combineAnimationClasses } from '@/components/layout/animations'
+import { combineAnimationClasses } from '@/components/layout/animations';
 
 const className = combineAnimationClasses(
   'base-class',
   isActive && 'active-class',
   isHovered && 'hover-class'
-)
+);
 ```
 
 ### getStaggerDelay
@@ -451,13 +454,16 @@ import { getStaggerDelay } from '@/components/layout/animations'
 Creates transition style object.
 
 ```typescript
-import { createTransitionStyle, ANIMATION_EASING } from '@/components/layout/animations'
+import {
+  createTransitionStyle,
+  ANIMATION_EASING,
+} from '@/components/layout/animations';
 
 const style = createTransitionStyle(
   ['opacity', 'transform'],
   200,
   ANIMATION_EASING.EASE_OUT
-)
+);
 ```
 
 ## Performance Guidelines
@@ -502,73 +508,80 @@ Chrome/Edge: Rendering tab → Emulate CSS media feature prefers-reduced-motion
 ### Complete Modal Example
 
 ```tsx
-import { useModalAnimation } from '@/components/layout/animations'
+import { useModalAnimation } from '@/components/layout/animations';
 
 function Modal({ isOpen, onClose, children }) {
-  const { shouldRender, backdropClass, contentClass } = useModalAnimation(isOpen)
+  const { shouldRender, backdropClass, contentClass } =
+    useModalAnimation(isOpen);
 
-  if (!shouldRender) return null
+  if (!shouldRender) return null;
 
   return (
-    <div 
+    <div
       className={`fixed inset-0 z-50 flex items-center justify-center ${backdropClass}`}
       onClick={onClose}
     >
-      <div 
+      <div
         className={`bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full ${contentClass}`}
         onClick={(e) => e.stopPropagation()}
       >
         {children}
       </div>
     </div>
-  )
+  );
 }
 ```
 
 ### Complete Dropdown Example
 
 ```tsx
-import { useDropdownAnimation } from '@/components/layout/animations'
+import { useDropdownAnimation } from '@/components/layout/animations';
 
 function Dropdown({ isOpen, items }) {
-  const { shouldRender, animationClass } = useDropdownAnimation(isOpen)
+  const { shouldRender, animationClass } = useDropdownAnimation(isOpen);
 
-  if (!shouldRender) return null
+  if (!shouldRender) return null;
 
   return (
-    <div className={`absolute top-full mt-2 bg-white rounded-lg shadow-lg ${animationClass}`}>
-      {items.map(item => (
-        <button key={item.id} className="block w-full px-4 py-2 text-left hover:bg-gray-100">
+    <div
+      className={`absolute top-full mt-2 bg-white rounded-lg shadow-lg ${animationClass}`}
+    >
+      {items.map((item) => (
+        <button
+          key={item.id}
+          className="block w-full px-4 py-2 text-left hover:bg-gray-100"
+        >
           {item.label}
         </button>
       ))}
     </div>
-  )
+  );
 }
 ```
 
 ### Complete List with Stagger Example
 
 ```tsx
-import { StaggerChildren } from '@/components/layout/animations'
+import { StaggerChildren } from '@/components/layout/animations';
 
 function ItemList({ items }) {
   return (
     <StaggerChildren staggerDelay={50}>
-      {items.map(item => (
+      {items.map((item) => (
         <div key={item.id} className="p-4 bg-white rounded-lg shadow">
           <h3>{item.title}</h3>
           <p>{item.description}</p>
         </div>
       ))}
     </StaggerChildren>
-  )
+  );
 }
 ```
 
 ## Browser Support
 
 All animations use standard CSS and are supported in:
+
 - Chrome/Edge 90+
 - Firefox 88+
 - Safari 14+

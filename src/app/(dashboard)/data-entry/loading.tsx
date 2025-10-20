@@ -95,7 +95,10 @@ export default function DataEntryLoading() {
               <div className="space-y-3 mb-6">
                 <Skeleton width="50%" height={18} className="mb-3" />
                 {Array.from({ length: 5 }).map((_, index) => (
-                  <div key={index} className="space-y-2 pb-3 border-b border-gray-200 dark:border-gray-700">
+                  <div
+                    key={index}
+                    className="space-y-2 pb-3 border-b border-gray-200 dark:border-gray-700"
+                  >
                     <Skeleton width="80%" height={16} />
                     <Skeleton width="60%" height={14} />
                   </div>

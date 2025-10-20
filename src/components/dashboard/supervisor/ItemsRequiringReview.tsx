@@ -1,41 +1,41 @@
-'use client'
+'use client';
 
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface ItemForReview {
-  id: string
-  itemName: string
-  batch: string
-  quantity: number
-  rejectQuantity: number
-  enteredBy: string
-  createdAt: string
-  flagReason: string
+  id: string;
+  itemName: string;
+  batch: string;
+  quantity: number;
+  rejectQuantity: number;
+  enteredBy: string;
+  createdAt: string;
+  flagReason: string;
 }
 
 export function ItemsRequiringReview() {
-  const router = useRouter()
-  const [items, setItems] = useState<ItemForReview[]>([])
-  const [loading, setLoading] = useState(true)
+  const router = useRouter();
+  const [items, setItems] = useState<ItemForReview[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchItemsForReview()
-  }, [])
+    fetchItemsForReview();
+  }, []);
 
   const fetchItemsForReview = async () => {
     try {
-      const response = await fetch('/api/dashboard/items-for-review')
+      const response = await fetch('/api/dashboard/items-for-review');
       if (response.ok) {
-        const data = await response.json()
-        setItems(data)
+        const data = await response.json();
+        setItems(data);
       }
     } catch (error) {
-      console.error('Failed to fetch items for review:', error)
+      console.error('Failed to fetch items for review:', error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   if (loading) {
     return (
@@ -46,7 +46,7 @@ export function ItemsRequiringReview() {
           <div className="h-20 bg-gray-200 dark:bg-gray-700 rounded"></div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -65,10 +65,22 @@ export function ItemsRequiringReview() {
       <div className="space-y-3 max-h-96 overflow-y-auto">
         {items.length === 0 ? (
           <div className="text-center py-8">
-            <svg className="w-12 h-12 text-green-500 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <svg
+              className="w-12 h-12 text-green-500 mx-auto mb-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
-            <p className="text-gray-500 dark:text-gray-400">No items requiring review</p>
+            <p className="text-gray-500 dark:text-gray-400">
+              No items requiring review
+            </p>
           </div>
         ) : (
           items.map((item) => (
@@ -86,8 +98,16 @@ export function ItemsRequiringReview() {
                     Batch: {item.batch} • By: {item.enteredBy}
                   </p>
                 </div>
-                <svg className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                <svg
+                  className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                    clipRule="evenodd"
+                  />
                 </svg>
               </div>
 
@@ -111,5 +131,5 @@ export function ItemsRequiringReview() {
         )}
       </div>
     </div>
-  )
+  );
 }

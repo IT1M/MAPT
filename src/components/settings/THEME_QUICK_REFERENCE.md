@@ -3,27 +3,27 @@
 ## Import
 
 ```tsx
-import { ThemeCustomizer } from '@/components/settings/ThemeCustomizer'
-import { useThemeCustomization } from '@/hooks/useThemeCustomization'
+import { ThemeCustomizer } from '@/components/settings/ThemeCustomizer';
+import { useThemeCustomization } from '@/hooks/useThemeCustomization';
 ```
 
 ## Hook API
 
 ```tsx
 const {
-  currentTheme,           // Current theme object
-  isLoading,             // Loading state
-  selectPreset,          // (id: string) => void
-  updateColors,          // (colors: Partial<Colors>) => void
-  updateFonts,           // (fonts: Partial<Fonts>) => void
-  updateDensity,         // (density: 'compact' | 'comfortable' | 'spacious') => void
-  updateAnimations,      // (animations: Partial<Animations>) => void
-  exportTheme,           // () => void
-  importTheme,           // (json: string) => { success: boolean; error?: string }
-  generateShareCode,     // () => string
-  importFromShareCode,   // (code: string) => { success: boolean; error?: string }
-  resetToDefault,        // () => void
-} = useThemeCustomization()
+  currentTheme, // Current theme object
+  isLoading, // Loading state
+  selectPreset, // (id: string) => void
+  updateColors, // (colors: Partial<Colors>) => void
+  updateFonts, // (fonts: Partial<Fonts>) => void
+  updateDensity, // (density: 'compact' | 'comfortable' | 'spacious') => void
+  updateAnimations, // (animations: Partial<Animations>) => void
+  exportTheme, // () => void
+  importTheme, // (json: string) => { success: boolean; error?: string }
+  generateShareCode, // () => string
+  importFromShareCode, // (code: string) => { success: boolean; error?: string }
+  resetToDefault, // () => void
+} = useThemeCustomization();
 ```
 
 ## Preset Themes
@@ -38,22 +38,26 @@ const {
 ## CSS Classes
 
 ### Buttons
+
 ```tsx
 <button className="theme-button-primary">Primary</button>
 <button className="theme-button-secondary">Secondary</button>
 ```
 
 ### Cards
+
 ```tsx
 <div className="theme-card">Content</div>
 ```
 
 ### Inputs
+
 ```tsx
 <input className="theme-input" />
 ```
 
 ### Badges
+
 ```tsx
 <span className="theme-badge-success">Success</span>
 <span className="theme-badge-warning">Warning</span>
@@ -62,6 +66,7 @@ const {
 ```
 
 ### Colors
+
 ```tsx
 <div className="theme-primary">Text</div>
 <div className="theme-bg-primary">Background</div>
@@ -69,6 +74,7 @@ const {
 ```
 
 ### Transitions
+
 ```tsx
 <div className="theme-transition">All</div>
 <div className="theme-transition-colors">Colors</div>
@@ -78,6 +84,7 @@ const {
 ## CSS Variables
 
 ### Colors
+
 ```css
 var(--theme-primary)
 var(--theme-secondary)
@@ -96,6 +103,7 @@ var(--theme-info)
 ```
 
 ### Typography
+
 ```css
 var(--theme-font-family)
 var(--theme-font-size-base)
@@ -105,6 +113,7 @@ var(--theme-font-size-xl)
 ```
 
 ### Spacing
+
 ```css
 var(--theme-padding)
 var(--theme-gap)
@@ -112,6 +121,7 @@ var(--theme-density-font-size)
 ```
 
 ### Animation
+
 ```css
 var(--theme-animation-speed)
 ```
@@ -119,68 +129,79 @@ var(--theme-animation-speed)
 ## Common Patterns
 
 ### Apply Preset
+
 ```tsx
-selectPreset('ocean')
+selectPreset('ocean');
 ```
 
 ### Update Single Color
+
 ```tsx
-updateColors({ primary: '#ff0000' })
+updateColors({ primary: '#ff0000' });
 ```
 
 ### Update Multiple Colors
+
 ```tsx
 updateColors({
   primary: '#ff0000',
   secondary: '#00ff00',
   accent: '#0000ff',
-})
+});
 ```
 
 ### Change Font
+
 ```tsx
-updateFonts({ family: 'Arial, sans-serif' })
+updateFonts({ family: 'Arial, sans-serif' });
 ```
 
 ### Change Density
+
 ```tsx
-updateDensity('compact')
+updateDensity('compact');
 ```
 
 ### Toggle Animations
+
 ```tsx
-updateAnimations({ enabled: false })
+updateAnimations({ enabled: false });
 ```
 
 ### Export Theme
+
 ```tsx
-exportTheme() // Downloads JSON file
+exportTheme(); // Downloads JSON file
 ```
 
 ### Generate Share Code
+
 ```tsx
-const code = generateShareCode()
+const code = generateShareCode();
 // Share this code with others
 ```
 
 ### Import from Code
+
 ```tsx
-const result = importFromShareCode(code)
+const result = importFromShareCode(code);
 if (result.success) {
-  console.log('Theme imported!')
+  console.log('Theme imported!');
 }
 ```
 
 ## Inline Styles
 
 ```tsx
-<div style={{
-  backgroundColor: 'var(--theme-primary)',
-  color: 'var(--theme-foreground)',
-  padding: 'var(--theme-padding)',
-  gap: 'var(--theme-gap)',
-  transition: 'all var(--theme-animation-speed)',
-}}>
+<div
+  style={{
+    backgroundColor: 'var(--theme-primary)',
+    color: 'var(--theme-foreground)',
+    padding: 'var(--theme-padding)',
+    gap: 'var(--theme-gap)',
+    transition: 'all var(--theme-animation-speed)',
+  }}
+>
   Content
 </div>
 ```

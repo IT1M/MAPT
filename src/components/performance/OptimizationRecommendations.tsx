@@ -1,6 +1,6 @@
-'use client'
+'use client';
 
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 import {
   Lightbulb,
   CheckCircle,
@@ -9,26 +9,26 @@ import {
   ChevronUp,
   Sparkles,
   AlertCircle,
-} from 'lucide-react'
+} from 'lucide-react';
 
 interface Recommendation {
-  id: string
-  title: string
-  description: string
-  priority: 'high' | 'medium' | 'low'
-  category: 'api' | 'database' | 'frontend' | 'infrastructure'
-  impact: string
-  effort: 'low' | 'medium' | 'high'
-  documentationLinks: string[]
-  implementationSteps: string[]
-  estimatedImprovement: string
-  implemented: boolean
+  id: string;
+  title: string;
+  description: string;
+  priority: 'high' | 'medium' | 'low';
+  category: 'api' | 'database' | 'frontend' | 'infrastructure';
+  impact: string;
+  effort: 'low' | 'medium' | 'high';
+  documentationLinks: string[];
+  implementationSteps: string[];
+  estimatedImprovement: string;
+  implemented: boolean;
 }
 
 interface OptimizationRecommendationsProps {
-  recommendations: Recommendation[]
-  onMarkImplemented: (id: string) => void
-  confidence: number
+  recommendations: Recommendation[];
+  onMarkImplemented: (id: string) => void;
+  confidence: number;
 }
 
 export function OptimizationRecommendations({
@@ -36,31 +36,33 @@ export function OptimizationRecommendations({
   onMarkImplemented,
   confidence,
 }: OptimizationRecommendationsProps) {
-  const [expandedId, setExpandedId] = useState<string | null>(null)
-  const [filter, setFilter] = useState<'all' | 'high' | 'medium' | 'low'>('all')
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [filter, setFilter] = useState<'all' | 'high' | 'medium' | 'low'>(
+    'all'
+  );
 
   const filteredRecommendations = recommendations.filter(
-    rec => filter === 'all' || rec.priority === filter
-  )
+    (rec) => filter === 'all' || rec.priority === filter
+  );
 
   const priorityColors = {
     high: 'bg-red-100 text-red-700 border-red-200',
     medium: 'bg-yellow-100 text-yellow-700 border-yellow-200',
     low: 'bg-blue-100 text-blue-700 border-blue-200',
-  }
+  };
 
   const effortLabels = {
     low: 'Low Effort',
     medium: 'Medium Effort',
     high: 'High Effort',
-  }
+  };
 
   const categoryIcons = {
     api: '🔌',
     database: '🗄️',
     frontend: '🎨',
     infrastructure: '⚙️',
-  }
+  };
 
   return (
     <div className="bg-white border rounded-lg p-6">
@@ -68,7 +70,9 @@ export function OptimizationRecommendations({
         <div className="flex items-center gap-3">
           <Sparkles className="w-6 h-6 text-purple-600" />
           <div>
-            <h3 className="text-lg font-semibold">AI-Powered Optimization Recommendations</h3>
+            <h3 className="text-lg font-semibold">
+              AI-Powered Optimization Recommendations
+            </h3>
             <p className="text-sm text-gray-600">
               Confidence: {(confidence * 100).toFixed(0)}%
             </p>
@@ -76,7 +80,7 @@ export function OptimizationRecommendations({
         </div>
 
         <div className="flex gap-2">
-          {(['all', 'high', 'medium', 'low'] as const).map(priority => (
+          {(['all', 'high', 'medium', 'low'] as const).map((priority) => (
             <button
               key={priority}
               onClick={() => setFilter(priority)}
@@ -86,7 +90,9 @@ export function OptimizationRecommendations({
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
-              {priority === 'all' ? 'All' : priority.charAt(0).toUpperCase() + priority.slice(1)}
+              {priority === 'all'
+                ? 'All'
+                : priority.charAt(0).toUpperCase() + priority.slice(1)}
             </button>
           ))}
         </div>
@@ -100,7 +106,7 @@ export function OptimizationRecommendations({
         </div>
       ) : (
         <div className="space-y-4">
-          {filteredRecommendations.map(rec => (
+          {filteredRecommendations.map((rec) => (
             <div
               key={rec.id}
               className={`border-2 rounded-lg overflow-hidden transition-all ${
@@ -111,7 +117,9 @@ export function OptimizationRecommendations({
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="text-2xl">{categoryIcons[rec.category]}</span>
+                      <span className="text-2xl">
+                        {categoryIcons[rec.category]}
+                      </span>
                       <span
                         className={`text-xs font-semibold px-2 py-1 rounded border ${
                           priorityColors[rec.priority]
@@ -131,7 +139,9 @@ export function OptimizationRecommendations({
                     </div>
 
                     <h4 className="font-semibold text-lg mb-2">{rec.title}</h4>
-                    <p className="text-gray-700 text-sm mb-3">{rec.description}</p>
+                    <p className="text-gray-700 text-sm mb-3">
+                      {rec.description}
+                    </p>
 
                     <div className="flex items-center gap-4 text-sm">
                       <div className="flex items-center gap-1 text-purple-600">
@@ -158,7 +168,9 @@ export function OptimizationRecommendations({
                       </button>
                     )}
                     <button
-                      onClick={() => setExpandedId(expandedId === rec.id ? null : rec.id)}
+                      onClick={() =>
+                        setExpandedId(expandedId === rec.id ? null : rec.id)
+                      }
                       className="px-4 py-2 bg-gray-100 text-gray-700 text-sm rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-2"
                     >
                       {expandedId === rec.id ? (
@@ -179,7 +191,9 @@ export function OptimizationRecommendations({
                 {expandedId === rec.id && (
                   <div className="mt-4 pt-4 border-t space-y-4">
                     <div>
-                      <h5 className="font-semibold text-sm mb-2">Implementation Steps:</h5>
+                      <h5 className="font-semibold text-sm mb-2">
+                        Implementation Steps:
+                      </h5>
                       <ol className="list-decimal list-inside space-y-1 text-sm text-gray-700">
                         {rec.implementationSteps.map((step, index) => (
                           <li key={index}>{step}</li>
@@ -188,7 +202,9 @@ export function OptimizationRecommendations({
                     </div>
 
                     <div>
-                      <h5 className="font-semibold text-sm mb-2">Documentation:</h5>
+                      <h5 className="font-semibold text-sm mb-2">
+                        Documentation:
+                      </h5>
                       <div className="flex flex-wrap gap-2">
                         {rec.documentationLinks.map((link, index) => (
                           <a
@@ -212,5 +228,5 @@ export function OptimizationRecommendations({
         </div>
       )}
     </div>
-  )
+  );
 }

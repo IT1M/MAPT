@@ -46,7 +46,7 @@ export const UserActivityHeatmap: React.FC<UserActivityHeatmapProps> = ({
   const getColor = (count: number): string => {
     if (count === 0) return 'rgb(243, 244, 246)'; // gray-100
     const intensity = count / maxCount;
-    
+
     if (intensity < 0.2) return 'rgb(219, 234, 254)'; // blue-100
     if (intensity < 0.4) return 'rgb(191, 219, 254)'; // blue-200
     if (intensity < 0.6) return 'rgb(147, 197, 253)'; // blue-300
@@ -57,7 +57,7 @@ export const UserActivityHeatmap: React.FC<UserActivityHeatmapProps> = ({
   const getDarkColor = (count: number): string => {
     if (count === 0) return 'rgb(31, 41, 55)'; // gray-800
     const intensity = count / maxCount;
-    
+
     if (intensity < 0.2) return 'rgb(30, 58, 138)'; // blue-900
     if (intensity < 0.4) return 'rgb(30, 64, 175)'; // blue-800
     if (intensity < 0.6) return 'rgb(29, 78, 216)'; // blue-700
@@ -76,7 +76,10 @@ export const UserActivityHeatmap: React.FC<UserActivityHeatmapProps> = ({
         .map((row) => row.join(','))
         .join('\n');
 
-      downloadCSV(csv, `user-activity-heatmap-${new Date().toISOString().split('T')[0]}.csv`);
+      downloadCSV(
+        csv,
+        `user-activity-heatmap-${new Date().toISOString().split('T')[0]}.csv`
+      );
     }
   };
 
@@ -151,7 +154,12 @@ export const UserActivityHeatmap: React.FC<UserActivityHeatmapProps> = ({
                 {/* Day label */}
                 <text
                   x={labelWidth - 10}
-                  y={labelHeight + dayIndex * (cellSize + cellGap) + cellSize / 2 + 4}
+                  y={
+                    labelHeight +
+                    dayIndex * (cellSize + cellGap) +
+                    cellSize / 2 +
+                    4
+                  }
                   textAnchor="end"
                   className="text-xs fill-gray-600 dark:fill-gray-400"
                   fontSize="11"
@@ -225,7 +233,9 @@ export const UserActivityHeatmap: React.FC<UserActivityHeatmapProps> = ({
           <span className="text-xs text-gray-500 dark:text-gray-400">More</span>
           <div className="ml-4 flex items-center gap-2">
             <div className="w-6 h-6 rounded border-2 border-red-500" />
-            <span className="text-xs text-gray-500 dark:text-gray-400">Peak time</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400">
+              Peak time
+            </span>
           </div>
         </div>
 
@@ -235,13 +245,17 @@ export const UserActivityHeatmap: React.FC<UserActivityHeatmapProps> = ({
             <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
               {data.reduce((sum, d) => sum + d.count, 0).toLocaleString()}
             </div>
-            <div className="text-xs text-gray-500 dark:text-gray-400">Total Entries</div>
+            <div className="text-xs text-gray-500 dark:text-gray-400">
+              Total Entries
+            </div>
           </div>
           <div>
             <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
               {maxCount.toLocaleString()}
             </div>
-            <div className="text-xs text-gray-500 dark:text-gray-400">Peak Hour</div>
+            <div className="text-xs text-gray-500 dark:text-gray-400">
+              Peak Hour
+            </div>
           </div>
         </div>
       </div>

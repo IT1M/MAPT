@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@/services/auth'
-import { prisma } from '@/services/prisma'
-import { FilterGroup } from '@/types/filters'
+import { NextRequest, NextResponse } from 'next/server';
+import { auth } from '@/services/auth';
+import { prisma } from '@/services/prisma';
+import { FilterGroup } from '@/types/filters';
 
 /**
  * PATCH /api/filters/[id]
@@ -12,34 +12,25 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await auth()
+    const session = await auth();
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const body = await request.json()
-    const { name, filters, isDefault } = body
+    const body = await request.json();
+    const { name, filters, isDefault } = body;
 
     // Verify ownership
     const existingFilter = await prisma.savedFilter.findUnique({
       where: { id: (await params).id },
-    })
+    });
 
     if (!existingFilter) {
-      return NextResponse.json(
-        { error: 'Filter not found' },
-        { status: 404 }
-      )
+      return NextResponse.json({ error: 'Filter not found' }, { status: 404 });
     }
 
     if (existingFilter.userId !== session.user.id) {
-      return NextResponse.json(
-        { error: 'Forbidden' },
-        { status: 403 }
-      )
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     // If setting as default, unset other defaults for this page
@@ -54,21 +45,21 @@ export async function PATCH(
         data: {
           isDefault: false,
         },
-      })
+      });
     }
 
     const updateData: any = {
       updatedAt: new Date(),
-    }
+    };
 
-    if (name !== undefined) updateData.name = name
-    if (filters !== undefined) updateData.filters = filters
-    if (isDefault !== undefined) updateData.isDefault = isDefault
+    if (name !== undefined) updateData.name = name;
+    if (filters !== undefined) updateData.filters = filters;
+    if (isDefault !== undefined) updateData.isDefault = isDefault;
 
     const updatedFilter = await prisma.savedFilter.update({
       where: { id: (await params).id },
       data: updateData,
-    })
+    });
 
     return NextResponse.json({
       success: true,
@@ -76,13 +67,13 @@ export async function PATCH(
         ...updatedFilter,
         filters: updatedFilter.filters as FilterGroup,
       },
-    })
+    });
   } catch (error) {
-    console.error('Error updating saved filter:', error)
+    console.error('Error updating saved filter:', error);
     return NextResponse.json(
       { error: 'Failed to update saved filter' },
       { status: 500 }
-    )
+    );
   }
 }
 
@@ -95,46 +86,37 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await auth()
+    const session = await auth();
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     // Verify ownership
     const existingFilter = await prisma.savedFilter.findUnique({
       where: { id: (await params).id },
-    })
+    });
 
     if (!existingFilter) {
-      return NextResponse.json(
-        { error: 'Filter not found' },
-        { status: 404 }
-      )
+      return NextResponse.json({ error: 'Filter not found' }, { status: 404 });
     }
 
     if (existingFilter.userId !== session.user.id) {
-      return NextResponse.json(
-        { error: 'Forbidden' },
-        { status: 403 }
-      )
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     await prisma.savedFilter.delete({
       where: { id: (await params).id },
-    })
+    });
 
     return NextResponse.json({
       success: true,
       message: 'Filter deleted successfully',
-    })
+    });
   } catch (error) {
-    console.error('Error deleting saved filter:', error)
+    console.error('Error deleting saved filter:', error);
     return NextResponse.json(
       { error: 'Failed to delete saved filter' },
       { status: 500 }
-    )
+    );
   }
 }

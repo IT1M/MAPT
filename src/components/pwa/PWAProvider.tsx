@@ -13,7 +13,9 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
     // Request persistent storage
     if (navigator.storage && navigator.storage.persist) {
       navigator.storage.persist().then((granted) => {
-        console.log(`[PWA] Persistent storage ${granted ? 'granted' : 'denied'}`);
+        console.log(
+          `[PWA] Persistent storage ${granted ? 'granted' : 'denied'}`
+        );
       });
     }
   }, []);

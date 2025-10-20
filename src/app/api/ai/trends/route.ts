@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@/services/auth'
-import { prisma } from '@/services/prisma'
-import { geminiService, InventoryData } from '@/services/gemini'
-import { API_ERROR_CODES } from '@/utils/constants'
+import { NextRequest, NextResponse } from 'next/server';
+import { auth } from '@/services/auth';
+import { prisma } from '@/services/prisma';
+import { geminiService, InventoryData } from '@/services/gemini';
+import { API_ERROR_CODES } from '@/utils/constants';
 
 /**
  * GET /api/ai/trends
@@ -11,7 +11,7 @@ import { API_ERROR_CODES } from '@/utils/constants'
 export async function GET(request: NextRequest) {
   try {
     // Check authentication
-    const session = await auth()
+    const session = await auth();
     if (!session?.user) {
       return NextResponse.json(
         {
@@ -22,12 +22,14 @@ export async function GET(request: NextRequest) {
           },
         },
         { status: 401 }
-      )
+      );
     }
 
     // Check permissions - managers and admins can view trends
-    if (!session.user.permissions.includes('reports:view') && 
-        !session.user.permissions.includes('inventory:read')) {
+    if (
+      !session.user.permissions.includes('reports:view') &&
+      !session.user.permissions.includes('inventory:read')
+    ) {
       return NextResponse.json(
         {
           success: false,
@@ -37,7 +39,7 @@ export async function GET(request: NextRequest) {
           },
         },
         { status: 403 }
-      )
+      );
     }
 
     // Check if Gemini service is available
@@ -51,7 +53,7 @@ export async function GET(request: NextRequest) {
           },
         },
         { status: 503 }
-      )
+      );
     }
 
     // Fetch inventory data with product details and recent transactions
@@ -72,21 +74,28 @@ export async function GET(request: NextRequest) {
         updatedAt: 'desc',
       },
       take: 50, // Limit to 50 items for performance
-    })
+    });
 
     // Transform data to InventoryData format with usage calculation
-    const inventoryData: InventoryData[] = inventoryItems.map(item => {
+    const inventoryData: InventoryData[] = inventoryItems.map((item) => {
       // Calculate average usage from recent transactions
-      const issueTransactions = item.transactions.filter(t => t.type === 'ISSUE')
-      const averageUsage = issueTransactions.length > 0
-        ? issueTransactions.reduce((sum, t) => sum + t.quantity, 0) / issueTransactions.length
-        : undefined
+      const issueTransactions = item.transactions.filter(
+        (t) => t.type === 'ISSUE'
+      );
+      const averageUsage =
+        issueTransactions.length > 0
+          ? issueTransactions.reduce((sum, t) => sum + t.quantity, 0) /
+            issueTransactions.length
+          : undefined;
 
       // Get last restock date
-      const receiveTransactions = item.transactions.filter(t => t.type === 'RECEIVE')
-      const lastRestockDate = receiveTransactions.length > 0
-        ? receiveTransactions[0].createdAt
-        : undefined
+      const receiveTransactions = item.transactions.filter(
+        (t) => t.type === 'RECEIVE'
+      );
+      const lastRestockDate =
+        receiveTransactions.length > 0
+          ? receiveTransactions[0].createdAt
+          : undefined;
 
       return {
         productId: item.product.id,
@@ -97,43 +106,45 @@ export async function GET(request: NextRequest) {
         reorderPoint: item.product.reorderPoint,
         averageUsage,
         lastRestockDate,
-      }
-    })
+      };
+    });
 
     // Aggregate by product (sum quantities and average usage for same product)
     const aggregatedData = inventoryData.reduce((acc, item) => {
-      const existing = acc.find(i => i.productId === item.productId)
+      const existing = acc.find((i) => i.productId === item.productId);
       if (existing) {
-        existing.currentStock += item.currentStock
+        existing.currentStock += item.currentStock;
         if (item.averageUsage && existing.averageUsage) {
-          existing.averageUsage = (existing.averageUsage + item.averageUsage) / 2
+          existing.averageUsage =
+            (existing.averageUsage + item.averageUsage) / 2;
         } else if (item.averageUsage) {
-          existing.averageUsage = item.averageUsage
+          existing.averageUsage = item.averageUsage;
         }
         // Keep the most recent restock date
         if (item.lastRestockDate && existing.lastRestockDate) {
-          existing.lastRestockDate = item.lastRestockDate > existing.lastRestockDate
-            ? item.lastRestockDate
-            : existing.lastRestockDate
+          existing.lastRestockDate =
+            item.lastRestockDate > existing.lastRestockDate
+              ? item.lastRestockDate
+              : existing.lastRestockDate;
         } else if (item.lastRestockDate) {
-          existing.lastRestockDate = item.lastRestockDate
+          existing.lastRestockDate = item.lastRestockDate;
         }
       } else {
-        acc.push({ ...item })
+        acc.push({ ...item });
       }
-      return acc
-    }, [] as InventoryData[])
+      return acc;
+    }, [] as InventoryData[]);
 
     // Analyze trends using Gemini AI
-    const trends = await geminiService.analyzeInventoryTrends(aggregatedData)
+    const trends = await geminiService.analyzeInventoryTrends(aggregatedData);
 
     return NextResponse.json({
       success: true,
       data: trends,
-    })
+    });
   } catch (error: any) {
-    console.error('Error analyzing inventory trends:', error)
-    
+    console.error('Error analyzing inventory trends:', error);
+
     // Handle specific error types
     if (error.message?.includes('Circuit breaker is OPEN')) {
       return NextResponse.json(
@@ -141,11 +152,12 @@ export async function GET(request: NextRequest) {
           success: false,
           error: {
             code: API_ERROR_CODES.EXTERNAL_SERVICE_ERROR,
-            message: 'AI service is temporarily unavailable due to repeated failures',
+            message:
+              'AI service is temporarily unavailable due to repeated failures',
           },
         },
         { status: 503 }
-      )
+      );
     }
 
     return NextResponse.json(
@@ -157,6 +169,6 @@ export async function GET(request: NextRequest) {
         },
       },
       { status: 500 }
-    )
+    );
   }
 }

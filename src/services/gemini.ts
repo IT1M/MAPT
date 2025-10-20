@@ -194,7 +194,7 @@ class CircuitBreaker {
   private onFailure(): void {
     this.failureCount++;
     this.lastFailureTime = Date.now();
-    
+
     if (this.failureCount >= this.FAILURE_THRESHOLD) {
       this.state = 'OPEN';
     }
@@ -238,11 +238,11 @@ class RequestQueue {
 
     this.processing = true;
     const task = this.queue.shift();
-    
+
     if (task) {
       await task();
       // Add small delay between requests to prevent rate limiting
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
     }
 
     this.processQueue();
@@ -270,9 +270,11 @@ export class GeminiService {
 
   private initialize(): void {
     const apiKey = process.env.GEMINI_API_KEY;
-    
+
     if (!apiKey) {
-      console.error('[GeminiService] GEMINI_API_KEY not found in environment variables');
+      console.error(
+        '[GeminiService] GEMINI_API_KEY not found in environment variables'
+      );
       return;
     }
 
@@ -298,14 +300,16 @@ export class GeminiService {
     try {
       return await this.circuitBreaker.execute(fn);
     } catch (error: any) {
-      const isRateLimitError = 
-        error?.message?.includes('429') || 
+      const isRateLimitError =
+        error?.message?.includes('429') ||
         error?.message?.includes('rate limit');
 
       if (isRateLimitError && retryCount < this.retryDelays.length) {
         const delay = this.retryDelays[retryCount];
-        console.log(`[GeminiService] Rate limit hit, retrying in ${delay}ms...`);
-        await new Promise(resolve => setTimeout(resolve, delay));
+        console.log(
+          `[GeminiService] Rate limit hit, retrying in ${delay}ms...`
+        );
+        await new Promise((resolve) => setTimeout(resolve, delay));
         return this.callWithRetry(fn, retryCount + 1);
       }
 
@@ -326,10 +330,13 @@ export class GeminiService {
     });
   }
 
-  private generateCacheKey(prefix: string, params: Record<string, any>): string {
+  private generateCacheKey(
+    prefix: string,
+    params: Record<string, any>
+  ): string {
     // Sort keys for consistent cache key generation
     const sortedKeys = Object.keys(params).sort();
-    const keyParts = sortedKeys.map(key => {
+    const keyParts = sortedKeys.map((key) => {
       const value = params[key];
       // Handle different types of values
       if (typeof value === 'object' && value !== null) {
@@ -337,7 +344,7 @@ export class GeminiService {
       }
       return `${key}:${value}`;
     });
-    
+
     return `${prefix}_${keyParts.join('_')}`;
   }
 
@@ -345,12 +352,14 @@ export class GeminiService {
   // Public API Methods
   // ============================================================================
 
-  async analyzeInventoryTrends(data: InventoryData[]): Promise<InventoryTrend[]> {
-    const cacheKey = this.generateCacheKey('trends', { 
-      products: data.map(d => ({ id: d.productId, stock: d.currentStock }))
+  async analyzeInventoryTrends(
+    data: InventoryData[]
+  ): Promise<InventoryTrend[]> {
+    const cacheKey = this.generateCacheKey('trends', {
+      products: data.map((d) => ({ id: d.productId, stock: d.currentStock })),
     });
     const cached = this.cache.get<InventoryTrend[]>(cacheKey);
-    
+
     if (cached) {
       console.log('[GeminiService] Returning cached trends');
       return cached;
@@ -359,14 +368,18 @@ export class GeminiService {
     try {
       const prompt = `Analyze the following medical inventory data and identify trends:
 
-${data.map(item => `
+${data
+  .map(
+    (item) => `
 Product: ${item.productName}
 Current Stock: ${item.currentStock}
 Min Level: ${item.minStockLevel}
 Max Level: ${item.maxStockLevel}
 Reorder Point: ${item.reorderPoint}
 ${item.averageUsage ? `Average Usage: ${item.averageUsage}` : ''}
-`).join('\n')}
+`
+  )
+  .join('\n')}
 
 For each product, determine if the stock trend is increasing, decreasing, or stable.
 Provide a confidence score (0-1) and a brief recommendation.
@@ -381,8 +394,10 @@ Return ONLY a valid JSON array with this exact structure:
   }
 ]`;
 
-      const response = await this.callWithRetry(() => this.generateContent(prompt));
-      
+      const response = await this.callWithRetry(() =>
+        this.generateContent(prompt)
+      );
+
       // Parse JSON from response
       const jsonMatch = response.match(/\[[\s\S]*\]/);
       if (!jsonMatch) {
@@ -391,10 +406,9 @@ Return ONLY a valid JSON array with this exact structure:
 
       const trends: InventoryTrend[] = JSON.parse(jsonMatch[0]);
       this.cache.set(cacheKey, trends, 30); // 30-minute TTL for cost optimization
-      
+
       console.log('[GeminiService] Trends analyzed successfully');
       return trends;
-
     } catch (error) {
       console.error('[GeminiService] Error analyzing trends:', error);
       return this.getFallbackTrends(data);
@@ -402,11 +416,15 @@ Return ONLY a valid JSON array with this exact structure:
   }
 
   async generateInsights(data: InventoryData[]): Promise<InventoryInsight[]> {
-    const cacheKey = this.generateCacheKey('insights', { 
-      products: data.map(d => ({ id: d.productId, stock: d.currentStock, reorder: d.reorderPoint }))
+    const cacheKey = this.generateCacheKey('insights', {
+      products: data.map((d) => ({
+        id: d.productId,
+        stock: d.currentStock,
+        reorder: d.reorderPoint,
+      })),
     });
     const cached = this.cache.get<InventoryInsight[]>(cacheKey);
-    
+
     if (cached) {
       console.log('[GeminiService] Returning cached insights');
       return cached;
@@ -415,13 +433,17 @@ Return ONLY a valid JSON array with this exact structure:
     try {
       const prompt = `Analyze this medical inventory data and generate actionable insights:
 
-${data.map(item => `
+${data
+  .map(
+    (item) => `
 Product: ${item.productName}
 Current Stock: ${item.currentStock}
 Min Level: ${item.minStockLevel}
 Max Level: ${item.maxStockLevel}
 Reorder Point: ${item.reorderPoint}
-`).join('\n')}
+`
+  )
+  .join('\n')}
 
 Identify:
 - Critical low stock warnings (high priority)
@@ -437,8 +459,10 @@ Return ONLY a valid JSON array with this exact structure:
   }
 ]`;
 
-      const response = await this.callWithRetry(() => this.generateContent(prompt));
-      
+      const response = await this.callWithRetry(() =>
+        this.generateContent(prompt)
+      );
+
       const jsonMatch = response.match(/\[[\s\S]*\]/);
       if (!jsonMatch) {
         throw new Error('Invalid response format');
@@ -446,10 +470,9 @@ Return ONLY a valid JSON array with this exact structure:
 
       const insights: InventoryInsight[] = JSON.parse(jsonMatch[0]);
       this.cache.set(cacheKey, insights, 30); // 30-minute TTL for cost optimization
-      
+
       console.log('[GeminiService] Insights generated successfully');
       return insights;
-
     } catch (error) {
       console.error('[GeminiService] Error generating insights:', error);
       return this.getFallbackInsights(data);
@@ -457,11 +480,15 @@ Return ONLY a valid JSON array with this exact structure:
   }
 
   async predictStockNeeds(data: InventoryData[]): Promise<StockPrediction[]> {
-    const cacheKey = this.generateCacheKey('predictions', { 
-      products: data.map(d => ({ id: d.productId, stock: d.currentStock, usage: d.averageUsage }))
+    const cacheKey = this.generateCacheKey('predictions', {
+      products: data.map((d) => ({
+        id: d.productId,
+        stock: d.currentStock,
+        usage: d.averageUsage,
+      })),
     });
     const cached = this.cache.get<StockPrediction[]>(cacheKey);
-    
+
     if (cached) {
       console.log('[GeminiService] Returning cached predictions');
       return cached;
@@ -470,13 +497,17 @@ Return ONLY a valid JSON array with this exact structure:
     try {
       const prompt = `Predict future stock needs for these medical products:
 
-${data.map(item => `
+${data
+  .map(
+    (item) => `
 Product: ${item.productName}
 Current Stock: ${item.currentStock}
 Min Level: ${item.minStockLevel}
 Reorder Point: ${item.reorderPoint}
 ${item.averageUsage ? `Average Usage: ${item.averageUsage} units/month` : ''}
-`).join('\n')}
+`
+  )
+  .join('\n')}
 
 For each product, predict the stock needed for the next 30 days.
 Provide confidence scores (0-1) based on available data.
@@ -492,8 +523,10 @@ Return ONLY a valid JSON array with this exact structure:
   }
 ]`;
 
-      const response = await this.callWithRetry(() => this.generateContent(prompt));
-      
+      const response = await this.callWithRetry(() =>
+        this.generateContent(prompt)
+      );
+
       const jsonMatch = response.match(/\[[\s\S]*\]/);
       if (!jsonMatch) {
         throw new Error('Invalid response format');
@@ -501,24 +534,25 @@ Return ONLY a valid JSON array with this exact structure:
 
       const predictions: StockPrediction[] = JSON.parse(jsonMatch[0]);
       this.cache.set(cacheKey, predictions, 30); // 30-minute TTL for cost optimization
-      
+
       console.log('[GeminiService] Predictions generated successfully');
       return predictions;
-
     } catch (error) {
       console.error('[GeminiService] Error predicting stock needs:', error);
       return this.getFallbackPredictions(data);
     }
   }
 
-  async generateMonthlyInsights(monthData: MonthlyData): Promise<MonthlyInsight> {
-    const cacheKey = this.generateCacheKey('monthly_insights', { 
+  async generateMonthlyInsights(
+    monthData: MonthlyData
+  ): Promise<MonthlyInsight> {
+    const cacheKey = this.generateCacheKey('monthly_insights', {
       month: monthData.month,
       totalItems: monthData.totalItems,
-      totalQuantity: monthData.totalQuantity
+      totalQuantity: monthData.totalQuantity,
     });
     const cached = this.cache.get<MonthlyInsight>(cacheKey);
-    
+
     if (cached) {
       console.log('[GeminiService] Returning cached monthly insights');
       return cached;
@@ -534,7 +568,7 @@ Reject Count: ${monthData.rejectCount}
 Reject Rate: ${((monthData.rejectCount / monthData.totalQuantity) * 100).toFixed(2)}%
 
 Top Products:
-${monthData.topProducts.map(p => `- ${p.name}: ${p.quantity} units`).join('\n')}
+${monthData.topProducts.map((p) => `- ${p.name}: ${p.quantity} units`).join('\n')}
 
 Distribution by Destination:
 - MAIS: ${monthData.destinations.MAIS} units
@@ -555,8 +589,10 @@ Return ONLY a valid JSON object with this exact structure:
   "confidence": 0.85
 }`;
 
-      const response = await this.callWithRetry(() => this.generateContent(prompt));
-      
+      const response = await this.callWithRetry(() =>
+        this.generateContent(prompt)
+      );
+
       const jsonMatch = response.match(/\{[\s\S]*\}/);
       if (!jsonMatch) {
         throw new Error('Invalid response format');
@@ -564,24 +600,29 @@ Return ONLY a valid JSON object with this exact structure:
 
       const insights: MonthlyInsight = JSON.parse(jsonMatch[0]);
       this.cache.set(cacheKey, insights, 30); // 30-minute TTL for cost optimization
-      
+
       console.log('[GeminiService] Monthly insights generated successfully');
       return insights;
-
     } catch (error) {
-      console.error('[GeminiService] Error generating monthly insights:', error);
+      console.error(
+        '[GeminiService] Error generating monthly insights:',
+        error
+      );
       return this.getFallbackMonthlyInsights(monthData);
     }
   }
 
-  async askQuestion(userQuery: string, context: InventoryContext): Promise<QuestionAnswer> {
-    const cacheKey = this.generateCacheKey('qa', { 
+  async askQuestion(
+    userQuery: string,
+    context: InventoryContext
+  ): Promise<QuestionAnswer> {
+    const cacheKey = this.generateCacheKey('qa', {
       query: userQuery,
       totalItems: context.totalItems,
-      totalQuantity: context.totalQuantity
+      totalQuantity: context.totalQuantity,
     });
     const cached = this.cache.get<QuestionAnswer>(cacheKey);
-    
+
     if (cached) {
       console.log('[GeminiService] Returning cached Q&A response');
       return cached;
@@ -595,17 +636,25 @@ Inventory Context:
 - Total Quantity: ${context.totalQuantity}
 
 Recent Activity:
-${context.recentActivity.map(item => `- ${item.itemName}: ${item.quantity} units to ${item.destination} on ${item.date}`).join('\n')}
+${context.recentActivity.map((item) => `- ${item.itemName}: ${item.quantity} units to ${item.destination} on ${item.date}`).join('\n')}
 
-${context.lowStockItems && context.lowStockItems.length > 0 ? `
+${
+  context.lowStockItems && context.lowStockItems.length > 0
+    ? `
 Low Stock Items:
-${context.lowStockItems.map(item => `- ${item.itemName}: ${item.currentStock} units (reorder at ${item.reorderPoint})`).join('\n')}
-` : ''}
+${context.lowStockItems.map((item) => `- ${item.itemName}: ${item.currentStock} units (reorder at ${item.reorderPoint})`).join('\n')}
+`
+    : ''
+}
 
-${context.topCategories && context.topCategories.length > 0 ? `
+${
+  context.topCategories && context.topCategories.length > 0
+    ? `
 Top Categories:
-${context.topCategories.map(cat => `- ${cat.category}: ${cat.count} items`).join('\n')}
-` : ''}
+${context.topCategories.map((cat) => `- ${cat.category}: ${cat.count} items`).join('\n')}
+`
+    : ''
+}
 
 User Question: ${userQuery}
 
@@ -619,8 +668,10 @@ Return ONLY a valid JSON object with this exact structure:
   "sources": ["context data point 1", "context data point 2"]
 }`;
 
-      const response = await this.callWithRetry(() => this.generateContent(prompt));
-      
+      const response = await this.callWithRetry(() =>
+        this.generateContent(prompt)
+      );
+
       const jsonMatch = response.match(/\{[\s\S]*\}/);
       if (!jsonMatch) {
         throw new Error('Invalid response format');
@@ -628,10 +679,9 @@ Return ONLY a valid JSON object with this exact structure:
 
       const answer: QuestionAnswer = JSON.parse(jsonMatch[0]);
       this.cache.set(cacheKey, answer, 30); // 30-minute TTL for cost optimization
-      
+
       console.log('[GeminiService] Q&A response generated successfully');
       return answer;
-
     } catch (error) {
       console.error('[GeminiService] Error generating Q&A response:', error);
       return this.getFallbackAnswer(userQuery, context);
@@ -644,10 +694,10 @@ Return ONLY a valid JSON object with this exact structure:
 
   private getFallbackTrends(data: InventoryData[]): InventoryTrend[] {
     console.log('[GeminiService] Using fallback trends');
-    return data.map(item => {
+    return data.map((item) => {
       const stockRatio = item.currentStock / item.maxStockLevel;
       let trend: 'increasing' | 'decreasing' | 'stable' = 'stable';
-      
+
       if (item.currentStock < item.reorderPoint) {
         trend = 'decreasing';
       } else if (stockRatio > 0.8) {
@@ -658,11 +708,12 @@ Return ONLY a valid JSON object with this exact structure:
         product: item.productName,
         trend,
         confidence: 0.5,
-        recommendation: trend === 'decreasing' 
-          ? 'Consider reordering soon' 
-          : trend === 'increasing'
-          ? 'Stock levels are healthy'
-          : 'Monitor stock levels',
+        recommendation:
+          trend === 'decreasing'
+            ? 'Consider reordering soon'
+            : trend === 'increasing'
+              ? 'Stock levels are healthy'
+              : 'Monitor stock levels',
       };
     });
   }
@@ -671,7 +722,7 @@ Return ONLY a valid JSON object with this exact structure:
     console.log('[GeminiService] Using fallback insights');
     const insights: InventoryInsight[] = [];
 
-    data.forEach(item => {
+    data.forEach((item) => {
       if (item.currentStock < item.reorderPoint) {
         insights.push({
           type: 'warning',
@@ -700,7 +751,7 @@ Return ONLY a valid JSON object with this exact structure:
 
   private getFallbackPredictions(data: InventoryData[]): StockPrediction[] {
     console.log('[GeminiService] Using fallback predictions');
-    return data.map(item => {
+    return data.map((item) => {
       const averageUsage = item.averageUsage || item.reorderPoint * 0.5;
       const predictedNeed = Math.round(averageUsage * 1.2); // 20% buffer
 
@@ -716,11 +767,13 @@ Return ONLY a valid JSON object with this exact structure:
 
   private getFallbackMonthlyInsights(monthData: MonthlyData): MonthlyInsight {
     console.log('[GeminiService] Using fallback monthly insights');
-    
+
     const rejectRate = (monthData.rejectCount / monthData.totalQuantity) * 100;
-    const maisPercentage = (monthData.destinations.MAIS / monthData.totalQuantity) * 100;
-    const fozanPercentage = (monthData.destinations.FOZAN / monthData.totalQuantity) * 100;
-    
+    const maisPercentage =
+      (monthData.destinations.MAIS / monthData.totalQuantity) * 100;
+    const fozanPercentage =
+      (monthData.destinations.FOZAN / monthData.totalQuantity) * 100;
+
     const keyFindings: string[] = [
       `Processed ${monthData.totalItems} inventory items with ${monthData.totalQuantity} total units`,
       `Reject rate was ${rejectRate.toFixed(2)}%`,
@@ -728,7 +781,9 @@ Return ONLY a valid JSON object with this exact structure:
     ];
 
     if (monthData.topProducts.length > 0) {
-      keyFindings.push(`Top product: ${monthData.topProducts[0].name} with ${monthData.topProducts[0].quantity} units`);
+      keyFindings.push(
+        `Top product: ${monthData.topProducts[0].name} with ${monthData.topProducts[0].quantity} units`
+      );
     }
 
     const trends: string[] = [];
@@ -740,12 +795,18 @@ Return ONLY a valid JSON object with this exact structure:
 
     const recommendations: string[] = [];
     if (rejectRate > 5) {
-      recommendations.push('Review quality control processes to reduce reject rate');
+      recommendations.push(
+        'Review quality control processes to reduce reject rate'
+      );
     }
     if (Math.abs(maisPercentage - fozanPercentage) > 30) {
-      recommendations.push('Consider balancing distribution between MAIS and FOZAN');
+      recommendations.push(
+        'Consider balancing distribution between MAIS and FOZAN'
+      );
     }
-    recommendations.push('Continue monitoring inventory levels for optimization opportunities');
+    recommendations.push(
+      'Continue monitoring inventory levels for optimization opportunities'
+    );
 
     return {
       summary: `In ${monthData.month}, the system processed ${monthData.totalItems} items totaling ${monthData.totalQuantity} units with a ${rejectRate.toFixed(2)}% reject rate.`,
@@ -756,42 +817,62 @@ Return ONLY a valid JSON object with this exact structure:
     };
   }
 
-  private getFallbackAnswer(userQuery: string, context: InventoryContext): QuestionAnswer {
+  private getFallbackAnswer(
+    userQuery: string,
+    context: InventoryContext
+  ): QuestionAnswer {
     console.log('[GeminiService] Using fallback Q&A response');
-    
-    let answer = 'I apologize, but I am currently unable to process your question. ';
+
+    let answer =
+      'I apologize, but I am currently unable to process your question. ';
     const sources: string[] = [];
-    
+
     // Provide basic context-based responses
-    if (userQuery.toLowerCase().includes('total') || userQuery.toLowerCase().includes('how many')) {
+    if (
+      userQuery.toLowerCase().includes('total') ||
+      userQuery.toLowerCase().includes('how many')
+    ) {
       answer = `Based on the current inventory data, there are ${context.totalItems} items with a total quantity of ${context.totalQuantity} units.`;
       sources.push('Total inventory count');
-    } else if (userQuery.toLowerCase().includes('low stock') || userQuery.toLowerCase().includes('reorder')) {
+    } else if (
+      userQuery.toLowerCase().includes('low stock') ||
+      userQuery.toLowerCase().includes('reorder')
+    ) {
       if (context.lowStockItems && context.lowStockItems.length > 0) {
-        answer = `There are ${context.lowStockItems.length} items with low stock: ${context.lowStockItems.map(item => item.itemName).join(', ')}.`;
+        answer = `There are ${context.lowStockItems.length} items with low stock: ${context.lowStockItems.map((item) => item.itemName).join(', ')}.`;
         sources.push('Low stock items list');
       } else {
         answer = 'All items appear to have adequate stock levels at this time.';
         sources.push('Stock level analysis');
       }
-    } else if (userQuery.toLowerCase().includes('recent') || userQuery.toLowerCase().includes('activity')) {
+    } else if (
+      userQuery.toLowerCase().includes('recent') ||
+      userQuery.toLowerCase().includes('activity')
+    ) {
       if (context.recentActivity.length > 0) {
-        answer = `Recent activity includes: ${context.recentActivity.slice(0, 3).map(item => `${item.itemName} (${item.quantity} units)`).join(', ')}.`;
+        answer = `Recent activity includes: ${context.recentActivity
+          .slice(0, 3)
+          .map((item) => `${item.itemName} (${item.quantity} units)`)
+          .join(', ')}.`;
         sources.push('Recent activity log');
       } else {
         answer = 'No recent activity data is available.';
       }
-    } else if (userQuery.toLowerCase().includes('category') || userQuery.toLowerCase().includes('categories')) {
+    } else if (
+      userQuery.toLowerCase().includes('category') ||
+      userQuery.toLowerCase().includes('categories')
+    ) {
       if (context.topCategories && context.topCategories.length > 0) {
-        answer = `Top categories: ${context.topCategories.map(cat => `${cat.category} (${cat.count} items)`).join(', ')}.`;
+        answer = `Top categories: ${context.topCategories.map((cat) => `${cat.category} (${cat.count} items)`).join(', ')}.`;
         sources.push('Category breakdown');
       } else {
         answer = 'Category information is not available at this time.';
       }
     } else {
-      answer += 'However, I can provide information about total inventory, low stock items, recent activity, and categories. Please try rephrasing your question.';
+      answer +=
+        'However, I can provide information about total inventory, low stock items, recent activity, and categories. Please try rephrasing your question.';
     }
-    
+
     return {
       question: userQuery,
       answer,

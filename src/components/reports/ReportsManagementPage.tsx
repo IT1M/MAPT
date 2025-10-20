@@ -54,9 +54,14 @@ interface ReportsManagementPageProps {
   userRole: string;
 }
 
-export default function ReportsManagementPage({ locale, userRole }: ReportsManagementPageProps) {
+export default function ReportsManagementPage({
+  locale,
+  userRole,
+}: ReportsManagementPageProps) {
   const t = useTranslations('reports');
-  const [activeTab, setActiveTab] = useState<'generate' | 'history' | 'schedules'>('generate');
+  const [activeTab, setActiveTab] = useState<
+    'generate' | 'history' | 'schedules'
+  >('generate');
   const [reports, setReports] = useState<Report[]>([]);
   const [schedules, setSchedules] = useState<ReportSchedule[]>([]);
   const [loading, setLoading] = useState(true);
@@ -240,9 +245,7 @@ export default function ReportsManagementPage({ locale, userRole }: ReportsManag
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
           {t('title')}
         </h1>
-        <p className="text-gray-600 dark:text-gray-400">
-          {t('subtitle')}
-        </p>
+        <p className="text-gray-600 dark:text-gray-400">{t('subtitle')}</p>
       </div>
 
       {/* Tabs */}

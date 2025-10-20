@@ -1,43 +1,43 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { useTranslations } from '@/hooks/useTranslations'
+import { useState } from 'react';
+import { useTranslations } from '@/hooks/useTranslations';
 
 // ============================================================================
 // Type Definitions
 // ============================================================================
 
 export interface QuestionAnswer {
-  question: string
-  answer: string
-  confidence: number
-  timestamp: Date
-  sources?: string[]
+  question: string;
+  answer: string;
+  confidence: number;
+  timestamp: Date;
+  sources?: string[];
 }
 
 export interface InventoryContext {
-  totalItems: number
-  totalQuantity: number
+  totalItems: number;
+  totalQuantity: number;
   recentActivity?: Array<{
-    itemName: string
-    quantity: number
-    destination: string
-    date: string
-  }>
+    itemName: string;
+    quantity: number;
+    destination: string;
+    date: string;
+  }>;
   lowStockItems?: Array<{
-    itemName: string
-    currentStock: number
-    reorderPoint: number
-  }>
+    itemName: string;
+    currentStock: number;
+    reorderPoint: number;
+  }>;
   topCategories?: Array<{
-    category: string
-    count: number
-  }>
+    category: string;
+    count: number;
+  }>;
 }
 
 interface AIQuestionInputProps {
-  context: InventoryContext
-  onAnswer?: (qa: QuestionAnswer) => void
+  context: InventoryContext;
+  onAnswer?: (qa: QuestionAnswer) => void;
 }
 
 // ============================================================================
@@ -50,28 +50,28 @@ const EXAMPLE_QUESTIONS = [
   'What are the recent trends?',
   'How can we improve inventory efficiency?',
   'What items are running low?',
-]
+];
 
 // ============================================================================
 // Component
 // ============================================================================
 
 export function AIQuestionInput({ context, onAnswer }: AIQuestionInputProps) {
-  const t = useTranslations('analytics.ai')
-  const [question, setQuestion] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const [history, setHistory] = useState<QuestionAnswer[]>([])
-  const [error, setError] = useState<string | null>(null)
+  const t = useTranslations('analytics.ai');
+  const [question, setQuestion] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [history, setHistory] = useState<QuestionAnswer[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
+    e.preventDefault();
+
     if (!question.trim() || isLoading) {
-      return
+      return;
     }
 
-    setIsLoading(true)
-    setError(null)
+    setIsLoading(true);
+    setError(null);
 
     try {
       const response = await fetch('/api/analytics/ai-question', {
@@ -83,13 +83,13 @@ export function AIQuestionInput({ context, onAnswer }: AIQuestionInputProps) {
           question: question.trim(),
           context,
         }),
-      })
+      });
 
       if (!response.ok) {
-        throw new Error('Failed to get answer')
+        throw new Error('Failed to get answer');
       }
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (data.success) {
         const qa: QuestionAnswer = {
@@ -98,29 +98,29 @@ export function AIQuestionInput({ context, onAnswer }: AIQuestionInputProps) {
           confidence: data.data.confidence,
           timestamp: new Date(),
           sources: data.data.sources,
-        }
+        };
 
-        setHistory([qa, ...history])
-        onAnswer?.(qa)
-        setQuestion('')
+        setHistory([qa, ...history]);
+        onAnswer?.(qa);
+        setQuestion('');
       } else {
-        throw new Error(data.error?.message || 'Failed to get answer')
+        throw new Error(data.error?.message || 'Failed to get answer');
       }
     } catch (err) {
-      console.error('Error asking question:', err)
-      setError(err instanceof Error ? err.message : 'An error occurred')
+      console.error('Error asking question:', err);
+      setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleExampleClick = (exampleQuestion: string) => {
-    setQuestion(exampleQuestion)
-  }
+    setQuestion(exampleQuestion);
+  };
 
   const handleCopyAnswer = (answer: string) => {
-    navigator.clipboard.writeText(answer)
-  }
+    navigator.clipboard.writeText(answer);
+  };
 
   return (
     <div className="space-y-4">
@@ -232,7 +232,7 @@ export function AIQuestionInput({ context, onAnswer }: AIQuestionInputProps) {
                   <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
                     {qa.answer}
                   </p>
-                  
+
                   {/* Confidence and Sources */}
                   <div className="flex items-center gap-4 mt-2">
                     <span className="text-xs text-gray-500 dark:text-gray-400">
@@ -269,5 +269,5 @@ export function AIQuestionInput({ context, onAnswer }: AIQuestionInputProps) {
         </div>
       )}
     </div>
-  )
+  );
 }

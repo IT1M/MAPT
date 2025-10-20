@@ -2,9 +2,9 @@
 
 /**
  * Database Performance Analysis Script
- * 
+ *
  * Analyzes database queries and provides optimization recommendations
- * 
+ *
  * Usage: npm run analyze:db
  */
 
@@ -48,7 +48,7 @@ async function testQuery(name: string, queryFn: () => Promise<any>) {
 
 async function analyzeDatabase() {
   console.log('📊 Database Performance Analysis\n');
-  console.log('=' .repeat(60));
+  console.log('='.repeat(60));
 
   try {
     // Test 1: Simple inventory query
@@ -166,8 +166,11 @@ async function analyzeDatabase() {
 
     console.log('Slowest Queries:');
     sortedStats.slice(0, 3).forEach((stat, index) => {
-      const status = stat.duration > 1000 ? '⚠️' : stat.duration > 500 ? '⚡' : '✅';
-      console.log(`  ${index + 1}. ${status} ${stat.name}: ${stat.duration.toFixed(2)}ms`);
+      const status =
+        stat.duration > 1000 ? '⚠️' : stat.duration > 500 ? '⚡' : '✅';
+      console.log(
+        `  ${index + 1}. ${status} ${stat.name}: ${stat.duration.toFixed(2)}ms`
+      );
     });
 
     console.log('\n💡 Recommendations:\n');
@@ -213,7 +216,6 @@ async function analyzeDatabase() {
       console.log('\n  ⚠️  Large audit log table detected');
       console.log('     Consider implementing log rotation strategy');
     }
-
   } catch (error) {
     console.error('\n❌ Error during analysis:', error);
     process.exit(1);

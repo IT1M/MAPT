@@ -2,9 +2,9 @@
 
 /**
  * Vercel Analytics Integration
- * 
+ *
  * Integrates Vercel Web Analytics and Speed Insights
- * 
+ *
  * To enable:
  * 1. Install packages: npm install @vercel/analytics @vercel/speed-insights
  * 2. Enable Analytics in Vercel dashboard (Settings > Analytics)
@@ -40,11 +40,14 @@ export function VercelAnalytics() {
 
 /**
  * Track custom events to Vercel Analytics
- * 
+ *
  * @example
  * trackEvent('button_click', { button: 'submit', page: 'contact' })
  */
-export function trackEvent(name: string, properties?: Record<string, any>): void {
+export function trackEvent(
+  name: string,
+  properties?: Record<string, any>
+): void {
   if (typeof window === 'undefined') {
     return;
   }
@@ -69,7 +72,10 @@ export function trackEvent(name: string, properties?: Record<string, any>): void
 /**
  * Track page views
  */
-export function trackPageView(path: string, properties?: Record<string, any>): void {
+export function trackPageView(
+  path: string,
+  properties?: Record<string, any>
+): void {
   trackEvent('pageview', {
     path,
     ...properties,

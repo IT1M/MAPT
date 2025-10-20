@@ -1,44 +1,44 @@
 /**
  * USAGE EXAMPLE - Tasks 13, 14, 15 Components
- * 
+ *
  * This file demonstrates how to use the newly created components:
  * - TableLoadingState, TableEmptyState, TableErrorState
  * - Pagination
  * - ExportButton
- * 
+ *
  * This is a reference file and should not be imported in production code.
  */
 
-'use client'
+'use client';
 
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 import {
   InventoryTable,
   TableLoadingState,
   TableEmptyState,
   TableErrorState,
-} from '@/components/tables'
-import { Pagination } from '@/components/ui/Pagination'
-import { ExportButton } from '@/components/export'
+} from '@/components/tables';
+import { Pagination } from '@/components/ui/Pagination';
+import { ExportButton } from '@/components/export';
 
 // Example: Complete Data Log Page with all states
 export function DataLogPageExample() {
   // State management
-  const [currentPage, setCurrentPage] = useState(1)
-  const [itemsPerPage, setItemsPerPage] = useState(25)
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
-  const [filters, setFilters] = useState({})
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(25);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [filters, setFilters] = useState({});
 
   // Simulated data fetching (replace with actual API call)
   const { data, isLoading, error, refetch } = useInventoryData({
     page: currentPage,
     limit: itemsPerPage,
     filters,
-  })
+  });
 
-  const totalItems = data?.total || 0
-  const items = data?.items || []
-  const totalPages = Math.ceil(totalItems / itemsPerPage)
+  const totalItems = data?.total || 0;
+  const items = data?.items || [];
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
 
   // Loading state
   if (isLoading) {
@@ -50,7 +50,7 @@ export function DataLogPageExample() {
         </div>
         <TableLoadingState columns={10} rows={10} hasSelection />
       </div>
-    )
+    );
   }
 
   // Error state
@@ -64,7 +64,7 @@ export function DataLogPageExample() {
           onRetry={refetch}
         />
       </div>
-    )
+    );
   }
 
   // Empty state
@@ -84,7 +84,7 @@ export function DataLogPageExample() {
           }}
         />
       </div>
-    )
+    );
   }
 
   // Success state with data
@@ -100,7 +100,7 @@ export function DataLogPageExample() {
           filters={filters}
           onExport={(format, success) => {
             if (success) {
-              console.log(`${format.toUpperCase()} exported successfully`)
+              console.log(`${format.toUpperCase()} exported successfully`);
               // Show toast notification here
             }
           }}
@@ -125,14 +125,14 @@ export function DataLogPageExample() {
         onItemsPerPageChange={setItemsPerPage}
       />
     </div>
-  )
+  );
 }
 
 // Example: Simple pagination usage
 export function SimplePaginationExample() {
-  const [page, setPage] = useState(1)
-  const [limit, setLimit] = useState(25)
-  const totalItems = 1000
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(25);
+  const totalItems = 1000;
 
   return (
     <Pagination
@@ -143,7 +143,7 @@ export function SimplePaginationExample() {
       onPageChange={setPage}
       onItemsPerPageChange={setLimit}
     />
-  )
+  );
 }
 
 // Example: Export button with selected items
@@ -152,26 +152,28 @@ export function ExportWithSelectionExample() {
     { id: '1', name: 'Item 1', quantity: 100 },
     { id: '2', name: 'Item 2', quantity: 200 },
     { id: '3', name: 'Item 3', quantity: 300 },
-  ]
-  const selectedIds = new Set(['1', '3'])
+  ];
+  const selectedIds = new Set(['1', '3']);
 
   return (
     <ExportButton
       data={data}
       selectedIds={selectedIds}
       onExport={(format, success) => {
-        console.log(`Export ${format}: ${success ? 'success' : 'failed'}`)
+        console.log(`Export ${format}: ${success ? 'success' : 'failed'}`);
       }}
     />
-  )
+  );
 }
 
 // Example: Table states
 export function TableStatesExample() {
-  const [state, setState] = useState<'loading' | 'error' | 'empty' | 'data'>('loading')
+  const [state, setState] = useState<'loading' | 'error' | 'empty' | 'data'>(
+    'loading'
+  );
 
   if (state === 'loading') {
-    return <TableLoadingState columns={8} rows={5} hasSelection />
+    return <TableLoadingState columns={8} rows={5} hasSelection />;
   }
 
   if (state === 'error') {
@@ -180,7 +182,7 @@ export function TableStatesExample() {
         error={new Error('Network error')}
         onRetry={() => setState('loading')}
       />
-    )
+    );
   }
 
   if (state === 'empty') {
@@ -191,10 +193,10 @@ export function TableStatesExample() {
           onClick: () => setState('loading'),
         }}
       />
-    )
+    );
   }
 
-  return <div>Table with data...</div>
+  return <div>Table with data...</div>;
 }
 
 // Mock hook for demonstration
@@ -205,5 +207,5 @@ function useInventoryData(params: any) {
     isLoading: false,
     error: null,
     refetch: () => {},
-  }
+  };
 }

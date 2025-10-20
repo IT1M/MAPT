@@ -8,7 +8,7 @@ export const SECURITY_HEADERS = {
   'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
   'Referrer-Policy': 'strict-origin-when-cross-origin',
   'Permissions-Policy': 'geolocation=(), microphone=(), camera=()',
-} as const
+} as const;
 
 /**
  * Add security headers to response
@@ -19,7 +19,7 @@ export function addSecurityHeaders(headers: HeadersInit = {}): HeadersInit {
   return {
     ...headers,
     ...SECURITY_HEADERS,
-  }
+  };
 }
 
 /**
@@ -32,10 +32,10 @@ export function createSecureResponse(
   body: BodyInit | null,
   init?: ResponseInit
 ): Response {
-  const headers = addSecurityHeaders(init?.headers)
-  
+  const headers = addSecurityHeaders(init?.headers);
+
   return new Response(body, {
     ...init,
     headers,
-  })
+  });
 }

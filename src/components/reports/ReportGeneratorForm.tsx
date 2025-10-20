@@ -41,7 +41,9 @@ interface ReportGeneratorFormProps {
   onGenerate: (config: ReportConfig) => Promise<void>;
 }
 
-export default function ReportGeneratorForm({ onGenerate }: ReportGeneratorFormProps) {
+export default function ReportGeneratorForm({
+  onGenerate,
+}: ReportGeneratorFormProps) {
   const t = useTranslations('reports.generator');
   const [config, setConfig] = useState<ReportConfig>({
     type: 'MONTHLY_INVENTORY',
@@ -118,7 +120,10 @@ export default function ReportGeneratorForm({ onGenerate }: ReportGeneratorFormP
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+    <form
+      onSubmit={handleSubmit}
+      className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6"
+    >
       {/* Report Type */}
       <div className="mb-6">
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -129,12 +134,24 @@ export default function ReportGeneratorForm({ onGenerate }: ReportGeneratorFormP
           onChange={(e) => setConfig({ ...config, type: e.target.value })}
           className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
         >
-          <option value="MONTHLY_INVENTORY">{t('../reportTypes.MONTHLY_INVENTORY')}</option>
-          <option value="YEARLY_SUMMARY">{t('../reportTypes.YEARLY_SUMMARY')}</option>
-          <option value="CUSTOM_RANGE">{t('../reportTypes.CUSTOM_RANGE')}</option>
-          <option value="AUDIT_REPORT">{t('../reportTypes.AUDIT_REPORT')}</option>
-          <option value="USER_ACTIVITY">{t('../reportTypes.USER_ACTIVITY')}</option>
-          <option value="CATEGORY_ANALYSIS">{t('../reportTypes.CATEGORY_ANALYSIS')}</option>
+          <option value="MONTHLY_INVENTORY">
+            {t('../reportTypes.MONTHLY_INVENTORY')}
+          </option>
+          <option value="YEARLY_SUMMARY">
+            {t('../reportTypes.YEARLY_SUMMARY')}
+          </option>
+          <option value="CUSTOM_RANGE">
+            {t('../reportTypes.CUSTOM_RANGE')}
+          </option>
+          <option value="AUDIT_REPORT">
+            {t('../reportTypes.AUDIT_REPORT')}
+          </option>
+          <option value="USER_ACTIVITY">
+            {t('../reportTypes.USER_ACTIVITY')}
+          </option>
+          <option value="CATEGORY_ANALYSIS">
+            {t('../reportTypes.CATEGORY_ANALYSIS')}
+          </option>
         </select>
       </div>
 
@@ -150,7 +167,10 @@ export default function ReportGeneratorForm({ onGenerate }: ReportGeneratorFormP
             onChange={(e) =>
               setConfig({
                 ...config,
-                dateRange: { ...config.dateRange, from: new Date(e.target.value) },
+                dateRange: {
+                  ...config.dateRange,
+                  from: new Date(e.target.value),
+                },
               })
             }
             className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
@@ -166,7 +186,10 @@ export default function ReportGeneratorForm({ onGenerate }: ReportGeneratorFormP
             onChange={(e) =>
               setConfig({
                 ...config,
-                dateRange: { ...config.dateRange, to: new Date(e.target.value) },
+                dateRange: {
+                  ...config.dateRange,
+                  to: new Date(e.target.value),
+                },
               })
             }
             className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
@@ -214,7 +237,9 @@ export default function ReportGeneratorForm({ onGenerate }: ReportGeneratorFormP
                 name="format"
                 value={format}
                 checked={config.format === format}
-                onChange={(e) => setConfig({ ...config, format: e.target.value })}
+                onChange={(e) =>
+                  setConfig({ ...config, format: e.target.value })
+                }
                 className="text-blue-600 focus:ring-blue-500"
               />
               <span className="text-sm text-gray-700 dark:text-gray-300">
@@ -238,7 +263,10 @@ export default function ReportGeneratorForm({ onGenerate }: ReportGeneratorFormP
               onChange={(e) =>
                 setConfig({
                   ...config,
-                  customization: { ...config.customization, includeLogo: e.target.checked },
+                  customization: {
+                    ...config.customization,
+                    includeLogo: e.target.checked,
+                  },
                 })
               }
               className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
@@ -254,7 +282,10 @@ export default function ReportGeneratorForm({ onGenerate }: ReportGeneratorFormP
               onChange={(e) =>
                 setConfig({
                   ...config,
-                  customization: { ...config.customization, includeSignature: e.target.checked },
+                  customization: {
+                    ...config.customization,
+                    includeSignature: e.target.checked,
+                  },
                 })
               }
               className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
@@ -274,7 +305,10 @@ export default function ReportGeneratorForm({ onGenerate }: ReportGeneratorFormP
                 onChange={(e) =>
                   setConfig({
                     ...config,
-                    customization: { ...config.customization, language: e.target.value },
+                    customization: {
+                      ...config.customization,
+                      language: e.target.value,
+                    },
                   })
                 }
                 className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
@@ -293,7 +327,10 @@ export default function ReportGeneratorForm({ onGenerate }: ReportGeneratorFormP
                 onChange={(e) =>
                   setConfig({
                     ...config,
-                    customization: { ...config.customization, paperSize: e.target.value },
+                    customization: {
+                      ...config.customization,
+                      paperSize: e.target.value,
+                    },
                   })
                 }
                 className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
@@ -311,7 +348,10 @@ export default function ReportGeneratorForm({ onGenerate }: ReportGeneratorFormP
                 onChange={(e) =>
                   setConfig({
                     ...config,
-                    customization: { ...config.customization, orientation: e.target.value },
+                    customization: {
+                      ...config.customization,
+                      orientation: e.target.value,
+                    },
                   })
                 }
                 className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"

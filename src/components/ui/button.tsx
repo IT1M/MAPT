@@ -1,6 +1,7 @@
 import React from 'react';
 
-export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+export interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'danger';
   size?: 'small' | 'medium' | 'large';
   loading?: boolean;
@@ -8,23 +9,38 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 }
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ variant = 'primary', size = 'medium', loading = false, disabled, children, className = '', ...props }, ref) => {
-    const baseStyles = 'inline-flex items-center justify-center font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px]';
-    
+  (
+    {
+      variant = 'primary',
+      size = 'medium',
+      loading = false,
+      disabled,
+      children,
+      className = '',
+      ...props
+    },
+    ref
+  ) => {
+    const baseStyles =
+      'inline-flex items-center justify-center font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px]';
+
     const variantStyles = {
-      primary: 'bg-primary-500 text-white hover:bg-primary-600 focus:ring-primary-500 dark:bg-primary-600 dark:hover:bg-primary-700',
-      secondary: 'bg-gray-200 text-gray-900 hover:bg-gray-300 focus:ring-gray-500 dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600',
-      danger: 'bg-danger-500 text-white hover:bg-danger-600 focus:ring-danger-500 dark:bg-danger-600 dark:hover:bg-danger-700',
+      primary:
+        'bg-primary-500 text-white hover:bg-primary-600 focus:ring-primary-500 dark:bg-primary-600 dark:hover:bg-primary-700',
+      secondary:
+        'bg-gray-200 text-gray-900 hover:bg-gray-300 focus:ring-gray-500 dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600',
+      danger:
+        'bg-danger-500 text-white hover:bg-danger-600 focus:ring-danger-500 dark:bg-danger-600 dark:hover:bg-danger-700',
     };
-    
+
     const sizeStyles = {
       small: 'px-3 py-1.5 text-sm',
       medium: 'px-4 py-2 text-base',
       large: 'px-6 py-3 text-lg',
     };
-    
+
     const combinedClassName = `${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${className}`;
-    
+
     return (
       <button
         ref={ref}

@@ -1,40 +1,40 @@
-'use client'
+'use client';
 
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface RecentEntry {
-  id: string
-  itemName: string
-  batch: string
-  quantity: number
-  destination: string
-  enteredBy: string
-  createdAt: string
+  id: string;
+  itemName: string;
+  batch: string;
+  quantity: number;
+  destination: string;
+  enteredBy: string;
+  createdAt: string;
 }
 
 export function RecentEntriesTable() {
-  const router = useRouter()
-  const [entries, setEntries] = useState<RecentEntry[]>([])
-  const [loading, setLoading] = useState(true)
+  const router = useRouter();
+  const [entries, setEntries] = useState<RecentEntry[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchRecentEntries()
-  }, [])
+    fetchRecentEntries();
+  }, []);
 
   const fetchRecentEntries = async () => {
     try {
-      const response = await fetch('/api/dashboard/recent-entries?limit=10')
+      const response = await fetch('/api/dashboard/recent-entries?limit=10');
       if (response.ok) {
-        const data = await response.json()
-        setEntries(data)
+        const data = await response.json();
+        setEntries(data);
       }
     } catch (error) {
-      console.error('Failed to fetch recent entries:', error)
+      console.error('Failed to fetch recent entries:', error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   if (loading) {
     return (
@@ -46,7 +46,7 @@ export function RecentEntriesTable() {
           <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded"></div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -90,7 +90,10 @@ export function RecentEntriesTable() {
           <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
             {entries.length === 0 ? (
               <tr>
-                <td colSpan={6} className="py-8 text-center text-gray-500 dark:text-gray-400">
+                <td
+                  colSpan={6}
+                  className="py-8 text-center text-gray-500 dark:text-gray-400"
+                >
                   No recent entries
                 </td>
               </tr>
@@ -111,11 +114,13 @@ export function RecentEntriesTable() {
                     {entry.quantity}
                   </td>
                   <td className="py-3">
-                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                      entry.destination === 'MAIS'
-                        ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400'
-                        : 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
-                    }`}>
+                    <span
+                      className={`px-2 py-1 text-xs font-medium rounded-full ${
+                        entry.destination === 'MAIS'
+                          ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400'
+                          : 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
+                      }`}
+                    >
                       {entry.destination}
                     </span>
                   </td>
@@ -132,5 +137,5 @@ export function RecentEntriesTable() {
         </table>
       </div>
     </div>
-  )
+  );
 }

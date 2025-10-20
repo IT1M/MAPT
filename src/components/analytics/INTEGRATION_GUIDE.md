@@ -33,13 +33,13 @@ The `AnalyticsDashboard` component manages a centralized filter state that contr
 ```typescript
 interface AnalyticsFilterState {
   dateRange: {
-    start: Date | null
-    end: Date | null
-    preset: DatePresetType
-  }
-  destinations: Destination[]
-  categories: string[]
-  userIds: string[]
+    start: Date | null;
+    end: Date | null;
+    preset: DatePresetType;
+  };
+  destinations: Destination[];
+  categories: string[];
+  userIds: string[];
 }
 ```
 
@@ -49,13 +49,13 @@ All chart data is managed in a single state object:
 
 ```typescript
 interface DashboardData {
-  summary: AnalyticsSummary | null
-  trends: TrendDataPoint[]
-  destination: DestinationData | null
-  categories: CategoryDataPoint[]
-  rejectAnalysis: RejectDataPoint[]
-  userActivity: HeatmapDataPoint[]
-  monthlyComparison: MonthlyDataPoint[]
+  summary: AnalyticsSummary | null;
+  trends: TrendDataPoint[];
+  destination: DestinationData | null;
+  categories: CategoryDataPoint[];
+  rejectAnalysis: RejectDataPoint[];
+  userActivity: HeatmapDataPoint[];
+  monthlyComparison: MonthlyDataPoint[];
 }
 ```
 
@@ -91,13 +91,13 @@ Users can click on various elements to apply filters:
   - Total Quantity card → Filter by destination
   - Categories card → Filter by most active category
   - Reject Rate card → Show high reject items
-  
 - **Destination Chart**: Click pie segment to filter by that destination
 - **Category Chart**: Click bar to filter by that category
 
 ### 4. Auto-Refresh
 
 When enabled:
+
 1. Timer triggers every 60 seconds
 2. `fetchAllData()` is called with current filters
 3. All data is refreshed
@@ -135,6 +135,7 @@ When enabled:
 ### Query Parameters
 
 All endpoints accept the same filter parameters:
+
 - `startDate`: ISO date string
 - `endDate`: ISO date string
 - `preset`: Date preset name
@@ -145,16 +146,19 @@ All endpoints accept the same filter parameters:
 ## Responsive Behavior
 
 ### Desktop (>1024px)
+
 - 3-column KPI grid
 - 2-column chart grid
 - Side-by-side layout for filters and content
 
 ### Tablet (768px - 1024px)
+
 - 2-column KPI grid
 - 2-column chart grid
 - Collapsible filter panel
 
 ### Mobile (<768px)
+
 - Single column layout
 - Stacked KPI cards
 - Full-width charts
@@ -164,18 +168,21 @@ All endpoints accept the same filter parameters:
 ## Accessibility Features
 
 ### Keyboard Navigation
+
 - All interactive elements are keyboard accessible
 - Tab order follows logical flow
 - Escape key closes modals and dropdowns
 - Arrow keys navigate chart data points
 
 ### Screen Reader Support
+
 - ARIA labels on all charts
 - Live regions announce data updates
 - Alternative data table view available
 - Descriptive button labels
 
 ### Visual Accessibility
+
 - Color contrast ratio ≥ 4.5:1
 - Not relying solely on color for information
 - Focus indicators visible
@@ -184,12 +191,14 @@ All endpoints accept the same filter parameters:
 ## Performance Optimizations
 
 ### Frontend
+
 1. **Debouncing**: Filter changes debounced by 300ms
 2. **Memoization**: Expensive calculations cached with `useMemo`
 3. **Lazy Loading**: Charts load only when in viewport
 4. **Code Splitting**: Chart components dynamically imported
 
 ### Backend
+
 1. **Response Caching**: 5-minute TTL for analytics endpoints
 2. **Parallel Requests**: Multiple endpoints fetched concurrently
 3. **Query Optimization**: Database aggregations instead of full scans
@@ -197,17 +206,21 @@ All endpoints accept the same filter parameters:
 ## Error Handling
 
 ### Chart-Level Errors
+
 Each chart is wrapped in `ChartErrorBoundary`:
+
 - Prevents cascade failures
 - Shows error message for that chart only
 - Other charts continue to function
 
 ### API Errors
+
 - Network errors show retry button
 - Timeout errors show appropriate message
 - Rate limit errors show wait time
 
 ### Fallback Strategies
+
 1. **AI Insights**: Use rule-based fallbacks when Gemini unavailable
 2. **Charts**: Show cached data with staleness indicator
 3. **Filters**: Gracefully degrade to default view
@@ -217,6 +230,7 @@ Each chart is wrapped in `ChartErrorBoundary`:
 ### Manual Testing Checklist
 
 #### Load and Display
+
 - [ ] Dashboard loads without errors
 - [ ] All KPI cards display correct data
 - [ ] All charts render properly
@@ -224,6 +238,7 @@ Each chart is wrapped in `ChartErrorBoundary`:
 - [ ] Error states display when API fails
 
 #### Filtering
+
 - [ ] Date range filter updates all charts
 - [ ] Destination filter works correctly
 - [ ] Category filter works correctly
@@ -233,24 +248,28 @@ Each chart is wrapped in `ChartErrorBoundary`:
 - [ ] Filters persist on page refresh
 
 #### Interactive Filtering
+
 - [ ] Clicking KPI cards applies filters
 - [ ] Clicking destination chart segments applies filters
 - [ ] Clicking category bars applies filters
 - [ ] Screen reader announces filter changes
 
 #### Auto-Refresh
+
 - [ ] Toggle enables/disables auto-refresh
 - [ ] Data refreshes every 60 seconds when enabled
 - [ ] Last updated timestamp updates correctly
 - [ ] Manual refresh button works
 
 #### Export
+
 - [ ] Dashboard export generates PDF
 - [ ] Individual chart exports work
 - [ ] Export includes all visible data
 - [ ] Export respects current filters
 
 #### AI Features
+
 - [ ] AI insights load automatically
 - [ ] Insights refresh when filters change
 - [ ] Q&A interface accepts questions
@@ -258,6 +277,7 @@ Each chart is wrapped in `ChartErrorBoundary`:
 - [ ] Error handling works for AI failures
 
 #### Responsive Design
+
 - [ ] Desktop layout displays correctly
 - [ ] Tablet layout adapts properly
 - [ ] Mobile layout is usable
@@ -265,6 +285,7 @@ Each chart is wrapped in `ChartErrorBoundary`:
 - [ ] Charts are readable on all screen sizes
 
 #### Accessibility
+
 - [ ] Keyboard navigation works throughout
 - [ ] Screen reader announces updates
 - [ ] Focus indicators are visible
@@ -274,24 +295,28 @@ Each chart is wrapped in `ChartErrorBoundary`:
 ## Troubleshooting
 
 ### Charts Not Loading
+
 1. Check browser console for errors
 2. Verify API endpoints are responding
 3. Check network tab for failed requests
 4. Verify user has correct role permissions
 
 ### Filters Not Working
+
 1. Check URL parameters are updating
 2. Verify filter state in React DevTools
 3. Check API requests include filter parameters
 4. Verify debounce is not causing confusion
 
 ### Performance Issues
+
 1. Check number of data points being rendered
 2. Verify caching is working
 3. Check for memory leaks in React DevTools
 4. Monitor network requests for duplicates
 
 ### AI Features Not Working
+
 1. Verify Gemini API key is configured
 2. Check API quota and rate limits
 3. Verify request/response format

@@ -1,9 +1,11 @@
 /**
  * Global Search Components
- * Export all search-related components and hooks
+ * Export all search-related components
  */
 
-export { GlobalSearch } from './GlobalSearch'
-export { GlobalSearchProvider, useGlobalSearchContext } from './GlobalSearchProvider'
-export { SearchButton } from './SearchButton'
-export { useGlobalSearch } from '@/hooks/useGlobalSearch'
+export { GlobalSearch } from './GlobalSearch';
+export {
+  GlobalSearchProvider,
+  useGlobalSearchContext,
+} from './GlobalSearchProvider';
+export { SearchButton } from './SearchButton';

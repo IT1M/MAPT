@@ -1,18 +1,18 @@
-'use client'
+'use client';
 
 /**
  * WelcomeModal Component
  * Displays a welcome modal for first-time users
  */
 
-import { useEffect, useState } from 'react'
-import { useTranslations } from '@/hooks/useTranslations'
-import { UserRole } from '@prisma/client'
+import { useEffect, useState } from 'react';
+import { useTranslations } from '@/hooks/useTranslations';
+import { UserRole } from '@prisma/client';
 
 interface WelcomeModalProps {
-  userName: string
-  userRole: UserRole
-  isFirstLogin?: boolean
+  userName: string;
+  userRole: UserRole;
+  isFirstLogin?: boolean;
 }
 
 export function WelcomeModal({
@@ -20,75 +20,76 @@ export function WelcomeModal({
   userRole,
   isFirstLogin = false,
 }: WelcomeModalProps) {
-  const t = useTranslations('dashboard')
-  const [isOpen, setIsOpen] = useState(false)
+  const t = useTranslations('dashboard');
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     // Check if user has seen welcome modal
-    const hasSeenWelcome = localStorage.getItem('hasSeenWelcome')
-    
+    const hasSeenWelcome = localStorage.getItem('hasSeenWelcome');
+
     if (isFirstLogin || !hasSeenWelcome) {
-      setIsOpen(true)
+      setIsOpen(true);
     }
-  }, [isFirstLogin])
+  }, [isFirstLogin]);
 
   const handleClose = () => {
-    localStorage.setItem('hasSeenWelcome', 'true')
-    setIsOpen(false)
-  }
+    localStorage.setItem('hasSeenWelcome', 'true');
+    setIsOpen(false);
+  };
 
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
   // Role-specific welcome messages
-  const roleMessages: Record<UserRole, { title: string; features: string[] }> = {
-    ADMIN: {
-      title: t('welcome.admin.title'),
-      features: [
-        t('welcome.admin.feature1'),
-        t('welcome.admin.feature2'),
-        t('welcome.admin.feature3'),
-        t('welcome.admin.feature4'),
-      ],
-    },
-    MANAGER: {
-      title: t('welcome.manager.title'),
-      features: [
-        t('welcome.manager.feature1'),
-        t('welcome.manager.feature2'),
-        t('welcome.manager.feature3'),
-        t('welcome.manager.feature4'),
-      ],
-    },
-    SUPERVISOR: {
-      title: t('welcome.supervisor.title'),
-      features: [
-        t('welcome.supervisor.feature1'),
-        t('welcome.supervisor.feature2'),
-        t('welcome.supervisor.feature3'),
-        t('welcome.supervisor.feature4'),
-      ],
-    },
-    DATA_ENTRY: {
-      title: t('welcome.dataEntry.title'),
-      features: [
-        t('welcome.dataEntry.feature1'),
-        t('welcome.dataEntry.feature2'),
-        t('welcome.dataEntry.feature3'),
-        t('welcome.dataEntry.feature4'),
-      ],
-    },
-    AUDITOR: {
-      title: t('welcome.auditor.title'),
-      features: [
-        t('welcome.auditor.feature1'),
-        t('welcome.auditor.feature2'),
-        t('welcome.auditor.feature3'),
-        t('welcome.auditor.feature4'),
-      ],
-    },
-  }
+  const roleMessages: Record<UserRole, { title: string; features: string[] }> =
+    {
+      ADMIN: {
+        title: t('welcome.admin.title'),
+        features: [
+          t('welcome.admin.feature1'),
+          t('welcome.admin.feature2'),
+          t('welcome.admin.feature3'),
+          t('welcome.admin.feature4'),
+        ],
+      },
+      MANAGER: {
+        title: t('welcome.manager.title'),
+        features: [
+          t('welcome.manager.feature1'),
+          t('welcome.manager.feature2'),
+          t('welcome.manager.feature3'),
+          t('welcome.manager.feature4'),
+        ],
+      },
+      SUPERVISOR: {
+        title: t('welcome.supervisor.title'),
+        features: [
+          t('welcome.supervisor.feature1'),
+          t('welcome.supervisor.feature2'),
+          t('welcome.supervisor.feature3'),
+          t('welcome.supervisor.feature4'),
+        ],
+      },
+      DATA_ENTRY: {
+        title: t('welcome.dataEntry.title'),
+        features: [
+          t('welcome.dataEntry.feature1'),
+          t('welcome.dataEntry.feature2'),
+          t('welcome.dataEntry.feature3'),
+          t('welcome.dataEntry.feature4'),
+        ],
+      },
+      AUDITOR: {
+        title: t('welcome.auditor.title'),
+        features: [
+          t('welcome.auditor.feature1'),
+          t('welcome.auditor.feature2'),
+          t('welcome.auditor.feature3'),
+          t('welcome.auditor.feature4'),
+        ],
+      },
+    };
 
-  const roleContent = roleMessages[userRole]
+  const roleContent = roleMessages[userRole];
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
@@ -116,9 +117,7 @@ export function WelcomeModal({
                 <h2 className="text-2xl font-bold text-white">
                   {t('welcome.greeting')}, {userName}!
                 </h2>
-                <p className="text-primary-100 text-sm">
-                  {roleContent.title}
-                </p>
+                <p className="text-primary-100 text-sm">{roleContent.title}</p>
               </div>
             </div>
             <button
@@ -212,5 +211,5 @@ export function WelcomeModal({
         </div>
       </div>
     </div>
-  )
+  );
 }

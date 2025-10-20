@@ -1,23 +1,23 @@
-'use client'
+'use client';
 
-import React, { useState, lazy, Suspense } from 'react'
-import { DataEntryForm } from './DataEntryForm'
-import type { QuickStatsEntry } from '@/components/dashboard/QuickStatsWidget'
-import type { Destination } from '@prisma/client'
+import React, { useState, lazy, Suspense } from 'react';
+import { DataEntryForm } from './DataEntryForm';
+import type { QuickStatsEntry } from '@/components/dashboard/QuickStatsWidget';
+import type { Destination } from '@prisma/client';
 
 // Lazy load QuickStatsWidget for better performance
 const QuickStatsWidget = lazy(() =>
   import('@/components/dashboard/QuickStatsWidget').then((mod) => ({
     default: mod.QuickStatsWidget,
   }))
-)
+);
 
 interface DataEntryFormWithStatsProps {
-  recentItems: Array<{ itemName: string; category: string | null }>
-  todayCount: number
-  recentEntries: QuickStatsEntry[]
-  userLastDestination?: Destination
-  userId: string
+  recentItems: Array<{ itemName: string; category: string | null }>;
+  todayCount: number;
+  recentEntries: QuickStatsEntry[];
+  userLastDestination?: Destination;
+  userId: string;
 }
 
 export function DataEntryFormWithStats({
@@ -27,12 +27,12 @@ export function DataEntryFormWithStats({
   userLastDestination,
   userId,
 }: DataEntryFormWithStatsProps) {
-  const [todayCount, setTodayCount] = useState(initialTodayCount)
-  const [recentEntries, setRecentEntries] = useState(initialRecentEntries)
+  const [todayCount, setTodayCount] = useState(initialTodayCount);
+  const [recentEntries, setRecentEntries] = useState(initialRecentEntries);
 
   const handleSuccess = (newEntry: any) => {
     // Update today's count
-    setTodayCount((prev) => prev + 1)
+    setTodayCount((prev) => prev + 1);
 
     // Add new entry to the top of recent entries and keep only 5
     const updatedEntries = [
@@ -45,37 +45,37 @@ export function DataEntryFormWithStats({
         createdAt: new Date(newEntry.createdAt),
       },
       ...recentEntries,
-    ].slice(0, 5)
+    ].slice(0, 5);
 
-    setRecentEntries(updatedEntries)
-  }
+    setRecentEntries(updatedEntries);
+  };
 
   const handleRefresh = async () => {
     try {
       // Fetch updated stats from the server
-      const todayStart = new Date()
-      todayStart.setHours(0, 0, 0, 0)
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
 
       const response = await fetch(
         `/api/inventory?userId=${userId}&todayStart=${todayStart.toISOString()}&limit=5`
-      )
+      );
 
       if (response.ok) {
-        const data = await response.json()
+        const data = await response.json();
         if (data.success) {
-          setTodayCount(data.todayCount || todayCount)
+          setTodayCount(data.todayCount || todayCount);
           setRecentEntries(
             data.recentEntries?.map((entry: any) => ({
               ...entry,
               createdAt: new Date(entry.createdAt),
             })) || recentEntries
-          )
+          );
         }
       }
     } catch (error) {
-      console.error('Failed to refresh stats:', error)
+      console.error('Failed to refresh stats:', error);
     }
-  }
+  };
 
   return (
     <div className="flex gap-6 w-full max-w-[1600px] mx-auto">
@@ -110,5 +110,5 @@ export function DataEntryFormWithStats({
         />
       </Suspense>
     </div>
-  )
+  );
 }

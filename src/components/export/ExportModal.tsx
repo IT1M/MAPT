@@ -1,22 +1,22 @@
-'use client'
+'use client';
 
-import React, { useState, useEffect } from 'react'
-import { useTranslations } from '@/hooks/useTranslations'
-import { downloadBlob } from '@/utils/download-helper'
+import React, { useState, useEffect } from 'react';
+import { useTranslations } from '@/hooks/useTranslations';
+import { downloadBlob } from '@/utils/download-helper';
 
 export interface ExportModalProps {
-  isOpen: boolean
-  onClose: () => void
-  entity: 'inventory' | 'audit' | 'reports' | 'users'
-  filters?: Record<string, any>
-  selectedIds?: string[]
-  onExportComplete?: (success: boolean, format: string) => void
+  isOpen: boolean;
+  onClose: () => void;
+  entity: 'inventory' | 'audit' | 'reports' | 'users';
+  filters?: Record<string, any>;
+  selectedIds?: string[];
+  onExportComplete?: (success: boolean, format: string) => void;
 }
 
 interface ColumnOption {
-  key: string
-  label: string
-  selected: boolean
+  key: string;
+  label: string;
+  selected: boolean;
 }
 
 export const ExportModal: React.FC<ExportModalProps> = ({
@@ -27,16 +27,18 @@ export const ExportModal: React.FC<ExportModalProps> = ({
   selectedIds,
   onExportComplete,
 }) => {
-  const t = useTranslations()
-  const [format, setFormat] = useState<'csv' | 'excel' | 'json' | 'pdf'>('excel')
-  const [filename, setFilename] = useState(`${entity}-export`)
-  const [includeFilters, setIncludeFilters] = useState(true)
-  const [emailDelivery, setEmailDelivery] = useState(false)
-  const [columns, setColumns] = useState<ColumnOption[]>([])
-  const [isExporting, setIsExporting] = useState(false)
-  const [progress, setProgress] = useState(0)
-  const [error, setError] = useState<string | null>(null)
-  const [estimatedRecords, setEstimatedRecords] = useState(0)
+  const t = useTranslations();
+  const [format, setFormat] = useState<'csv' | 'excel' | 'json' | 'pdf'>(
+    'excel'
+  );
+  const [filename, setFilename] = useState(`${entity}-export`);
+  const [includeFilters, setIncludeFilters] = useState(true);
+  const [emailDelivery, setEmailDelivery] = useState(false);
+  const [columns, setColumns] = useState<ColumnOption[]>([]);
+  const [isExporting, setIsExporting] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [error, setError] = useState<string | null>(null);
+  const [estimatedRecords, setEstimatedRecords] = useState(0);
 
   // Initialize columns based on entity
   useEffect(() => {
@@ -76,31 +78,31 @@ export const ExportModal: React.FC<ExportModalProps> = ({
         { key: 'createdAt', label: 'Created At', selected: true },
         { key: 'lastLogin', label: 'Last Login', selected: true },
       ],
-    }
+    };
 
-    setColumns(entityColumns[entity] || [])
-    
+    setColumns(entityColumns[entity] || []);
+
     // Estimate record count
     if (selectedIds && selectedIds.length > 0) {
-      setEstimatedRecords(selectedIds.length)
+      setEstimatedRecords(selectedIds.length);
     } else {
       // This would ideally come from an API call
-      setEstimatedRecords(0)
+      setEstimatedRecords(0);
     }
-  }, [entity, selectedIds])
+  }, [entity, selectedIds]);
 
   const handleExport = async () => {
-    setIsExporting(true)
-    setProgress(0)
-    setError(null)
+    setIsExporting(true);
+    setProgress(0);
+    setError(null);
 
     try {
       // Prepare selected columns
       const selectedColumns = columns
-        .filter(col => col.selected)
-        .map(col => col.key)
+        .filter((col) => col.selected)
+        .map((col) => col.key);
 
-      setProgress(10)
+      setProgress(10);
 
       // Make API request
       const response = await fetch('/api/export', {
@@ -118,93 +120,96 @@ export const ExportModal: React.FC<ExportModalProps> = ({
           includeFilters,
           emailDelivery,
         }),
-      })
+      });
 
-      setProgress(50)
+      setProgress(50);
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
-        throw new Error(errorData.error?.message || `Export failed with status ${response.status}`)
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(
+          errorData.error?.message ||
+            `Export failed with status ${response.status}`
+        );
       }
 
       // Check if email delivery
-      const contentType = response.headers.get('Content-Type')
+      const contentType = response.headers.get('Content-Type');
       if (contentType?.includes('application/json')) {
-        const result = await response.json()
-        setProgress(100)
-        
+        const result = await response.json();
+        setProgress(100);
+
         if (result.emailSent) {
-          alert('Export file will be sent to your email shortly')
+          alert('Export file will be sent to your email shortly');
         }
-        
+
         if (onExportComplete) {
-          onExportComplete(true, format)
+          onExportComplete(true, format);
         }
-        
-        onClose()
-        return
+
+        onClose();
+        return;
       }
 
       // Download file
-      const blob = await response.blob()
-      setProgress(75)
+      const blob = await response.blob();
+      setProgress(75);
 
       // Extract filename from Content-Disposition header
-      const contentDisposition = response.headers.get('Content-Disposition')
-      let downloadFilename = `${filename}.${format === 'excel' ? 'xlsx' : format}`
-      
+      const contentDisposition = response.headers.get('Content-Disposition');
+      let downloadFilename = `${filename}.${format === 'excel' ? 'xlsx' : format}`;
+
       if (contentDisposition) {
-        const fileNameMatch = contentDisposition.match(/filename="?(.+)"?/)
+        const fileNameMatch = contentDisposition.match(/filename="?(.+)"?/);
         if (fileNameMatch) {
-          downloadFilename = fileNameMatch[1]
+          downloadFilename = fileNameMatch[1];
         }
       }
-      
-      downloadBlob(blob, downloadFilename)
 
-      setProgress(100)
+      downloadBlob(blob, downloadFilename);
+
+      setProgress(100);
 
       if (onExportComplete) {
-        onExportComplete(true, format)
+        onExportComplete(true, format);
       }
 
       // Close modal after short delay
       setTimeout(() => {
-        onClose()
-      }, 500)
+        onClose();
+      }, 500);
     } catch (error) {
-      console.error('Export failed:', error)
-      setError(error instanceof Error ? error.message : 'Export failed')
-      
+      console.error('Export failed:', error);
+      setError(error instanceof Error ? error.message : 'Export failed');
+
       if (onExportComplete) {
-        onExportComplete(false, format)
+        onExportComplete(false, format);
       }
     } finally {
-      setIsExporting(false)
-      setProgress(0)
+      setIsExporting(false);
+      setProgress(0);
     }
-  }
+  };
 
   const toggleColumn = (key: string) => {
-    setColumns(prev =>
-      prev.map(col =>
+    setColumns((prev) =>
+      prev.map((col) =>
         col.key === key ? { ...col, selected: !col.selected } : col
       )
-    )
-  }
+    );
+  };
 
   const selectAllColumns = () => {
-    setColumns(prev => prev.map(col => ({ ...col, selected: true })))
-  }
+    setColumns((prev) => prev.map((col) => ({ ...col, selected: true })));
+  };
 
   const deselectAllColumns = () => {
-    setColumns(prev => prev.map(col => ({ ...col, selected: false })))
-  }
+    setColumns((prev) => prev.map((col) => ({ ...col, selected: false })));
+  };
 
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
-  const selectedCount = columns.filter(col => col.selected).length
-  const shouldShowEmailOption = estimatedRecords > 5000
+  const selectedCount = columns.filter((col) => col.selected).length;
+  const shouldShowEmailOption = estimatedRecords > 5000;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
@@ -221,15 +226,26 @@ export const ExportModal: React.FC<ExportModalProps> = ({
               className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 disabled:opacity-50"
               aria-label="Close"
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>
-          
+
           {selectedIds && selectedIds.length > 0 && (
             <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-              Exporting {selectedIds.length} selected {selectedIds.length === 1 ? 'item' : 'items'}
+              Exporting {selectedIds.length} selected{' '}
+              {selectedIds.length === 1 ? 'item' : 'items'}
             </p>
           )}
         </div>
@@ -242,7 +258,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
               Export Format
             </label>
             <div className="grid grid-cols-2 gap-3">
-              {(['csv', 'excel', 'json'] as const).map(fmt => (
+              {(['csv', 'excel', 'json'] as const).map((fmt) => (
                 <button
                   key={fmt}
                   onClick={() => setFormat(fmt)}
@@ -307,7 +323,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
             </div>
             <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-3 max-h-48 overflow-y-auto">
               <div className="grid grid-cols-2 gap-2">
-                {columns.map(col => (
+                {columns.map((col) => (
                   <label
                     key={col.key}
                     className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded"
@@ -408,8 +424,18 @@ export const ExportModal: React.FC<ExportModalProps> = ({
                   onClick={() => setError(null)}
                   className="text-red-400 hover:text-red-600 dark:hover:text-red-200"
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
                   </svg>
                 </button>
               </div>
@@ -433,16 +459,41 @@ export const ExportModal: React.FC<ExportModalProps> = ({
           >
             {isExporting ? (
               <>
-                <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                <svg
+                  className="w-4 h-4 animate-spin"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  />
                 </svg>
                 <span>Exporting...</span>
               </>
             ) : (
               <>
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
                 </svg>
                 <span>Export</span>
               </>
@@ -451,5 +502,5 @@ export const ExportModal: React.FC<ExportModalProps> = ({
         </div>
       </div>
     </div>
-  )
-}
+  );
+};

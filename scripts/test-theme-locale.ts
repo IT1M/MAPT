@@ -11,13 +11,13 @@ const results: TestResult[] = [];
 
 function testLocaleFiles(): boolean {
   console.log('🌍 Testing locale files...');
-  
+
   const locales = ['en', 'ar'];
   let allPassed = true;
 
   for (const locale of locales) {
     const filePath = path.join(process.cwd(), 'messages', `${locale}.json`);
-    
+
     try {
       if (!fs.existsSync(filePath)) {
         results.push({
@@ -39,8 +39,14 @@ function testLocaleFiles(): boolean {
       });
 
       // Check for required translation keys
-      const requiredKeys = ['common', 'navigation', 'auth', 'dashboard', 'errors'];
-      const missingKeys = requiredKeys.filter(key => !translations[key]);
+      const requiredKeys = [
+        'common',
+        'navigation',
+        'auth',
+        'dashboard',
+        'errors',
+      ];
+      const missingKeys = requiredKeys.filter((key) => !translations[key]);
 
       if (missingKeys.length > 0) {
         results.push({
@@ -71,9 +77,9 @@ function testLocaleFiles(): boolean {
 
 function testLocaleConfiguration(): boolean {
   console.log('⚙️  Testing locale configuration...');
-  
+
   const i18nPath = path.join(process.cwd(), 'src', 'i18n.ts');
-  
+
   try {
     if (!fs.existsSync(i18nPath)) {
       results.push({
@@ -87,23 +93,29 @@ function testLocaleConfiguration(): boolean {
     const content = fs.readFileSync(i18nPath, 'utf-8');
 
     // Check for locale definitions
-    const hasLocales = content.includes("locales = ['en', 'ar']") || 
-                       content.includes('locales = ["en", "ar"]');
-    
+    const hasLocales =
+      content.includes("locales = ['en', 'ar']") ||
+      content.includes('locales = ["en", "ar"]');
+
     results.push({
       test: 'Locale definitions in i18n.ts',
       passed: hasLocales,
-      message: hasLocales ? 'Locales defined correctly' : 'Locale definitions not found',
+      message: hasLocales
+        ? 'Locales defined correctly'
+        : 'Locale definitions not found',
     });
 
     // Check for default locale
-    const hasDefaultLocale = content.includes("defaultLocale: Locale = 'en'") ||
-                             content.includes('defaultLocale: Locale = "en"');
-    
+    const hasDefaultLocale =
+      content.includes("defaultLocale: Locale = 'en'") ||
+      content.includes('defaultLocale: Locale = "en"');
+
     results.push({
       test: 'Default locale configuration',
       passed: hasDefaultLocale,
-      message: hasDefaultLocale ? 'Default locale set to English' : 'Default locale not configured',
+      message: hasDefaultLocale
+        ? 'Default locale set to English'
+        : 'Default locale not configured',
     });
 
     return hasLocales && hasDefaultLocale;
@@ -119,9 +131,15 @@ function testLocaleConfiguration(): boolean {
 
 function testThemeToggleComponent(): boolean {
   console.log('🎨 Testing theme toggle component...');
-  
-  const themePath = path.join(process.cwd(), 'src', 'components', 'ui', 'theme-toggle.tsx');
-  
+
+  const themePath = path.join(
+    process.cwd(),
+    'src',
+    'components',
+    'ui',
+    'theme-toggle.tsx'
+  );
+
   try {
     if (!fs.existsSync(themePath)) {
       results.push({
@@ -139,7 +157,9 @@ function testThemeToggleComponent(): boolean {
     results.push({
       test: 'Theme toggle uses next-themes',
       passed: usesNextThemes,
-      message: usesNextThemes ? 'next-themes imported' : 'next-themes not found',
+      message: usesNextThemes
+        ? 'next-themes imported'
+        : 'next-themes not found',
     });
 
     // Check for useTheme hook
@@ -155,7 +175,9 @@ function testThemeToggleComponent(): boolean {
     results.push({
       test: 'Theme toggle has setTheme functionality',
       passed: hasSetTheme,
-      message: hasSetTheme ? 'setTheme function present' : 'setTheme function not found',
+      message: hasSetTheme
+        ? 'setTheme function present'
+        : 'setTheme function not found',
     });
 
     // Check for accessibility
@@ -179,9 +201,15 @@ function testThemeToggleComponent(): boolean {
 
 function testRTLSupport(): boolean {
   console.log('📝 Testing RTL support...');
-  
-  const layoutPath = path.join(process.cwd(), 'src', 'app', '[locale]', 'layout.tsx');
-  
+
+  const layoutPath = path.join(
+    process.cwd(),
+    'src',
+    'app',
+    '[locale]',
+    'layout.tsx'
+  );
+
   try {
     if (!fs.existsSync(layoutPath)) {
       results.push({
@@ -195,11 +223,14 @@ function testRTLSupport(): boolean {
     const content = fs.readFileSync(layoutPath, 'utf-8');
 
     // Check for dir attribute
-    const hasDirAttribute = content.includes('dir=') || content.includes('dir:');
+    const hasDirAttribute =
+      content.includes('dir=') || content.includes('dir:');
     results.push({
       test: 'RTL support with dir attribute',
       passed: hasDirAttribute,
-      message: hasDirAttribute ? 'dir attribute found in layout' : 'dir attribute not found',
+      message: hasDirAttribute
+        ? 'dir attribute found in layout'
+        : 'dir attribute not found',
     });
 
     // Check for locale-based direction
@@ -223,9 +254,9 @@ function testRTLSupport(): boolean {
 
 function testTailwindDarkMode(): boolean {
   console.log('🌙 Testing Tailwind dark mode configuration...');
-  
+
   const tailwindPath = path.join(process.cwd(), 'tailwind.config.ts');
-  
+
   try {
     if (!fs.existsSync(tailwindPath)) {
       results.push({
@@ -239,13 +270,16 @@ function testTailwindDarkMode(): boolean {
     const content = fs.readFileSync(tailwindPath, 'utf-8');
 
     // Check for dark mode configuration
-    const hasDarkMode = content.includes("darkMode: 'class'") || 
-                        content.includes('darkMode: "class"');
-    
+    const hasDarkMode =
+      content.includes("darkMode: 'class'") ||
+      content.includes('darkMode: "class"');
+
     results.push({
       test: 'Tailwind dark mode configured',
       passed: hasDarkMode,
-      message: hasDarkMode ? 'Dark mode set to class strategy' : 'Dark mode not configured',
+      message: hasDarkMode
+        ? 'Dark mode set to class strategy'
+        : 'Dark mode not configured',
     });
 
     return hasDarkMode;
@@ -261,9 +295,9 @@ function testTailwindDarkMode(): boolean {
 
 function testThemeProvider(): boolean {
   console.log('🎭 Testing theme provider setup...');
-  
+
   const rootLayoutPath = path.join(process.cwd(), 'src', 'app', 'layout.tsx');
-  
+
   try {
     if (!fs.existsSync(rootLayoutPath)) {
       results.push({
@@ -281,7 +315,9 @@ function testThemeProvider(): boolean {
     results.push({
       test: 'ThemeProvider in root layout',
       passed: hasThemeProvider,
-      message: hasThemeProvider ? 'ThemeProvider found' : 'ThemeProvider not found',
+      message: hasThemeProvider
+        ? 'ThemeProvider found'
+        : 'ThemeProvider not found',
     });
 
     return hasThemeProvider;
@@ -297,7 +333,7 @@ function testThemeProvider(): boolean {
 
 function testTranslationConsistency(): boolean {
   console.log('🔄 Testing translation consistency...');
-  
+
   try {
     const enPath = path.join(process.cwd(), 'messages', 'en.json');
     const arPath = path.join(process.cwd(), 'messages', 'ar.json');
@@ -309,8 +345,8 @@ function testTranslationConsistency(): boolean {
     const arKeys = Object.keys(arContent);
 
     // Check if both have the same top-level keys
-    const missingInAr = enKeys.filter(key => !arKeys.includes(key));
-    const missingInEn = arKeys.filter(key => !enKeys.includes(key));
+    const missingInAr = enKeys.filter((key) => !arKeys.includes(key));
+    const missingInEn = arKeys.filter((key) => !enKeys.includes(key));
 
     if (missingInAr.length > 0 || missingInEn.length > 0) {
       results.push({
@@ -340,7 +376,7 @@ function testTranslationConsistency(): boolean {
 
 async function main() {
   console.log('🎨 Testing Theme and Locale Switching\n');
-  console.log('=' .repeat(60));
+  console.log('='.repeat(60));
 
   // Run all tests
   testLocaleFiles();
@@ -355,11 +391,11 @@ async function main() {
   console.log('\n' + '='.repeat(60));
   console.log('\n📊 Test Summary:\n');
 
-  const passed = results.filter(r => r.passed).length;
-  const failed = results.filter(r => !r.passed).length;
+  const passed = results.filter((r) => r.passed).length;
+  const failed = results.filter((r) => !r.passed).length;
   const total = results.length;
 
-  results.forEach(result => {
+  results.forEach((result) => {
     const icon = result.passed ? '✅' : '❌';
     console.log(`${icon} ${result.test}`);
     console.log(`   ${result.message}`);
@@ -369,11 +405,15 @@ async function main() {
   console.log(`\n📈 Results: ${passed}/${total} tests passed`);
 
   if (failed > 0) {
-    console.log(`\n❌ ${failed} test(s) failed. Please review the errors above.`);
+    console.log(
+      `\n❌ ${failed} test(s) failed. Please review the errors above.`
+    );
     process.exit(1);
   } else {
     console.log('\n✅ All theme and locale tests passed!');
-    console.log('🎉 Theme switching and internationalization are properly configured.\n');
+    console.log(
+      '🎉 Theme switching and internationalization are properly configured.\n'
+    );
     console.log('💡 Manual testing checklist:');
     console.log('   1. Start the app and toggle between light/dark themes');
     console.log('   2. Verify theme persists after page reload');

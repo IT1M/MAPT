@@ -7,18 +7,18 @@
  */
 export function getLocalStorageItem<T>(key: string, defaultValue: T): T {
   if (typeof window === 'undefined') {
-    return defaultValue
+    return defaultValue;
   }
 
   try {
-    const item = localStorage.getItem(key)
+    const item = localStorage.getItem(key);
     if (item === null) {
-      return defaultValue
+      return defaultValue;
     }
-    return JSON.parse(item) as T
+    return JSON.parse(item) as T;
   } catch (error) {
-    console.error(`Error reading from localStorage (key: ${key}):`, error)
-    return defaultValue
+    console.error(`Error reading from localStorage (key: ${key}):`, error);
+    return defaultValue;
   }
 }
 
@@ -27,15 +27,15 @@ export function getLocalStorageItem<T>(key: string, defaultValue: T): T {
  */
 export function setLocalStorageItem<T>(key: string, value: T): boolean {
   if (typeof window === 'undefined') {
-    return false
+    return false;
   }
 
   try {
-    localStorage.setItem(key, JSON.stringify(value))
-    return true
+    localStorage.setItem(key, JSON.stringify(value));
+    return true;
   } catch (error) {
-    console.error(`Error writing to localStorage (key: ${key}):`, error)
-    return false
+    console.error(`Error writing to localStorage (key: ${key}):`, error);
+    return false;
   }
 }
 
@@ -44,15 +44,15 @@ export function setLocalStorageItem<T>(key: string, value: T): boolean {
  */
 export function removeLocalStorageItem(key: string): boolean {
   if (typeof window === 'undefined') {
-    return false
+    return false;
   }
 
   try {
-    localStorage.removeItem(key)
-    return true
+    localStorage.removeItem(key);
+    return true;
   } catch (error) {
-    console.error(`Error removing from localStorage (key: ${key}):`, error)
-    return false
+    console.error(`Error removing from localStorage (key: ${key}):`, error);
+    return false;
   }
 }
 
@@ -61,15 +61,15 @@ export function removeLocalStorageItem(key: string): boolean {
  */
 export function clearLocalStorage(): boolean {
   if (typeof window === 'undefined') {
-    return false
+    return false;
   }
 
   try {
-    localStorage.clear()
-    return true
+    localStorage.clear();
+    return true;
   } catch (error) {
-    console.error('Error clearing localStorage:', error)
-    return false
+    console.error('Error clearing localStorage:', error);
+    return false;
   }
 }
 
@@ -78,16 +78,16 @@ export function clearLocalStorage(): boolean {
  */
 export function isLocalStorageAvailable(): boolean {
   if (typeof window === 'undefined') {
-    return false
+    return false;
   }
 
   try {
-    const testKey = '__localStorage_test__'
-    localStorage.setItem(testKey, 'test')
-    localStorage.removeItem(testKey)
-    return true
+    const testKey = '__localStorage_test__';
+    localStorage.setItem(testKey, 'test');
+    localStorage.removeItem(testKey);
+    return true;
   } catch {
-    return false
+    return false;
   }
 }
 
@@ -96,21 +96,21 @@ export function isLocalStorageAvailable(): boolean {
  */
 export function getLocalStorageKeys(prefix?: string): string[] {
   if (typeof window === 'undefined') {
-    return []
+    return [];
   }
 
   try {
-    const keys: string[] = []
+    const keys: string[] = [];
     for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i)
+      const key = localStorage.key(i);
       if (key && (!prefix || key.startsWith(prefix))) {
-        keys.push(key)
+        keys.push(key);
       }
     }
-    return keys
+    return keys;
   } catch (error) {
-    console.error('Error getting localStorage keys:', error)
-    return []
+    console.error('Error getting localStorage keys:', error);
+    return [];
   }
 }
 
@@ -119,24 +119,24 @@ export function getLocalStorageKeys(prefix?: string): string[] {
  */
 export function getLocalStorageSize(): number {
   if (typeof window === 'undefined') {
-    return 0
+    return 0;
   }
 
   try {
-    let size = 0
+    let size = 0;
     for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i)
+      const key = localStorage.key(i);
       if (key) {
-        const value = localStorage.getItem(key)
+        const value = localStorage.getItem(key);
         if (value) {
-          size += key.length + value.length
+          size += key.length + value.length;
         }
       }
     }
-    return size
+    return size;
   } catch (error) {
-    console.error('Error calculating localStorage size:', error)
-    return 0
+    console.error('Error calculating localStorage size:', error);
+    return 0;
   }
 }
 
@@ -145,15 +145,15 @@ export function getLocalStorageSize(): number {
  */
 export function clearLocalStorageByPrefix(prefix: string): boolean {
   if (typeof window === 'undefined') {
-    return false
+    return false;
   }
 
   try {
-    const keys = getLocalStorageKeys(prefix)
-    keys.forEach(key => localStorage.removeItem(key))
-    return true
+    const keys = getLocalStorageKeys(prefix);
+    keys.forEach((key) => localStorage.removeItem(key));
+    return true;
   } catch (error) {
-    console.error(`Error clearing localStorage with prefix ${prefix}:`, error)
-    return false
+    console.error(`Error clearing localStorage with prefix ${prefix}:`, error);
+    return false;
   }
 }

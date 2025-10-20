@@ -1,57 +1,57 @@
-'use client'
+'use client';
 
-import { useRouter } from 'next/navigation'
-import { useTranslations } from '@/hooks/useTranslations'
-import { useLocale } from '@/hooks/useLocale'
-import { Card } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
+import { useRouter } from 'next/navigation';
+import { useTranslations } from '@/hooks/useTranslations';
+import { useLocale } from '@/hooks/useLocale';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 
 interface ActivityItem {
-  id: string
-  itemName: string
-  quantity: number
-  destination: string
-  enteredBy: string
-  createdAt: string
+  id: string;
+  itemName: string;
+  quantity: number;
+  destination: string;
+  enteredBy: string;
+  createdAt: string;
 }
 
 interface ActivityTimelineProps {
-  activities: ActivityItem[]
+  activities: ActivityItem[];
 }
 
 export function ActivityTimeline({ activities }: ActivityTimelineProps) {
-  const t = useTranslations()
-  const router = useRouter()
-  const locale = useLocale()
+  const t = useTranslations();
+  const router = useRouter();
+  const locale = useLocale();
 
   const formatTimeAgo = (dateString: string) => {
-    const date = new Date(dateString)
-    const now = new Date()
-    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000)
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 
     if (diffInSeconds < 60) {
-      return t('dashboard.justNow')
+      return t('dashboard.justNow');
     } else if (diffInSeconds < 3600) {
-      const minutes = Math.floor(diffInSeconds / 60)
-      return t('dashboard.minutesAgo', { count: minutes })
+      const minutes = Math.floor(diffInSeconds / 60);
+      return t('dashboard.minutesAgo', { count: minutes });
     } else if (diffInSeconds < 86400) {
-      const hours = Math.floor(diffInSeconds / 3600)
-      return t('dashboard.hoursAgo', { count: hours })
+      const hours = Math.floor(diffInSeconds / 3600);
+      return t('dashboard.hoursAgo', { count: hours });
     } else {
-      const days = Math.floor(diffInSeconds / 86400)
-      return t('dashboard.daysAgo', { count: days })
+      const days = Math.floor(diffInSeconds / 86400);
+      return t('dashboard.daysAgo', { count: days });
     }
-  }
+  };
 
   const getDestinationColor = (destination: string) => {
     return destination === 'MAIS'
       ? 'bg-primary-100 text-primary-800 dark:bg-primary-900/30 dark:text-primary-400'
-      : 'bg-accent-100 text-accent-800 dark:bg-accent-900/30 dark:text-accent-400'
-  }
+      : 'bg-accent-100 text-accent-800 dark:bg-accent-900/30 dark:text-accent-400';
+  };
 
   const handleViewAll = () => {
-    router.push(`/data-log`)
-  }
+    router.push(`/data-log`);
+  };
 
   return (
     <Card>
@@ -64,11 +64,7 @@ export function ActivityTimeline({ activities }: ActivityTimelineProps) {
             {t('dashboard.last10Entries')}
           </p>
         </div>
-        <Button
-          variant="secondary"
-          size="small"
-          onClick={handleViewAll}
-        >
+        <Button variant="secondary" size="small" onClick={handleViewAll}>
           {t('dashboard.viewAll')}
         </Button>
       </Card.Header>
@@ -115,11 +111,14 @@ export function ActivityTimeline({ activities }: ActivityTimelineProps) {
                         {activity.itemName}
                       </p>
                       <div className="flex items-center gap-2 mt-1">
-                        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${getDestinationColor(activity.destination)}`}>
+                        <span
+                          className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${getDestinationColor(activity.destination)}`}
+                        >
                           {activity.destination}
                         </span>
                         <span className="text-xs text-gray-500 dark:text-gray-400">
-                          {t('common.quantity')}: {activity.quantity.toLocaleString()}
+                          {t('common.quantity')}:{' '}
+                          {activity.quantity.toLocaleString()}
                         </span>
                       </div>
                       <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -137,5 +136,5 @@ export function ActivityTimeline({ activities }: ActivityTimelineProps) {
         )}
       </Card.Body>
     </Card>
-  )
+  );
 }

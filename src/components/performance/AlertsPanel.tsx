@@ -1,16 +1,16 @@
-'use client'
+'use client';
 
-import React from 'react'
-import { AlertTriangle, AlertCircle, Info } from 'lucide-react'
+import React from 'react';
+import { AlertTriangle, AlertCircle, Info } from 'lucide-react';
 
 interface Alert {
-  rule: string
-  message: string
-  severity: 'warning' | 'critical'
+  rule: string;
+  message: string;
+  severity: 'warning' | 'critical';
 }
 
 interface AlertsPanelProps {
-  alerts: Alert[]
+  alerts: Alert[];
 }
 
 export function AlertsPanel({ alerts }: AlertsPanelProps) {
@@ -20,18 +20,21 @@ export function AlertsPanel({ alerts }: AlertsPanelProps) {
         <div className="flex items-center gap-3">
           <Info className="w-6 h-6 text-green-600" />
           <div>
-            <h3 className="font-semibold text-green-900">All Systems Operational</h3>
+            <h3 className="font-semibold text-green-900">
+              All Systems Operational
+            </h3>
             <p className="text-sm text-green-700 mt-1">
-              No performance alerts detected. System is running within normal parameters.
+              No performance alerts detected. System is running within normal
+              parameters.
             </p>
           </div>
         </div>
       </div>
-    )
+    );
   }
 
-  const criticalAlerts = alerts.filter(a => a.severity === 'critical')
-  const warningAlerts = alerts.filter(a => a.severity === 'warning')
+  const criticalAlerts = alerts.filter((a) => a.severity === 'critical');
+  const warningAlerts = alerts.filter((a) => a.severity === 'warning');
 
   return (
     <div className="space-y-4">
@@ -82,7 +85,9 @@ export function AlertsPanel({ alerts }: AlertsPanelProps) {
                 </div>
                 <p
                   className={`mt-2 text-sm ${
-                    alert.severity === 'critical' ? 'text-red-900' : 'text-yellow-900'
+                    alert.severity === 'critical'
+                      ? 'text-red-900'
+                      : 'text-yellow-900'
                   }`}
                 >
                   {alert.message}
@@ -93,5 +98,5 @@ export function AlertsPanel({ alerts }: AlertsPanelProps) {
         ))}
       </div>
     </div>
-  )
+  );
 }

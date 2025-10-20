@@ -1,15 +1,15 @@
-'use client'
+'use client';
 
-import Link from 'next/link'
-import { ChevronRightIcon } from '@heroicons/react/24/outline'
+import Link from 'next/link';
+import { ChevronRightIcon } from '@heroicons/react/24/outline';
 
 interface BreadcrumbItem {
-  label: string
-  href?: string
+  label: string;
+  href?: string;
 }
 
 interface HelpBreadcrumbsProps {
-  items: BreadcrumbItem[]
+  items: BreadcrumbItem[];
 }
 
 export default function HelpBreadcrumbs({ items }: HelpBreadcrumbsProps) {
@@ -21,7 +21,7 @@ export default function HelpBreadcrumbs({ items }: HelpBreadcrumbsProps) {
             {index > 0 && (
               <ChevronRightIcon className="h-4 w-4 text-gray-400 mx-2" />
             )}
-            
+
             {item.href ? (
               <Link
                 href={item.href}
@@ -38,5 +38,5 @@ export default function HelpBreadcrumbs({ items }: HelpBreadcrumbsProps) {
         ))}
       </ol>
     </nav>
-  )
+  );
 }

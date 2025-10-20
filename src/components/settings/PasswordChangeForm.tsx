@@ -1,105 +1,116 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { useTranslations } from '@/hooks/useTranslations'
-import { calculatePasswordStrength, validatePassword, passwordsMatch } from '@/utils/password'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { useState } from 'react';
+import { useTranslations } from '@/hooks/useTranslations';
+import {
+  calculatePasswordStrength,
+  validatePassword,
+  passwordsMatch,
+} from '@/utils/password';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 interface PasswordChangeFormProps {
-  onSubmit: (data: PasswordChangeData) => Promise<void>
+  onSubmit: (data: PasswordChangeData) => Promise<void>;
 }
 
 export interface PasswordChangeData {
-  currentPassword: string
-  newPassword: string
-  confirmPassword: string
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
 }
 
 export function PasswordChangeForm({ onSubmit }: PasswordChangeFormProps) {
-  const t = useTranslations('settings.security')
-  
+  const t = useTranslations('settings.security');
+
   const [formData, setFormData] = useState<PasswordChangeData>({
     currentPassword: '',
     newPassword: '',
     confirmPassword: '',
-  })
-  
+  });
+
   const [showPasswords, setShowPasswords] = useState({
     current: false,
     new: false,
     confirm: false,
-  })
-  
-  const [errors, setErrors] = useState<Partial<Record<keyof PasswordChangeData, string>>>({})
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  });
+
+  const [errors, setErrors] = useState<
+    Partial<Record<keyof PasswordChangeData, string>>
+  >({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Calculate password strength for new password
-  const passwordStrength = calculatePasswordStrength(formData.newPassword)
+  const passwordStrength = calculatePasswordStrength(formData.newPassword);
 
   const handleChange = (field: keyof PasswordChangeData, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
+    setFormData((prev) => ({ ...prev, [field]: value }));
     // Clear error for this field
-    setErrors((prev) => ({ ...prev, [field]: undefined }))
-  }
+    setErrors((prev) => ({ ...prev, [field]: undefined }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
+    e.preventDefault();
+
     // Validate form
-    const newErrors: Partial<Record<keyof PasswordChangeData, string>> = {}
-    
+    const newErrors: Partial<Record<keyof PasswordChangeData, string>> = {};
+
     if (!formData.currentPassword) {
-      newErrors.currentPassword = 'Current password is required'
+      newErrors.currentPassword = 'Current password is required';
     }
-    
+
     if (!formData.newPassword) {
-      newErrors.newPassword = 'New password is required'
+      newErrors.newPassword = 'New password is required';
     } else {
-      const validation = validatePassword(formData.newPassword)
+      const validation = validatePassword(formData.newPassword);
       if (!validation.valid) {
-        newErrors.newPassword = validation.errors[0]
+        newErrors.newPassword = validation.errors[0];
       }
     }
-    
+
     if (!formData.confirmPassword) {
-      newErrors.confirmPassword = 'Please confirm your new password'
-    } else if (!passwordsMatch(formData.newPassword, formData.confirmPassword)) {
-      newErrors.confirmPassword = 'Passwords do not match'
+      newErrors.confirmPassword = 'Please confirm your new password';
+    } else if (
+      !passwordsMatch(formData.newPassword, formData.confirmPassword)
+    ) {
+      newErrors.confirmPassword = 'Passwords do not match';
     }
-    
+
     if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors)
-      return
+      setErrors(newErrors);
+      return;
     }
-    
+
     // Submit form
-    setIsSubmitting(true)
+    setIsSubmitting(true);
     try {
-      await onSubmit(formData)
+      await onSubmit(formData);
       // Reset form on success
       setFormData({
         currentPassword: '',
         newPassword: '',
         confirmPassword: '',
-      })
-      setErrors({})
+      });
+      setErrors({});
     } catch (error: any) {
       // Handle API errors
       if (error.field) {
-        setErrors({ [error.field]: error.message })
+        setErrors({ [error.field]: error.message });
       }
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-4">
         {/* Current Password */}
         <div>
-          <label htmlFor="currentPassword" className="block text-sm font-medium mb-2">
+          <label
+            htmlFor="currentPassword"
+            className="block text-sm font-medium mb-2"
+          >
             {t('currentPassword')}
           </label>
           <div className="relative">
@@ -115,7 +126,10 @@ export function PasswordChangeForm({ onSubmit }: PasswordChangeFormProps) {
             <button
               type="button"
               onClick={() =>
-                setShowPasswords((prev) => ({ ...prev, current: !prev.current }))
+                setShowPasswords((prev) => ({
+                  ...prev,
+                  current: !prev.current,
+                }))
               }
               className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
               tabIndex={-1}
@@ -124,13 +138,18 @@ export function PasswordChangeForm({ onSubmit }: PasswordChangeFormProps) {
             </button>
           </div>
           {errors.currentPassword && (
-            <p className="text-sm text-red-600 mt-1">{errors.currentPassword}</p>
+            <p className="text-sm text-red-600 mt-1">
+              {errors.currentPassword}
+            </p>
           )}
         </div>
 
         {/* New Password */}
         <div>
-          <label htmlFor="newPassword" className="block text-sm font-medium mb-2">
+          <label
+            htmlFor="newPassword"
+            className="block text-sm font-medium mb-2"
+          >
             {t('newPassword')}
           </label>
           <div className="relative">
@@ -157,7 +176,7 @@ export function PasswordChangeForm({ onSubmit }: PasswordChangeFormProps) {
           {errors.newPassword && (
             <p className="text-sm text-red-600 mt-1">{errors.newPassword}</p>
           )}
-          
+
           {/* Password Strength Indicator */}
           {formData.newPassword && (
             <div className="mt-2">
@@ -194,7 +213,10 @@ export function PasswordChangeForm({ onSubmit }: PasswordChangeFormProps) {
 
         {/* Confirm Password */}
         <div>
-          <label htmlFor="confirmPassword" className="block text-sm font-medium mb-2">
+          <label
+            htmlFor="confirmPassword"
+            className="block text-sm font-medium mb-2"
+          >
             {t('confirmPassword')}
           </label>
           <div className="relative">
@@ -210,7 +232,10 @@ export function PasswordChangeForm({ onSubmit }: PasswordChangeFormProps) {
             <button
               type="button"
               onClick={() =>
-                setShowPasswords((prev) => ({ ...prev, confirm: !prev.confirm }))
+                setShowPasswords((prev) => ({
+                  ...prev,
+                  confirm: !prev.confirm,
+                }))
               }
               className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
               tabIndex={-1}
@@ -219,7 +244,9 @@ export function PasswordChangeForm({ onSubmit }: PasswordChangeFormProps) {
             </button>
           </div>
           {errors.confirmPassword && (
-            <p className="text-sm text-red-600 mt-1">{errors.confirmPassword}</p>
+            <p className="text-sm text-red-600 mt-1">
+              {errors.confirmPassword}
+            </p>
           )}
         </div>
 
@@ -244,5 +271,5 @@ export function PasswordChangeForm({ onSubmit }: PasswordChangeFormProps) {
         </Button>
       </div>
     </form>
-  )
+  );
 }

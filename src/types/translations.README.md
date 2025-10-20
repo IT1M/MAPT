@@ -20,7 +20,7 @@ import { useCommonTranslations } from '@/hooks/useTypedTranslations';
 
 function MyComponent() {
   const t = useCommonTranslations();
-  
+
   return (
     <div>
       <h1>{t('appName')}</h1>
@@ -34,16 +34,16 @@ function MyComponent() {
 ### Using Specific Namespace Hooks
 
 ```tsx
-import { 
+import {
   useNavigationTranslations,
   useAuthTranslations,
-  useDashboardTranslations 
+  useDashboardTranslations,
 } from '@/hooks/useTypedTranslations';
 
 function Navigation() {
   const tNav = useNavigationTranslations();
   const tAuth = useAuthTranslations();
-  
+
   return (
     <nav>
       <a href="/dashboard">{tNav('dashboard')}</a>
@@ -61,7 +61,7 @@ import { useTypedTranslations } from '@/hooks/useTypedTranslations';
 
 function ReportsPage() {
   const t = useTypedTranslations('reports');
-  
+
   return (
     <div>
       <h1>{t('title')}</h1>
@@ -79,7 +79,7 @@ import { useDataLogTranslations } from '@/hooks/useTypedTranslations';
 function DataLog() {
   const t = useDataLogTranslations();
   const count = 5;
-  
+
   return (
     <div>
       {/* Pass parameters as second argument */}
@@ -99,7 +99,7 @@ import { getTranslations } from 'next-intl/server';
 
 async function ServerComponent() {
   const t = await getTranslations('common');
-  
+
   return (
     <div>
       <h1>{t('appName')}</h1>
@@ -134,12 +134,12 @@ The following typed hooks are available:
 A union type of all possible translation keys in dot notation:
 
 ```typescript
-type TranslationKeys = 
+type TranslationKeys =
   | 'common.appName'
   | 'common.save'
   | 'navigation.dashboard'
-  | 'auth.signIn'
-  // ... all other keys
+  | 'auth.signIn';
+// ... all other keys
 ```
 
 ### TranslationNamespace
@@ -147,12 +147,8 @@ type TranslationKeys =
 A union type of all top-level namespaces:
 
 ```typescript
-type TranslationNamespace = 
-  | 'common'
-  | 'navigation'
-  | 'auth'
-  | 'dashboard'
-  // ... all other namespaces
+type TranslationNamespace = 'common' | 'navigation' | 'auth' | 'dashboard';
+// ... all other namespaces
 ```
 
 ### TranslationParams
@@ -209,6 +205,7 @@ npm run validate:translations
 ```
 
 This will check for:
+
 - Missing translation keys
 - Extra translation keys
 - Placeholder variable mismatches

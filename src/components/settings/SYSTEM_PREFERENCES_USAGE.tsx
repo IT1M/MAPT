@@ -1,11 +1,11 @@
 /**
  * System Preferences Usage Example
- * 
+ *
  * This file demonstrates how to integrate the SystemPreferences component
  * into your settings page.
  */
 
-import { SystemPreferences } from '@/components/settings'
+import { SystemPreferences } from '@/components/settings';
 
 /**
  * Example 1: Basic Usage
@@ -17,7 +17,7 @@ export function SettingsPageExample1() {
     <div className="container mx-auto px-4 py-8">
       <SystemPreferences />
     </div>
-  )
+  );
 }
 
 /**
@@ -33,7 +33,7 @@ export function SettingsPageExample2() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 /**
@@ -46,54 +46,64 @@ import {
   BackupConfig,
   SystemLimits,
   DeveloperSettings,
-} from '@/components/settings'
+} from '@/components/settings';
 
 export function CustomSystemPreferencesPage() {
   return (
     <div className="space-y-8">
       {/* Company Information */}
       <section>
-        <CompanyInfo onSave={(data) => console.log('Company info saved:', data)} />
+        <CompanyInfo
+          onSave={(data) => console.log('Company info saved:', data)}
+        />
       </section>
 
       {/* Inventory Settings */}
       <section>
-        <InventorySettings onSave={(data) => console.log('Inventory settings saved:', data)} />
+        <InventorySettings
+          onSave={(data) => console.log('Inventory settings saved:', data)}
+        />
       </section>
 
       {/* Backup Configuration */}
       <section>
-        <BackupConfig onSave={(data) => console.log('Backup config saved:', data)} />
+        <BackupConfig
+          onSave={(data) => console.log('Backup config saved:', data)}
+        />
       </section>
 
       {/* System Limits */}
       <section>
-        <SystemLimits onSave={(data) => console.log('System limits saved:', data)} />
+        <SystemLimits
+          onSave={(data) => console.log('System limits saved:', data)}
+        />
       </section>
 
       {/* Developer Settings (Admin only) */}
       <section>
-        <DeveloperSettings onSave={(data) => console.log('Developer settings saved:', data)} />
+        <DeveloperSettings
+          onSave={(data) => console.log('Developer settings saved:', data)}
+        />
       </section>
     </div>
-  )
+  );
 }
 
 /**
  * Example 4: With Loading State
  * Show a loading state while checking permissions
  */
-import { useSession } from 'next-auth/react'
+import { useSession } from 'next-auth/react';
 
 export function SettingsPageExample4() {
-  const { data: session, status } = useSession()
+  const { data: session, status } = useSession();
 
   if (status === 'loading') {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-gray-500">Loading...</div>
       </div>
-    )
+    );
   }
 
   if (status === 'unauthenticated') {
@@ -101,32 +111,37 @@ export function SettingsPageExample4() {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-red-500">Please log in to access settings</div>
       </div>
-    )
+    );
   }
 
   return (
     <div className="container mx-auto px-4 py-8">
       <SystemPreferences />
     </div>
-  )
+  );
 }
 
 /**
  * Example 5: In Next.js App Router
  * Use in a server component with proper authentication
  */
-import { auth } from '@/services/auth'
-import { redirect } from 'next/navigation'
+import { auth } from '@/services/auth';
+import { redirect } from 'next/navigation';
 
-export async function SystemPreferencesServerPage({ params }: { params: { locale: string } }) {
-  const session = await auth()
+export async function SystemPreferencesServerPage({
+  params,
+}: {
+  params: { locale: string };
+}) {
+  const session = await auth();
 
   if (!session) {
-    redirect(`/${params.locale}/login`)
+    redirect(`/${params.locale}/login`);
   }
 
   // Check if user has access (Admin or Manager)
-  const hasAccess = session.user.role === 'ADMIN' || session.user.role === 'MANAGER'
+  const hasAccess =
+    session.user.role === 'ADMIN' || session.user.role === 'MANAGER';
 
   if (!hasAccess) {
     return (
@@ -137,14 +152,14 @@ export async function SystemPreferencesServerPage({ params }: { params: { locale
           </p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
     <div className="container mx-auto px-4 py-8">
       <SystemPreferences />
     </div>
-  )
+  );
 }
 
 /**
@@ -153,12 +168,12 @@ export async function SystemPreferencesServerPage({ params }: { params: { locale
 
 // Fetch all settings
 async function fetchSettings() {
-  const response = await fetch('/api/settings')
-  const data = await response.json()
-  
+  const response = await fetch('/api/settings');
+  const data = await response.json();
+
   if (data.success) {
-    console.log('Settings:', data.data.settings)
-    console.log('Categories:', data.data.categories)
+    console.log('Settings:', data.data.settings);
+    console.log('Categories:', data.data.categories);
   }
 }
 
@@ -176,28 +191,31 @@ async function updateSettings() {
         { key: 'debug_mode', value: false },
       ],
     }),
-  })
+  });
 
-  const data = await response.json()
-  
+  const data = await response.json();
+
   if (data.success) {
-    console.log('Settings updated:', data.data.settings)
+    console.log('Settings updated:', data.data.settings);
   } else {
-    console.error('Error:', data.error)
+    console.error('Error:', data.error);
   }
 }
 
 // Export system logs (Admin only)
-import { downloadBlob } from '@/utils/download-helper'
+import { downloadBlob } from '@/utils/download-helper';
 
 async function exportSystemLogs() {
-  const response = await fetch('/api/settings/logs/export')
-  
+  const response = await fetch('/api/settings/logs/export');
+
   if (response.ok) {
-    const blob = await response.blob()
-    downloadBlob(blob, `system-logs-${new Date().toISOString().split('T')[0]}.txt`)
+    const blob = await response.blob();
+    downloadBlob(
+      blob,
+      `system-logs-${new Date().toISOString().split('T')[0]}.txt`
+    );
   } else {
-    console.error('Failed to export logs')
+    console.error('Failed to export logs');
   }
 }
 
@@ -210,7 +228,7 @@ import type {
   BackupConfiguration,
   SystemLimitsConfiguration,
   DeveloperConfiguration,
-} from '@/types/settings'
+} from '@/types/settings';
 
 // Example: Type-safe settings object
 const companyInfo: CompanyInformation = {
@@ -218,7 +236,7 @@ const companyInfo: CompanyInformation = {
   logo: 'data:image/png;base64,...',
   fiscalYearStart: 1, // January
   timezone: 'America/New_York',
-}
+};
 
 const inventorySettings: InventoryConfiguration = {
   defaultDestination: 'MAIS',
@@ -228,14 +246,14 @@ const inventorySettings: InventoryConfiguration = {
   batchNumberPattern: 'BATCH-{YYYY}-{####}',
   supervisorApproval: true,
   approvalThreshold: 1000,
-}
+};
 
 const backupConfig: BackupConfiguration = {
   enabled: true,
   time: '02:00',
   retentionDays: 30,
   format: ['CSV', 'JSON'],
-}
+};
 
 const systemLimits: SystemLimitsConfiguration = {
   maxItemsPerUserPerDay: 1000,
@@ -243,7 +261,7 @@ const systemLimits: SystemLimitsConfiguration = {
   sessionTimeoutMinutes: 60,
   maxLoginAttempts: 5,
   rateLimitPerMinute: 100,
-}
+};
 
 const developerSettings: DeveloperConfiguration = {
   debugMode: false,
@@ -252,4 +270,4 @@ const developerSettings: DeveloperConfiguration = {
     perMinute: 60,
     perHour: 1000,
   },
-}
+};

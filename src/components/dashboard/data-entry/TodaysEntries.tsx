@@ -1,37 +1,37 @@
-'use client'
+'use client';
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react';
 
 interface TodayEntry {
-  id: string
-  itemName: string
-  batch: string
-  quantity: number
-  destination: string
-  createdAt: string
+  id: string;
+  itemName: string;
+  batch: string;
+  quantity: number;
+  destination: string;
+  createdAt: string;
 }
 
 export function TodaysEntries() {
-  const [entries, setEntries] = useState<TodayEntry[]>([])
-  const [loading, setLoading] = useState(true)
+  const [entries, setEntries] = useState<TodayEntry[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchTodaysEntries()
-  }, [])
+    fetchTodaysEntries();
+  }, []);
 
   const fetchTodaysEntries = async () => {
     try {
-      const response = await fetch('/api/dashboard/my-entries-today')
+      const response = await fetch('/api/dashboard/my-entries-today');
       if (response.ok) {
-        const data = await response.json()
-        setEntries(data)
+        const data = await response.json();
+        setEntries(data);
       }
     } catch (error) {
-      console.error('Failed to fetch today\'s entries:', error)
+      console.error("Failed to fetch today's entries:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   if (loading) {
     return (
@@ -42,7 +42,7 @@ export function TodaysEntries() {
           <div className="h-16 bg-gray-200 dark:bg-gray-700 rounded"></div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -59,11 +59,25 @@ export function TodaysEntries() {
       <div className="space-y-3 max-h-96 overflow-y-auto">
         {entries.length === 0 ? (
           <div className="text-center py-8">
-            <svg className="w-12 h-12 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            <svg
+              className="w-12 h-12 text-gray-400 mx-auto mb-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
             </svg>
-            <p className="text-gray-500 dark:text-gray-400">No entries yet today</p>
-            <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">Start adding items to see them here</p>
+            <p className="text-gray-500 dark:text-gray-400">
+              No entries yet today
+            </p>
+            <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">
+              Start adding items to see them here
+            </p>
           </div>
         ) : (
           entries.map((entry) => (
@@ -80,11 +94,13 @@ export function TodaysEntries() {
                     Batch: {entry.batch}
                   </p>
                 </div>
-                <span className={`px-2 py-1 text-xs font-medium rounded-full flex-shrink-0 ${
-                  entry.destination === 'MAIS'
-                    ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400'
-                    : 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
-                }`}>
+                <span
+                  className={`px-2 py-1 text-xs font-medium rounded-full flex-shrink-0 ${
+                    entry.destination === 'MAIS'
+                      ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400'
+                      : 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
+                  }`}
+                >
                   {entry.destination}
                 </span>
               </div>
@@ -101,5 +117,5 @@ export function TodaysEntries() {
         )}
       </div>
     </div>
-  )
+  );
 }

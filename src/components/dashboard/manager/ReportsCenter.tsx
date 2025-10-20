@@ -1,47 +1,49 @@
-'use client'
+'use client';
 
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface Report {
-  id: string
-  title: string
-  type: string
-  createdAt: string
-  status: 'completed' | 'pending' | 'failed'
+  id: string;
+  title: string;
+  type: string;
+  createdAt: string;
+  status: 'completed' | 'pending' | 'failed';
 }
 
 export function ReportsCenter() {
-  const router = useRouter()
-  const [reports, setReports] = useState<Report[]>([])
-  const [loading, setLoading] = useState(true)
+  const router = useRouter();
+  const [reports, setReports] = useState<Report[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchReports()
-  }, [])
+    fetchReports();
+  }, []);
 
   const fetchReports = async () => {
     try {
-      const response = await fetch('/api/dashboard/recent-reports')
+      const response = await fetch('/api/dashboard/recent-reports');
       if (response.ok) {
-        const data = await response.json()
-        setReports(data)
+        const data = await response.json();
+        setReports(data);
       }
     } catch (error) {
-      console.error('Failed to fetch reports:', error)
+      console.error('Failed to fetch reports:', error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const getStatusBadge = (status: string) => {
     const styles = {
-      completed: 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400',
-      pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400',
-      failed: 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400'
-    }
-    return styles[status as keyof typeof styles] || styles.pending
-  }
+      completed:
+        'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400',
+      pending:
+        'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400',
+      failed: 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400',
+    };
+    return styles[status as keyof typeof styles] || styles.pending;
+  };
 
   if (loading) {
     return (
@@ -53,7 +55,7 @@ export function ReportsCenter() {
           <div className="h-16 bg-gray-200 dark:bg-gray-700 rounded"></div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -88,10 +90,13 @@ export function ReportsCenter() {
                     {report.title}
                   </h4>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    {report.type} • {new Date(report.createdAt).toLocaleDateString()}
+                    {report.type} •{' '}
+                    {new Date(report.createdAt).toLocaleDateString()}
                   </p>
                 </div>
-                <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusBadge(report.status)}`}>
+                <span
+                  className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusBadge(report.status)}`}
+                >
                   {report.status}
                 </span>
               </div>
@@ -107,5 +112,5 @@ export function ReportsCenter() {
         Generate New Report
       </button>
     </div>
-  )
+  );
 }

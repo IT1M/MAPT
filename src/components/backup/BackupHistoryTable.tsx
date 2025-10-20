@@ -30,7 +30,8 @@ export default function BackupHistoryTable({
   onPageChange,
 }: BackupHistoryTableProps) {
   const t = useTranslations('backup');
-  const locale = typeof window !== 'undefined' ? document.documentElement.lang : 'en';
+  const locale =
+    typeof window !== 'undefined' ? document.documentElement.lang : 'en';
   const dateLocale = locale === 'ar' ? ar : enUS;
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<string>('all');
@@ -48,27 +49,36 @@ export default function BackupHistoryTable({
 
   const getStatusBadge = (status: string) => {
     const badges = {
-      COMPLETED: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-      IN_PROGRESS: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+      COMPLETED:
+        'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+      IN_PROGRESS:
+        'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
       FAILED: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
-      CORRUPTED: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400',
+      CORRUPTED:
+        'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400',
     };
     return badges[status as keyof typeof badges] || badges.COMPLETED;
   };
 
   const getTypeBadge = (type: string) => {
     const badges = {
-      MANUAL: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
-      AUTOMATIC: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-      PRE_RESTORE: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
+      MANUAL:
+        'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
+      AUTOMATIC:
+        'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+      PRE_RESTORE:
+        'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
     };
     return badges[type as keyof typeof badges] || badges.MANUAL;
   };
 
   const filteredBackups = backups.filter((backup) => {
-    const matchesSearch = backup.filename.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = backup.filename
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
     const matchesType = filterType === 'all' || backup.type === filterType;
-    const matchesStatus = filterStatus === 'all' || backup.status === filterStatus;
+    const matchesStatus =
+      filterStatus === 'all' || backup.status === filterStatus;
     return matchesSearch && matchesType && matchesStatus;
   });
 
@@ -149,13 +159,19 @@ export default function BackupHistoryTable({
           <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
             {filteredBackups.length === 0 ? (
               <tr>
-                <td colSpan={8} className="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
+                <td
+                  colSpan={8}
+                  className="px-6 py-12 text-center text-gray-500 dark:text-gray-400"
+                >
                   {t('noBackupsFound')}
                 </td>
               </tr>
             ) : (
               filteredBackups.map((backup) => (
-                <tr key={backup.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                <tr
+                  key={backup.id}
+                  className="hover:bg-gray-50 dark:hover:bg-gray-700/50"
+                >
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                     <div>
                       {new Date(backup.createdAt).toLocaleDateString(locale)}
@@ -168,8 +184,16 @@ export default function BackupHistoryTable({
                     <div className="flex items-center space-x-2">
                       <span className="font-medium">{backup.filename}</span>
                       {backup.validated && (
-                        <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        <svg
+                          className="w-4 h-4 text-green-500"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                            clipRule="evenodd"
+                          />
                         </svg>
                       )}
                     </div>
@@ -178,7 +202,9 @@ export default function BackupHistoryTable({
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${getTypeBadge(backup.type)}`}>
+                    <span
+                      className={`px-2 py-1 text-xs font-medium rounded-full ${getTypeBadge(backup.type)}`}
+                    >
                       {t(backup.type.toLowerCase())}
                     </span>
                   </td>
@@ -189,7 +215,9 @@ export default function BackupHistoryTable({
                     {backup.recordCount.toLocaleString()}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusBadge(backup.status)}`}>
+                    <span
+                      className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusBadge(backup.status)}`}
+                    >
                       {t(backup.status.toLowerCase())}
                     </span>
                   </td>
@@ -203,19 +231,39 @@ export default function BackupHistoryTable({
                         className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
                         title={t('download')}
                       >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        <svg
+                          className="w-5 h-5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                          />
                         </svg>
                       </button>
-                      
+
                       {isAdmin && backup.status === 'COMPLETED' && (
                         <button
                           onClick={() => onRestore(backup)}
                           className="text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300"
                           title={t('restore')}
                         >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                          <svg
+                            className="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                            />
                           </svg>
                         </button>
                       )}
@@ -225,8 +273,18 @@ export default function BackupHistoryTable({
                         className="text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300"
                         title={t('validate')}
                       >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        <svg
+                          className="w-5 h-5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
                         </svg>
                       </button>
 
@@ -236,8 +294,18 @@ export default function BackupHistoryTable({
                           className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
                           title={t('delete')}
                         >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          <svg
+                            className="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                            />
                           </svg>
                         </button>
                       )}
@@ -271,27 +339,45 @@ export default function BackupHistoryTable({
                     })}
                   </p>
                 </div>
-                <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusBadge(backup.status)}`}>
+                <span
+                  className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusBadge(backup.status)}`}
+                >
                   {t(backup.status.toLowerCase())}
                 </span>
               </div>
 
               <div className="grid grid-cols-2 gap-2 text-sm mb-3">
                 <div>
-                  <span className="text-gray-500 dark:text-gray-400">{t('type')}:</span>
-                  <span className="ml-1 text-gray-900 dark:text-white">{t(backup.type.toLowerCase())}</span>
+                  <span className="text-gray-500 dark:text-gray-400">
+                    {t('type')}:
+                  </span>
+                  <span className="ml-1 text-gray-900 dark:text-white">
+                    {t(backup.type.toLowerCase())}
+                  </span>
                 </div>
                 <div>
-                  <span className="text-gray-500 dark:text-gray-400">{t('size')}:</span>
-                  <span className="ml-1 text-gray-900 dark:text-white">{formatBytes(backup.fileSize)}</span>
+                  <span className="text-gray-500 dark:text-gray-400">
+                    {t('size')}:
+                  </span>
+                  <span className="ml-1 text-gray-900 dark:text-white">
+                    {formatBytes(backup.fileSize)}
+                  </span>
                 </div>
                 <div>
-                  <span className="text-gray-500 dark:text-gray-400">{t('records')}:</span>
-                  <span className="ml-1 text-gray-900 dark:text-white">{backup.recordCount.toLocaleString()}</span>
+                  <span className="text-gray-500 dark:text-gray-400">
+                    {t('records')}:
+                  </span>
+                  <span className="ml-1 text-gray-900 dark:text-white">
+                    {backup.recordCount.toLocaleString()}
+                  </span>
                 </div>
                 <div>
-                  <span className="text-gray-500 dark:text-gray-400">{t('format')}:</span>
-                  <span className="ml-1 text-gray-900 dark:text-white">{backup.format}</span>
+                  <span className="text-gray-500 dark:text-gray-400">
+                    {t('format')}:
+                  </span>
+                  <span className="ml-1 text-gray-900 dark:text-white">
+                    {backup.format}
+                  </span>
                 </div>
               </div>
 
@@ -304,8 +390,18 @@ export default function BackupHistoryTable({
                     onClick={() => onDownload(backup.id)}
                     className="text-blue-600 hover:text-blue-700 dark:text-blue-400"
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                      />
                     </svg>
                   </button>
                   {isAdmin && backup.status === 'COMPLETED' && (
@@ -313,8 +409,18 @@ export default function BackupHistoryTable({
                       onClick={() => onRestore(backup)}
                       className="text-green-600 hover:text-green-700 dark:text-green-400"
                     >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                        />
                       </svg>
                     </button>
                   )}

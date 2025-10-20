@@ -23,7 +23,7 @@ export default function RestoreBackupDialog({
   const [restoring, setRestoring] = useState(false);
   const [progress, setProgress] = useState(0);
   const [currentStep, setCurrentStepText] = useState('');
-  
+
   const [options, setOptions] = useState<RestoreOptions>({
     mode: 'preview',
     adminPassword: '',
@@ -66,7 +66,7 @@ export default function RestoreBackupDialog({
       ];
 
       for (const progressStep of progressSteps) {
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise((resolve) => setTimeout(resolve, 1000));
         setProgress(progressStep.progress);
         setCurrentStepText(progressStep.text);
       }
@@ -126,8 +126,18 @@ export default function RestoreBackupDialog({
                 onClick={handleClose}
                 className="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
@@ -141,8 +151,16 @@ export default function RestoreBackupDialog({
                 {/* Warning */}
                 <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
                   <div className="flex">
-                    <svg className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    <svg
+                      className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                        clipRule="evenodd"
+                      />
                     </svg>
                     <div className="ml-3">
                       <h4 className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
@@ -162,20 +180,36 @@ export default function RestoreBackupDialog({
                   </h4>
                   <dl className="space-y-2 text-sm">
                     <div className="flex justify-between">
-                      <dt className="text-gray-600 dark:text-gray-400">{t('filename')}:</dt>
-                      <dd className="text-gray-900 dark:text-white font-medium">{backup.filename}</dd>
+                      <dt className="text-gray-600 dark:text-gray-400">
+                        {t('filename')}:
+                      </dt>
+                      <dd className="text-gray-900 dark:text-white font-medium">
+                        {backup.filename}
+                      </dd>
                     </div>
                     <div className="flex justify-between">
-                      <dt className="text-gray-600 dark:text-gray-400">{t('created')}:</dt>
-                      <dd className="text-gray-900 dark:text-white">{new Date(backup.createdAt).toLocaleString()}</dd>
+                      <dt className="text-gray-600 dark:text-gray-400">
+                        {t('created')}:
+                      </dt>
+                      <dd className="text-gray-900 dark:text-white">
+                        {new Date(backup.createdAt).toLocaleString()}
+                      </dd>
                     </div>
                     <div className="flex justify-between">
-                      <dt className="text-gray-600 dark:text-gray-400">{t('records')}:</dt>
-                      <dd className="text-gray-900 dark:text-white">{backup.recordCount.toLocaleString()}</dd>
+                      <dt className="text-gray-600 dark:text-gray-400">
+                        {t('records')}:
+                      </dt>
+                      <dd className="text-gray-900 dark:text-white">
+                        {backup.recordCount.toLocaleString()}
+                      </dd>
                     </div>
                     <div className="flex justify-between">
-                      <dt className="text-gray-600 dark:text-gray-400">{t('createdBy')}:</dt>
-                      <dd className="text-gray-900 dark:text-white">{backup.creator.name}</dd>
+                      <dt className="text-gray-600 dark:text-gray-400">
+                        {t('createdBy')}:
+                      </dt>
+                      <dd className="text-gray-900 dark:text-white">
+                        {backup.creator.name}
+                      </dd>
                     </div>
                   </dl>
                 </div>
@@ -186,9 +220,13 @@ export default function RestoreBackupDialog({
                     {t('restoreMode')}
                   </label>
                   <div className="space-y-3">
-                    <label className="flex items-start p-4 border-2 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                    <label
+                      className="flex items-start p-4 border-2 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
                       style={{
-                        borderColor: options.mode === 'preview' ? 'rgb(37, 99, 235)' : 'rgb(229, 231, 235)',
+                        borderColor:
+                          options.mode === 'preview'
+                            ? 'rgb(37, 99, 235)'
+                            : 'rgb(229, 231, 235)',
                       }}
                     >
                       <input
@@ -196,7 +234,12 @@ export default function RestoreBackupDialog({
                         name="mode"
                         value="preview"
                         checked={options.mode === 'preview'}
-                        onChange={(e) => setOptions({ ...options, mode: e.target.value as any })}
+                        onChange={(e) =>
+                          setOptions({
+                            ...options,
+                            mode: e.target.value as any,
+                          })
+                        }
                         className="mt-1 w-4 h-4 text-blue-600 border-gray-300"
                       />
                       <div className="ml-3">
@@ -209,9 +252,13 @@ export default function RestoreBackupDialog({
                       </div>
                     </label>
 
-                    <label className="flex items-start p-4 border-2 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                    <label
+                      className="flex items-start p-4 border-2 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
                       style={{
-                        borderColor: options.mode === 'merge' ? 'rgb(37, 99, 235)' : 'rgb(229, 231, 235)',
+                        borderColor:
+                          options.mode === 'merge'
+                            ? 'rgb(37, 99, 235)'
+                            : 'rgb(229, 231, 235)',
                       }}
                     >
                       <input
@@ -219,7 +266,12 @@ export default function RestoreBackupDialog({
                         name="mode"
                         value="merge"
                         checked={options.mode === 'merge'}
-                        onChange={(e) => setOptions({ ...options, mode: e.target.value as any })}
+                        onChange={(e) =>
+                          setOptions({
+                            ...options,
+                            mode: e.target.value as any,
+                          })
+                        }
                         className="mt-1 w-4 h-4 text-blue-600 border-gray-300"
                       />
                       <div className="ml-3">
@@ -232,9 +284,13 @@ export default function RestoreBackupDialog({
                       </div>
                     </label>
 
-                    <label className="flex items-start p-4 border-2 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                    <label
+                      className="flex items-start p-4 border-2 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
                       style={{
-                        borderColor: options.mode === 'full' ? 'rgb(37, 99, 235)' : 'rgb(229, 231, 235)',
+                        borderColor:
+                          options.mode === 'full'
+                            ? 'rgb(37, 99, 235)'
+                            : 'rgb(229, 231, 235)',
                       }}
                     >
                       <input
@@ -242,7 +298,12 @@ export default function RestoreBackupDialog({
                         name="mode"
                         value="full"
                         checked={options.mode === 'full'}
-                        onChange={(e) => setOptions({ ...options, mode: e.target.value as any })}
+                        onChange={(e) =>
+                          setOptions({
+                            ...options,
+                            mode: e.target.value as any,
+                          })
+                        }
                         className="mt-1 w-4 h-4 text-blue-600 border-gray-300"
                       />
                       <div className="ml-3">
@@ -269,7 +330,9 @@ export default function RestoreBackupDialog({
                     <input
                       type="password"
                       value={options.password || ''}
-                      onChange={(e) => setOptions({ ...options, password: e.target.value })}
+                      onChange={(e) =>
+                        setOptions({ ...options, password: e.target.value })
+                      }
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                       placeholder={t('enterBackupPassword')}
                     />
@@ -287,15 +350,25 @@ export default function RestoreBackupDialog({
                 {/* Final Warning */}
                 <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
                   <div className="flex">
-                    <svg className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                    <svg
+                      className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                        clipRule="evenodd"
+                      />
                     </svg>
                     <div className="ml-3">
                       <h4 className="text-sm font-medium text-red-800 dark:text-red-200">
                         {t('confirmRestore')}
                       </h4>
                       <p className="text-sm text-red-700 dark:text-red-300 mt-1">
-                        {options.mode === 'full' ? t('confirmRestoreFull') : t('confirmRestoreDesc')}
+                        {options.mode === 'full'
+                          ? t('confirmRestoreFull')
+                          : t('confirmRestoreDesc')}
                       </p>
                     </div>
                   </div>
@@ -309,7 +382,9 @@ export default function RestoreBackupDialog({
                   <input
                     type="password"
                     value={options.adminPassword}
-                    onChange={(e) => setOptions({ ...options, adminPassword: e.target.value })}
+                    onChange={(e) =>
+                      setOptions({ ...options, adminPassword: e.target.value })
+                    }
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     placeholder={t('enterAdminPassword')}
                     autoFocus
@@ -326,16 +401,28 @@ export default function RestoreBackupDialog({
                   </h4>
                   <dl className="space-y-2 text-sm">
                     <div className="flex justify-between">
-                      <dt className="text-gray-600 dark:text-gray-400">{t('mode')}:</dt>
-                      <dd className="text-gray-900 dark:text-white font-medium">{t(options.mode + 'Mode')}</dd>
+                      <dt className="text-gray-600 dark:text-gray-400">
+                        {t('mode')}:
+                      </dt>
+                      <dd className="text-gray-900 dark:text-white font-medium">
+                        {t(options.mode + 'Mode')}
+                      </dd>
                     </div>
                     <div className="flex justify-between">
-                      <dt className="text-gray-600 dark:text-gray-400">{t('backup')}:</dt>
-                      <dd className="text-gray-900 dark:text-white">{backup.filename}</dd>
+                      <dt className="text-gray-600 dark:text-gray-400">
+                        {t('backup')}:
+                      </dt>
+                      <dd className="text-gray-900 dark:text-white">
+                        {backup.filename}
+                      </dd>
                     </div>
                     <div className="flex justify-between">
-                      <dt className="text-gray-600 dark:text-gray-400">{t('recordsToRestore')}:</dt>
-                      <dd className="text-gray-900 dark:text-white">{backup.recordCount.toLocaleString()}</dd>
+                      <dt className="text-gray-600 dark:text-gray-400">
+                        {t('recordsToRestore')}:
+                      </dt>
+                      <dd className="text-gray-900 dark:text-white">
+                        {backup.recordCount.toLocaleString()}
+                      </dd>
                     </div>
                   </dl>
                 </div>
@@ -347,13 +434,13 @@ export default function RestoreBackupDialog({
           <div className="px-6 py-4 bg-gray-50 dark:bg-gray-700/50 border-t border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between">
               <button
-                onClick={() => step > 1 ? setStep(step - 1) : handleClose()}
+                onClick={() => (step > 1 ? setStep(step - 1) : handleClose())}
                 className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
               >
                 {step === 1 ? t('cancel') : t('back')}
               </button>
               <button
-                onClick={() => step < 2 ? setStep(step + 1) : handleRestore()}
+                onClick={() => (step < 2 ? setStep(step + 1) : handleRestore())}
                 disabled={step === 2 && !options.adminPassword}
                 className={`px-4 py-2 text-sm rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
                   step === 2

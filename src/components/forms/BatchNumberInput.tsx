@@ -1,13 +1,14 @@
-'use client'
+'use client';
 
-import React, { useState, useRef } from 'react'
-import { Input, InputProps } from '@/components/ui/input'
+import React, { useState, useRef } from 'react';
+import { Input, InputProps } from '@/components/ui/input';
 
-interface BatchNumberInputProps extends Omit<InputProps, 'onChange' | 'onBlur'> {
-  value: string
-  onChange: (value: string) => void
-  onBlur?: () => void
-  warning?: string
+interface BatchNumberInputProps
+  extends Omit<InputProps, 'onChange' | 'onBlur'> {
+  value: string;
+  onChange: (value: string) => void;
+  onBlur?: () => void;
+  warning?: string;
 }
 
 export function BatchNumberInput({
@@ -18,76 +19,76 @@ export function BatchNumberInput({
   warning,
   ...props
 }: BatchNumberInputProps) {
-  const [isChecking, setIsChecking] = useState(false)
-  const [batchWarning, setBatchWarning] = useState<string | null>(null)
-  const abortControllerRef = useRef<AbortController | null>(null)
+  const [isChecking, setIsChecking] = useState(false);
+  const [batchWarning, setBatchWarning] = useState<string | null>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
-  const charCount = value.length
-  const maxChars = 50
-  const minChars = 3
+  const charCount = value.length;
+  const maxChars = 50;
+  const minChars = 3;
 
   // Transform to uppercase and validate alphanumeric
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const inputValue = e.target.value
+    const inputValue = e.target.value;
     // Only allow alphanumeric characters and hyphens
-    const sanitized = inputValue.replace(/[^A-Za-z0-9-]/g, '')
-    const uppercase = sanitized.toUpperCase()
-    onChange(uppercase)
-  }
+    const sanitized = inputValue.replace(/[^A-Za-z0-9-]/g, '');
+    const uppercase = sanitized.toUpperCase();
+    onChange(uppercase);
+  };
 
   // Check for duplicate batch on blur
   const handleBlur = async () => {
-    onBlur?.()
+    onBlur?.();
 
     // Only check if value is valid length
     if (value.length < minChars || value.length > maxChars) {
-      setBatchWarning(null)
-      return
+      setBatchWarning(null);
+      return;
     }
 
     // Cancel previous request
     if (abortControllerRef.current) {
-      abortControllerRef.current.abort()
+      abortControllerRef.current.abort();
     }
 
-    setIsChecking(true)
-    setBatchWarning(null)
-    abortControllerRef.current = new AbortController()
+    setIsChecking(true);
+    setBatchWarning(null);
+    abortControllerRef.current = new AbortController();
 
     try {
-      const params = new URLSearchParams({ batch: value })
+      const params = new URLSearchParams({ batch: value });
       const response = await fetch(`/api/inventory/check-batch?${params}`, {
         signal: abortControllerRef.current.signal,
-      })
+      });
 
       if (!response.ok) {
-        throw new Error('Failed to check batch')
+        throw new Error('Failed to check batch');
       }
 
-      const result = await response.json()
+      const result = await response.json();
 
       if (result.success && result.data?.exists) {
-        const itemInfo = result.data.item
+        const itemInfo = result.data.item;
         const createdDate = itemInfo?.createdAt
           ? new Date(itemInfo.createdAt).toLocaleDateString()
-          : 'unknown date'
+          : 'unknown date';
         setBatchWarning(
           `Warning: Batch "${value}" already exists (created ${createdDate})`
-        )
+        );
       } else {
-        setBatchWarning(null)
+        setBatchWarning(null);
       }
     } catch (err: any) {
       if (err.name !== 'AbortError') {
-        console.error('Failed to check batch:', err)
-        setBatchWarning(null)
+        console.error('Failed to check batch:', err);
+        setBatchWarning(null);
       }
     } finally {
-      setIsChecking(false)
+      setIsChecking(false);
     }
-  }
+  };
 
-  const displayWarning = warning || batchWarning
+  const displayWarning = warning || batchWarning;
 
   return (
     <div className="w-full">
@@ -139,7 +140,7 @@ export function BatchNumberInput({
 
       {/* Warning Message (non-blocking) */}
       {displayWarning && !error && (
-        <div 
+        <div
           className="mt-1 flex items-start gap-1 text-sm text-yellow-600 dark:text-yellow-400"
           role="status"
           aria-live="polite"
@@ -160,5 +161,5 @@ export function BatchNumberInput({
         </div>
       )}
     </div>
-  )
+  );
 }

@@ -3,7 +3,7 @@
  * Handles role-based dashboard redirection and routing logic
  */
 
-import { UserRole } from '@prisma/client'
+import { UserRole } from '@prisma/client';
 
 /**
  * Role-to-path mapping for dashboard redirection after login
@@ -14,7 +14,7 @@ export const ROLE_DASHBOARDS: Record<UserRole, string> = {
   SUPERVISOR: '/data-log',
   DATA_ENTRY: '/data-entry',
   AUDITOR: '/audit',
-}
+};
 
 /**
  * Get the appropriate dashboard path for a user role
@@ -25,11 +25,11 @@ export const ROLE_DASHBOARDS: Record<UserRole, string> = {
 export function getDashboardPath(role: UserRole, callbackUrl?: string): string {
   // If callback URL is provided and valid, use it
   if (callbackUrl && isValidCallbackUrl(callbackUrl)) {
-    return callbackUrl
+    return callbackUrl;
   }
-  
+
   // Otherwise, use role-based default
-  return ROLE_DASHBOARDS[role] || '/dashboard'
+  return ROLE_DASHBOARDS[role] || '/dashboard';
 }
 
 /**
@@ -41,22 +41,22 @@ function isValidCallbackUrl(url: string): boolean {
   try {
     // Must be a relative URL (starts with /)
     if (!url.startsWith('/')) {
-      return false
+      return false;
     }
-    
+
     // Must not be a protocol-relative URL (starts with //)
     if (url.startsWith('//')) {
-      return false
+      return false;
     }
-    
+
     // Must not contain backslashes (potential bypass)
     if (url.includes('\\')) {
-      return false
+      return false;
     }
-    
-    return true
+
+    return true;
   } catch {
-    return false
+    return false;
   }
 }
 
@@ -72,5 +72,5 @@ export function getDashboardUrl(
   locale?: string,
   callbackUrl?: string
 ): string {
-  return getDashboardPath(role, callbackUrl)
+  return getDashboardPath(role, callbackUrl);
 }

@@ -1,6 +1,6 @@
 /**
  * Client-side API Error Handler
- * 
+ *
  * Handles API errors on the client side with appropriate user feedback
  * and navigation
  */
@@ -17,7 +17,10 @@ export interface ApiError {
 export interface ApiErrorHandlerOptions {
   router?: AppRouterInstance;
   locale?: string;
-  showToast?: (message: string, type: 'error' | 'success' | 'warning' | 'info') => void;
+  showToast?: (
+    message: string,
+    type: 'error' | 'success' | 'warning' | 'info'
+  ) => void;
   onUnauthorized?: () => void;
   onForbidden?: () => void;
   onNotFound?: () => void;
@@ -77,7 +80,10 @@ export async function handleApiError(
       case 401:
         // Unauthorized - redirect to login
         if (showToast) {
-          showToast('Your session has expired. Please sign in again.', 'warning');
+          showToast(
+            'Your session has expired. Please sign in again.',
+            'warning'
+          );
         }
         if (onUnauthorized) {
           onUnauthorized();
@@ -90,7 +96,10 @@ export async function handleApiError(
       case 403:
         // Forbidden - redirect to access denied
         if (showToast) {
-          showToast('You don\'t have permission to perform this action.', 'error');
+          showToast(
+            "You don't have permission to perform this action.",
+            'error'
+          );
         }
         if (onForbidden) {
           onForbidden();
@@ -146,7 +155,10 @@ export async function handleApiError(
       default:
         // Generic error
         if (showToast) {
-          showToast(apiError.message || 'An error occurred. Please try again.', 'error');
+          showToast(
+            apiError.message || 'An error occurred. Please try again.',
+            'error'
+          );
         }
     }
 
@@ -209,7 +221,8 @@ export async function fetchWithErrorHandling(
  * Network status monitor
  */
 export class NetworkStatusMonitor {
-  private isOnline: boolean = typeof navigator !== 'undefined' ? navigator.onLine : true;
+  private isOnline: boolean =
+    typeof navigator !== 'undefined' ? navigator.onLine : true;
   private listeners: Set<(isOnline: boolean) => void> = new Set();
 
   constructor() {
@@ -230,7 +243,7 @@ export class NetworkStatusMonitor {
   };
 
   private notifyListeners() {
-    this.listeners.forEach(listener => listener(this.isOnline));
+    this.listeners.forEach((listener) => listener(this.isOnline));
   }
 
   public subscribe(listener: (isOnline: boolean) => void): () => void {
@@ -276,7 +289,7 @@ export function handleFormValidationErrors(
   errors: FormValidationError[],
   setFieldError?: (field: string, message: string) => void
 ): void {
-  errors.forEach(error => {
+  errors.forEach((error) => {
     if (setFieldError) {
       setFieldError(error.field, error.message);
     }
@@ -284,7 +297,9 @@ export function handleFormValidationErrors(
 
   // Scroll to first error
   if (errors.length > 0 && typeof document !== 'undefined') {
-    const firstErrorField = document.querySelector(`[name="${errors[0].field}"]`);
+    const firstErrorField = document.querySelector(
+      `[name="${errors[0].field}"]`
+    );
     if (firstErrorField) {
       firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
       // Add shake animation
@@ -313,14 +328,18 @@ export async function retryWithBackoff<T>(
       lastError = error;
 
       // Don't retry on client errors (4xx)
-      if (error instanceof Response && error.status >= 400 && error.status < 500) {
+      if (
+        error instanceof Response &&
+        error.status >= 400 &&
+        error.status < 500
+      ) {
         throw error;
       }
 
       // Wait before retrying (exponential backoff)
       if (attempt < maxRetries - 1) {
         const delay = baseDelay * Math.pow(2, attempt);
-        await new Promise(resolve => setTimeout(resolve, delay));
+        await new Promise((resolve) => setTimeout(resolve, delay));
       }
     }
   }

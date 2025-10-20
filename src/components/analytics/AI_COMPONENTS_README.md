@@ -9,6 +9,7 @@ This directory contains the AI-powered insights and conversational Q&A component
 A collapsible panel that displays AI-generated insights about inventory data using Google's Gemini AI.
 
 **Features:**
+
 - Automatic insights generation on mount and data changes
 - Structured sections: Findings, Alerts, Recommendations, Predictions
 - Loading states with animated spinner
@@ -19,22 +20,24 @@ A collapsible panel that displays AI-generated insights about inventory data usi
 - Priority-based color coding (high/medium/low)
 
 **Props:**
+
 ```typescript
 interface AIInsightsPanelProps {
-  dashboardData: DashboardContext
+  dashboardData: DashboardContext;
   filters?: {
-    startDate?: Date | null
-    endDate?: Date | null
-    destinations?: string[]
-    categories?: string[]
-  }
-  onRefresh?: () => void
+    startDate?: Date | null;
+    endDate?: Date | null;
+    destinations?: string[];
+    categories?: string[];
+  };
+  onRefresh?: () => void;
 }
 ```
 
 **Usage:**
+
 ```tsx
-import { AIInsightsPanel } from '@/components/analytics'
+import { AIInsightsPanel } from '@/components/analytics';
 
 <AIInsightsPanel
   dashboardData={{
@@ -44,11 +47,11 @@ import { AIInsightsPanel } from '@/components/analytics'
       rejectRate: 3.5,
       activeUsers: 10,
       categoriesCount: 15,
-      avgDailyEntries: 50
-    }
+      avgDailyEntries: 50,
+    },
   }}
   onRefresh={() => console.log('Refreshing...')}
-/>
+/>;
 ```
 
 ### AIQuestionInput
@@ -56,6 +59,7 @@ import { AIInsightsPanel } from '@/components/analytics'
 An interactive Q&A interface that allows users to ask questions about their analytics data.
 
 **Features:**
+
 - Text input with submit button
 - Example questions for quick access
 - Q&A history display within session
@@ -66,14 +70,16 @@ An interactive Q&A interface that allows users to ask questions about their anal
 - 5-minute caching for identical questions
 
 **Props:**
+
 ```typescript
 interface AIQuestionInputProps {
-  context: InventoryContext
-  onAnswer?: (qa: QuestionAnswer) => void
+  context: InventoryContext;
+  onAnswer?: (qa: QuestionAnswer) => void;
 }
 ```
 
 **Usage:**
+
 ```tsx
 import { AIQuestionInput } from '@/components/analytics'
 
@@ -93,6 +99,7 @@ import { AIQuestionInput } from '@/components/analytics'
 A client-side wrapper component that fetches dashboard data and renders both the insights panel and Q&A interface in a responsive grid layout.
 
 **Features:**
+
 - Automatic data fetching from analytics API
 - Loading states
 - Error handling
@@ -100,11 +107,12 @@ A client-side wrapper component that fetches dashboard data and renders both the
 - Data transformation for AI components
 
 **Usage:**
+
 ```tsx
-import { AIInsightsSectionWrapper } from '@/components/analytics'
+import { AIInsightsSectionWrapper } from '@/components/analytics';
 
 // In your page component
-<AIInsightsSectionWrapper />
+<AIInsightsSectionWrapper />;
 ```
 
 ## API Endpoints
@@ -114,6 +122,7 @@ import { AIInsightsSectionWrapper } from '@/components/analytics'
 Generates AI-powered insights using Gemini AI.
 
 **Request:**
+
 ```json
 {
   "dataType": "inventory",
@@ -125,6 +134,7 @@ Generates AI-powered insights using Gemini AI.
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -142,6 +152,7 @@ Generates AI-powered insights using Gemini AI.
 Handles conversational AI questions about analytics data.
 
 **Request:**
+
 ```json
 {
   "question": "Why is reject rate high?",
@@ -155,6 +166,7 @@ Handles conversational AI questions about analytics data.
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -170,12 +182,14 @@ Handles conversational AI questions about analytics data.
 ## Caching Strategy
 
 Both components implement 5-minute caching to:
+
 - Reduce API calls to Gemini AI
 - Improve performance
 - Reduce costs
 - Provide faster responses for repeated queries
 
 Cache keys include:
+
 - User role (for role-specific insights)
 - Question/context hash
 - Date range
@@ -188,12 +202,14 @@ Cache keys include:
 When Gemini AI is unavailable, the components provide rule-based fallback responses:
 
 **Insights:**
+
 - Basic inventory analysis
 - Low stock warnings
 - Overstocking alerts
 - Simple recommendations
 
 **Q&A:**
+
 - Pattern matching for common questions
 - Context-based responses
 - Helpful suggestions for rephrasing
@@ -210,12 +226,14 @@ When Gemini AI is unavailable, the components provide rule-based fallback respon
 All text is internationalized using next-intl:
 
 **English (en):**
+
 - `analytics.ai.insights`
 - `analytics.ai.askQuestion`
 - `analytics.ai.generating`
 - `analytics.ai.error`
 
 **Arabic (ar):**
+
 - Full RTL support
 - Translated labels and messages
 - Mirrored layout where appropriate

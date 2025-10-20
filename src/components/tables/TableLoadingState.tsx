@@ -1,13 +1,13 @@
-'use client'
+'use client';
 
-import React from 'react'
-import { Skeleton } from '@/components/ui/skeleton'
+import React from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export interface TableLoadingStateProps {
-  columns: number
-  rows?: number
-  hasSelection?: boolean
-  className?: string
+  columns: number;
+  rows?: number;
+  hasSelection?: boolean;
+  className?: string;
 }
 
 export const TableLoadingState: React.FC<TableLoadingStateProps> = ({
@@ -46,7 +46,13 @@ export const TableLoadingState: React.FC<TableLoadingStateProps> = ({
                   {Array.from({ length: columns }).map((_, colIdx) => (
                     <td key={colIdx} className="px-3 py-4">
                       <Skeleton
-                        width={colIdx === 0 ? '90%' : colIdx % 3 === 0 ? '60%' : '75%'}
+                        width={
+                          colIdx === 0
+                            ? '90%'
+                            : colIdx % 3 === 0
+                              ? '60%'
+                              : '75%'
+                        }
                         height={16}
                       />
                     </td>
@@ -58,5 +64,5 @@ export const TableLoadingState: React.FC<TableLoadingStateProps> = ({
         </div>
       </div>
     </div>
-  )
-}
+  );
+};

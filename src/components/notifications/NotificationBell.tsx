@@ -1,39 +1,43 @@
-'use client'
+'use client';
 
-import { useState, useRef, useEffect } from 'react'
-import { useNotifications } from '@/context/NotificationContext'
-import { NotificationDropdown } from './NotificationDropdown'
+import { useState, useRef, useEffect } from 'react';
+import { useNotifications } from '@/context/NotificationContext';
+import { NotificationDropdown } from './NotificationDropdown';
 
 export function NotificationBell() {
-  const { unreadCount } = useNotifications()
-  const [isOpen, setIsOpen] = useState(false)
-  const dropdownRef = useRef<HTMLDivElement>(null)
+  const { unreadCount } = useNotifications();
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false)
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
       }
-    }
+    };
 
     if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside)
-      return () => document.removeEventListener('mousedown', handleClickOutside)
+      document.addEventListener('mousedown', handleClickOutside);
+      return () =>
+        document.removeEventListener('mousedown', handleClickOutside);
     }
-  }, [isOpen])
+  }, [isOpen]);
 
   // Close dropdown on escape key
   useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape' && isOpen) {
-        setIsOpen(false)
+        setIsOpen(false);
       }
-    }
+    };
 
-    document.addEventListener('keydown', handleEscape)
-    return () => document.removeEventListener('keydown', handleEscape)
-  }, [isOpen])
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [isOpen]);
 
   return (
     <div className="relative" ref={dropdownRef}>
@@ -71,5 +75,5 @@ export function NotificationBell() {
       {/* Dropdown */}
       {isOpen && <NotificationDropdown onClose={() => setIsOpen(false)} />}
     </div>
-  )
+  );
 }

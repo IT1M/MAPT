@@ -1,41 +1,41 @@
-'use client'
+'use client';
 
-import React, { useState, useCallback, useEffect, useMemo } from 'react'
-import { useTranslations } from '@/hooks/useTranslations'
-import { useSession } from 'next-auth/react'
-import { redirect } from 'next/navigation'
-import { Toaster } from 'react-hot-toast'
-import { Button } from '@/components/ui/button'
-import { InventoryFilters } from '@/components/filters/InventoryFilters'
-import { InventoryTable } from '@/components/tables/InventoryTable'
-import { BulkActionsToolbar } from '@/components/tables/BulkActionsToolbar'
-import { ExportButton } from '@/components/export/ExportButton'
-import { useTablePreferences } from '@/hooks/useTablePreferences'
-import { useDataLogManager } from '@/hooks/useDataLogManager'
-import { useDataLogKeyboardShortcuts } from '@/hooks/usePageKeyboardShortcuts'
-import type { FilterState, InventoryItemWithUser } from '@/types'
-import { toast } from '@/utils/toast'
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
+import { useTranslations } from '@/hooks/useTranslations';
+import { useSession } from 'next-auth/react';
+import { redirect } from 'next/navigation';
+import { Toaster } from 'react-hot-toast';
+import { Button } from '@/components/ui/button';
+import { InventoryFilters } from '@/components/filters/InventoryFilters';
+import { InventoryTable } from '@/components/tables/InventoryTable';
+import { BulkActionsToolbar } from '@/components/tables/BulkActionsToolbar';
+import { ExportButton } from '@/components/export/ExportButton';
+import { useTablePreferences } from '@/hooks/useTablePreferences';
+import { useDataLogManager } from '@/hooks/useDataLogManager';
+import { useDataLogKeyboardShortcuts } from '@/hooks/usePageKeyboardShortcuts';
+import type { FilterState, InventoryItemWithUser } from '@/types';
+import { toast } from '@/utils/toast';
 import {
   EditInventoryModal,
   DeleteConfirmationDialog,
   AuditHistoryModal,
   BulkEditDestinationModal,
-} from '@/components/modals'
+} from '@/components/modals';
 
 export default function DataLogPage() {
-  const t = useTranslations()
-  const { data: session, status } = useSession()
-  const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(true)
-  const [showExportModal, setShowExportModal] = useState(false)
-  
+  const t = useTranslations();
+  const { data: session, status } = useSession();
+  const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(true);
+  const [showExportModal, setShowExportModal] = useState(false);
+
   // Table preferences hook
   const {
     preferences,
     setColumnWidth,
     toggleColumnVisibility,
     resetPreferences,
-  } = useTablePreferences()
-  
+  } = useTablePreferences();
+
   // Data log manager hook
   const {
     items,
@@ -56,44 +56,57 @@ export default function DataLogPage() {
     reset,
   } = useDataLogManager({
     autoFetch: false, // We'll fetch after session is loaded
-  })
-  
+  });
+
   // State for table
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
-  const [availableCategories, setAvailableCategories] = useState<string[]>([])
-  const [availableUsers, setAvailableUsers] = useState<Array<{ id: string; name: string; email: string }>>([])
-  
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [availableCategories, setAvailableCategories] = useState<string[]>([]);
+  const [availableUsers, setAvailableUsers] = useState<
+    Array<{ id: string; name: string; email: string }>
+  >([]);
+
   // Modal states
-  const [editingItem, setEditingItem] = useState<InventoryItemWithUser | null>(null)
-  const [deletingItem, setDeletingItem] = useState<InventoryItemWithUser | null>(null)
-  const [deletingItems, setDeletingItems] = useState<InventoryItemWithUser[]>([])
-  const [viewingAuditItemId, setViewingAuditItemId] = useState<string | null>(null)
-  const [viewingAuditItemName, setViewingAuditItemName] = useState<string | null>(null)
-  const [bulkEditingItems, setBulkEditingItems] = useState<InventoryItemWithUser[]>([])
-  
+  const [editingItem, setEditingItem] = useState<InventoryItemWithUser | null>(
+    null
+  );
+  const [deletingItem, setDeletingItem] =
+    useState<InventoryItemWithUser | null>(null);
+  const [deletingItems, setDeletingItems] = useState<InventoryItemWithUser[]>(
+    []
+  );
+  const [viewingAuditItemId, setViewingAuditItemId] = useState<string | null>(
+    null
+  );
+  const [viewingAuditItemName, setViewingAuditItemName] = useState<
+    string | null
+  >(null);
+  const [bulkEditingItems, setBulkEditingItems] = useState<
+    InventoryItemWithUser[]
+  >([]);
+
   // Keyboard shortcuts
   useDataLogKeyboardShortcuts({
-    onFilter: () => setIsFilterPanelOpen(prev => !prev),
+    onFilter: () => setIsFilterPanelOpen((prev) => !prev),
     onExport: () => setShowExportModal(true),
     onRefresh: () => refresh(),
     enabled: true,
-  })
-  
+  });
+
   // Fetch initial data when session is ready
   useEffect(() => {
     if (session?.user) {
-      fetchData()
-      fetchAvailableCategories()
-      fetchAvailableUsers()
+      fetchData();
+      fetchAvailableCategories();
+      fetchAvailableUsers();
     }
-  }, [session?.user])
-  
+  }, [session?.user]);
+
   // Fetch available categories
   const fetchAvailableCategories = async () => {
     try {
-      const response = await fetch('/api/inventory/data-log?pageSize=1000')
+      const response = await fetch('/api/inventory/data-log?pageSize=1000');
       if (response.ok) {
-        const result = await response.json()
+        const result = await response.json();
         if (result.success && result.data?.items) {
           const categories = Array.from(
             new Set(
@@ -101,58 +114,63 @@ export default function DataLogPage() {
                 .map((item: InventoryItemWithUser) => item.category)
                 .filter((cat: string | null) => cat !== null)
             )
-          ) as string[]
-          setAvailableCategories(categories.sort())
+          ) as string[];
+          setAvailableCategories(categories.sort());
         }
       }
     } catch (error) {
-      console.error('Failed to fetch categories:', error)
+      console.error('Failed to fetch categories:', error);
     }
-  }
-  
+  };
+
   // Fetch available users (for ADMIN/SUPERVISOR)
   const fetchAvailableUsers = async () => {
-    if (session?.user?.role === 'ADMIN' || session?.user?.role === 'SUPERVISOR') {
+    if (
+      session?.user?.role === 'ADMIN' ||
+      session?.user?.role === 'SUPERVISOR'
+    ) {
       try {
-        const response = await fetch('/api/users')
+        const response = await fetch('/api/users');
         if (response.ok) {
-          const result = await response.json()
+          const result = await response.json();
           if (result.success && result.data?.items) {
-            setAvailableUsers(result.data.items.map((user: any) => ({
-              id: user.id,
-              name: user.name,
-              email: user.email,
-            })))
+            setAvailableUsers(
+              result.data.items.map((user: any) => ({
+                id: user.id,
+                name: user.name,
+                email: user.email,
+              }))
+            );
           }
         }
       } catch (error) {
-        console.error('Failed to fetch users:', error)
+        console.error('Failed to fetch users:', error);
       }
     }
-  }
-  
+  };
+
   // Calculate time since last update with auto-refresh
-  const [, setTick] = useState(0)
-  
+  const [, setTick] = useState(0);
+
   useEffect(() => {
     // Update the timestamp display every 10 seconds
     const interval = setInterval(() => {
-      setTick(prev => prev + 1)
-    }, 10000)
-    
-    return () => clearInterval(interval)
-  }, [])
-  
+      setTick((prev) => prev + 1);
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   const timeSinceUpdate = useMemo(() => {
-    if (!lastUpdated) return null
-    
-    const seconds = Math.floor((Date.now() - lastUpdated.getTime()) / 1000)
-    
-    if (seconds < 60) return `${seconds}s ago`
-    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`
-    if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`
-    return `${Math.floor(seconds / 86400)}d ago`
-  }, [lastUpdated, setTick])
+    if (!lastUpdated) return null;
+
+    const seconds = Math.floor((Date.now() - lastUpdated.getTime()) / 1000);
+
+    if (seconds < 60) return `${seconds}s ago`;
+    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+    if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+    return `${Math.floor(seconds / 86400)}d ago`;
+  }, [lastUpdated, setTick]);
 
   // Calculate active filter count
   const activeFilterCount = [
@@ -162,159 +180,190 @@ export default function DataLogPage() {
     filters.categories.length > 0,
     filters.rejectFilter !== 'all',
     filters.enteredByIds.length > 0,
-  ].filter(Boolean).length
+  ].filter(Boolean).length;
 
   // Handle filter changes
-  const handleFilterChange = useCallback((newFilters: Partial<FilterState>) => {
-    setFilters(newFilters)
-  }, [setFilters])
+  const handleFilterChange = useCallback(
+    (newFilters: Partial<FilterState>) => {
+      setFilters(newFilters);
+    },
+    [setFilters]
+  );
 
   // Handle apply filters
   const handleApplyFilters = useCallback(async () => {
     try {
-      await fetchData()
-      toast.success('Filters applied successfully')
+      await fetchData();
+      toast.success('Filters applied successfully');
     } catch (error) {
-      toast.error('Failed to apply filters')
+      toast.error('Failed to apply filters');
     }
-  }, [fetchData])
+  }, [fetchData]);
 
   // Handle sort
-  const handleSort = useCallback((column: string) => {
-    const newSortOrder = filters.sortBy === column && filters.sortOrder === 'asc' ? 'desc' : 'asc'
-    setFilters({
-      sortBy: column,
-      sortOrder: newSortOrder,
-    })
-  }, [filters.sortBy, filters.sortOrder, setFilters])
+  const handleSort = useCallback(
+    (column: string) => {
+      const newSortOrder =
+        filters.sortBy === column && filters.sortOrder === 'asc'
+          ? 'desc'
+          : 'asc';
+      setFilters({
+        sortBy: column,
+        sortOrder: newSortOrder,
+      });
+    },
+    [filters.sortBy, filters.sortOrder, setFilters]
+  );
 
   // Handle row click
   const handleRowClick = useCallback((item: InventoryItemWithUser) => {
-    setEditingItem(item)
-  }, [])
+    setEditingItem(item);
+  }, []);
 
   // Handle selection change
   const handleSelectionChange = useCallback((ids: Set<string>) => {
-    setSelectedIds(ids)
-  }, [])
+    setSelectedIds(ids);
+  }, []);
 
   // Handle clear selection
   const handleClearSelection = useCallback(() => {
-    setSelectedIds(new Set())
-  }, [])
+    setSelectedIds(new Set());
+  }, []);
 
   // Handle edit
   const handleEdit = useCallback((item: InventoryItemWithUser) => {
-    setEditingItem(item)
-  }, [])
+    setEditingItem(item);
+  }, []);
 
   // Handle delete
-  const handleDelete = useCallback((id: string) => {
-    const item = items.find(i => i.id === id)
-    if (item) {
-      setDeletingItem(item)
-    }
-  }, [items])
+  const handleDelete = useCallback(
+    (id: string) => {
+      const item = items.find((i) => i.id === id);
+      if (item) {
+        setDeletingItem(item);
+      }
+    },
+    [items]
+  );
 
   // Handle view audit
-  const handleViewAudit = useCallback((id: string) => {
-    const item = items.find(i => i.id === id)
-    setViewingAuditItemId(id)
-    setViewingAuditItemName(item?.itemName || null)
-  }, [items])
+  const handleViewAudit = useCallback(
+    (id: string) => {
+      const item = items.find((i) => i.id === id);
+      setViewingAuditItemId(id);
+      setViewingAuditItemName(item?.itemName || null);
+    },
+    [items]
+  );
 
   // Handle copy batch
   const handleCopyBatch = useCallback(async (batch: string) => {
     try {
-      await navigator.clipboard.writeText(batch)
-      toast.success('Batch number copied to clipboard')
+      await navigator.clipboard.writeText(batch);
+      toast.success('Batch number copied to clipboard');
     } catch (err) {
-      console.error('Failed to copy batch number:', err)
-      toast.error('Failed to copy batch number')
+      console.error('Failed to copy batch number:', err);
+      toast.error('Failed to copy batch number');
     }
-  }, [])
+  }, []);
 
   // Handle duplicate
-  const handleDuplicate = useCallback(async (item: InventoryItemWithUser) => {
-    try {
-      const response = await fetch('/api/inventory', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          itemName: item.itemName,
-          batch: `${item.batch}-COPY`,
-          quantity: item.quantity,
-          reject: item.reject,
-          destination: item.destination,
-          category: item.category,
-          notes: item.notes ? `Copy of: ${item.notes}` : 'Duplicated entry',
-        }),
-      })
-      
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
-        throw new Error(errorData.error?.message || 'Failed to duplicate item')
+  const handleDuplicate = useCallback(
+    async (item: InventoryItemWithUser) => {
+      try {
+        const response = await fetch('/api/inventory', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            itemName: item.itemName,
+            batch: `${item.batch}-COPY`,
+            quantity: item.quantity,
+            reject: item.reject,
+            destination: item.destination,
+            category: item.category,
+            notes: item.notes ? `Copy of: ${item.notes}` : 'Duplicated entry',
+          }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(
+            errorData.error?.message || 'Failed to duplicate item'
+          );
+        }
+
+        toast.success('Item duplicated successfully');
+        await refresh();
+      } catch (error) {
+        console.error('Duplicate error:', error);
+        toast.error(
+          error instanceof Error ? error.message : 'Failed to duplicate item'
+        );
       }
-      
-      toast.success('Item duplicated successfully')
-      await refresh()
-    } catch (error) {
-      console.error('Duplicate error:', error)
-      toast.error(error instanceof Error ? error.message : 'Failed to duplicate item')
-    }
-  }, [refresh])
+    },
+    [refresh]
+  );
 
   // Handle bulk delete
   const handleBulkDelete = useCallback(() => {
-    const itemsToDelete = items.filter(item => selectedIds.has(item.id))
-    setDeletingItems(itemsToDelete)
-  }, [selectedIds, items])
+    const itemsToDelete = items.filter((item) => selectedIds.has(item.id));
+    setDeletingItems(itemsToDelete);
+  }, [selectedIds, items]);
 
   // Handle bulk export
   const handleBulkExport = useCallback(() => {
-    console.log('Bulk export:', Array.from(selectedIds))
+    console.log('Bulk export:', Array.from(selectedIds));
     // This is handled by the ExportButton component
-  }, [selectedIds])
+  }, [selectedIds]);
 
   // Handle bulk edit destination
   const handleBulkEditDestination = useCallback(() => {
-    const itemsToEdit = items.filter(item => selectedIds.has(item.id))
-    setBulkEditingItems(itemsToEdit)
-  }, [selectedIds, items])
+    const itemsToEdit = items.filter((item) => selectedIds.has(item.id));
+    setBulkEditingItems(itemsToEdit);
+  }, [selectedIds, items]);
 
   // Handle reset filters
   const handleResetFilters = useCallback(() => {
-    reset()
-    toast.success('Filters reset')
-  }, [reset])
-  
+    reset();
+    toast.success('Filters reset');
+  }, [reset]);
+
   // Handle refresh
   const handleRefresh = useCallback(async () => {
     try {
-      await refresh()
-      toast.success('Data refreshed successfully')
+      await refresh();
+      toast.success('Data refreshed successfully');
     } catch (error) {
-      toast.error('Failed to refresh data')
+      toast.error('Failed to refresh data');
     }
-  }, [refresh])
-  
+  }, [refresh]);
+
   // Handle export callback
-  const handleExport = useCallback((format: 'csv' | 'json' | 'excel' | 'pdf', success: boolean, fileSize?: number) => {
-    if (success) {
-      const sizeText = fileSize ? ` (${fileSize.toFixed(2)} KB)` : ''
-      toast.success(`${format.toUpperCase()} exported successfully${sizeText}`)
-    } else {
-      toast.error(`Failed to export ${format.toUpperCase()}`)
-    }
-  }, [])
+  const handleExport = useCallback(
+    (
+      format: 'csv' | 'json' | 'excel' | 'pdf',
+      success: boolean,
+      fileSize?: number
+    ) => {
+      if (success) {
+        const sizeText = fileSize ? ` (${fileSize.toFixed(2)} KB)` : '';
+        toast.success(
+          `${format.toUpperCase()} exported successfully${sizeText}`
+        );
+      } else {
+        toast.error(`Failed to export ${format.toUpperCase()}`);
+      }
+    },
+    []
+  );
 
   // Modal handlers
   const handleEditSuccess = useCallback(async () => {
-    await refresh()
-    setEditingItem(null)
-  }, [refresh])
+    await refresh();
+    setEditingItem(null);
+  }, [refresh]);
 
   const handleDeleteConfirm = useCallback(async () => {
     if (deletingItem) {
@@ -322,20 +371,22 @@ export default function DataLogPage() {
       try {
         const response = await fetch(`/api/inventory/${deletingItem.id}`, {
           method: 'DELETE',
-        })
+        });
 
         if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}))
-          throw new Error(errorData.error?.message || 'Failed to delete item')
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.error?.message || 'Failed to delete item');
         }
 
-        toast.success('Item deleted successfully')
-        await refresh()
-        setDeletingItem(null)
+        toast.success('Item deleted successfully');
+        await refresh();
+        setDeletingItem(null);
       } catch (error) {
-        console.error('Delete error:', error)
-        toast.error(error instanceof Error ? error.message : 'Failed to delete item')
-        throw error
+        console.error('Delete error:', error);
+        toast.error(
+          error instanceof Error ? error.message : 'Failed to delete item'
+        );
+        throw error;
       }
     } else if (deletingItems.length > 0) {
       // Bulk delete
@@ -346,34 +397,38 @@ export default function DataLogPage() {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            ids: deletingItems.map(item => item.id),
+            ids: deletingItems.map((item) => item.id),
           }),
-        })
+        });
 
         if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}))
-          throw new Error(errorData.error?.message || 'Failed to delete items')
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.error?.message || 'Failed to delete items');
         }
 
-        const result = await response.json()
-        toast.success(`${result.data?.deletedCount || deletingItems.length} items deleted successfully`)
-        await refresh()
-        setDeletingItems([])
-        setSelectedIds(new Set())
+        const result = await response.json();
+        toast.success(
+          `${result.data?.deletedCount || deletingItems.length} items deleted successfully`
+        );
+        await refresh();
+        setDeletingItems([]);
+        setSelectedIds(new Set());
       } catch (error) {
-        console.error('Bulk delete error:', error)
-        toast.error(error instanceof Error ? error.message : 'Failed to delete items')
-        throw error
+        console.error('Bulk delete error:', error);
+        toast.error(
+          error instanceof Error ? error.message : 'Failed to delete items'
+        );
+        throw error;
       }
     }
-  }, [deletingItem, deletingItems, refresh])
+  }, [deletingItem, deletingItems, refresh]);
 
   const handleBulkEditSuccess = useCallback(async () => {
-    await refresh()
-    setBulkEditingItems([])
-    setSelectedIds(new Set())
-    toast.success('Destinations updated successfully')
-  }, [refresh])
+    await refresh();
+    setBulkEditingItems([]);
+    setSelectedIds(new Set());
+    toast.success('Destinations updated successfully');
+  }, [refresh]);
 
   // Authentication check and redirect
   if (status === 'loading') {
@@ -381,23 +436,27 @@ export default function DataLogPage() {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">{t('common.loading')}</p>
+          <p className="text-gray-600 dark:text-gray-400">
+            {t('common.loading')}
+          </p>
         </div>
       </div>
-    )
+    );
   }
 
   if (!session) {
-    const locale = typeof window !== 'undefined' ? 
-      document.documentElement.lang || 'en' : 'en'
-    redirect(`/${locale}/login`)
+    const locale =
+      typeof window !== 'undefined'
+        ? document.documentElement.lang || 'en'
+        : 'en';
+    redirect(`/${locale}/login`);
   }
 
   return (
     <div className="h-full flex flex-col">
       {/* Toast notifications */}
       <Toaster position="top-right" />
-      
+
       {/* Page Header */}
       <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-4 md:px-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -419,7 +478,7 @@ export default function DataLogPage() {
               )}
             </div>
           </div>
-          
+
           {/* Action Buttons */}
           <div className="flex items-center gap-2">
             <Button
@@ -444,24 +503,30 @@ export default function DataLogPage() {
               </svg>
               {t('common.refresh')}
             </Button>
-            
+
             <Button
               variant="secondary"
               size="small"
               onClick={() => {
                 // Build analytics URL with current filters
-                const locale = typeof window !== 'undefined' ? 
-                  document.documentElement.lang || 'en' : 'en'
-                const params = new URLSearchParams()
-                
-                if (filters.startDate) params.append('startDate', filters.startDate.toISOString())
-                if (filters.endDate) params.append('endDate', filters.endDate.toISOString())
-                filters.destinations.forEach(d => params.append('destination', d))
-                filters.categories.forEach(c => params.append('category', c))
-                filters.enteredByIds.forEach(u => params.append('userId', u))
-                
-                const queryString = params.toString()
-                window.location.href = `/${locale}/analytics${queryString ? '?' + queryString : ''}`
+                const locale =
+                  typeof window !== 'undefined'
+                    ? document.documentElement.lang || 'en'
+                    : 'en';
+                const params = new URLSearchParams();
+
+                if (filters.startDate)
+                  params.append('startDate', filters.startDate.toISOString());
+                if (filters.endDate)
+                  params.append('endDate', filters.endDate.toISOString());
+                filters.destinations.forEach((d) =>
+                  params.append('destination', d)
+                );
+                filters.categories.forEach((c) => params.append('category', c));
+                filters.enteredByIds.forEach((u) => params.append('userId', u));
+
+                const queryString = params.toString();
+                window.location.href = `/${locale}/analytics${queryString ? '?' + queryString : ''}`;
               }}
               title="View Analytics"
             >
@@ -480,7 +545,7 @@ export default function DataLogPage() {
               </svg>
               View Analytics
             </Button>
-            
+
             <ExportButton
               data={items}
               filename="inventory-data-log"
@@ -491,24 +556,30 @@ export default function DataLogPage() {
             />
           </div>
         </div>
-        
+
         {/* Aggregates Summary */}
         {!loading && items.length > 0 && (
           <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3">
-              <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">Total Quantity</p>
+              <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">
+                Total Quantity
+              </p>
               <p className="text-2xl font-bold text-blue-900 dark:text-blue-100 mt-1">
                 {aggregates.totalQuantity.toLocaleString()}
               </p>
             </div>
             <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-3">
-              <p className="text-xs text-red-600 dark:text-red-400 font-medium">Total Rejects</p>
+              <p className="text-xs text-red-600 dark:text-red-400 font-medium">
+                Total Rejects
+              </p>
               <p className="text-2xl font-bold text-red-900 dark:text-red-100 mt-1">
                 {aggregates.totalRejects.toLocaleString()}
               </p>
             </div>
             <div className="bg-amber-50 dark:bg-amber-900/20 rounded-lg p-3">
-              <p className="text-xs text-amber-600 dark:text-amber-400 font-medium">Avg Reject Rate</p>
+              <p className="text-xs text-amber-600 dark:text-amber-400 font-medium">
+                Avg Reject Rate
+              </p>
               <p className="text-2xl font-bold text-amber-900 dark:text-amber-100 mt-1">
                 {aggregates.averageRejectRate.toFixed(2)}%
               </p>
@@ -599,14 +670,15 @@ export default function DataLogPage() {
                 onResetPreferences={resetPreferences}
                 userPermissions={session?.user?.permissions || []}
               />
-              
+
               {/* Pagination */}
               {!loading && !error && items.length > 0 && (
                 <div className="mt-4 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 pt-4">
                   <div className="text-sm text-gray-500 dark:text-gray-400">
-                    Showing {((page - 1) * pageSize) + 1} to {Math.min(page * pageSize, total)} of {total} items
+                    Showing {(page - 1) * pageSize + 1} to{' '}
+                    {Math.min(page * pageSize, total)} of {total} items
                   </div>
-                  
+
                   <div className="flex items-center gap-2">
                     {/* Page size selector */}
                     <select
@@ -620,7 +692,7 @@ export default function DataLogPage() {
                       <option value={100}>100 per page</option>
                       <option value={200}>200 per page</option>
                     </select>
-                    
+
                     {/* Pagination buttons */}
                     <div className="flex items-center gap-1">
                       <Button
@@ -631,13 +703,13 @@ export default function DataLogPage() {
                       >
                         Previous
                       </Button>
-                      
+
                       <div className="flex items-center gap-1 px-2">
                         <span className="text-sm text-gray-700 dark:text-gray-300">
                           Page {page} of {totalPages}
                         </span>
                       </div>
-                      
+
                       <Button
                         variant="secondary"
                         size="small"
@@ -668,8 +740,8 @@ export default function DataLogPage() {
         items={deletingItems}
         isOpen={!!deletingItem || deletingItems.length > 0}
         onClose={() => {
-          setDeletingItem(null)
-          setDeletingItems([])
+          setDeletingItem(null);
+          setDeletingItems([]);
         }}
         onConfirm={handleDeleteConfirm}
         isBulk={deletingItems.length > 0}
@@ -680,8 +752,8 @@ export default function DataLogPage() {
         itemName={viewingAuditItemName || undefined}
         isOpen={!!viewingAuditItemId}
         onClose={() => {
-          setViewingAuditItemId(null)
-          setViewingAuditItemName(null)
+          setViewingAuditItemId(null);
+          setViewingAuditItemName(null);
         }}
       />
 
@@ -692,5 +764,5 @@ export default function DataLogPage() {
         onSuccess={handleBulkEditSuccess}
       />
     </div>
-  )
+  );
 }

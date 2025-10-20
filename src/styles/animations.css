@@ -128,8 +128,8 @@
 }
 
 /* RTL support for dropdown animations */
-[dir="rtl"] .dropdown-enter,
-[dir="rtl"] .dropdown-exit {
+[dir='rtl'] .dropdown-enter,
+[dir='rtl'] .dropdown-exit {
   transform-origin: top right;
 }
 
@@ -282,11 +282,11 @@
   animation: toastSlideOutRight 200ms ease-in forwards;
 }
 
-[dir="rtl"] .toast-enter {
+[dir='rtl'] .toast-enter {
   animation: toastSlideInLeft 200ms ease-out forwards;
 }
 
-[dir="rtl"] .toast-exit {
+[dir='rtl'] .toast-exit {
   animation: toastSlideOutLeft 200ms ease-in forwards;
 }
 
@@ -296,7 +296,9 @@
 
 /* Smooth width transition for sidebar collapse/expand */
 .sidebar-transition {
-  transition: width 300ms ease-in-out, transform 300ms ease-in-out;
+  transition:
+    width 300ms ease-in-out,
+    transform 300ms ease-in-out;
 }
 
 /* Sidebar overlay slide in (mobile) */
@@ -344,11 +346,11 @@
   animation: sidebarSlideOutLeft 300ms ease-in forwards;
 }
 
-[dir="rtl"] .sidebar-enter {
+[dir='rtl'] .sidebar-enter {
   animation: sidebarSlideInRight 300ms ease-out forwards;
 }
 
-[dir="rtl"] .sidebar-exit {
+[dir='rtl'] .sidebar-exit {
   animation: sidebarSlideOutRight 300ms ease-in forwards;
 }
 
@@ -358,7 +360,8 @@
 
 /* Skeleton pulse animation */
 @keyframes skeletonPulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {
@@ -400,7 +403,9 @@
 
 /* Dots loading animation */
 @keyframes dotsBounce {
-  0%, 80%, 100% {
+  0%,
+  80%,
+  100% {
     transform: scale(0);
     opacity: 0.5;
   }
@@ -447,7 +452,9 @@
 
 /* Hover lift effect */
 .hover-lift {
-  transition: transform 150ms ease-out, box-shadow 150ms ease-out;
+  transition:
+    transform 150ms ease-out,
+    box-shadow 150ms ease-out;
 }
 
 .hover-lift:hover {
@@ -490,13 +497,21 @@
 
 /* Error shake animation */
 @keyframes shake {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateX(0);
   }
-  10%, 30%, 50%, 70%, 90% {
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
     transform: translateX(-4px);
   }
-  20%, 40%, 60%, 80% {
+  20%,
+  40%,
+  60%,
+  80% {
     transform: translateX(4px);
   }
 }
@@ -507,7 +522,8 @@
 
 /* Bounce animation for attention */
 @keyframes bounce {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0);
   }
   50% {
@@ -521,7 +537,8 @@
 
 /* Wiggle animation for errors */
 @keyframes wiggle {
-  0%, 100% {
+  0%,
+  100% {
     transform: rotate(0deg);
   }
   25% {
@@ -542,7 +559,8 @@
 
 /* Badge pulse for new items */
 @keyframes badgePulse {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
     opacity: 1;
   }
@@ -558,13 +576,16 @@
 
 /* Notification bell ring */
 @keyframes bellRing {
-  0%, 100% {
+  0%,
+  100% {
     transform: rotate(0deg);
   }
-  10%, 30% {
+  10%,
+  30% {
     transform: rotate(-10deg);
   }
-  20%, 40% {
+  20%,
+  40% {
     transform: rotate(10deg);
   }
 }
@@ -595,11 +616,21 @@
 }
 
 /* Stagger delays for sequential items */
-.list-item-enter:nth-child(1) { animation-delay: 0ms; }
-.list-item-enter:nth-child(2) { animation-delay: 50ms; }
-.list-item-enter:nth-child(3) { animation-delay: 100ms; }
-.list-item-enter:nth-child(4) { animation-delay: 150ms; }
-.list-item-enter:nth-child(5) { animation-delay: 200ms; }
+.list-item-enter:nth-child(1) {
+  animation-delay: 0ms;
+}
+.list-item-enter:nth-child(2) {
+  animation-delay: 50ms;
+}
+.list-item-enter:nth-child(3) {
+  animation-delay: 100ms;
+}
+.list-item-enter:nth-child(4) {
+  animation-delay: 150ms;
+}
+.list-item-enter:nth-child(5) {
+  animation-delay: 200ms;
+}
 
 /* Collapse/expand animation */
 @keyframes expandHeight {

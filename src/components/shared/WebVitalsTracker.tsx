@@ -2,7 +2,7 @@
 
 /**
  * Web Vitals Tracker Component
- * 
+ *
  * Initializes Core Web Vitals tracking on the client side
  */
 

@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from 'react'
-import type { UserPreferences } from '@/types/settings'
+import { useState, useEffect, useCallback } from 'react';
+import type { UserPreferences } from '@/types/settings';
 
 const DEFAULT_PREFERENCES: UserPreferences = {
   theme: 'system',
@@ -24,14 +24,14 @@ const DEFAULT_PREFERENCES: UserPreferences = {
   sidebarCollapsed: false,
   sidebarPosition: 'left',
   showBreadcrumbs: true,
-}
+};
 
 interface UseUserPreferencesReturn {
-  preferences: UserPreferences
-  updatePreferences: (updates: Partial<UserPreferences>) => Promise<void>
-  resetPreferences: () => Promise<void>
-  isLoading: boolean
-  error: string | null
+  preferences: UserPreferences;
+  updatePreferences: (updates: Partial<UserPreferences>) => Promise<void>;
+  resetPreferences: () => Promise<void>;
+  isLoading: boolean;
+  error: string | null;
 }
 
 /**
@@ -39,77 +39,85 @@ interface UseUserPreferencesReturn {
  * Fetches preferences from the server and provides methods to update them
  */
 export function useUserPreferences(): UseUserPreferencesReturn {
-  const [preferences, setPreferences] = useState<UserPreferences>(DEFAULT_PREFERENCES)
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [preferences, setPreferences] =
+    useState<UserPreferences>(DEFAULT_PREFERENCES);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // Fetch preferences on mount
   useEffect(() => {
-    fetchPreferences()
-  }, [])
+    fetchPreferences();
+  }, []);
 
   const fetchPreferences = async () => {
     try {
-      setIsLoading(true)
-      setError(null)
+      setIsLoading(true);
+      setError(null);
 
-      const response = await fetch('/api/users/preferences')
-      
+      const response = await fetch('/api/users/preferences');
+
       if (!response.ok) {
-        throw new Error('Failed to fetch preferences')
+        throw new Error('Failed to fetch preferences');
       }
 
-      const data = await response.json()
-      
+      const data = await response.json();
+
       if (data.success && data.data) {
-        setPreferences({ ...DEFAULT_PREFERENCES, ...data.data })
+        setPreferences({ ...DEFAULT_PREFERENCES, ...data.data });
       }
     } catch (err) {
-      console.error('Error fetching preferences:', err)
-      setError(err instanceof Error ? err.message : 'Failed to load preferences')
+      console.error('Error fetching preferences:', err);
+      setError(
+        err instanceof Error ? err.message : 'Failed to load preferences'
+      );
       // Use default preferences on error
-      setPreferences(DEFAULT_PREFERENCES)
+      setPreferences(DEFAULT_PREFERENCES);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
-  const updatePreferences = useCallback(async (updates: Partial<UserPreferences>) => {
-    try {
-      setError(null)
+  const updatePreferences = useCallback(
+    async (updates: Partial<UserPreferences>) => {
+      try {
+        setError(null);
 
-      // Optimistically update local state
-      setPreferences((prev) => ({ ...prev, ...updates }))
+        // Optimistically update local state
+        setPreferences((prev) => ({ ...prev, ...updates }));
 
-      const response = await fetch('/api/users/preferences', {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(updates),
-      })
+        const response = await fetch('/api/users/preferences', {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(updates),
+        });
 
-      if (!response.ok) {
-        throw new Error('Failed to update preferences')
+        if (!response.ok) {
+          throw new Error('Failed to update preferences');
+        }
+
+        const data = await response.json();
+
+        if (data.success && data.data) {
+          setPreferences({ ...DEFAULT_PREFERENCES, ...data.data });
+        }
+      } catch (err) {
+        console.error('Error updating preferences:', err);
+        setError(
+          err instanceof Error ? err.message : 'Failed to update preferences'
+        );
+        // Revert optimistic update by refetching
+        await fetchPreferences();
+        throw err;
       }
-
-      const data = await response.json()
-
-      if (data.success && data.data) {
-        setPreferences({ ...DEFAULT_PREFERENCES, ...data.data })
-      }
-    } catch (err) {
-      console.error('Error updating preferences:', err)
-      setError(err instanceof Error ? err.message : 'Failed to update preferences')
-      // Revert optimistic update by refetching
-      await fetchPreferences()
-      throw err
-    }
-  }, [])
+    },
+    []
+  );
 
   const resetPreferences = useCallback(async () => {
     try {
-      setError(null)
+      setError(null);
 
       const response = await fetch('/api/users/preferences', {
         method: 'PATCH',
@@ -117,19 +125,21 @@ export function useUserPreferences(): UseUserPreferencesReturn {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(DEFAULT_PREFERENCES),
-      })
+      });
 
       if (!response.ok) {
-        throw new Error('Failed to reset preferences')
+        throw new Error('Failed to reset preferences');
       }
 
-      setPreferences(DEFAULT_PREFERENCES)
+      setPreferences(DEFAULT_PREFERENCES);
     } catch (err) {
-      console.error('Error resetting preferences:', err)
-      setError(err instanceof Error ? err.message : 'Failed to reset preferences')
-      throw err
+      console.error('Error resetting preferences:', err);
+      setError(
+        err instanceof Error ? err.message : 'Failed to reset preferences'
+      );
+      throw err;
     }
-  }, [])
+  }, []);
 
   return {
     preferences,
@@ -137,5 +147,5 @@ export function useUserPreferences(): UseUserPreferencesReturn {
     resetPreferences,
     isLoading,
     error,
-  }
+  };
 }

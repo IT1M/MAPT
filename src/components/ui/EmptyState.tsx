@@ -28,7 +28,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
     if (icon) return icon;
 
     const iconClasses = 'w-16 h-16';
-    
+
     switch (illustration) {
       case 'no-data':
         return (
@@ -46,7 +46,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
             />
           </svg>
         );
-      
+
       case 'no-results':
         return (
           <svg
@@ -63,7 +63,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
             />
           </svg>
         );
-      
+
       case 'no-access':
         return (
           <svg
@@ -80,7 +80,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
             />
           </svg>
         );
-      
+
       case 'error':
         return (
           <svg
@@ -97,7 +97,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
             />
           </svg>
         );
-      
+
       default:
         return (
           <svg
@@ -120,7 +120,8 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   const renderAction = () => {
     if (!action) return null;
 
-    const buttonClasses = 'inline-flex items-center px-4 py-2 bg-primary-600 hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600 text-white text-sm font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500';
+    const buttonClasses =
+      'inline-flex items-center px-4 py-2 bg-primary-600 hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600 text-white text-sm font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500';
 
     if (action.href) {
       return (
@@ -138,19 +139,21 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   };
 
   return (
-    <div className={`flex flex-col items-center justify-center py-12 px-4 text-center ${className}`}>
+    <div
+      className={`flex flex-col items-center justify-center py-12 px-4 text-center ${className}`}
+    >
       <div className="mb-4">{renderIllustration()}</div>
-      
+
       <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
         {title}
       </h3>
-      
+
       {description && (
         <p className="text-sm text-gray-600 dark:text-gray-400 max-w-md mb-6">
           {description}
         </p>
       )}
-      
+
       {renderAction()}
     </div>
   );
@@ -182,7 +185,7 @@ export const TableEmptyState: React.FC<TableEmptyStateProps> = ({
         description={
           description ||
           (hasFilters
-            ? 'Try adjusting your filters to find what you\'re looking for'
+            ? "Try adjusting your filters to find what you're looking for"
             : 'Get started by adding your first item')
         }
         action={

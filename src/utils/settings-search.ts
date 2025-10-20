@@ -3,24 +3,24 @@
  * Provides search functionality for settings interface with highlighting
  */
 
-import React from 'react'
+import React from 'react';
 
 export interface SearchableItem {
-  id: string
-  section: string
-  title: string
-  description?: string
-  keywords?: string[]
-  path: string
+  id: string;
+  section: string;
+  title: string;
+  description?: string;
+  keywords?: string[];
+  path: string;
 }
 
 export interface SearchResult extends SearchableItem {
-  score: number
+  score: number;
   matches: {
-    field: 'title' | 'description' | 'keywords'
-    text: string
-    indices: [number, number][]
-  }[]
+    field: 'title' | 'description' | 'keywords';
+    text: string;
+    indices: [number, number][];
+  }[];
 }
 
 /**
@@ -31,66 +31,66 @@ function normalizeText(text: string): string {
     .toLowerCase()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '') // Remove diacritics
-    .trim()
+    .trim();
 }
 
 /**
  * Find all occurrences of query in text
  */
 function findMatches(text: string, query: string): [number, number][] {
-  const normalizedText = normalizeText(text)
-  const normalizedQuery = normalizeText(query)
-  const matches: [number, number][] = []
-  
-  let index = normalizedText.indexOf(normalizedQuery)
+  const normalizedText = normalizeText(text);
+  const normalizedQuery = normalizeText(query);
+  const matches: [number, number][] = [];
+
+  let index = normalizedText.indexOf(normalizedQuery);
   while (index !== -1) {
-    matches.push([index, index + normalizedQuery.length])
-    index = normalizedText.indexOf(normalizedQuery, index + 1)
+    matches.push([index, index + normalizedQuery.length]);
+    index = normalizedText.indexOf(normalizedQuery, index + 1);
   }
-  
-  return matches
+
+  return matches;
 }
 
 /**
  * Calculate relevance score for a search result
  */
 function calculateScore(item: SearchableItem, query: string): number {
-  const normalizedQuery = normalizeText(query)
-  let score = 0
-  
+  const normalizedQuery = normalizeText(query);
+  let score = 0;
+
   // Title match (highest weight)
-  const titleMatches = findMatches(item.title, query)
+  const titleMatches = findMatches(item.title, query);
   if (titleMatches.length > 0) {
-    score += titleMatches.length * 10
+    score += titleMatches.length * 10;
     // Bonus for exact match
     if (normalizeText(item.title) === normalizedQuery) {
-      score += 50
+      score += 50;
     }
     // Bonus for starts with
     if (normalizeText(item.title).startsWith(normalizedQuery)) {
-      score += 20
+      score += 20;
     }
   }
-  
+
   // Description match (medium weight)
   if (item.description) {
-    const descMatches = findMatches(item.description, query)
-    score += descMatches.length * 5
+    const descMatches = findMatches(item.description, query);
+    score += descMatches.length * 5;
   }
-  
+
   // Keywords match (medium weight)
   if (item.keywords) {
-    item.keywords.forEach(keyword => {
-      const keywordMatches = findMatches(keyword, query)
-      score += keywordMatches.length * 7
+    item.keywords.forEach((keyword) => {
+      const keywordMatches = findMatches(keyword, query);
+      score += keywordMatches.length * 7;
       // Bonus for exact keyword match
       if (normalizeText(keyword) === normalizedQuery) {
-        score += 15
+        score += 15;
       }
-    })
+    });
   }
-  
-  return score
+
+  return score;
 }
 
 /**
@@ -100,75 +100,75 @@ export function searchSettings(
   items: SearchableItem[],
   query: string,
   options: {
-    minScore?: number
-    maxResults?: number
+    minScore?: number;
+    maxResults?: number;
   } = {}
 ): SearchResult[] {
-  const { minScore = 1, maxResults = 50 } = options
-  
+  const { minScore = 1, maxResults = 50 } = options;
+
   if (!query.trim()) {
-    return []
+    return [];
   }
-  
-  const results: SearchResult[] = []
-  
+
+  const results: SearchResult[] = [];
+
   for (const item of items) {
-    const score = calculateScore(item, query)
-    
+    const score = calculateScore(item, query);
+
     if (score < minScore) {
-      continue
+      continue;
     }
-    
-    const matches: SearchResult['matches'] = []
-    
+
+    const matches: SearchResult['matches'] = [];
+
     // Find matches in title
-    const titleMatches = findMatches(item.title, query)
+    const titleMatches = findMatches(item.title, query);
     if (titleMatches.length > 0) {
       matches.push({
         field: 'title',
         text: item.title,
         indices: titleMatches,
-      })
+      });
     }
-    
+
     // Find matches in description
     if (item.description) {
-      const descMatches = findMatches(item.description, query)
+      const descMatches = findMatches(item.description, query);
       if (descMatches.length > 0) {
         matches.push({
           field: 'description',
           text: item.description,
           indices: descMatches,
-        })
+        });
       }
     }
-    
+
     // Find matches in keywords
     if (item.keywords) {
-      item.keywords.forEach(keyword => {
-        const keywordMatches = findMatches(keyword, query)
+      item.keywords.forEach((keyword) => {
+        const keywordMatches = findMatches(keyword, query);
         if (keywordMatches.length > 0) {
           matches.push({
             field: 'keywords',
             text: keyword,
             indices: keywordMatches,
-          })
+          });
         }
-      })
+      });
     }
-    
+
     results.push({
       ...item,
       score,
       matches,
-    })
+    });
   }
-  
+
   // Sort by score (descending)
-  results.sort((a, b) => b.score - a.score)
-  
+  results.sort((a, b) => b.score - a.score);
+
   // Limit results
-  return results.slice(0, maxResults)
+  return results.slice(0, maxResults);
 }
 
 /**
@@ -180,21 +180,21 @@ export function highlightMatches(
   highlightClass: string = 'bg-yellow-200 dark:bg-yellow-800'
 ): React.ReactNode[] {
   if (indices.length === 0) {
-    return [text]
+    return [text];
   }
-  
-  const parts: React.ReactNode[] = []
-  let lastIndex = 0
-  
+
+  const parts: React.ReactNode[] = [];
+  let lastIndex = 0;
+
   // Sort indices by start position
-  const sortedIndices = [...indices].sort((a, b) => a[0] - b[0])
-  
+  const sortedIndices = [...indices].sort((a, b) => a[0] - b[0]);
+
   sortedIndices.forEach(([start, end], i) => {
     // Add text before match
     if (start > lastIndex) {
-      parts.push(text.substring(lastIndex, start))
+      parts.push(text.substring(lastIndex, start));
     }
-    
+
     // Add highlighted match
     parts.push(
       React.createElement(
@@ -202,17 +202,17 @@ export function highlightMatches(
         { key: i, className: highlightClass },
         text.substring(start, end)
       )
-    )
-    
-    lastIndex = end
-  })
-  
+    );
+
+    lastIndex = end;
+  });
+
   // Add remaining text
   if (lastIndex < text.length) {
-    parts.push(text.substring(lastIndex))
+    parts.push(text.substring(lastIndex));
   }
-  
-  return parts
+
+  return parts;
 }
 
 /**
@@ -222,8 +222,8 @@ export function buildSearchableItems(
   translations: Record<string, any>,
   locale: string = 'en'
 ): SearchableItem[] {
-  const items: SearchableItem[] = []
-  
+  const items: SearchableItem[] = [];
+
   // Profile settings
   items.push({
     id: 'profile',
@@ -232,8 +232,8 @@ export function buildSearchableItems(
     description: translations.profile?.subtitle,
     keywords: ['avatar', 'name', 'email', 'phone', 'department', 'employee'],
     path: '/settings?section=profile',
-  })
-  
+  });
+
   // Security settings
   items.push({
     id: 'security',
@@ -242,8 +242,8 @@ export function buildSearchableItems(
     description: translations.security?.subtitle,
     keywords: ['password', 'sessions', 'audit', 'login', 'authentication'],
     path: '/settings?section=security',
-  })
-  
+  });
+
   items.push({
     id: 'security-password',
     section: translations.sections?.security || 'Security',
@@ -251,8 +251,8 @@ export function buildSearchableItems(
     description: 'Update your account password',
     keywords: ['password', 'security', 'authentication'],
     path: '/settings?section=security&focus=password',
-  })
-  
+  });
+
   items.push({
     id: 'security-sessions',
     section: translations.sections?.security || 'Security',
@@ -260,8 +260,8 @@ export function buildSearchableItems(
     description: translations.security?.sessionsSubtitle,
     keywords: ['sessions', 'devices', 'logout', 'signout'],
     path: '/settings?section=security&focus=sessions',
-  })
-  
+  });
+
   // User Management
   items.push({
     id: 'users',
@@ -270,8 +270,8 @@ export function buildSearchableItems(
     description: translations.users?.subtitle,
     keywords: ['users', 'accounts', 'roles', 'permissions', 'admin'],
     path: '/settings?section=users',
-  })
-  
+  });
+
   // Appearance settings
   items.push({
     id: 'appearance',
@@ -280,8 +280,8 @@ export function buildSearchableItems(
     description: translations.appearance?.subtitle,
     keywords: ['theme', 'dark', 'light', 'colors', 'font', 'density', 'ui'],
     path: '/settings?section=appearance',
-  })
-  
+  });
+
   items.push({
     id: 'appearance-theme',
     section: translations.sections?.appearance || 'Appearance',
@@ -289,8 +289,8 @@ export function buildSearchableItems(
     description: translations.appearance?.themeDescription,
     keywords: ['theme', 'dark mode', 'light mode', 'system'],
     path: '/settings?section=appearance&focus=theme',
-  })
-  
+  });
+
   items.push({
     id: 'appearance-density',
     section: translations.sections?.appearance || 'Appearance',
@@ -298,8 +298,8 @@ export function buildSearchableItems(
     description: translations.appearance?.uiDensityDescription,
     keywords: ['density', 'spacing', 'compact', 'comfortable', 'spacious'],
     path: '/settings?section=appearance&focus=density',
-  })
-  
+  });
+
   // Notifications
   items.push({
     id: 'notifications',
@@ -308,8 +308,8 @@ export function buildSearchableItems(
     description: translations.notifications?.subtitle,
     keywords: ['notifications', 'email', 'alerts', 'browser', 'desktop'],
     path: '/settings?section=notifications',
-  })
-  
+  });
+
   // API & Integrations
   items.push({
     id: 'api',
@@ -318,8 +318,8 @@ export function buildSearchableItems(
     description: translations.api?.description,
     keywords: ['api', 'gemini', 'ai', 'integrations', 'database'],
     path: '/settings?section=api',
-  })
-  
+  });
+
   items.push({
     id: 'api-gemini',
     section: translations.sections?.api || 'API & Integrations',
@@ -327,8 +327,8 @@ export function buildSearchableItems(
     description: 'Configure Gemini AI API settings',
     keywords: ['gemini', 'ai', 'api key', 'artificial intelligence'],
     path: '/settings?section=api&focus=gemini',
-  })
-  
+  });
+
   // System Preferences
   items.push({
     id: 'system',
@@ -337,8 +337,8 @@ export function buildSearchableItems(
     description: translations.system?.subtitle,
     keywords: ['system', 'company', 'backup', 'limits', 'configuration'],
     path: '/settings?section=system',
-  })
-  
+  });
+
   items.push({
     id: 'system-company',
     section: translations.sections?.system || 'System Preferences',
@@ -346,8 +346,8 @@ export function buildSearchableItems(
     description: 'Configure company details and branding',
     keywords: ['company', 'logo', 'name', 'timezone', 'fiscal year'],
     path: '/settings?section=system&focus=company',
-  })
-  
+  });
+
   items.push({
     id: 'system-backup',
     section: translations.sections?.system || 'System Preferences',
@@ -355,7 +355,7 @@ export function buildSearchableItems(
     description: 'Configure automatic backup settings',
     keywords: ['backup', 'restore', 'retention', 'schedule'],
     path: '/settings?section=system&focus=backup',
-  })
-  
-  return items
+  });
+
+  return items;
 }

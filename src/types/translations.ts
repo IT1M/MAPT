@@ -14,7 +14,10 @@ export type TranslationKeys = RecursiveKeyOf<typeof enMessages>;
  * Helper type to recursively extract keys from nested objects
  */
 type RecursiveKeyOf<TObj extends object> = {
-  [TKey in keyof TObj & (string | number)]: RecursiveKeyOfHandleValue<TObj[TKey], `${TKey}`>;
+  [TKey in keyof TObj & (string | number)]: RecursiveKeyOfHandleValue<
+    TObj[TKey],
+    `${TKey}`
+  >;
 }[keyof TObj & (string | number)];
 
 type RecursiveKeyOfInner<TObj extends object> = {
@@ -24,11 +27,14 @@ type RecursiveKeyOfInner<TObj extends object> = {
   >;
 }[keyof TObj & (string | number)];
 
-type RecursiveKeyOfHandleValue<TValue, Text extends string> = TValue extends any[]
+type RecursiveKeyOfHandleValue<
+  TValue,
+  Text extends string,
+> = TValue extends any[]
   ? Text
   : TValue extends object
-  ? Text | `${Text}${RecursiveKeyOfInner<TValue>}`
-  : Text;
+    ? Text | `${Text}${RecursiveKeyOfInner<TValue>}`
+    : Text;
 
 /**
  * Type for translation namespaces
@@ -126,12 +132,13 @@ export type TranslateFunction = <Key extends TranslationKeys>(
 /**
  * Utility type to extract nested value type from translation key
  */
-export type TranslationValue<K extends string> = K extends keyof typeof enMessages
-  ? typeof enMessages[K]
-  : K extends `${infer Namespace}.${infer Rest}`
-  ? Namespace extends keyof typeof enMessages
-    ? Rest extends keyof typeof enMessages[Namespace]
-      ? typeof enMessages[Namespace][Rest]
-      : any
-    : any
-  : any;
+export type TranslationValue<K extends string> =
+  K extends keyof typeof enMessages
+    ? (typeof enMessages)[K]
+    : K extends `${infer Namespace}.${infer Rest}`
+      ? Namespace extends keyof typeof enMessages
+        ? Rest extends keyof (typeof enMessages)[Namespace]
+          ? (typeof enMessages)[Namespace][Rest]
+          : any
+        : any
+      : any;

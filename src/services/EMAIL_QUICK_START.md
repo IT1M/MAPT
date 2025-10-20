@@ -29,6 +29,7 @@ npm run test:email
 ```
 
 You should see:
+
 ```
 ✅ Email configuration is valid
 ✅ Welcome email sent successfully
@@ -39,14 +40,14 @@ You should see:
 ### Step 3: Send Your First Email
 
 ```typescript
-import { sendWelcomeEmail } from '@/services/email'
+import { sendWelcomeEmail } from '@/services/email';
 
 // In your registration handler
 await sendWelcomeEmail('user@example.com', {
   userName: 'John Doe',
   email: 'user@example.com',
   loginUrl: 'https://yourapp.com/login',
-})
+});
 ```
 
 That's it! 🎉
@@ -57,39 +58,39 @@ That's it! 🎉
 
 ```typescript
 // src/app/api/auth/register/route.ts
-import { sendWelcomeEmail } from '@/services/email'
+import { sendWelcomeEmail } from '@/services/email';
 
 export async function POST(request: NextRequest) {
-  const newUser = await createUser(data)
-  
+  const newUser = await createUser(data);
+
   // Send welcome email (non-blocking)
   sendWelcomeEmail(newUser.email, {
     userName: newUser.name,
     email: newUser.email,
     loginUrl: `${process.env.NEXT_PUBLIC_APP_URL}/login`,
-  }).catch(console.error)
-  
-  return apiResponse.success({ user: newUser })
+  }).catch(console.error);
+
+  return apiResponse.success({ user: newUser });
 }
 ```
 
 ### Send Password Reset Email
 
 ```typescript
-import { sendPasswordResetEmail } from '@/services/email'
+import { sendPasswordResetEmail } from '@/services/email';
 
-const token = generateResetToken()
+const token = generateResetToken();
 await sendPasswordResetEmail(user.email, {
   userName: user.name,
   resetUrl: `${APP_URL}/reset-password?token=${token}`,
   expiresAt: new Date(Date.now() + 60 * 60 * 1000), // 1 hour
-})
+});
 ```
 
 ### Send Security Alert
 
 ```typescript
-import { sendSecurityAlertEmail } from '@/services/email'
+import { sendSecurityAlertEmail } from '@/services/email';
 
 await sendSecurityAlertEmail(user.email, {
   userName: user.name,
@@ -99,12 +100,13 @@ await sendSecurityAlertEmail(user.email, {
   ipAddress: '192.168.1.1',
   location: 'Riyadh, Saudi Arabia',
   timestamp: new Date(),
-})
+});
 ```
 
 ## 📊 Monitor Email Delivery
 
 Access the analytics dashboard at:
+
 ```
 https://yourapp.com/admin/email-analytics
 ```
@@ -147,6 +149,7 @@ Use an [App Password](https://myaccount.google.com/apppasswords) instead of your
 7. ✅ Report Ready
 
 All templates are professionally designed with:
+
 - Responsive HTML
 - Plain text fallback
 - Mobile-friendly

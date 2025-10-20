@@ -1,23 +1,28 @@
-'use client'
+'use client';
 
-import { useTranslations } from '@/hooks/useTranslations'
-import { FileSpreadsheet, CheckCircle2, AlertTriangle, Settings } from 'lucide-react'
+import { useTranslations } from '@/hooks/useTranslations';
+import {
+  FileSpreadsheet,
+  CheckCircle2,
+  AlertTriangle,
+  Settings,
+} from 'lucide-react';
 import type {
   ImportFile,
   ParsedData,
   ColumnMapping,
   ValidationError,
   ImportOptions,
-} from '@/types/import'
+} from '@/types/import';
 
 interface ReviewStepProps {
-  importFile: ImportFile
-  parsedData: ParsedData
-  columnMapping: ColumnMapping
-  validationErrors: ValidationError[]
-  importOptions: ImportOptions
-  onConfirm: () => void
-  onBack: () => void
+  importFile: ImportFile;
+  parsedData: ParsedData;
+  columnMapping: ColumnMapping;
+  validationErrors: ValidationError[];
+  importOptions: ImportOptions;
+  onConfirm: () => void;
+  onBack: () => void;
 }
 
 export default function ReviewStep({
@@ -29,15 +34,19 @@ export default function ReviewStep({
   onConfirm,
   onBack,
 }: ReviewStepProps) {
-  const t = useTranslations('import.review')
+  const t = useTranslations('import.review');
 
-  const validRows = parsedData.rows.length - validationErrors.length
+  const validRows = parsedData.rows.length - validationErrors.length;
 
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">{t('title')}</h3>
-        <p className="text-sm text-gray-600 dark:text-gray-400">{t('description')}</p>
+        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+          {t('title')}
+        </h3>
+        <p className="text-sm text-gray-600 dark:text-gray-400">
+          {t('description')}
+        </p>
       </div>
 
       {/* File Info */}
@@ -52,25 +61,33 @@ export default function ReviewStep({
             </h4>
             <dl className="grid grid-cols-2 gap-4">
               <div>
-                <dt className="text-xs text-gray-500 dark:text-gray-400">{t('fileName')}</dt>
+                <dt className="text-xs text-gray-500 dark:text-gray-400">
+                  {t('fileName')}
+                </dt>
                 <dd className="text-sm font-medium text-gray-900 dark:text-white mt-1">
                   {importFile.name}
                 </dd>
               </div>
               <div>
-                <dt className="text-xs text-gray-500 dark:text-gray-400">{t('fileSize')}</dt>
+                <dt className="text-xs text-gray-500 dark:text-gray-400">
+                  {t('fileSize')}
+                </dt>
                 <dd className="text-sm font-medium text-gray-900 dark:text-white mt-1">
                   {(importFile.size / 1024).toFixed(2)} KB
                 </dd>
               </div>
               <div>
-                <dt className="text-xs text-gray-500 dark:text-gray-400">{t('totalRows')}</dt>
+                <dt className="text-xs text-gray-500 dark:text-gray-400">
+                  {t('totalRows')}
+                </dt>
                 <dd className="text-sm font-medium text-gray-900 dark:text-white mt-1">
                   {parsedData.rows.length}
                 </dd>
               </div>
               <div>
-                <dt className="text-xs text-gray-500 dark:text-gray-400">{t('fileType')}</dt>
+                <dt className="text-xs text-gray-500 dark:text-gray-400">
+                  {t('fileType')}
+                </dt>
                 <dd className="text-sm font-medium text-gray-900 dark:text-white mt-1">
                   {importFile.type.toUpperCase()}
                 </dd>
@@ -92,13 +109,17 @@ export default function ReviewStep({
             </h4>
             <dl className="grid grid-cols-2 gap-4">
               <div>
-                <dt className="text-xs text-gray-500 dark:text-gray-400">{t('validRows')}</dt>
+                <dt className="text-xs text-gray-500 dark:text-gray-400">
+                  {t('validRows')}
+                </dt>
                 <dd className="text-2xl font-bold text-green-600 dark:text-green-400 mt-1">
                   {validRows}
                 </dd>
               </div>
               <div>
-                <dt className="text-xs text-gray-500 dark:text-gray-400">{t('invalidRows')}</dt>
+                <dt className="text-xs text-gray-500 dark:text-gray-400">
+                  {t('invalidRows')}
+                </dt>
                 <dd className="text-2xl font-bold text-red-600 dark:text-red-400 mt-1">
                   {validationErrors.length}
                 </dd>
@@ -115,7 +136,7 @@ export default function ReviewStep({
         </h4>
         <div className="grid grid-cols-2 gap-4">
           {Object.entries(columnMapping).map(([field, column]) => {
-            if (!column) return null
+            if (!column) return null;
             return (
               <div key={field} className="flex items-center justify-between">
                 <span className="text-sm text-gray-600 dark:text-gray-400">
@@ -125,7 +146,7 @@ export default function ReviewStep({
                   {column}
                 </span>
               </div>
-            )
+            );
           })}
         </div>
       </div>
@@ -205,5 +226,5 @@ export default function ReviewStep({
         </button>
       </div>
     </div>
-  )
+  );
 }

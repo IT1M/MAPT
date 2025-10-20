@@ -1,19 +1,19 @@
-'use client'
+'use client';
 
-import { useEffect } from 'react'
-import { PageErrorState } from '@/components/ui/ErrorState'
+import { useEffect } from 'react';
+import { PageErrorState } from '@/components/ui/ErrorState';
 
 export default function Error({
   error,
   reset,
 }: {
-  error: Error & { digest?: string }
-  reset: () => void
+  error: Error & { digest?: string };
+  reset: () => void;
 }) {
   useEffect(() => {
     // Log error to console in development
     if (process.env.NODE_ENV === 'development') {
-      console.error('Error boundary caught:', error)
+      console.error('Error boundary caught:', error);
     }
 
     // Log to monitoring service in production
@@ -24,18 +24,26 @@ export default function Error({
           message: error.message,
           digest: error.digest,
           stack: error.stack,
-          userAgent: typeof window !== 'undefined' ? window.navigator.userAgent : 'unknown',
+          userAgent:
+            typeof window !== 'undefined'
+              ? window.navigator.userAgent
+              : 'unknown',
           url: typeof window !== 'undefined' ? window.location.href : 'unknown',
         };
 
-        const existingLogs = JSON.parse(localStorage.getItem('error-logs') || '[]');
+        const existingLogs = JSON.parse(
+          localStorage.getItem('error-logs') || '[]'
+        );
         existingLogs.push(errorLog);
-        localStorage.setItem('error-logs', JSON.stringify(existingLogs.slice(-50)));
+        localStorage.setItem(
+          'error-logs',
+          JSON.stringify(existingLogs.slice(-50))
+        );
       } catch (loggingError) {
         console.error('Failed to log error:', loggingError);
       }
     }
-  }, [error])
+  }, [error]);
 
   return (
     <PageErrorState
@@ -46,5 +54,5 @@ export default function Error({
       showDetails={process.env.NODE_ENV === 'development'}
       showHomeButton={true}
     />
-  )
+  );
 }

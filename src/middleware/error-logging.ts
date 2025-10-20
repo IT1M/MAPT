@@ -1,6 +1,6 @@
 /**
  * API Error Logging Middleware
- * 
+ *
  * Middleware for logging API errors with request context
  */
 
@@ -76,7 +76,7 @@ export function withErrorLogging<T = any>(
           message: error instanceof Error ? error.message : 'Unknown error',
           requestId,
         },
-        { 
+        {
           status: 500,
           headers: {
             'X-Request-ID': requestId,
@@ -131,7 +131,7 @@ export function createErrorResponse(
       message: errorMessage,
       ...(requestId && { requestId }),
     },
-    { 
+    {
       status,
       headers: {
         ...(requestId && { 'X-Request-ID': requestId }),

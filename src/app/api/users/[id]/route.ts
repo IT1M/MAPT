@@ -1,11 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@/services/auth'
-import { prisma } from '@/services/prisma'
-import { API_ERROR_CODES } from '@/utils/constants'
-import { hash } from 'bcrypt'
-import { z } from 'zod'
-import { UserRole } from '@prisma/client'
-import { createAuditLog } from '@/utils/audit'
+import { NextRequest, NextResponse } from 'next/server';
+import { auth } from '@/services/auth';
+import { prisma } from '@/services/prisma';
+import { API_ERROR_CODES } from '@/utils/constants';
+import { hash } from 'bcrypt';
+import { z } from 'zod';
+import { UserRole } from '@prisma/client';
+import { createAuditLog } from '@/utils/audit';
 
 /**
  * Validation schema for user update
@@ -13,9 +13,12 @@ import { createAuditLog } from '@/utils/audit'
 const updateUserSchema = z.object({
   name: z.string().min(1, 'Name is required').optional(),
   email: z.string().email('Invalid email address').optional(),
-  password: z.string().min(8, 'Password must be at least 8 characters').optional(),
+  password: z
+    .string()
+    .min(8, 'Password must be at least 8 characters')
+    .optional(),
   role: z.nativeEnum(UserRole).optional(),
-})
+});
 
 /**
  * GET /api/users/[id]
@@ -25,10 +28,10 @@ export async function GET(
   request: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
-  const params = await context.params
+  const params = await context.params;
   try {
     // Check authentication
-    const session = await auth()
+    const session = await auth();
     if (!session?.user) {
       return NextResponse.json(
         {
@@ -39,7 +42,7 @@ export async function GET(
           },
         },
         { status: 401 }
-      )
+      );
     }
 
     // Check permissions - only Admin can manage users
@@ -53,10 +56,10 @@ export async function GET(
           },
         },
         { status: 403 }
-      )
+      );
     }
 
-    const { id } = params
+    const { id } = params;
 
     // Fetch user
     const user = await prisma.user.findUnique({
@@ -69,7 +72,7 @@ export async function GET(
         createdAt: true,
         updatedAt: true,
       },
-    })
+    });
 
     if (!user) {
       return NextResponse.json(
@@ -81,15 +84,15 @@ export async function GET(
           },
         },
         { status: 404 }
-      )
+      );
     }
 
     return NextResponse.json({
       success: true,
       data: user,
-    })
+    });
   } catch (error) {
-    console.error('Error fetching user:', error)
+    console.error('Error fetching user:', error);
     return NextResponse.json(
       {
         success: false,
@@ -99,7 +102,7 @@ export async function GET(
         },
       },
       { status: 500 }
-    )
+    );
   }
 }
 
@@ -111,10 +114,10 @@ export async function PUT(
   request: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
-  const params = await context.params
+  const params = await context.params;
   try {
     // Check authentication
-    const session = await auth()
+    const session = await auth();
     if (!session?.user) {
       return NextResponse.json(
         {
@@ -125,7 +128,7 @@ export async function PUT(
           },
         },
         { status: 401 }
-      )
+      );
     }
 
     // Check permissions - only Admin can manage users
@@ -139,15 +142,15 @@ export async function PUT(
           },
         },
         { status: 403 }
-      )
+      );
     }
 
-    const { id } = params
+    const { id } = params;
 
     // Check if user exists
     const existingUser = await prisma.user.findUnique({
       where: { id },
-    })
+    });
 
     if (!existingUser) {
       return NextResponse.json(
@@ -159,12 +162,12 @@ export async function PUT(
           },
         },
         { status: 404 }
-      )
+      );
     }
 
     // Parse and validate request body
-    const body = await request.json()
-    const validation = updateUserSchema.safeParse(body)
+    const body = await request.json();
+    const validation = updateUserSchema.safeParse(body);
 
     if (!validation.success) {
       return NextResponse.json(
@@ -177,16 +180,16 @@ export async function PUT(
           },
         },
         { status: 400 }
-      )
+      );
     }
 
-    const { name, email, password, role } = validation.data
+    const { name, email, password, role } = validation.data;
 
     // Check if email is being changed and if it's already taken
     if (email && email !== existingUser.email) {
       const emailTaken = await prisma.user.findUnique({
         where: { email },
-      })
+      });
 
       if (emailTaken) {
         return NextResponse.json(
@@ -198,17 +201,17 @@ export async function PUT(
             },
           },
           { status: 409 }
-        )
+        );
       }
     }
 
     // Prepare update data
-    const updateData: any = {}
-    if (name !== undefined) updateData.name = name
-    if (email !== undefined) updateData.email = email
-    if (role !== undefined) updateData.role = role
+    const updateData: any = {};
+    if (name !== undefined) updateData.name = name;
+    if (email !== undefined) updateData.email = email;
+    if (role !== undefined) updateData.role = role;
     if (password) {
-      updateData.passwordHash = await hash(password, 12)
+      updateData.passwordHash = await hash(password, 12);
     }
 
     // Store before state for audit
@@ -216,7 +219,7 @@ export async function PUT(
       name: existingUser.name,
       email: existingUser.email,
       role: existingUser.role,
-    }
+    };
 
     // Update user
     const user = await prisma.user.update({
@@ -230,14 +233,14 @@ export async function PUT(
         createdAt: true,
         updatedAt: true,
       },
-    })
+    });
 
     // Store after state for audit
     const afterState = {
       name: user.name,
       email: user.email,
       role: user.role,
-    }
+    };
 
     // Create audit log
     await createAuditLog({
@@ -250,17 +253,20 @@ export async function PUT(
         after: afterState,
       },
       metadata: {
-        ipAddress: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || undefined,
+        ipAddress:
+          request.headers.get('x-forwarded-for') ||
+          request.headers.get('x-real-ip') ||
+          undefined,
         userAgent: request.headers.get('user-agent') || undefined,
       },
-    })
+    });
 
     return NextResponse.json({
       success: true,
       data: user,
-    })
+    });
   } catch (error) {
-    console.error('Error updating user:', error)
+    console.error('Error updating user:', error);
     return NextResponse.json(
       {
         success: false,
@@ -270,7 +276,7 @@ export async function PUT(
         },
       },
       { status: 500 }
-    )
+    );
   }
 }
 
@@ -282,10 +288,10 @@ export async function DELETE(
   request: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
-  const params = await context.params
+  const params = await context.params;
   try {
     // Check authentication
-    const session = await auth()
+    const session = await auth();
     if (!session?.user) {
       return NextResponse.json(
         {
@@ -296,7 +302,7 @@ export async function DELETE(
           },
         },
         { status: 401 }
-      )
+      );
     }
 
     // Check permissions - only Admin can manage users
@@ -310,10 +316,10 @@ export async function DELETE(
           },
         },
         { status: 403 }
-      )
+      );
     }
 
-    const { id } = params
+    const { id } = params;
 
     // Prevent user from deleting themselves
     if (session.user.id === id) {
@@ -326,13 +332,13 @@ export async function DELETE(
           },
         },
         { status: 400 }
-      )
+      );
     }
 
     // Check if user exists
     const existingUser = await prisma.user.findUnique({
       where: { id },
-    })
+    });
 
     if (!existingUser) {
       return NextResponse.json(
@@ -344,7 +350,7 @@ export async function DELETE(
           },
         },
         { status: 404 }
-      )
+      );
     }
 
     // Store user data for audit before deletion
@@ -352,12 +358,12 @@ export async function DELETE(
       name: existingUser.name,
       email: existingUser.email,
       role: existingUser.role,
-    }
+    };
 
     // Delete user
     await prisma.user.delete({
       where: { id },
-    })
+    });
 
     // Create audit log
     await createAuditLog({
@@ -369,17 +375,20 @@ export async function DELETE(
         deleted: deletedUserData,
       },
       metadata: {
-        ipAddress: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || undefined,
+        ipAddress:
+          request.headers.get('x-forwarded-for') ||
+          request.headers.get('x-real-ip') ||
+          undefined,
         userAgent: request.headers.get('user-agent') || undefined,
       },
-    })
+    });
 
     return NextResponse.json({
       success: true,
       message: 'User deleted successfully',
-    })
+    });
   } catch (error) {
-    console.error('Error deleting user:', error)
+    console.error('Error deleting user:', error);
     return NextResponse.json(
       {
         success: false,
@@ -389,6 +398,6 @@ export async function DELETE(
         },
       },
       { status: 500 }
-    )
+    );
   }
 }

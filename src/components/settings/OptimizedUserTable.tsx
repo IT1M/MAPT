@@ -1,7 +1,7 @@
-'use client'
+'use client';
 
-import React from 'react'
-import { UserTable, type UserTableProps } from './UserTable'
+import React from 'react';
+import { UserTable, type UserTableProps } from './UserTable';
 
 /**
  * Optimized UserTable with React.memo to prevent unnecessary re-renders
@@ -18,7 +18,7 @@ export const OptimizedUserTable = React.memo<UserTableProps>(
       prevProps.isLoading === nextProps.isLoading &&
       // Deep comparison for users array (only if lengths match)
       prevProps.users.every((user, index) => {
-        const nextUser = nextProps.users[index]
+        const nextUser = nextProps.users[index];
         return (
           user.id === nextUser?.id &&
           user.name === nextUser?.name &&
@@ -26,10 +26,10 @@ export const OptimizedUserTable = React.memo<UserTableProps>(
           user.role === nextUser?.role &&
           user.isActive === nextUser?.isActive &&
           user.lastLogin?.getTime() === nextUser?.lastLogin?.getTime()
-        )
+        );
       })
-    )
+    );
   }
-)
+);
 
-OptimizedUserTable.displayName = 'OptimizedUserTable'
+OptimizedUserTable.displayName = 'OptimizedUserTable';

@@ -1,21 +1,25 @@
-'use client'
+'use client';
 
-import React, { useState, useEffect } from 'react'
-import { useTranslations } from '@/hooks/useTranslations'
-import { FilterGroup, FilterFieldConfig, SavedFilterData } from '@/types/filters'
-import { FilterBuilder } from './FilterBuilder'
-import { SavedFiltersManager } from './SavedFiltersManager'
-import { FilterSharing } from './FilterSharing'
-import { Button } from '@/components/ui/button'
-import { toast } from '@/utils/toast'
+import React, { useState, useEffect } from 'react';
+import { useTranslations } from '@/hooks/useTranslations';
+import {
+  FilterGroup,
+  FilterFieldConfig,
+  SavedFilterData,
+} from '@/types/filters';
+import { FilterBuilder } from './FilterBuilder';
+import { SavedFiltersManager } from './SavedFiltersManager';
+import { FilterSharing } from './FilterSharing';
+import { Button } from '@/components/ui/button';
+import { toast } from '@/utils/toast';
 
 interface AdvancedFilterPanelProps {
-  currentPage: string
-  fieldConfigs: FilterFieldConfig[]
-  initialFilterGroup?: FilterGroup
-  onApply: (filterGroup: FilterGroup) => void
-  isOpen: boolean
-  onToggle: () => void
+  currentPage: string;
+  fieldConfigs: FilterFieldConfig[];
+  initialFilterGroup?: FilterGroup;
+  onApply: (filterGroup: FilterGroup) => void;
+  isOpen: boolean;
+  onToggle: () => void;
 }
 
 export function AdvancedFilterPanel({
@@ -26,53 +30,61 @@ export function AdvancedFilterPanel({
   isOpen,
   onToggle,
 }: AdvancedFilterPanelProps) {
-  const t = useTranslations('filters')
+  const t = useTranslations('filters');
   const [filterGroup, setFilterGroup] = useState<FilterGroup>(
     initialFilterGroup || { filters: [], logic: 'AND' }
-  )
-  const [savedFilters, setSavedFilters] = useState<SavedFilterData[]>([])
-  const [activeTab, setActiveTab] = useState<'builder' | 'saved' | 'share'>('builder')
-  const [isLoading, setIsLoading] = useState(false)
-  const [filterName, setFilterName] = useState('My Filter')
+  );
+  const [savedFilters, setSavedFilters] = useState<SavedFilterData[]>([]);
+  const [activeTab, setActiveTab] = useState<'builder' | 'saved' | 'share'>(
+    'builder'
+  );
+  const [isLoading, setIsLoading] = useState(false);
+  const [filterName, setFilterName] = useState('My Filter');
 
   // Load saved filters on mount
   useEffect(() => {
-    loadSavedFilters()
-  }, [currentPage])
+    loadSavedFilters();
+  }, [currentPage]);
 
   // Load default filter if exists
   useEffect(() => {
-    const defaultFilter = savedFilters.find(f => f.isDefault && f.page === currentPage)
+    const defaultFilter = savedFilters.find(
+      (f) => f.isDefault && f.page === currentPage
+    );
     if (defaultFilter && filterGroup.filters.length === 0) {
-      setFilterGroup(defaultFilter.filters)
+      setFilterGroup(defaultFilter.filters);
     }
-  }, [savedFilters, currentPage])
+  }, [savedFilters, currentPage]);
 
   const loadSavedFilters = async () => {
     try {
-      const response = await fetch(`/api/filters?page=${currentPage}`)
+      const response = await fetch(`/api/filters?page=${currentPage}`);
       if (response.ok) {
-        const data = await response.json()
-        setSavedFilters(data.filters || [])
+        const data = await response.json();
+        setSavedFilters(data.filters || []);
       }
     } catch (error) {
-      console.error('Failed to load saved filters:', error)
+      console.error('Failed to load saved filters:', error);
     }
-  }
+  };
 
   const handleApply = () => {
-    onApply(filterGroup)
-    toast.success(t('success.filtersApplied'))
-  }
+    onApply(filterGroup);
+    toast.success(t('success.filtersApplied'));
+  };
 
   const handleReset = () => {
-    setFilterGroup({ filters: [], logic: 'AND' })
-    onApply({ filters: [], logic: 'AND' })
-    toast.success(t('success.filtersReset'))
-  }
+    setFilterGroup({ filters: [], logic: 'AND' });
+    onApply({ filters: [], logic: 'AND' });
+    toast.success(t('success.filtersReset'));
+  };
 
-  const handleSaveFilter = async (name: string, filters: FilterGroup, isDefault: boolean) => {
-    setIsLoading(true)
+  const handleSaveFilter = async (
+    name: string,
+    filters: FilterGroup,
+    isDefault: boolean
+  ) => {
+    setIsLoading(true);
     try {
       const response = await fetch('/api/filters', {
         method: 'POST',
@@ -83,67 +95,67 @@ export function AdvancedFilterPanel({
           page: currentPage,
           isDefault,
         }),
-      })
+      });
 
       if (!response.ok) {
-        throw new Error('Failed to save filter')
+        throw new Error('Failed to save filter');
       }
 
-      await loadSavedFilters()
-      setFilterName(name)
+      await loadSavedFilters();
+      setFilterName(name);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleDeleteFilter = async (filterId: string) => {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
       const response = await fetch(`/api/filters/${filterId}`, {
         method: 'DELETE',
-      })
+      });
 
       if (!response.ok) {
-        throw new Error('Failed to delete filter')
+        throw new Error('Failed to delete filter');
       }
 
-      await loadSavedFilters()
+      await loadSavedFilters();
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleSetDefault = async (filterId: string) => {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
       const response = await fetch(`/api/filters/${filterId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ isDefault: true }),
-      })
+      });
 
       if (!response.ok) {
-        throw new Error('Failed to set default filter')
+        throw new Error('Failed to set default filter');
       }
 
-      await loadSavedFilters()
+      await loadSavedFilters();
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleLoadFilter = (filters: FilterGroup) => {
-    setFilterGroup(filters)
-    setActiveTab('builder')
-  }
+    setFilterGroup(filters);
+    setActiveTab('builder');
+  };
 
   const handleImportFilter = (filters: FilterGroup, name: string) => {
-    setFilterGroup(filters)
-    setFilterName(name)
-    setActiveTab('builder')
-  }
+    setFilterGroup(filters);
+    setFilterName(name);
+    setActiveTab('builder');
+  };
 
-  const activeFilterCount = filterGroup.filters.length
+  const activeFilterCount = filterGroup.filters.length;
 
   return (
     <div
@@ -187,8 +199,18 @@ export function AdvancedFilterPanel({
                 className="md:hidden p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
                 aria-label={t('close')}
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
@@ -267,5 +289,5 @@ export function AdvancedFilterPanel({
         </div>
       </div>
     </div>
-  )
+  );
 }

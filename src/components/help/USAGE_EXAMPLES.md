@@ -9,6 +9,7 @@ This document provides practical examples of how to use the keyboard shortcuts s
 Global shortcuts are automatically available throughout the application. No additional setup required!
 
 **Available Global Shortcuts**:
+
 - `Ctrl/Cmd + K` - Open global search
 - `Ctrl/Cmd + /` - Show keyboard shortcuts help
 - `Shift + ?` - Show help
@@ -32,7 +33,7 @@ import { useDataLogKeyboardShortcuts } from '@/hooks/usePageKeyboardShortcuts'
 export default function DataLogPage() {
   const [showFilters, setShowFilters] = useState(false)
   const [showExport, setShowExport] = useState(false)
-  
+
   // Add keyboard shortcuts
   useDataLogKeyboardShortcuts({
     onFilter: () => setShowFilters(true),
@@ -43,7 +44,7 @@ export default function DataLogPage() {
     onSelectItem: () => openSelectedItem(),
     enabled: true,
   })
-  
+
   return (
     // ... your page content
   )
@@ -51,6 +52,7 @@ export default function DataLogPage() {
 ```
 
 **Shortcuts Added**:
+
 - `F` - Open filters
 - `E` - Export data
 - `R` - Refresh data
@@ -66,14 +68,14 @@ import { useAnalyticsKeyboardShortcuts } from '@/hooks/usePageKeyboardShortcuts'
 export default function AnalyticsPage() {
   const [showFilters, setShowFilters] = useState(false)
   const [showExport, setShowExport] = useState(false)
-  
+
   useAnalyticsKeyboardShortcuts({
     onFilter: () => setShowFilters(true),
     onExport: () => setShowExport(true),
     onRefresh: () => refetchData(),
     enabled: true,
   })
-  
+
   return (
     // ... your page content
   )
@@ -87,14 +89,14 @@ import { useDataEntryKeyboardShortcuts } from '@/hooks/usePageKeyboardShortcuts'
 
 export default function DataEntryPage() {
   const [form, setForm] = useState(initialForm)
-  
+
   useDataEntryKeyboardShortcuts({
     onNewItem: () => setForm(initialForm),
     onSave: () => handleSubmit(),
     onClear: () => setForm(initialForm),
     enabled: true,
   })
-  
+
   return (
     // ... your page content
   )
@@ -102,6 +104,7 @@ export default function DataEntryPage() {
 ```
 
 **Shortcuts Added**:
+
 - `Ctrl/Cmd + N` - Create new item
 - `Ctrl/Cmd + S` - Save form
 - `Escape` - Clear form
@@ -121,7 +124,7 @@ export default function AuditPage() {
     onSelectItem: () => viewLogDetails(),
     enabled: true,
   })
-  
+
   return (
     // ... your page content
   )
@@ -138,7 +141,7 @@ import { useTableKeyboardShortcuts } from '@/hooks/usePageKeyboardShortcuts'
 function MyTableComponent() {
   const [selectedRow, setSelectedRow] = useState(0)
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
-  
+
   useTableKeyboardShortcuts({
     onNavigateUp: () => setSelectedRow(prev => Math.max(0, prev - 1)),
     onNavigateDown: () => setSelectedRow(prev => Math.min(data.length - 1, prev + 1)),
@@ -146,7 +149,7 @@ function MyTableComponent() {
     onSelectAll: () => setSelectedIds(new Set(data.map(item => item.id))),
     enabled: true,
   })
-  
+
   return (
     // ... table content
   )
@@ -154,6 +157,7 @@ function MyTableComponent() {
 ```
 
 **Shortcuts Added**:
+
 - `↑` - Navigate up
 - `↓` - Navigate down
 - `Enter` - Select/open item
@@ -169,14 +173,14 @@ import { useFormKeyboardShortcuts } from '@/hooks/usePageKeyboardShortcuts'
 function MyFormComponent() {
   const [formData, setFormData] = useState(initialData)
   const [isDirty, setIsDirty] = useState(false)
-  
+
   useFormKeyboardShortcuts({
     onSave: () => handleSubmit(),
     onCancel: () => handleCancel(),
     onReset: () => setFormData(initialData),
     enabled: true,
   })
-  
+
   return (
     // ... form content
   )
@@ -184,6 +188,7 @@ function MyFormComponent() {
 ```
 
 **Shortcuts Added**:
+
 - `Ctrl/Cmd + S` - Save form
 - `Escape` - Cancel
 - `Ctrl/Cmd + R` - Reset form
@@ -226,7 +231,7 @@ function MyComponent() {
     ],
     enabled: true,
   })
-  
+
   return (
     // ... component content
   )
@@ -242,7 +247,7 @@ Enable/disable shortcuts based on conditions:
 ```tsx
 function MyComponent() {
   const [isEditing, setIsEditing] = useState(false)
-  
+
   // Only enable save shortcut when editing
   useKeyboardShortcuts({
     shortcuts: [
@@ -258,7 +263,7 @@ function MyComponent() {
     ],
     enabled: isEditing, // Only active when editing
   })
-  
+
   return (
     // ... component content
   )
@@ -277,14 +282,14 @@ function ComplexPage() {
     onNavigateDown: () => selectNext(),
     enabled: true,
   })
-  
+
   // Form shortcuts
   useFormKeyboardShortcuts({
     onSave: () => handleSave(),
     onCancel: () => handleCancel(),
     enabled: isEditing,
   })
-  
+
   // Custom shortcuts
   useKeyboardShortcuts({
     shortcuts: [
@@ -298,7 +303,7 @@ function ComplexPage() {
     ],
     enabled: hasSelection,
   })
-  
+
   return (
     // ... page content
   )
@@ -327,10 +332,10 @@ useKeyboardShortcuts({
       description: 'Go to profile',
       category: 'Navigation',
       preventDefault: true,
-    }
+    },
   ],
   enabled: true,
-})
+});
 ```
 
 **Usage**: Press `G` then `N` within 1 second to navigate to notifications.
@@ -340,6 +345,7 @@ useKeyboardShortcuts({
 ### 1. Don't Override Browser Shortcuts
 
 Avoid common browser shortcuts:
+
 - ❌ `Ctrl+T` (new tab)
 - ❌ `Ctrl+W` (close tab)
 - ❌ `Ctrl+N` (new window) - unless in specific context
@@ -350,6 +356,7 @@ Avoid common browser shortcuts:
 ### 2. Use Consistent Patterns
 
 Follow established patterns:
+
 - `G + X` for navigation (Gmail-style)
 - `F` for filters
 - `E` for export
@@ -362,10 +369,7 @@ Follow established patterns:
 Show shortcuts in tooltips and buttons:
 
 ```tsx
-<Button
-  onClick={handleSave}
-  title="Save (Ctrl+S)"
->
+<Button onClick={handleSave} title="Save (Ctrl+S)">
   Save
 </Button>
 ```
@@ -387,13 +391,14 @@ export const GLOBAL_SHORTCUTS: GlobalShortcutConfig[] = [
     category: 'Actions',
     preventDefault: true,
     pageSpecific: ['my-page'],
-  }
-]
+  },
+];
 ```
 
 ### 5. Test on Multiple Platforms
 
 Always test shortcuts on:
+
 - Windows (Ctrl key)
 - macOS (Cmd key)
 - Linux (Ctrl key)
@@ -424,10 +429,10 @@ useKeyboardShortcuts({
 If platform detection fails:
 
 ```tsx
-import { isMac, getModifierKey } from '@/hooks/useKeyboardShortcuts'
+import { isMac, getModifierKey } from '@/hooks/useKeyboardShortcuts';
 
-const modKey = getModifierKey() // 'Ctrl' or 'Cmd'
-const isMacOS = isMac() // true or false
+const modKey = getModifierKey(); // 'Ctrl' or 'Cmd'
+const isMacOS = isMac(); // true or false
 ```
 
 ## Testing
@@ -443,12 +448,12 @@ const isMacOS = isMac() // true or false
 ### Automated Testing
 
 ```tsx
-import { renderHook } from '@testing-library/react'
-import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts'
+import { renderHook } from '@testing-library/react';
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 
 test('keyboard shortcut triggers callback', () => {
-  const callback = jest.fn()
-  
+  const callback = jest.fn();
+
   renderHook(() =>
     useKeyboardShortcuts({
       shortcuts: [
@@ -458,26 +463,27 @@ test('keyboard shortcut triggers callback', () => {
           callback,
           description: 'Save',
           category: 'Actions',
-        }
+        },
       ],
       enabled: true,
     })
-  )
-  
+  );
+
   // Simulate Ctrl+S
   const event = new KeyboardEvent('keydown', {
     key: 's',
     ctrlKey: true,
-  })
-  window.dispatchEvent(event)
-  
-  expect(callback).toHaveBeenCalled()
-})
+  });
+  window.dispatchEvent(event);
+
+  expect(callback).toHaveBeenCalled();
+});
 ```
 
 ## Support
 
 For questions or issues:
+
 1. Check the help modal (`Ctrl/Cmd + /`)
 2. Review the [README](./README.md)
 3. Contact the development team

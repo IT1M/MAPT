@@ -1,21 +1,21 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import { useSession } from 'next-auth/react'
-import { Destination } from '@prisma/client'
-import { inventorySettingsSchema } from '@/utils/settings-validation'
-import type { InventoryConfiguration } from '@/types/settings'
+import { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
+import { Destination } from '@prisma/client';
+import { inventorySettingsSchema } from '@/utils/settings-validation';
+import type { InventoryConfiguration } from '@/types/settings';
 
 interface InventorySettingsProps {
-  onSave?: (data: InventoryConfiguration) => void
+  onSave?: (data: InventoryConfiguration) => void;
 }
 
 export function InventorySettings({ onSave }: InventorySettingsProps) {
-  const { data: session } = useSession()
-  const [isLoading, setIsLoading] = useState(true)
-  const [isSaving, setIsSaving] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [successMessage, setSuccessMessage] = useState<string | null>(null)
+  const { data: session } = useSession();
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const [formData, setFormData] = useState<InventoryConfiguration>({
     defaultDestination: null,
@@ -25,99 +25,128 @@ export function InventorySettings({ onSave }: InventorySettingsProps) {
     batchNumberPattern: 'BATCH-{YYYY}-{####}',
     supervisorApproval: false,
     approvalThreshold: 0,
-  })
+  });
 
-  const [newCategory, setNewCategory] = useState('')
-  const [errors, setErrors] = useState<Record<string, string>>({})
+  const [newCategory, setNewCategory] = useState('');
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   // Fetch current settings
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        setIsLoading(true)
-        const response = await fetch('/api/settings')
-        
+        setIsLoading(true);
+        const response = await fetch('/api/settings');
+
         if (!response.ok) {
-          throw new Error('Failed to fetch settings')
+          throw new Error('Failed to fetch settings');
         }
 
-        const data = await response.json()
-        
+        const data = await response.json();
+
         if (data.success && data.data.settings) {
-          const settings = data.data.settings
-          
+          const settings = data.data.settings;
+
           // Extract inventory settings
           const inventorySettings: InventoryConfiguration = {
-            defaultDestination: settings.inventory?.find((s: any) => s.key === 'default_destination')?.value || null,
-            categoriesEnabled: settings.inventory?.find((s: any) => s.key === 'categories_enabled')?.value || false,
-            predefinedCategories: settings.inventory?.find((s: any) => s.key === 'predefined_categories')?.value || [],
-            autoBatchNumbers: settings.inventory?.find((s: any) => s.key === 'auto_batch_numbers')?.value || false,
-            batchNumberPattern: settings.inventory?.find((s: any) => s.key === 'batch_number_pattern')?.value || 'BATCH-{YYYY}-{####}',
-            supervisorApproval: settings.inventory?.find((s: any) => s.key === 'supervisor_approval')?.value || false,
-            approvalThreshold: settings.inventory?.find((s: any) => s.key === 'approval_threshold')?.value || 0,
-          }
-          
-          setFormData(inventorySettings)
+            defaultDestination:
+              settings.inventory?.find(
+                (s: any) => s.key === 'default_destination'
+              )?.value || null,
+            categoriesEnabled:
+              settings.inventory?.find(
+                (s: any) => s.key === 'categories_enabled'
+              )?.value || false,
+            predefinedCategories:
+              settings.inventory?.find(
+                (s: any) => s.key === 'predefined_categories'
+              )?.value || [],
+            autoBatchNumbers:
+              settings.inventory?.find(
+                (s: any) => s.key === 'auto_batch_numbers'
+              )?.value || false,
+            batchNumberPattern:
+              settings.inventory?.find(
+                (s: any) => s.key === 'batch_number_pattern'
+              )?.value || 'BATCH-{YYYY}-{####}',
+            supervisorApproval:
+              settings.inventory?.find(
+                (s: any) => s.key === 'supervisor_approval'
+              )?.value || false,
+            approvalThreshold:
+              settings.inventory?.find(
+                (s: any) => s.key === 'approval_threshold'
+              )?.value || 0,
+          };
+
+          setFormData(inventorySettings);
         }
       } catch (err) {
-        console.error('Error fetching settings:', err)
-        setError(err instanceof Error ? err.message : 'Failed to load settings')
+        console.error('Error fetching settings:', err);
+        setError(
+          err instanceof Error ? err.message : 'Failed to load settings'
+        );
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
-    fetchSettings()
-  }, [])
+    fetchSettings();
+  }, []);
 
   const handleChange = (field: keyof InventoryConfiguration, value: any) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
+    setFormData((prev) => ({ ...prev, [field]: value }));
     // Clear field error when user starts typing
     if (errors[field]) {
       setErrors((prev) => {
-        const newErrors = { ...prev }
-        delete newErrors[field]
-        return newErrors
-      })
+        const newErrors = { ...prev };
+        delete newErrors[field];
+        return newErrors;
+      });
     }
-    setSuccessMessage(null)
-  }
+    setSuccessMessage(null);
+  };
 
   const handleAddCategory = () => {
-    if (newCategory.trim() && !formData.predefinedCategories.includes(newCategory.trim())) {
-      handleChange('predefinedCategories', [...formData.predefinedCategories, newCategory.trim()])
-      setNewCategory('')
+    if (
+      newCategory.trim() &&
+      !formData.predefinedCategories.includes(newCategory.trim())
+    ) {
+      handleChange('predefinedCategories', [
+        ...formData.predefinedCategories,
+        newCategory.trim(),
+      ]);
+      setNewCategory('');
     }
-  }
+  };
 
   const handleRemoveCategory = (category: string) => {
     handleChange(
       'predefinedCategories',
       formData.predefinedCategories.filter((c) => c !== category)
-    )
-  }
+    );
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
+    e.preventDefault();
+
     // Validate form data
-    const validation = inventorySettingsSchema.safeParse(formData)
-    
+    const validation = inventorySettingsSchema.safeParse(formData);
+
     if (!validation.success) {
-      const fieldErrors: Record<string, string> = {}
+      const fieldErrors: Record<string, string> = {};
       validation.error.errors.forEach((err) => {
         if (err.path[0]) {
-          fieldErrors[err.path[0] as string] = err.message
+          fieldErrors[err.path[0] as string] = err.message;
         }
-      })
-      setErrors(fieldErrors)
-      return
+      });
+      setErrors(fieldErrors);
+      return;
     }
 
     try {
-      setIsSaving(true)
-      setError(null)
-      setSuccessMessage(null)
+      setIsSaving(true);
+      setError(null);
+      setSuccessMessage(null);
 
       // Convert to settings format
       const settingsToUpdate = [
@@ -128,7 +157,7 @@ export function InventorySettings({ onSave }: InventorySettingsProps) {
         { key: 'batch_number_pattern', value: formData.batchNumberPattern },
         { key: 'supervisor_approval', value: formData.supervisorApproval },
         { key: 'approval_threshold', value: formData.approvalThreshold },
-      ]
+      ];
 
       const response = await fetch('/api/settings', {
         method: 'PATCH',
@@ -136,29 +165,31 @@ export function InventorySettings({ onSave }: InventorySettingsProps) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ settings: settingsToUpdate }),
-      })
+      });
 
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error?.message || 'Failed to update settings')
+        const errorData = await response.json();
+        throw new Error(
+          errorData.error?.message || 'Failed to update settings'
+        );
       }
 
-      setSuccessMessage('Inventory settings updated successfully')
-      onSave?.(formData)
+      setSuccessMessage('Inventory settings updated successfully');
+      onSave?.(formData);
     } catch (err) {
-      console.error('Error saving settings:', err)
-      setError(err instanceof Error ? err.message : 'Failed to save settings')
+      console.error('Error saving settings:', err);
+      setError(err instanceof Error ? err.message : 'Failed to save settings');
     } finally {
-      setIsSaving(false)
+      setIsSaving(false);
     }
-  }
+  };
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center p-8">
         <div className="text-gray-500">Loading inventory settings...</div>
       </div>
-    )
+    );
   }
 
   return (
@@ -175,13 +206,18 @@ export function InventorySettings({ onSave }: InventorySettingsProps) {
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Default Destination */}
         <div>
-          <label htmlFor="default-destination" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          <label
+            htmlFor="default-destination"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
             Default Destination
           </label>
           <select
             id="default-destination"
             value={formData.defaultDestination || ''}
-            onChange={(e) => handleChange('defaultDestination', e.target.value || null)}
+            onChange={(e) =>
+              handleChange('defaultDestination', e.target.value || null)
+            }
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm"
           >
             <option value="">None</option>
@@ -200,12 +236,17 @@ export function InventorySettings({ onSave }: InventorySettingsProps) {
               id="categories-enabled"
               type="checkbox"
               checked={formData.categoriesEnabled}
-              onChange={(e) => handleChange('categoriesEnabled', e.target.checked)}
+              onChange={(e) =>
+                handleChange('categoriesEnabled', e.target.checked)
+              }
               className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
             />
           </div>
           <div className="ml-3 text-sm">
-            <label htmlFor="categories-enabled" className="font-medium text-gray-700 dark:text-gray-300">
+            <label
+              htmlFor="categories-enabled"
+              className="font-medium text-gray-700 dark:text-gray-300"
+            >
               Enable Categories
             </label>
             <p className="text-gray-500 dark:text-gray-400">
@@ -228,8 +269,8 @@ export function InventorySettings({ onSave }: InventorySettingsProps) {
                   onChange={(e) => setNewCategory(e.target.value)}
                   onKeyPress={(e) => {
                     if (e.key === 'Enter') {
-                      e.preventDefault()
-                      handleAddCategory()
+                      e.preventDefault();
+                      handleAddCategory();
                     }
                   }}
                   placeholder="Add category"
@@ -271,12 +312,17 @@ export function InventorySettings({ onSave }: InventorySettingsProps) {
               id="auto-batch"
               type="checkbox"
               checked={formData.autoBatchNumbers}
-              onChange={(e) => handleChange('autoBatchNumbers', e.target.checked)}
+              onChange={(e) =>
+                handleChange('autoBatchNumbers', e.target.checked)
+              }
               className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
             />
           </div>
           <div className="ml-3 text-sm">
-            <label htmlFor="auto-batch" className="font-medium text-gray-700 dark:text-gray-300">
+            <label
+              htmlFor="auto-batch"
+              className="font-medium text-gray-700 dark:text-gray-300"
+            >
               Auto-generate Batch Numbers
             </label>
             <p className="text-gray-500 dark:text-gray-400">
@@ -288,19 +334,25 @@ export function InventorySettings({ onSave }: InventorySettingsProps) {
         {/* Batch Number Pattern */}
         {formData.autoBatchNumbers && (
           <div>
-            <label htmlFor="batch-pattern" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            <label
+              htmlFor="batch-pattern"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
               Batch Number Pattern
             </label>
             <input
               type="text"
               id="batch-pattern"
               value={formData.batchNumberPattern}
-              onChange={(e) => handleChange('batchNumberPattern', e.target.value)}
+              onChange={(e) =>
+                handleChange('batchNumberPattern', e.target.value)
+              }
               placeholder="BATCH-{YYYY}-{####}"
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm"
             />
             <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-              Use {'{YYYY}'} for year, {'{MM}'} for month, {'{DD}'} for day, {'{####}'} for sequential number
+              Use {'{YYYY}'} for year, {'{MM}'} for month, {'{DD}'} for day,{' '}
+              {'{####}'} for sequential number
             </p>
           </div>
         )}
@@ -312,12 +364,17 @@ export function InventorySettings({ onSave }: InventorySettingsProps) {
               id="supervisor-approval"
               type="checkbox"
               checked={formData.supervisorApproval}
-              onChange={(e) => handleChange('supervisorApproval', e.target.checked)}
+              onChange={(e) =>
+                handleChange('supervisorApproval', e.target.checked)
+              }
               className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
             />
           </div>
           <div className="ml-3 text-sm">
-            <label htmlFor="supervisor-approval" className="font-medium text-gray-700 dark:text-gray-300">
+            <label
+              htmlFor="supervisor-approval"
+              className="font-medium text-gray-700 dark:text-gray-300"
+            >
               Require Supervisor Approval
             </label>
             <p className="text-gray-500 dark:text-gray-400">
@@ -329,19 +386,25 @@ export function InventorySettings({ onSave }: InventorySettingsProps) {
         {/* Approval Threshold */}
         {formData.supervisorApproval && (
           <div>
-            <label htmlFor="approval-threshold" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            <label
+              htmlFor="approval-threshold"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
               Approval Threshold
             </label>
             <input
               type="number"
               id="approval-threshold"
               value={formData.approvalThreshold}
-              onChange={(e) => handleChange('approvalThreshold', parseInt(e.target.value) || 0)}
+              onChange={(e) =>
+                handleChange('approvalThreshold', parseInt(e.target.value) || 0)
+              }
               min="0"
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm"
             />
             <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-              Items with quantity above this threshold require supervisor approval
+              Items with quantity above this threshold require supervisor
+              approval
             </p>
           </div>
         )}
@@ -355,7 +418,9 @@ export function InventorySettings({ onSave }: InventorySettingsProps) {
 
         {successMessage && (
           <div className="rounded-md bg-green-50 dark:bg-green-900/20 p-4">
-            <p className="text-sm text-green-800 dark:text-green-400">{successMessage}</p>
+            <p className="text-sm text-green-800 dark:text-green-400">
+              {successMessage}
+            </p>
           </div>
         )}
 
@@ -371,5 +436,5 @@ export function InventorySettings({ onSave }: InventorySettingsProps) {
         </div>
       </form>
     </div>
-  )
+  );
 }

@@ -3,29 +3,29 @@
  * Manages settings search state and filtering with real-time results
  */
 
-import { useState, useMemo, useCallback } from 'react'
-import { useTranslations } from '@/hooks/useTranslations'
-import { useLocale } from '@/hooks/useLocale'
+import { useState, useMemo, useCallback } from 'react';
+import { useTranslations } from '@/hooks/useTranslations';
+import { useLocale } from '@/hooks/useLocale';
 import {
   searchSettings,
   buildSearchableItems,
   type SearchResult,
   type SearchableItem,
-} from '@/utils/settings-search'
+} from '@/utils/settings-search';
 
 interface UseSettingsSearchOptions {
-  minScore?: number
-  maxResults?: number
-  onResultClick?: (result: SearchResult) => void
+  minScore?: number;
+  maxResults?: number;
+  onResultClick?: (result: SearchResult) => void;
 }
 
 export function useSettingsSearch(options: UseSettingsSearchOptions = {}) {
-  const { minScore = 1, maxResults = 20, onResultClick } = options
-  const t = useTranslations('settings')
-  const locale = useLocale()
-  
-  const [query, setQuery] = useState('')
-  const [isSearching, setIsSearching] = useState(false)
+  const { minScore = 1, maxResults = 20, onResultClick } = options;
+  const t = useTranslations('settings');
+  const locale = useLocale();
+
+  const [query, setQuery] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
 
   // Build searchable items from translations
   const searchableItems = useMemo<SearchableItem[]>(() => {
@@ -79,68 +79,68 @@ export function useSettingsSearch(options: UseSettingsSearchOptions = {}) {
           companyInfo: t('system.companyInfo'),
           backupSettings: t('system.backupSettings'),
         },
-      }
-      
-      return buildSearchableItems(translations, locale)
+      };
+
+      return buildSearchableItems(translations, locale);
     } catch (error) {
-      console.error('Error building searchable items:', error)
-      return []
+      console.error('Error building searchable items:', error);
+      return [];
     }
-  }, [t, locale])
+  }, [t, locale]);
 
   // Perform search
   const results = useMemo<SearchResult[]>(() => {
     if (!query.trim()) {
-      return []
+      return [];
     }
-    
-    setIsSearching(true)
+
+    setIsSearching(true);
     const searchResults = searchSettings(searchableItems, query, {
       minScore,
       maxResults,
-    })
-    setIsSearching(false)
-    
-    return searchResults
-  }, [query, searchableItems, minScore, maxResults])
+    });
+    setIsSearching(false);
+
+    return searchResults;
+  }, [query, searchableItems, minScore, maxResults]);
 
   // Handle search query change
   const handleSearch = useCallback((newQuery: string) => {
-    setQuery(newQuery)
-  }, [])
+    setQuery(newQuery);
+  }, []);
 
   // Clear search
   const clearSearch = useCallback(() => {
-    setQuery('')
-  }, [])
+    setQuery('');
+  }, []);
 
   // Handle result selection
   const handleResultClick = useCallback(
     (result: SearchResult) => {
       if (onResultClick) {
-        onResultClick(result)
+        onResultClick(result);
       }
       // Navigate to the result path
       if (typeof window !== 'undefined' && result.path) {
-        window.location.href = result.path
+        window.location.href = result.path;
       }
     },
     [onResultClick]
-  )
+  );
 
   // Get results grouped by section
   const resultsBySection = useMemo(() => {
-    const grouped: Record<string, SearchResult[]> = {}
-    
-    results.forEach(result => {
+    const grouped: Record<string, SearchResult[]> = {};
+
+    results.forEach((result) => {
       if (!grouped[result.section]) {
-        grouped[result.section] = []
+        grouped[result.section] = [];
       }
-      grouped[result.section].push(result)
-    })
-    
-    return grouped
-  }, [results])
+      grouped[result.section].push(result);
+    });
+
+    return grouped;
+  }, [results]);
 
   return {
     query,
@@ -151,5 +151,5 @@ export function useSettingsSearch(options: UseSettingsSearchOptions = {}) {
     handleSearch,
     clearSearch,
     handleResultClick,
-  }
+  };
 }

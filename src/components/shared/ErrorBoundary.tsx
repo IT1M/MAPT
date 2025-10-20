@@ -2,7 +2,7 @@
 
 /**
  * Error Boundary Component
- * 
+ *
  * Catches React errors and provides fallback UI while logging errors
  * Enhanced with monitoring service integration and better error recovery
  */
@@ -24,7 +24,10 @@ interface ErrorBoundaryState {
   errorInfo: React.ErrorInfo | null;
 }
 
-export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+export class ErrorBoundary extends Component<
+  ErrorBoundaryProps,
+  ErrorBoundaryState
+> {
   constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = {
@@ -67,7 +70,10 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
    * Log error to external monitoring service
    * This can be integrated with services like Sentry, LogRocket, etc.
    */
-  private logToMonitoringService(error: Error, errorInfo: React.ErrorInfo): void {
+  private logToMonitoringService(
+    error: Error,
+    errorInfo: React.ErrorInfo
+  ): void {
     try {
       // Store error in localStorage for debugging
       const errorLog = {
@@ -75,14 +81,22 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
         message: error.message,
         stack: error.stack,
         componentStack: errorInfo.componentStack,
-        userAgent: typeof window !== 'undefined' ? window.navigator.userAgent : 'unknown',
+        userAgent:
+          typeof window !== 'undefined'
+            ? window.navigator.userAgent
+            : 'unknown',
         url: typeof window !== 'undefined' ? window.location.href : 'unknown',
       };
 
-      const existingLogs = JSON.parse(localStorage.getItem('error-logs') || '[]');
+      const existingLogs = JSON.parse(
+        localStorage.getItem('error-logs') || '[]'
+      );
       existingLogs.push(errorLog);
       // Keep only last 50 errors
-      localStorage.setItem('error-logs', JSON.stringify(existingLogs.slice(-50)));
+      localStorage.setItem(
+        'error-logs',
+        JSON.stringify(existingLogs.slice(-50))
+      );
 
       // TODO: Integrate with external monitoring service
       // Example: Sentry.captureException(error, { extra: errorInfo });
@@ -115,8 +129,8 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       }
 
       return (
-        <DefaultErrorFallback 
-          error={this.state.error} 
+        <DefaultErrorFallback
+          error={this.state.error}
           onReset={this.handleReset}
         />
       );
@@ -129,10 +143,10 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 /**
  * Default error fallback UI
  */
-function DefaultErrorFallback({ 
-  error, 
-  onReset 
-}: { 
+function DefaultErrorFallback({
+  error,
+  onReset,
+}: {
   error: Error | null;
   onReset?: () => void;
 }) {
@@ -186,11 +200,11 @@ export function PageErrorBoundary({ children }: { children: ReactNode }) {
 /**
  * Component-level error boundary for isolated failures
  */
-export function ComponentErrorBoundary({ 
-  children, 
-  componentName 
-}: { 
-  children: ReactNode; 
+export function ComponentErrorBoundary({
+  children,
+  componentName,
+}: {
+  children: ReactNode;
   componentName?: string;
 }) {
   return (
@@ -215,7 +229,9 @@ export function ComponentErrorBoundary({
             </div>
             <div className="ml-3 rtl:ml-0 rtl:mr-3">
               <p className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
-                {componentName ? `${componentName} failed to load` : 'Component failed to load'}
+                {componentName
+                  ? `${componentName} failed to load`
+                  : 'Component failed to load'}
               </p>
               <button
                 onClick={() => window.location.reload()}

@@ -5,6 +5,7 @@ A comprehensive filtering system with filter builder, saved filters, and sharing
 ## Features
 
 ### 1. Filter Builder
+
 - **Dynamic Filter Creation**: Add/remove filters with field, operator, and value selection
 - **Multiple Operators**: Supports equals, contains, greater than, less than, between, in, is null, etc.
 - **Logic Operators**: Combine filters with AND/OR logic
@@ -14,6 +15,7 @@ A comprehensive filtering system with filter builder, saved filters, and sharing
 - **Real-time Validation**: Validate filter values based on operator type
 
 ### 2. Saved Filters
+
 - **Save Configurations**: Save filter groups with custom names
 - **Default Filters**: Set a default filter per page that loads automatically
 - **Load Presets**: Quickly load saved filter configurations
@@ -22,6 +24,7 @@ A comprehensive filtering system with filter builder, saved filters, and sharing
 - **Database Persistence**: Saved filters stored in PostgreSQL via Prisma
 
 ### 3. Filter Sharing
+
 - **Shareable URLs**: Generate URLs with encoded filter parameters
 - **Share Codes**: Copy/paste filter codes for easy sharing
 - **JSON Export**: Download filter configurations as JSON files
@@ -29,6 +32,7 @@ A comprehensive filtering system with filter builder, saved filters, and sharing
 - **Cross-User Sharing**: Share filters with team members
 
 ### 4. Filter Chips
+
 - **Visual Display**: Show active filters as removable chips
 - **Quick Remove**: Click to remove individual filters
 - **Clear All**: Remove all filters at once
@@ -37,11 +41,12 @@ A comprehensive filtering system with filter builder, saved filters, and sharing
 ## Components
 
 ### AdvancedFilterPanel
+
 Main container component that combines all filtering features.
 
 ```tsx
-import { AdvancedFilterPanel } from '@/components/filters'
-import { FilterFieldConfig } from '@/types/filters'
+import { AdvancedFilterPanel } from '@/components/filters';
+import { FilterFieldConfig } from '@/types/filters';
 
 const fieldConfigs: FilterFieldConfig[] = [
   {
@@ -66,17 +71,17 @@ const fieldConfigs: FilterFieldConfig[] = [
       { value: 'FOZAN', label: 'Fozan' },
     ],
   },
-]
+];
 
 function MyPage() {
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleApply = (filterGroup: FilterGroup) => {
     // Convert to Prisma where clause
-    const where = buildPrismaWhere(filterGroup)
+    const where = buildPrismaWhere(filterGroup);
     // Fetch data with filters
-    fetchData(where)
-  }
+    fetchData(where);
+  };
 
   return (
     <AdvancedFilterPanel
@@ -86,21 +91,22 @@ function MyPage() {
       isOpen={isOpen}
       onToggle={() => setIsOpen(!isOpen)}
     />
-  )
+  );
 }
 ```
 
 ### FilterBuilder
+
 Standalone filter builder component.
 
 ```tsx
-import { FilterBuilder } from '@/components/filters'
+import { FilterBuilder } from '@/components/filters';
 
 function MyComponent() {
   const [filterGroup, setFilterGroup] = useState<FilterGroup>({
     filters: [],
     logic: 'AND',
-  })
+  });
 
   return (
     <FilterBuilder
@@ -110,26 +116,31 @@ function MyComponent() {
       onApply={() => console.log('Apply', filterGroup)}
       onReset={() => setFilterGroup({ filters: [], logic: 'AND' })}
     />
-  )
+  );
 }
 ```
 
 ### SavedFiltersManager
+
 Manage saved filter presets.
 
 ```tsx
-import { SavedFiltersManager } from '@/components/filters'
+import { SavedFiltersManager } from '@/components/filters';
 
 function MyComponent() {
-  const [savedFilters, setSavedFilters] = useState<SavedFilterData[]>([])
+  const [savedFilters, setSavedFilters] = useState<SavedFilterData[]>([]);
 
-  const handleSave = async (name: string, filters: FilterGroup, isDefault: boolean) => {
+  const handleSave = async (
+    name: string,
+    filters: FilterGroup,
+    isDefault: boolean
+  ) => {
     const response = await fetch('/api/filters', {
       method: 'POST',
       body: JSON.stringify({ name, filters, page: 'inventory', isDefault }),
-    })
+    });
     // Reload saved filters
-  }
+  };
 
   return (
     <SavedFiltersManager
@@ -141,15 +152,16 @@ function MyComponent() {
       onSetDefault={handleSetDefault}
       currentFilterGroup={filterGroup}
     />
-  )
+  );
 }
 ```
 
 ### FilterSharing
+
 Share and import filter configurations.
 
 ```tsx
-import { FilterSharing } from '@/components/filters'
+import { FilterSharing } from '@/components/filters';
 
 function MyComponent() {
   return (
@@ -158,19 +170,20 @@ function MyComponent() {
       filterName="My Filter"
       currentPage="inventory"
       onImport={(filters, name) => {
-        setFilterGroup(filters)
-        setFilterName(name)
+        setFilterGroup(filters);
+        setFilterName(name);
       }}
     />
-  )
+  );
 }
 ```
 
 ### FilterChips
+
 Display active filters as chips.
 
 ```tsx
-import { FilterChips } from '@/components/filters'
+import { FilterChips } from '@/components/filters';
 
 function MyComponent() {
   return (
@@ -180,24 +193,27 @@ function MyComponent() {
       onRemoveFilter={(filterId) => {
         setFilterGroup({
           ...filterGroup,
-          filters: filterGroup.filters.filter(f => f.id !== filterId),
-        })
+          filters: filterGroup.filters.filter((f) => f.id !== filterId),
+        });
       }}
       onClearAll={() => setFilterGroup({ filters: [], logic: 'AND' })}
     />
-  )
+  );
 }
 ```
 
 ## API Endpoints
 
 ### GET /api/filters
+
 Get all saved filters for the current user.
 
 **Query Parameters:**
+
 - `page` (optional): Filter by page/entity
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -227,9 +243,11 @@ Get all saved filters for the current user.
 ```
 
 ### POST /api/filters
+
 Create a new saved filter.
 
 **Request Body:**
+
 ```json
 {
   "name": "My Filter",
@@ -243,9 +261,11 @@ Create a new saved filter.
 ```
 
 ### PATCH /api/filters/[id]
+
 Update a saved filter.
 
 **Request Body:**
+
 ```json
 {
   "name": "Updated Name",
@@ -255,15 +275,17 @@ Update a saved filter.
 ```
 
 ### DELETE /api/filters/[id]
+
 Delete a saved filter.
 
 ## Utilities
 
 ### buildPrismaWhere
+
 Convert filter group to Prisma where clause.
 
 ```typescript
-import { buildPrismaWhere } from '@/utils/filter-builder'
+import { buildPrismaWhere } from '@/utils/filter-builder';
 
 const filterGroup: FilterGroup = {
   filters: [
@@ -271,9 +293,9 @@ const filterGroup: FilterGroup = {
     { id: '2', field: 'quantity', operator: 'greater_than', value: 50 },
   ],
   logic: 'AND',
-}
+};
 
-const where = buildPrismaWhere(filterGroup)
+const where = buildPrismaWhere(filterGroup);
 // Result:
 // {
 //   AND: [
@@ -282,24 +304,25 @@ const where = buildPrismaWhere(filterGroup)
 //   ]
 // }
 
-const items = await prisma.inventoryItem.findMany({ where })
+const items = await prisma.inventoryItem.findMany({ where });
 ```
 
 ### exportFilterGroup / importFilterGroup
+
 Share filter configurations.
 
 ```typescript
-import { exportFilterGroup, importFilterGroup } from '@/utils/filter-builder'
+import { exportFilterGroup, importFilterGroup } from '@/utils/filter-builder';
 
 // Export
-const encoded = exportFilterGroup(filterGroup, 'My Filter', 'inventory')
-const url = `${window.location.origin}/inventory?filter=${encoded}`
+const encoded = exportFilterGroup(filterGroup, 'My Filter', 'inventory');
+const url = `${window.location.origin}/inventory?filter=${encoded}`;
 
 // Import
-const imported = importFilterGroup(encoded)
+const imported = importFilterGroup(encoded);
 if (imported) {
-  setFilterGroup(imported.filters)
-  setFilterName(imported.name)
+  setFilterGroup(imported.filters);
+  setFilterName(imported.name);
 }
 ```
 
@@ -316,7 +339,7 @@ const fieldConfigs: FilterFieldConfig[] = [
     type: 'string',
     operators: ['equals', 'contains', 'starts_with', 'ends_with', 'is_null'],
   },
-  
+
   // Number field
   {
     name: 'quantity',
@@ -324,7 +347,7 @@ const fieldConfigs: FilterFieldConfig[] = [
     type: 'number',
     operators: ['equals', 'greater_than', 'less_than', 'between'],
   },
-  
+
   // Date field
   {
     name: 'createdAt',
@@ -332,7 +355,7 @@ const fieldConfigs: FilterFieldConfig[] = [
     type: 'date',
     operators: ['equals', 'greater_than', 'less_than', 'between'],
   },
-  
+
   // Boolean field
   {
     name: 'isActive',
@@ -340,7 +363,7 @@ const fieldConfigs: FilterFieldConfig[] = [
     type: 'boolean',
     operators: ['equals'],
   },
-  
+
   // Enum field
   {
     name: 'destination',
@@ -352,28 +375,28 @@ const fieldConfigs: FilterFieldConfig[] = [
       { value: 'FOZAN', label: 'Fozan' },
     ],
   },
-]
+];
 ```
 
 ## Supported Operators
 
-| Operator | Description | Value Type | Example |
-|----------|-------------|------------|---------|
-| `equals` | Exact match | Single | `itemName equals "Syringe"` |
-| `not_equals` | Not equal to | Single | `quantity not_equals 0` |
-| `contains` | Contains substring | String | `itemName contains "medical"` |
-| `not_contains` | Does not contain | String | `itemName not_contains "expired"` |
-| `starts_with` | Starts with | String | `batch starts_with "2024"` |
-| `ends_with` | Ends with | String | `itemName ends_with "ml"` |
-| `greater_than` | Greater than | Number/Date | `quantity greater_than 100` |
-| `less_than` | Less than | Number/Date | `quantity less_than 50` |
-| `greater_than_or_equal` | >= | Number/Date | `quantity >= 100` |
-| `less_than_or_equal` | <= | Number/Date | `quantity <= 50` |
-| `between` | Range | Array[2] | `quantity between [10, 100]` |
-| `is_null` | Is empty/null | None | `notes is_null` |
-| `is_not_null` | Is not empty | None | `notes is_not_null` |
-| `in` | In list | Array | `destination in ["MAIS", "FOZAN"]` |
-| `not_in` | Not in list | Array | `category not_in ["Expired"]` |
+| Operator                | Description        | Value Type  | Example                            |
+| ----------------------- | ------------------ | ----------- | ---------------------------------- |
+| `equals`                | Exact match        | Single      | `itemName equals "Syringe"`        |
+| `not_equals`            | Not equal to       | Single      | `quantity not_equals 0`            |
+| `contains`              | Contains substring | String      | `itemName contains "medical"`      |
+| `not_contains`          | Does not contain   | String      | `itemName not_contains "expired"`  |
+| `starts_with`           | Starts with        | String      | `batch starts_with "2024"`         |
+| `ends_with`             | Ends with          | String      | `itemName ends_with "ml"`          |
+| `greater_than`          | Greater than       | Number/Date | `quantity greater_than 100`        |
+| `less_than`             | Less than          | Number/Date | `quantity less_than 50`            |
+| `greater_than_or_equal` | >=                 | Number/Date | `quantity >= 100`                  |
+| `less_than_or_equal`    | <=                 | Number/Date | `quantity <= 50`                   |
+| `between`               | Range              | Array[2]    | `quantity between [10, 100]`       |
+| `is_null`               | Is empty/null      | None        | `notes is_null`                    |
+| `is_not_null`           | Is not empty       | None        | `notes is_not_null`                |
+| `in`                    | In list            | Array       | `destination in ["MAIS", "FOZAN"]` |
+| `not_in`                | Not in list        | Array       | `category not_in ["Expired"]`      |
 
 ## Database Schema
 
@@ -408,6 +431,7 @@ model SavedFilter {
 ## Internationalization
 
 All text is translatable via `next-intl`:
+
 - English: `messages/en.json`
 - Arabic: `messages/ar.json`
 

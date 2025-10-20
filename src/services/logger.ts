@@ -1,6 +1,6 @@
 /**
  * Centralized Logging Service
- * 
+ *
  * Provides structured logging with environment-aware log levels,
  * request tracking, and contextual metadata.
  */
@@ -39,8 +39,8 @@ class Logger {
 
   private readonly levelColors: Record<LogLevel, string> = {
     debug: '\x1b[36m', // Cyan
-    info: '\x1b[32m',  // Green
-    warn: '\x1b[33m',  // Yellow
+    info: '\x1b[32m', // Green
+    warn: '\x1b[33m', // Yellow
     error: '\x1b[31m', // Red
   };
 
@@ -48,7 +48,8 @@ class Logger {
 
   constructor() {
     const env = process.env.NODE_ENV || 'development';
-    const logLevel = (process.env.LOG_LEVEL as LogLevel) || 
+    const logLevel =
+      (process.env.LOG_LEVEL as LogLevel) ||
       (env === 'production' ? 'error' : 'debug');
 
     this.config = {
@@ -111,7 +112,11 @@ class Logger {
   /**
    * Log error message
    */
-  error(message: string, error?: Error | unknown, context?: Record<string, any>): void {
+  error(
+    message: string,
+    error?: Error | unknown,
+    context?: Record<string, any>
+  ): void {
     const errorContext = {
       ...context,
       ...(error instanceof Error && {
@@ -121,7 +126,12 @@ class Logger {
       }),
     };
 
-    this.log('error', message, errorContext, error instanceof Error ? error.stack : undefined);
+    this.log(
+      'error',
+      message,
+      errorContext,
+      error instanceof Error ? error.stack : undefined
+    );
   }
 
   /**
@@ -226,8 +236,15 @@ class ChildLogger {
     this.parent.warn(message, { ...this.context, ...additionalContext });
   }
 
-  error(message: string, error?: Error | unknown, additionalContext?: Record<string, any>): void {
-    this.parent.error(message, error, { ...this.context, ...additionalContext });
+  error(
+    message: string,
+    error?: Error | unknown,
+    additionalContext?: Record<string, any>
+  ): void {
+    this.parent.error(message, error, {
+      ...this.context,
+      ...additionalContext,
+    });
   }
 }
 

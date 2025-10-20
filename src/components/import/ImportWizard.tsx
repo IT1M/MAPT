@@ -1,14 +1,14 @@
-'use client'
+'use client';
 
-import { useState, useCallback } from 'react'
-import { useTranslations } from '@/hooks/useTranslations'
-import { X, Upload, FileSpreadsheet, AlertCircle } from 'lucide-react'
-import FileUploadStep from './FileUploadStep'
-import ColumnMappingStep from './ColumnMappingStep'
-import ValidationStep from './ValidationStep'
-import ImportOptionsStep from './ImportOptionsStep'
-import ReviewStep from './ReviewStep'
-import ProgressStep from './ProgressStep'
+import { useState, useCallback } from 'react';
+import { useTranslations } from '@/hooks/useTranslations';
+import { X, Upload, FileSpreadsheet, AlertCircle } from 'lucide-react';
+import FileUploadStep from './FileUploadStep';
+import ColumnMappingStep from './ColumnMappingStep';
+import ValidationStep from './ValidationStep';
+import ImportOptionsStep from './ImportOptionsStep';
+import ReviewStep from './ReviewStep';
+import ProgressStep from './ProgressStep';
 import type {
   ImportFile,
   ColumnMapping,
@@ -18,21 +18,32 @@ import type {
   ImportResult,
   ParsedData,
   ImportStep,
-} from '@/types/import'
+} from '@/types/import';
 
 interface ImportWizardProps {
-  isOpen: boolean
-  onClose: () => void
-  onComplete?: (result: ImportResult) => void
+  isOpen: boolean;
+  onClose: () => void;
+  onComplete?: (result: ImportResult) => void;
 }
 
-const STEPS: ImportStep[] = ['upload', 'mapping', 'validation', 'options', 'review', 'progress']
+const STEPS: ImportStep[] = [
+  'upload',
+  'mapping',
+  'validation',
+  'options',
+  'review',
+  'progress',
+];
 
-export default function ImportWizard({ isOpen, onClose, onComplete }: ImportWizardProps) {
-  const t = useTranslations('import')
-  const [currentStep, setCurrentStep] = useState<ImportStep>('upload')
-  const [importFile, setImportFile] = useState<ImportFile | null>(null)
-  const [parsedData, setParsedData] = useState<ParsedData | null>(null)
+export default function ImportWizard({
+  isOpen,
+  onClose,
+  onComplete,
+}: ImportWizardProps) {
+  const t = useTranslations('import');
+  const [currentStep, setCurrentStep] = useState<ImportStep>('upload');
+  const [importFile, setImportFile] = useState<ImportFile | null>(null);
+  const [parsedData, setParsedData] = useState<ParsedData | null>(null);
   const [columnMapping, setColumnMapping] = useState<ColumnMapping>({
     itemName: null,
     batch: null,
@@ -41,63 +52,65 @@ export default function ImportWizard({ isOpen, onClose, onComplete }: ImportWiza
     destination: null,
     category: null,
     notes: null,
-  })
-  const [validationErrors, setValidationErrors] = useState<ValidationError[]>([])
+  });
+  const [validationErrors, setValidationErrors] = useState<ValidationError[]>(
+    []
+  );
   const [importOptions, setImportOptions] = useState<ImportOptions>({
     duplicateHandling: 'skip',
-  })
+  });
   const [importProgress, setImportProgress] = useState<ImportProgress>({
     total: 0,
     processed: 0,
     successful: 0,
     failed: 0,
     status: 'idle',
-  })
-  const [importResult, setImportResult] = useState<ImportResult | null>(null)
+  });
+  const [importResult, setImportResult] = useState<ImportResult | null>(null);
 
   const handleFileUpload = useCallback((file: ImportFile, data: ParsedData) => {
-    setImportFile(file)
-    setParsedData(data)
-    setCurrentStep('mapping')
-  }, [])
+    setImportFile(file);
+    setParsedData(data);
+    setCurrentStep('mapping');
+  }, []);
 
   const handleMappingComplete = useCallback((mapping: ColumnMapping) => {
-    setColumnMapping(mapping)
-    setCurrentStep('validation')
-  }, [])
+    setColumnMapping(mapping);
+    setCurrentStep('validation');
+  }, []);
 
   const handleValidationComplete = useCallback((errors: ValidationError[]) => {
-    setValidationErrors(errors)
-    setCurrentStep('options')
-  }, [])
+    setValidationErrors(errors);
+    setCurrentStep('options');
+  }, []);
 
   const handleOptionsComplete = useCallback((options: ImportOptions) => {
-    setImportOptions(options)
-    setCurrentStep('review')
-  }, [])
+    setImportOptions(options);
+    setCurrentStep('review');
+  }, []);
 
   const handleReviewConfirm = useCallback(() => {
-    setCurrentStep('progress')
-  }, [])
+    setCurrentStep('progress');
+  }, []);
 
   const handleImportComplete = useCallback(
     (result: ImportResult) => {
-      setImportResult(result)
-      onComplete?.(result)
+      setImportResult(result);
+      onComplete?.(result);
     },
     [onComplete]
-  )
+  );
 
   const handleClose = useCallback(() => {
     if (importProgress.status === 'processing') {
       if (!confirm(t('confirmCancel'))) {
-        return
+        return;
       }
     }
     // Reset state
-    setCurrentStep('upload')
-    setImportFile(null)
-    setParsedData(null)
+    setCurrentStep('upload');
+    setImportFile(null);
+    setParsedData(null);
     setColumnMapping({
       itemName: null,
       batch: null,
@@ -106,31 +119,31 @@ export default function ImportWizard({ isOpen, onClose, onComplete }: ImportWiza
       destination: null,
       category: null,
       notes: null,
-    })
-    setValidationErrors([])
-    setImportOptions({ duplicateHandling: 'skip' })
+    });
+    setValidationErrors([]);
+    setImportOptions({ duplicateHandling: 'skip' });
     setImportProgress({
       total: 0,
       processed: 0,
       successful: 0,
       failed: 0,
       status: 'idle',
-    })
-    setImportResult(null)
-    onClose()
-  }, [importProgress.status, onClose, t])
+    });
+    setImportResult(null);
+    onClose();
+  }, [importProgress.status, onClose, t]);
 
   const handleBack = useCallback(() => {
-    const currentIndex = STEPS.indexOf(currentStep)
+    const currentIndex = STEPS.indexOf(currentStep);
     if (currentIndex > 0) {
-      setCurrentStep(STEPS[currentIndex - 1])
+      setCurrentStep(STEPS[currentIndex - 1]);
     }
-  }, [currentStep])
+  }, [currentStep]);
 
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
-  const currentStepIndex = STEPS.indexOf(currentStep)
-  const canGoBack = currentStepIndex > 0 && currentStep !== 'progress'
+  const currentStepIndex = STEPS.indexOf(currentStep);
+  const canGoBack = currentStepIndex > 0 && currentStep !== 'progress';
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
@@ -170,8 +183,8 @@ export default function ImportWizard({ isOpen, onClose, onComplete }: ImportWiza
                       index < currentStepIndex
                         ? 'bg-teal-600 text-white'
                         : index === currentStepIndex
-                        ? 'bg-teal-600 text-white ring-4 ring-teal-100 dark:ring-teal-900/30'
-                        : 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
+                          ? 'bg-teal-600 text-white ring-4 ring-teal-100 dark:ring-teal-900/30'
+                          : 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
                     }`}
                   >
                     {index + 1}
@@ -253,5 +266,5 @@ export default function ImportWizard({ isOpen, onClose, onComplete }: ImportWiza
         </div>
       </div>
     </div>
-  )
+  );
 }

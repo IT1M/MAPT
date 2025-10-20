@@ -1,19 +1,19 @@
-'use client'
+'use client';
 
-import React, { useState, useCallback } from 'react'
-import { useTranslations } from '@/hooks/useTranslations'
+import React, { useState, useCallback } from 'react';
+import { useTranslations } from '@/hooks/useTranslations';
 
 export interface PaginationProps {
-  currentPage: number
-  totalPages: number
-  totalItems: number
-  itemsPerPage: number
-  onPageChange: (page: number) => void
-  onItemsPerPageChange: (itemsPerPage: number) => void
-  className?: string
-  showJumpToPage?: boolean
-  showItemsPerPage?: boolean
-  itemsPerPageOptions?: number[]
+  currentPage: number;
+  totalPages: number;
+  totalItems: number;
+  itemsPerPage: number;
+  onPageChange: (page: number) => void;
+  onItemsPerPageChange: (itemsPerPage: number) => void;
+  className?: string;
+  showJumpToPage?: boolean;
+  showItemsPerPage?: boolean;
+  itemsPerPageOptions?: number[];
 }
 
 export const Pagination: React.FC<PaginationProps> = ({
@@ -28,125 +28,137 @@ export const Pagination: React.FC<PaginationProps> = ({
   showItemsPerPage = true,
   itemsPerPageOptions = [10, 25, 50, 100, 200],
 }) => {
-  const t = useTranslations()
-  const [jumpToPageValue, setJumpToPageValue] = useState('')
+  const t = useTranslations();
+  const [jumpToPageValue, setJumpToPageValue] = useState('');
 
   // Calculate the range of items being displayed
-  const startItem = totalItems === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1
-  const endItem = Math.min(currentPage * itemsPerPage, totalItems)
+  const startItem = totalItems === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
+  const endItem = Math.min(currentPage * itemsPerPage, totalItems);
 
   // Generate page numbers to display (show 5 at a time with ellipsis)
   const getPageNumbers = useCallback(() => {
-    const pages: (number | string)[] = []
-    const maxPagesToShow = 5
-    
+    const pages: (number | string)[] = [];
+    const maxPagesToShow = 5;
+
     if (totalPages <= maxPagesToShow + 2) {
       // Show all pages if total is small
       for (let i = 1; i <= totalPages; i++) {
-        pages.push(i)
+        pages.push(i);
       }
     } else {
       // Always show first page
-      pages.push(1)
-      
-      let startPage = Math.max(2, currentPage - 1)
-      let endPage = Math.min(totalPages - 1, currentPage + 1)
-      
+      pages.push(1);
+
+      let startPage = Math.max(2, currentPage - 1);
+      let endPage = Math.min(totalPages - 1, currentPage + 1);
+
       // Adjust if we're near the start
       if (currentPage <= 3) {
-        endPage = maxPagesToShow - 1
+        endPage = maxPagesToShow - 1;
       }
-      
+
       // Adjust if we're near the end
       if (currentPage >= totalPages - 2) {
-        startPage = totalPages - (maxPagesToShow - 2)
+        startPage = totalPages - (maxPagesToShow - 2);
       }
-      
+
       // Add ellipsis after first page if needed
       if (startPage > 2) {
-        pages.push('...')
+        pages.push('...');
       }
-      
+
       // Add middle pages
       for (let i = startPage; i <= endPage; i++) {
-        pages.push(i)
+        pages.push(i);
       }
-      
+
       // Add ellipsis before last page if needed
       if (endPage < totalPages - 1) {
-        pages.push('...')
+        pages.push('...');
       }
-      
+
       // Always show last page
-      pages.push(totalPages)
+      pages.push(totalPages);
     }
-    
-    return pages
-  }, [currentPage, totalPages])
+
+    return pages;
+  }, [currentPage, totalPages]);
 
   // Handle page change
-  const handlePageChange = useCallback((page: number) => {
-    if (page >= 1 && page <= totalPages && page !== currentPage) {
-      onPageChange(page)
-    }
-  }, [currentPage, totalPages, onPageChange])
+  const handlePageChange = useCallback(
+    (page: number) => {
+      if (page >= 1 && page <= totalPages && page !== currentPage) {
+        onPageChange(page);
+      }
+    },
+    [currentPage, totalPages, onPageChange]
+  );
 
   // Handle previous page
   const handlePrevious = useCallback(() => {
     if (currentPage > 1) {
-      handlePageChange(currentPage - 1)
+      handlePageChange(currentPage - 1);
     }
-  }, [currentPage, handlePageChange])
+  }, [currentPage, handlePageChange]);
 
   // Handle next page
   const handleNext = useCallback(() => {
     if (currentPage < totalPages) {
-      handlePageChange(currentPage + 1)
+      handlePageChange(currentPage + 1);
     }
-  }, [currentPage, totalPages, handlePageChange])
+  }, [currentPage, totalPages, handlePageChange]);
 
   // Handle jump to page
-  const handleJumpToPage = useCallback((e: React.FormEvent) => {
-    e.preventDefault()
-    const page = parseInt(jumpToPageValue, 10)
-    if (!isNaN(page) && page >= 1 && page <= totalPages) {
-      handlePageChange(page)
-      setJumpToPageValue('')
-    }
-  }, [jumpToPageValue, totalPages, handlePageChange])
+  const handleJumpToPage = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
+      const page = parseInt(jumpToPageValue, 10);
+      if (!isNaN(page) && page >= 1 && page <= totalPages) {
+        handlePageChange(page);
+        setJumpToPageValue('');
+      }
+    },
+    [jumpToPageValue, totalPages, handlePageChange]
+  );
 
   // Handle items per page change
-  const handleItemsPerPageChange = useCallback((value: number) => {
-    onItemsPerPageChange(value)
-    // Reset to page 1 when changing page size
-    if (currentPage !== 1) {
-      onPageChange(1)
-    }
-  }, [currentPage, onPageChange, onItemsPerPageChange])
+  const handleItemsPerPageChange = useCallback(
+    (value: number) => {
+      onItemsPerPageChange(value);
+      // Reset to page 1 when changing page size
+      if (currentPage !== 1) {
+        onPageChange(1);
+      }
+    },
+    [currentPage, onPageChange, onItemsPerPageChange]
+  );
 
   // Handle keyboard navigation
-  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-    switch (e.key) {
-      case 'ArrowLeft':
-        e.preventDefault()
-        handlePrevious()
-        break
-      case 'ArrowRight':
-        e.preventDefault()
-        handleNext()
-        break
-      case 'Home':
-        e.preventDefault()
-        handlePageChange(1)
-        break
-      case 'End':
-        e.preventDefault()
-        handlePageChange(totalPages)
-        break
-    }
-  }, [handlePrevious, handleNext, handlePageChange, totalPages])
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      switch (e.key) {
+        case 'ArrowLeft':
+          e.preventDefault();
+          handlePrevious();
+          break;
+        case 'ArrowRight':
+          e.preventDefault();
+          handleNext();
+          break;
+        case 'Home':
+          e.preventDefault();
+          handlePageChange(1);
+          break;
+        case 'End':
+          e.preventDefault();
+          handlePageChange(totalPages);
+          break;
+      }
+    },
+    [handlePrevious, handleNext, handlePageChange, totalPages]
+  );
 
-  const pageNumbers = getPageNumbers()
+  const pageNumbers = getPageNumbers();
 
   return (
     <div
@@ -158,9 +170,10 @@ export const Pagination: React.FC<PaginationProps> = ({
         <div className="whitespace-nowrap">
           Showing <span className="font-medium">{startItem}</span> to{' '}
           <span className="font-medium">{endItem}</span> of{' '}
-          <span className="font-medium">{totalItems.toLocaleString()}</span> items
+          <span className="font-medium">{totalItems.toLocaleString()}</span>{' '}
+          items
         </div>
-        
+
         {showItemsPerPage && (
           <div className="flex items-center gap-2">
             <label htmlFor="items-per-page" className="whitespace-nowrap">
@@ -218,11 +231,11 @@ export const Pagination: React.FC<PaginationProps> = ({
                 >
                   ...
                 </span>
-              )
+              );
             }
 
-            const pageNum = page as number
-            const isActive = pageNum === currentPage
+            const pageNum = page as number;
+            const isActive = pageNum === currentPage;
 
             return (
               <button
@@ -238,7 +251,7 @@ export const Pagination: React.FC<PaginationProps> = ({
               >
                 {pageNum}
               </button>
-            )
+            );
           })}
         </div>
 
@@ -272,8 +285,14 @@ export const Pagination: React.FC<PaginationProps> = ({
 
         {/* Jump to page */}
         {showJumpToPage && totalPages > 10 && (
-          <form onSubmit={handleJumpToPage} className="hidden lg:flex items-center gap-2 ml-4">
-            <label htmlFor="jump-to-page" className="text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">
+          <form
+            onSubmit={handleJumpToPage}
+            className="hidden lg:flex items-center gap-2 ml-4"
+          >
+            <label
+              htmlFor="jump-to-page"
+              className="text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap"
+            >
               Go to:
             </label>
             <input
@@ -297,5 +316,5 @@ export const Pagination: React.FC<PaginationProps> = ({
         )}
       </div>
     </div>
-  )
-}
+  );
+};

@@ -1,58 +1,63 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react';
 
 interface SimpleCaptchaProps {
-  onVerify: (isValid: boolean) => void
-  className?: string
+  onVerify: (isValid: boolean) => void;
+  className?: string;
 }
 
 /**
  * Simple math-based CAPTCHA component
  * For production, consider using reCAPTCHA or hCaptcha
  */
-export function SimpleCaptcha({ onVerify, className = '' }: SimpleCaptchaProps) {
-  const [num1, setNum1] = useState(0)
-  const [num2, setNum2] = useState(0)
-  const [userAnswer, setUserAnswer] = useState('')
-  const [error, setError] = useState('')
+export function SimpleCaptcha({
+  onVerify,
+  className = '',
+}: SimpleCaptchaProps) {
+  const [num1, setNum1] = useState(0);
+  const [num2, setNum2] = useState(0);
+  const [userAnswer, setUserAnswer] = useState('');
+  const [error, setError] = useState('');
 
   // Generate new challenge
   const generateChallenge = () => {
-    setNum1(Math.floor(Math.random() * 10) + 1)
-    setNum2(Math.floor(Math.random() * 10) + 1)
-    setUserAnswer('')
-    setError('')
-  }
+    setNum1(Math.floor(Math.random() * 10) + 1);
+    setNum2(Math.floor(Math.random() * 10) + 1);
+    setUserAnswer('');
+    setError('');
+  };
 
   useEffect(() => {
-    generateChallenge()
-  }, [])
+    generateChallenge();
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    const correctAnswer = num1 + num2
-    const answer = parseInt(userAnswer, 10)
+    e.preventDefault();
+
+    const correctAnswer = num1 + num2;
+    const answer = parseInt(userAnswer, 10);
 
     if (isNaN(answer)) {
-      setError('Please enter a valid number')
-      onVerify(false)
-      return
+      setError('Please enter a valid number');
+      onVerify(false);
+      return;
     }
 
     if (answer === correctAnswer) {
-      setError('')
-      onVerify(true)
+      setError('');
+      onVerify(true);
     } else {
-      setError('Incorrect answer. Please try again.')
-      onVerify(false)
-      generateChallenge()
+      setError('Incorrect answer. Please try again.');
+      onVerify(false);
+      generateChallenge();
     }
-  }
+  };
 
   return (
-    <div className={`border border-gray-300 dark:border-gray-600 rounded-lg p-4 bg-gray-50 dark:bg-gray-800 ${className}`}>
+    <div
+      className={`border border-gray-300 dark:border-gray-600 rounded-lg p-4 bg-gray-50 dark:bg-gray-800 ${className}`}
+    >
       <form onSubmit={handleSubmit}>
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           Security Check
@@ -82,7 +87,11 @@ export function SimpleCaptcha({ onVerify, className = '' }: SimpleCaptchaProps) 
           />
         </div>
         {error && (
-          <p id="captcha-error" className="text-sm text-red-600 dark:text-red-400 mb-2" role="alert">
+          <p
+            id="captcha-error"
+            className="text-sm text-red-600 dark:text-red-400 mb-2"
+            role="alert"
+          >
             {error}
           </p>
         )}
@@ -103,5 +112,5 @@ export function SimpleCaptcha({ onVerify, className = '' }: SimpleCaptchaProps) 
         </div>
       </form>
     </div>
-  )
+  );
 }

@@ -1,5 +1,5 @@
-import { Prisma } from '@prisma/client'
-import { prisma } from '@/services/prisma'
+import { Prisma } from '@prisma/client';
+import { prisma } from '@/services/prisma';
 
 /**
  * Database Error Types
@@ -22,8 +22,8 @@ export class DatabaseError extends Error {
     public code?: string,
     public meta?: Record<string, any>
   ) {
-    super(message)
-    this.name = 'DatabaseError'
+    super(message);
+    this.name = 'DatabaseError';
   }
 }
 
@@ -34,60 +34,56 @@ export function handlePrismaError(error: unknown): DatabaseError {
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
     switch (error.code) {
       case DbErrorCode.UNIQUE_CONSTRAINT:
-        const target = error.meta?.target as string[] | undefined
-        const field = target?.[0] || 'field'
+        const target = error.meta?.target as string[] | undefined;
+        const field = target?.[0] || 'field';
         return new DatabaseError(
           `A record with this ${field} already exists`,
           error.code,
           error.meta
-        )
+        );
 
       case DbErrorCode.FOREIGN_KEY_CONSTRAINT:
         return new DatabaseError(
           'Invalid reference: The related record does not exist',
           error.code,
           error.meta
-        )
+        );
 
       case DbErrorCode.RECORD_NOT_FOUND:
-        return new DatabaseError(
-          'Record not found',
-          error.code,
-          error.meta
-        )
+        return new DatabaseError('Record not found', error.code, error.meta);
 
       case DbErrorCode.DEPENDENT_RECORDS:
         return new DatabaseError(
           'Cannot delete record: It has dependent records',
           error.code,
           error.meta
-        )
+        );
 
       default:
         return new DatabaseError(
           `Database error: ${error.message}`,
           error.code,
           error.meta
-        )
+        );
     }
   }
 
   if (error instanceof Prisma.PrismaClientValidationError) {
-    return new DatabaseError('Invalid data provided', 'VALIDATION_ERROR')
+    return new DatabaseError('Invalid data provided', 'VALIDATION_ERROR');
   }
 
   if (error instanceof Prisma.PrismaClientInitializationError) {
     return new DatabaseError(
       'Failed to connect to database',
       DbErrorCode.CONNECTION_ERROR
-    )
+    );
   }
 
   if (error instanceof Error) {
-    return new DatabaseError(error.message)
+    return new DatabaseError(error.message);
   }
 
-  return new DatabaseError('An unknown database error occurred')
+  return new DatabaseError('An unknown database error occurred');
 }
 
 /**
@@ -101,9 +97,9 @@ export async function withTransaction<T>(
     return await prisma.$transaction(callback, {
       maxWait: 5000, // Maximum time to wait for a transaction slot (ms)
       timeout: 10000, // Maximum time the transaction can run (ms)
-    })
+    });
   } catch (error) {
-    throw handlePrismaError(error)
+    throw handlePrismaError(error);
   }
 }
 
@@ -114,10 +110,10 @@ export async function safeQuery<T>(
   queryFn: () => Promise<T>
 ): Promise<{ data: T | null; error: DatabaseError | null }> {
   try {
-    const data = await queryFn()
-    return { data, error: null }
+    const data = await queryFn();
+    return { data, error: null };
   } catch (error) {
-    return { data: null, error: handlePrismaError(error) }
+    return { data: null, error: handlePrismaError(error) };
   }
 }
 
@@ -125,29 +121,29 @@ export async function safeQuery<T>(
  * Pagination helper types
  */
 export interface PaginationParams {
-  page?: number
-  pageSize?: number
-  cursor?: string
+  page?: number;
+  pageSize?: number;
+  cursor?: string;
 }
 
 export interface PaginatedResult<T> {
-  data: T[]
+  data: T[];
   pagination: {
-    page: number
-    pageSize: number
-    total: number
-    totalPages: number
-    hasNext: boolean
-    hasPrev: boolean
-  }
+    page: number;
+    pageSize: number;
+    total: number;
+    totalPages: number;
+    hasNext: boolean;
+    hasPrev: boolean;
+  };
 }
 
 export interface CursorPaginatedResult<T> {
-  data: T[]
+  data: T[];
   pagination: {
-    nextCursor: string | null
-    hasMore: boolean
-  }
+    nextCursor: string | null;
+    hasMore: boolean;
+  };
 }
 
 /**
@@ -159,9 +155,9 @@ export async function paginateQuery<T>(
   params: PaginationParams & { where?: any; orderBy?: any; include?: any },
   defaultPageSize = 10
 ): Promise<PaginatedResult<T>> {
-  const page = Math.max(1, params.page || 1)
-  const pageSize = Math.min(100, params.pageSize || defaultPageSize)
-  const skip = (page - 1) * pageSize
+  const page = Math.max(1, params.page || 1);
+  const pageSize = Math.min(100, params.pageSize || defaultPageSize);
+  const skip = (page - 1) * pageSize;
 
   const [data, total] = await Promise.all([
     model.findMany({
@@ -172,9 +168,9 @@ export async function paginateQuery<T>(
       take: pageSize,
     }),
     model.count({ where: params.where }),
-  ])
+  ]);
 
-  const totalPages = Math.ceil(total / pageSize)
+  const totalPages = Math.ceil(total / pageSize);
 
   return {
     data,
@@ -186,7 +182,7 @@ export async function paginateQuery<T>(
       hasNext: page < totalPages,
       hasPrev: page > 1,
     },
-  }
+  };
 }
 
 /**
@@ -198,7 +194,7 @@ export async function paginateWithCursor<T extends { id: string }>(
   params: PaginationParams & { where?: any; orderBy?: any; include?: any },
   defaultPageSize = 10
 ): Promise<CursorPaginatedResult<T>> {
-  const pageSize = Math.min(100, params.pageSize || defaultPageSize)
+  const pageSize = Math.min(100, params.pageSize || defaultPageSize);
 
   const data = await model.findMany({
     where: params.where,
@@ -209,11 +205,11 @@ export async function paginateWithCursor<T extends { id: string }>(
       cursor: { id: params.cursor },
       skip: 1, // Skip the cursor itself
     }),
-  })
+  });
 
-  const hasMore = data.length > pageSize
-  const items = hasMore ? data.slice(0, pageSize) : data
-  const nextCursor = hasMore ? items[items.length - 1].id : null
+  const hasMore = data.length > pageSize;
+  const items = hasMore ? data.slice(0, pageSize) : data;
+  const nextCursor = hasMore ? items[items.length - 1].id : null;
 
   return {
     data: items,
@@ -221,7 +217,7 @@ export async function paginateWithCursor<T extends { id: string }>(
       nextCursor,
       hasMore,
     },
-  }
+  };
 }
 
 /**
@@ -233,15 +229,15 @@ export async function batchProcess<T, R>(
   batchSize: number,
   processor: (batch: T[]) => Promise<R[]>
 ): Promise<R[]> {
-  const results: R[] = []
+  const results: R[] = [];
 
   for (let i = 0; i < items.length; i += batchSize) {
-    const batch = items.slice(i, i + batchSize)
-    const batchResults = await processor(batch)
-    results.push(...batchResults)
+    const batch = items.slice(i, i + batchSize);
+    const batchResults = await processor(batch);
+    results.push(...batchResults);
   }
 
-  return results
+  return results;
 }
 
 /**
@@ -258,9 +254,9 @@ export async function upsertRecord<T>(
       where,
       create,
       update,
-    })
+    });
   } catch (error) {
-    throw handlePrismaError(error)
+    throw handlePrismaError(error);
   }
 }
 
@@ -277,9 +273,9 @@ export async function softDelete(
     await model.update({
       where: { id },
       data: { [deletedByField]: new Date() },
-    })
+    });
   } catch (error) {
-    throw handlePrismaError(error)
+    throw handlePrismaError(error);
   }
 }
 
@@ -295,9 +291,9 @@ export async function bulkCreate<T>(
     return await model.createMany({
       data,
       skipDuplicates,
-    })
+    });
   } catch (error) {
-    throw handlePrismaError(error)
+    throw handlePrismaError(error);
   }
 }
 
@@ -310,27 +306,24 @@ export async function findOrCreate<T>(
   create: any
 ): Promise<{ record: T; created: boolean }> {
   try {
-    const existing = await model.findUnique({ where })
+    const existing = await model.findUnique({ where });
     if (existing) {
-      return { record: existing, created: false }
+      return { record: existing, created: false };
     }
 
-    const record = await model.create({ data: create })
-    return { record, created: true }
+    const record = await model.create({ data: create });
+    return { record, created: true };
   } catch (error) {
-    throw handlePrismaError(error)
+    throw handlePrismaError(error);
   }
 }
 
 /**
  * Check if record exists
  */
-export async function recordExists(
-  model: any,
-  where: any
-): Promise<boolean> {
-  const count = await model.count({ where })
-  return count > 0
+export async function recordExists(model: any, where: any): Promise<boolean> {
+  const count = await model.count({ where });
+  return count > 0;
 }
 
 /**
@@ -345,10 +338,10 @@ export async function getRecordOrThrow<T>(
     const record = await model.findUniqueOrThrow({
       where,
       include,
-    })
-    return record
+    });
+    return record;
   } catch (error) {
-    throw handlePrismaError(error)
+    throw handlePrismaError(error);
   }
 }
 
@@ -356,39 +349,36 @@ export async function getRecordOrThrow<T>(
  * Date range query helper
  */
 export interface DateRangeParams {
-  startDate?: Date | string
-  endDate?: Date | string
-  field?: string
+  startDate?: Date | string;
+  endDate?: Date | string;
+  field?: string;
 }
 
 export function buildDateRangeFilter(params: DateRangeParams) {
-  const field = params.field || 'createdAt'
-  const filter: any = {}
+  const field = params.field || 'createdAt';
+  const filter: any = {};
 
   if (params.startDate || params.endDate) {
-    filter[field] = {}
+    filter[field] = {};
 
     if (params.startDate) {
-      filter[field].gte = new Date(params.startDate)
+      filter[field].gte = new Date(params.startDate);
     }
 
     if (params.endDate) {
-      filter[field].lte = new Date(params.endDate)
+      filter[field].lte = new Date(params.endDate);
     }
   }
 
-  return filter
+  return filter;
 }
 
 /**
  * Search helper for text fields
  */
-export function buildSearchFilter(
-  searchTerm: string,
-  fields: string[]
-): any {
+export function buildSearchFilter(searchTerm: string, fields: string[]): any {
   if (!searchTerm || fields.length === 0) {
-    return {}
+    return {};
   }
 
   return {
@@ -398,7 +388,7 @@ export function buildSearchFilter(
         mode: 'insensitive' as Prisma.QueryMode,
       },
     })),
-  }
+  };
 }
 
 /**
@@ -408,46 +398,46 @@ export async function aggregateData(
   model: any,
   where: any,
   aggregations: {
-    count?: boolean
-    sum?: string[]
-    avg?: string[]
-    min?: string[]
-    max?: string[]
+    count?: boolean;
+    sum?: string[];
+    avg?: string[];
+    min?: string[];
+    max?: string[];
   }
 ) {
-  const aggregateQuery: any = { where }
+  const aggregateQuery: any = { where };
 
   if (aggregations.count) {
-    aggregateQuery._count = true
+    aggregateQuery._count = true;
   }
 
   if (aggregations.sum) {
     aggregateQuery._sum = aggregations.sum.reduce(
       (acc, field) => ({ ...acc, [field]: true }),
       {}
-    )
+    );
   }
 
   if (aggregations.avg) {
     aggregateQuery._avg = aggregations.avg.reduce(
       (acc, field) => ({ ...acc, [field]: true }),
       {}
-    )
+    );
   }
 
   if (aggregations.min) {
     aggregateQuery._min = aggregations.min.reduce(
       (acc, field) => ({ ...acc, [field]: true }),
       {}
-    )
+    );
   }
 
   if (aggregations.max) {
     aggregateQuery._max = aggregations.max.reduce(
       (acc, field) => ({ ...acc, [field]: true }),
       {}
-    )
+    );
   }
 
-  return await model.aggregate(aggregateQuery)
+  return await model.aggregate(aggregateQuery);
 }

@@ -1,4 +1,4 @@
-import { Skeleton, SkeletonTable } from '@/components/ui/skeleton'
+import { Skeleton, SkeletonTable } from '@/components/ui/skeleton';
 
 export default function InventoryLoading() {
   return (
@@ -27,5 +27,5 @@ export default function InventoryLoading() {
       {/* Table Skeleton */}
       <SkeletonTable rows={10} columns={8} hasHeader />
     </div>
-  )
+  );
 }

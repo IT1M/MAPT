@@ -16,7 +16,7 @@ if (!fs.existsSync(iconsDir)) {
 }
 
 // Generate SVG for each size
-sizes.forEach(size => {
+sizes.forEach((size) => {
   const svg = `<?xml version="1.0" encoding="UTF-8"?>
 <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" xmlns="http://www.w3.org/2000/svg">
   <rect width="${size}" height="${size}" fill="${color}" rx="${size * 0.1}"/>

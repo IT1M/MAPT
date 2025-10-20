@@ -3,21 +3,22 @@
  * Defines all keyboard shortcuts available throughout the application
  */
 
-import { KeyboardShortcut } from '@/hooks/useKeyboardShortcuts'
+import { KeyboardShortcut } from '@/hooks/useKeyboardShortcuts';
 
-export type ShortcutCategory = 
+export type ShortcutCategory =
   | 'Navigation'
   | 'Actions'
   | 'Search'
   | 'Help'
   | 'Table'
   | 'Forms'
-  | 'Modals'
+  | 'Modals';
 
-export interface GlobalShortcutConfig extends Omit<KeyboardShortcut, 'callback'> {
-  id: string
-  category: ShortcutCategory
-  pageSpecific?: string[] // Pages where this shortcut is active
+export interface GlobalShortcutConfig
+  extends Omit<KeyboardShortcut, 'callback'> {
+  id: string;
+  category: ShortcutCategory;
+  pageSpecific?: string[]; // Pages where this shortcut is active
 }
 
 /**
@@ -192,13 +193,15 @@ export const GLOBAL_SHORTCUTS: GlobalShortcutConfig[] = [
     preventDefault: true,
     pageSpecific: ['data-log', 'audit'],
   },
-]
+];
 
 /**
  * Get shortcuts by category
  */
-export function getShortcutsByCategory(category: ShortcutCategory): GlobalShortcutConfig[] {
-  return GLOBAL_SHORTCUTS.filter(s => s.category === category)
+export function getShortcutsByCategory(
+  category: ShortcutCategory
+): GlobalShortcutConfig[] {
+  return GLOBAL_SHORTCUTS.filter((s) => s.category === category);
 }
 
 /**
@@ -206,13 +209,13 @@ export function getShortcutsByCategory(category: ShortcutCategory): GlobalShortc
  */
 export function getShortcutsForPage(page: string): GlobalShortcutConfig[] {
   return GLOBAL_SHORTCUTS.filter(
-    s => !s.pageSpecific || s.pageSpecific.includes(page)
-  )
+    (s) => !s.pageSpecific || s.pageSpecific.includes(page)
+  );
 }
 
 /**
  * Get all categories
  */
 export function getAllCategories(): ShortcutCategory[] {
-  return Array.from(new Set(GLOBAL_SHORTCUTS.map(s => s.category)))
+  return Array.from(new Set(GLOBAL_SHORTCUTS.map((s) => s.category)));
 }

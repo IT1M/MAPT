@@ -1,25 +1,26 @@
-'use client'
+'use client';
 
-import React, { useState, useEffect } from 'react'
-import type { ColorScheme } from '@/types/settings'
+import React, { useState, useEffect } from 'react';
+import type { ColorScheme } from '@/types/settings';
 
 interface ColorSchemeCustomizerProps {
-  primaryColor: string
-  accentColor: string
-  onChange: (colors: ColorScheme) => void
-  onReset: () => void
+  primaryColor: string;
+  accentColor: string;
+  onChange: (colors: ColorScheme) => void;
+  onReset: () => void;
 }
 
-const COLOR_PRESETS: Array<{ name: string; primary: string; accent: string }> = [
-  { name: 'Default', primary: '#3B82F6', accent: '#8B5CF6' },
-  { name: 'Blue', primary: '#2563EB', accent: '#06B6D4' },
-  { name: 'Green', primary: '#10B981', accent: '#34D399' },
-  { name: 'Purple', primary: '#8B5CF6', accent: '#A78BFA' },
-  { name: 'Red', primary: '#EF4444', accent: '#F87171' },
-  { name: 'Orange', primary: '#F97316', accent: '#FB923C' },
-  { name: 'Pink', primary: '#EC4899', accent: '#F472B6' },
-  { name: 'Teal', primary: '#14B8A6', accent: '#2DD4BF' },
-]
+const COLOR_PRESETS: Array<{ name: string; primary: string; accent: string }> =
+  [
+    { name: 'Default', primary: '#3B82F6', accent: '#8B5CF6' },
+    { name: 'Blue', primary: '#2563EB', accent: '#06B6D4' },
+    { name: 'Green', primary: '#10B981', accent: '#34D399' },
+    { name: 'Purple', primary: '#8B5CF6', accent: '#A78BFA' },
+    { name: 'Red', primary: '#EF4444', accent: '#F87171' },
+    { name: 'Orange', primary: '#F97316', accent: '#FB923C' },
+    { name: 'Pink', primary: '#EC4899', accent: '#F472B6' },
+    { name: 'Teal', primary: '#14B8A6', accent: '#2DD4BF' },
+  ];
 
 export function ColorSchemeCustomizer({
   primaryColor,
@@ -27,40 +28,43 @@ export function ColorSchemeCustomizer({
   onChange,
   onReset,
 }: ColorSchemeCustomizerProps) {
-  const [localPrimary, setLocalPrimary] = useState(primaryColor)
-  const [localAccent, setLocalAccent] = useState(accentColor)
+  const [localPrimary, setLocalPrimary] = useState(primaryColor);
+  const [localAccent, setLocalAccent] = useState(accentColor);
 
   // Update local state when props change
   useEffect(() => {
-    setLocalPrimary(primaryColor)
-  }, [primaryColor])
+    setLocalPrimary(primaryColor);
+  }, [primaryColor]);
 
   useEffect(() => {
-    setLocalAccent(accentColor)
-  }, [accentColor])
+    setLocalAccent(accentColor);
+  }, [accentColor]);
 
   const handlePrimaryChange = (color: string) => {
-    setLocalPrimary(color)
-    onChange({ primary: color, accent: localAccent })
-  }
+    setLocalPrimary(color);
+    onChange({ primary: color, accent: localAccent });
+  };
 
   const handleAccentChange = (color: string) => {
-    setLocalAccent(color)
-    onChange({ primary: localPrimary, accent: color })
-  }
+    setLocalAccent(color);
+    onChange({ primary: localPrimary, accent: color });
+  };
 
   const handlePresetSelect = (preset: { primary: string; accent: string }) => {
-    setLocalPrimary(preset.primary)
-    setLocalAccent(preset.accent)
-    onChange({ primary: preset.primary, accent: preset.accent })
-  }
+    setLocalPrimary(preset.primary);
+    setLocalAccent(preset.accent);
+    onChange({ primary: preset.primary, accent: preset.accent });
+  };
 
-  const isDefaultColors = localPrimary === '#3B82F6' && localAccent === '#8B5CF6'
+  const isDefaultColors =
+    localPrimary === '#3B82F6' && localAccent === '#8B5CF6';
 
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">Color Scheme</h3>
+        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">
+          Color Scheme
+        </h3>
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
           Customize the primary and accent colors used throughout the interface
         </p>
@@ -68,10 +72,13 @@ export function ColorSchemeCustomizer({
 
       {/* Color Presets */}
       <div className="space-y-3">
-        <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Presets</label>
+        <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+          Presets
+        </label>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {COLOR_PRESETS.map((preset) => {
-            const isSelected = localPrimary === preset.primary && localAccent === preset.accent
+            const isSelected =
+              localPrimary === preset.primary && localAccent === preset.accent;
 
             return (
               <button
@@ -123,9 +130,11 @@ export function ColorSchemeCustomizer({
                 </div>
 
                 {/* Preset name */}
-                <span className="text-xs font-medium text-gray-700 dark:text-gray-300">{preset.name}</span>
+                <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
+                  {preset.name}
+                </span>
               </button>
-            )
+            );
           })}
         </div>
       </div>
@@ -134,7 +143,10 @@ export function ColorSchemeCustomizer({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Primary Color */}
         <div className="space-y-3">
-          <label htmlFor="primary-color" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+          <label
+            htmlFor="primary-color"
+            className="text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
             Primary Color
           </label>
           <div className="flex items-center gap-3">
@@ -156,14 +168,19 @@ export function ColorSchemeCustomizer({
                 pattern="^#[0-9A-Fa-f]{6}$"
                 aria-label="Primary color hex code"
               />
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Used for buttons, links, and highlights</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                Used for buttons, links, and highlights
+              </p>
             </div>
           </div>
         </div>
 
         {/* Accent Color */}
         <div className="space-y-3">
-          <label htmlFor="accent-color" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+          <label
+            htmlFor="accent-color"
+            className="text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
             Accent Color
           </label>
           <div className="flex items-center gap-3">
@@ -185,7 +202,9 @@ export function ColorSchemeCustomizer({
                 pattern="^#[0-9A-Fa-f]{6}$"
                 aria-label="Accent color hex code"
               />
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Used for secondary elements and badges</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                Used for secondary elements and badges
+              </p>
             </div>
           </div>
         </div>
@@ -193,14 +212,19 @@ export function ColorSchemeCustomizer({
 
       {/* Live Preview */}
       <div className="space-y-3">
-        <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Preview</label>
+        <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+          Preview
+        </label>
         <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700 space-y-4">
           {/* Buttons preview */}
           <div className="flex flex-wrap gap-3">
             <button
               type="button"
               className="px-4 py-2 rounded-lg text-white font-medium transition-opacity hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2"
-              style={{ backgroundColor: localPrimary, boxShadow: `0 0 0 0 ${localPrimary}` }}
+              style={{
+                backgroundColor: localPrimary,
+                boxShadow: `0 0 0 0 ${localPrimary}`,
+              }}
               disabled
             >
               Primary Button
@@ -208,7 +232,10 @@ export function ColorSchemeCustomizer({
             <button
               type="button"
               className="px-4 py-2 rounded-lg text-white font-medium transition-opacity hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2"
-              style={{ backgroundColor: localAccent, boxShadow: `0 0 0 0 ${localAccent}` }}
+              style={{
+                backgroundColor: localAccent,
+                boxShadow: `0 0 0 0 ${localAccent}`,
+              }}
               disabled
             >
               Accent Button
@@ -272,9 +299,10 @@ export function ColorSchemeCustomizer({
           />
         </svg>
         <span>
-          Custom colors are applied using CSS variables. Some components may require a page refresh to fully apply the new colors.
+          Custom colors are applied using CSS variables. Some components may
+          require a page refresh to fully apply the new colors.
         </span>
       </div>
     </div>
-  )
+  );
 }

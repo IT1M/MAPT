@@ -1,17 +1,18 @@
-'use client'
+'use client';
 
 /**
  * Loading State Components
  * Provides consistent loading indicators and optimistic updates
  */
 
-import React, { useState, useEffect } from 'react'
-import { InlineLoader } from './SkeletonLoader'
+import React, { useState, useEffect } from 'react';
+import { InlineLoader } from './SkeletonLoader';
 
-interface LoadingButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  loading?: boolean
-  loadingText?: string
-  children: React.ReactNode
+interface LoadingButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  loading?: boolean;
+  loadingText?: string;
+  children: React.ReactNode;
 }
 
 /**
@@ -40,15 +41,15 @@ export function LoadingButton({
         {loading && loadingText ? loadingText : children}
       </span>
     </button>
-  )
+  );
 }
 
 interface ProgressBarProps {
-  progress: number
-  className?: string
-  showLabel?: boolean
-  size?: 'sm' | 'md' | 'lg'
-  variant?: 'default' | 'success' | 'warning' | 'error'
+  progress: number;
+  className?: string;
+  showLabel?: boolean;
+  size?: 'sm' | 'md' | 'lg';
+  variant?: 'default' | 'success' | 'warning' | 'error';
 }
 
 /**
@@ -65,20 +66,22 @@ export function ProgressBar({
     sm: 'h-1',
     md: 'h-2',
     lg: 'h-3',
-  }
-  
+  };
+
   const variantClasses = {
     default: 'bg-primary-600',
     success: 'bg-green-600',
     warning: 'bg-yellow-600',
     error: 'bg-red-600',
-  }
-  
-  const clampedProgress = Math.min(100, Math.max(0, progress))
-  
+  };
+
+  const clampedProgress = Math.min(100, Math.max(0, progress));
+
   return (
     <div className={className}>
-      <div className={`w-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden ${sizeClasses[size]}`}>
+      <div
+        className={`w-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden ${sizeClasses[size]}`}
+      >
         <div
           className={`${sizeClasses[size]} ${variantClasses[variant]} transition-all duration-300 ease-out rounded-full`}
           style={{ width: `${clampedProgress}%` }}
@@ -94,13 +97,13 @@ export function ProgressBar({
         </div>
       )}
     </div>
-  )
+  );
 }
 
 interface SpinnerProps {
-  size?: 'sm' | 'md' | 'lg' | 'xl'
-  className?: string
-  label?: string
+  size?: 'sm' | 'md' | 'lg' | 'xl';
+  className?: string;
+  label?: string;
 }
 
 /**
@@ -112,8 +115,8 @@ export function Spinner({ size = 'md', className = '', label }: SpinnerProps) {
     md: 'w-8 h-8',
     lg: 'w-12 h-12',
     xl: 'w-16 h-16',
-  }
-  
+  };
+
   return (
     <div className={`flex flex-col items-center justify-center ${className}`}>
       <svg
@@ -142,21 +145,25 @@ export function Spinner({ size = 'md', className = '', label }: SpinnerProps) {
         <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">{label}</p>
       )}
     </div>
-  )
+  );
 }
 
 interface LoadingOverlayProps {
-  isLoading: boolean
-  message?: string
-  children: React.ReactNode
+  isLoading: boolean;
+  message?: string;
+  children: React.ReactNode;
 }
 
 /**
  * Loading overlay for sections
  */
-export function LoadingOverlay({ isLoading, message, children }: LoadingOverlayProps) {
-  if (!isLoading) return <>{children}</>
-  
+export function LoadingOverlay({
+  isLoading,
+  message,
+  children,
+}: LoadingOverlayProps) {
+  if (!isLoading) return <>{children}</>;
+
   return (
     <div className="relative">
       <div className="opacity-50 pointer-events-none">{children}</div>
@@ -164,15 +171,15 @@ export function LoadingOverlay({ isLoading, message, children }: LoadingOverlayP
         <Spinner size="lg" label={message} />
       </div>
     </div>
-  )
+  );
 }
 
 interface OptimisticUpdateProps<T> {
-  data: T
-  isLoading: boolean
-  error?: Error
-  children: (data: T, isStale: boolean) => React.ReactNode
-  fallback?: React.ReactNode
+  data: T;
+  isLoading: boolean;
+  error?: Error;
+  children: (data: T, isStale: boolean) => React.ReactNode;
+  fallback?: React.ReactNode;
 }
 
 /**
@@ -185,48 +192,48 @@ export function OptimisticUpdate<T>({
   children,
   fallback,
 }: OptimisticUpdateProps<T>) {
-  const [optimisticData, setOptimisticData] = useState(data)
-  const [isStale, setIsStale] = useState(false)
-  
+  const [optimisticData, setOptimisticData] = useState(data);
+  const [isStale, setIsStale] = useState(false);
+
   useEffect(() => {
     if (isLoading) {
-      setIsStale(true)
+      setIsStale(true);
     } else {
-      setOptimisticData(data)
-      setIsStale(false)
+      setOptimisticData(data);
+      setIsStale(false);
     }
-  }, [data, isLoading])
-  
+  }, [data, isLoading]);
+
   if (error && fallback) {
-    return <>{fallback}</>
+    return <>{fallback}</>;
   }
-  
-  return <>{children(optimisticData, isStale)}</>
+
+  return <>{children(optimisticData, isStale)}</>;
 }
 
 interface DelayedLoaderProps {
-  delay?: number
-  children: React.ReactNode
+  delay?: number;
+  children: React.ReactNode;
 }
 
 /**
  * Delayed loader to prevent flash of loading state
  */
 export function DelayedLoader({ delay = 300, children }: DelayedLoaderProps) {
-  const [show, setShow] = useState(false)
-  
+  const [show, setShow] = useState(false);
+
   useEffect(() => {
-    const timer = setTimeout(() => setShow(true), delay)
-    return () => clearTimeout(timer)
-  }, [delay])
-  
-  if (!show) return null
-  
-  return <>{children}</>
+    const timer = setTimeout(() => setShow(true), delay);
+    return () => clearTimeout(timer);
+  }, [delay]);
+
+  if (!show) return null;
+
+  return <>{children}</>;
 }
 
 interface LoadingDotsProps {
-  className?: string
+  className?: string;
 }
 
 /**
@@ -235,29 +242,42 @@ interface LoadingDotsProps {
 export function LoadingDots({ className = '' }: LoadingDotsProps) {
   return (
     <div className={`flex space-x-1 ${className}`}>
-      <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-      <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-      <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+      <div
+        className="w-2 h-2 bg-current rounded-full animate-bounce"
+        style={{ animationDelay: '0ms' }}
+      />
+      <div
+        className="w-2 h-2 bg-current rounded-full animate-bounce"
+        style={{ animationDelay: '150ms' }}
+      />
+      <div
+        className="w-2 h-2 bg-current rounded-full animate-bounce"
+        style={{ animationDelay: '300ms' }}
+      />
     </div>
-  )
+  );
 }
 
 interface PulseLoaderProps {
-  count?: number
-  size?: 'sm' | 'md' | 'lg'
-  className?: string
+  count?: number;
+  size?: 'sm' | 'md' | 'lg';
+  className?: string;
 }
 
 /**
  * Pulse loader animation
  */
-export function PulseLoader({ count = 3, size = 'md', className = '' }: PulseLoaderProps) {
+export function PulseLoader({
+  count = 3,
+  size = 'md',
+  className = '',
+}: PulseLoaderProps) {
   const sizeClasses = {
     sm: 'w-2 h-2',
     md: 'w-3 h-3',
     lg: 'w-4 h-4',
-  }
-  
+  };
+
   return (
     <div className={`flex space-x-2 ${className}`}>
       {Array.from({ length: count }).map((_, i) => (
@@ -268,12 +288,12 @@ export function PulseLoader({ count = 3, size = 'md', className = '' }: PulseLoa
         />
       ))}
     </div>
-  )
+  );
 }
 
 interface SkeletonTextProps {
-  lines?: number
-  className?: string
+  lines?: number;
+  className?: string;
 }
 
 /**
@@ -290,17 +310,17 @@ export function SkeletonText({ lines = 3, className = '' }: SkeletonTextProps) {
         />
       ))}
     </div>
-  )
+  );
 }
 
 interface LoadingStateProps {
-  isLoading: boolean
-  error?: Error
-  isEmpty?: boolean
-  loadingComponent?: React.ReactNode
-  errorComponent?: React.ReactNode
-  emptyComponent?: React.ReactNode
-  children: React.ReactNode
+  isLoading: boolean;
+  error?: Error;
+  isEmpty?: boolean;
+  loadingComponent?: React.ReactNode;
+  errorComponent?: React.ReactNode;
+  emptyComponent?: React.ReactNode;
+  children: React.ReactNode;
 }
 
 /**
@@ -316,15 +336,17 @@ export function LoadingState({
   children,
 }: LoadingStateProps) {
   if (isLoading) {
-    return <>{loadingComponent || <Spinner size="lg" label="Loading..." />}</>
+    return <>{loadingComponent || <Spinner size="lg" label="Loading..." />}</>;
   }
-  
+
   if (error) {
     return (
       <>
         {errorComponent || (
           <div className="text-center py-8">
-            <p className="text-red-600 dark:text-red-400">Error: {error.message}</p>
+            <p className="text-red-600 dark:text-red-400">
+              Error: {error.message}
+            </p>
             <button
               onClick={() => window.location.reload()}
               className="mt-4 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
@@ -334,9 +356,9 @@ export function LoadingState({
           </div>
         )}
       </>
-    )
+    );
   }
-  
+
   if (isEmpty) {
     return (
       <>
@@ -346,8 +368,8 @@ export function LoadingState({
           </div>
         )}
       </>
-    )
+    );
   }
-  
-  return <>{children}</>
+
+  return <>{children}</>;
 }

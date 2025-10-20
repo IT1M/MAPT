@@ -2,10 +2,10 @@
 
 /**
  * Bundle Size Analysis Script
- * 
+ *
  * This script analyzes the Next.js build output to identify large bundles
  * and provides recommendations for optimization.
- * 
+ *
  * Usage: node scripts/analyze-bundle.js
  */
 

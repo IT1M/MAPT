@@ -1,13 +1,13 @@
 /**
  * Theme Customization Usage Examples
- * 
+ *
  * This file demonstrates how to use the theme customization system
  * in different scenarios throughout the application.
  */
 
-import React from 'react'
-import { ThemeCustomizer } from './ThemeCustomizer'
-import { useThemeCustomization } from '@/hooks/useThemeCustomization'
+import React from 'react';
+import { ThemeCustomizer } from './ThemeCustomizer';
+import { useThemeCustomization } from '@/hooks/useThemeCustomization';
 
 // ============================================================================
 // Example 1: Basic Integration in Settings Page
@@ -18,7 +18,7 @@ export function SettingsAppearancePage() {
     <div className="max-w-6xl mx-auto p-6">
       <ThemeCustomizer />
     </div>
-  )
+  );
 }
 
 // ============================================================================
@@ -26,8 +26,8 @@ export function SettingsAppearancePage() {
 // ============================================================================
 
 export function QuickThemeSwitcher() {
-  const { currentTheme, selectPreset } = useThemeCustomization()
-  const [isOpen, setIsOpen] = React.useState(false)
+  const { currentTheme, selectPreset } = useThemeCustomization();
+  const [isOpen, setIsOpen] = React.useState(false);
 
   return (
     <div className="relative">
@@ -36,8 +36,18 @@ export function QuickThemeSwitcher() {
         className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
         aria-label="Change theme"
       >
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+        <svg
+          className="w-5 h-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"
+          />
         </svg>
       </button>
 
@@ -47,18 +57,26 @@ export function QuickThemeSwitcher() {
             Quick Themes
           </div>
           <div className="space-y-1">
-            {['default', 'ocean', 'forest', 'sunset', 'royal', 'monochrome'].map((themeId) => (
+            {[
+              'default',
+              'ocean',
+              'forest',
+              'sunset',
+              'royal',
+              'monochrome',
+            ].map((themeId) => (
               <button
                 key={themeId}
                 onClick={() => {
-                  selectPreset(themeId)
-                  setIsOpen(false)
+                  selectPreset(themeId);
+                  setIsOpen(false);
                 }}
                 className={`
                   w-full text-left px-3 py-2 rounded-md text-sm transition-colors capitalize
-                  ${currentTheme.id === themeId
-                    ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300'
-                    : 'hover:bg-gray-100 dark:hover:bg-gray-700'
+                  ${
+                    currentTheme.id === themeId
+                      ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300'
+                      : 'hover:bg-gray-100 dark:hover:bg-gray-700'
                   }
                 `}
               >
@@ -69,24 +87,31 @@ export function QuickThemeSwitcher() {
         </div>
       )}
     </div>
-  )
+  );
 }
 
 // ============================================================================
 // Example 3: Themed Component
 // ============================================================================
 
-export function ThemedCard({ title, children }: { title: string; children: React.ReactNode }) {
+export function ThemedCard({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="theme-card theme-transition-colors">
-      <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--theme-primary)' }}>
+      <h3
+        className="text-lg font-semibold mb-4"
+        style={{ color: 'var(--theme-primary)' }}
+      >
         {title}
       </h3>
-      <div className="space-y-2">
-        {children}
-      </div>
+      <div className="space-y-2">{children}</div>
     </div>
-  )
+  );
 }
 
 // ============================================================================
@@ -94,19 +119,24 @@ export function ThemedCard({ title, children }: { title: string; children: React
 // ============================================================================
 
 interface ThemedButtonProps {
-  variant?: 'primary' | 'secondary' | 'outline'
-  children: React.ReactNode
-  onClick?: () => void
+  variant?: 'primary' | 'secondary' | 'outline';
+  children: React.ReactNode;
+  onClick?: () => void;
 }
 
-export function ThemedButton({ variant = 'primary', children, onClick }: ThemedButtonProps) {
-  const baseClasses = 'px-4 py-2 rounded-lg font-medium transition-all theme-transition-colors'
-  
+export function ThemedButton({
+  variant = 'primary',
+  children,
+  onClick,
+}: ThemedButtonProps) {
+  const baseClasses =
+    'px-4 py-2 rounded-lg font-medium transition-all theme-transition-colors';
+
   const variantClasses = {
     primary: 'theme-button-primary',
     secondary: 'theme-button-secondary',
     outline: 'border-2 hover:bg-opacity-10',
-  }
+  };
 
   const variantStyles = {
     outline: {
@@ -114,7 +144,7 @@ export function ThemedButton({ variant = 'primary', children, onClick }: ThemedB
       color: 'var(--theme-primary)',
       backgroundColor: 'transparent',
     },
-  }
+  };
 
   return (
     <button
@@ -124,7 +154,7 @@ export function ThemedButton({ variant = 'primary', children, onClick }: ThemedB
     >
       {children}
     </button>
-  )
+  );
 }
 
 // ============================================================================
@@ -132,8 +162,8 @@ export function ThemedButton({ variant = 'primary', children, onClick }: ThemedB
 // ============================================================================
 
 interface StatusBadgeProps {
-  status: 'success' | 'warning' | 'error' | 'info'
-  children: React.ReactNode
+  status: 'success' | 'warning' | 'error' | 'info';
+  children: React.ReactNode;
 }
 
 export function StatusBadge({ status, children }: StatusBadgeProps) {
@@ -142,28 +172,31 @@ export function StatusBadge({ status, children }: StatusBadgeProps) {
     warning: 'theme-badge-warning',
     error: 'theme-badge-error',
     info: 'theme-badge-info',
-  }
+  };
 
-  return (
-    <span className={badgeClasses[status]}>
-      {children}
-    </span>
-  )
+  return <span className={badgeClasses[status]}>{children}</span>;
 }
 
 // ============================================================================
 // Example 6: Density-Aware Layout
 // ============================================================================
 
-export function DensityAwareLayout({ children }: { children: React.ReactNode }) {
+export function DensityAwareLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <div className="space-y-4">
       {/* This layout will automatically adjust based on density setting */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3" style={{ gap: 'var(--theme-gap)' }}>
+      <div
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+        style={{ gap: 'var(--theme-gap)' }}
+      >
         {children}
       </div>
     </div>
-  )
+  );
 }
 
 // ============================================================================
@@ -171,28 +204,31 @@ export function DensityAwareLayout({ children }: { children: React.ReactNode }) 
 // ============================================================================
 
 export function ThemeShareWidget() {
-  const { exportTheme, generateShareCode } = useThemeCustomization()
-  const [shareCode, setShareCode] = React.useState('')
+  const { exportTheme, generateShareCode } = useThemeCustomization();
+  const [shareCode, setShareCode] = React.useState('');
 
   const handleGenerateCode = () => {
-    const code = generateShareCode()
-    setShareCode(code)
-  }
+    const code = generateShareCode();
+    setShareCode(code);
+  };
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(shareCode)
-    alert('Share code copied to clipboard!')
-  }
+    navigator.clipboard.writeText(shareCode);
+    alert('Share code copied to clipboard!');
+  };
 
   return (
     <div className="theme-card space-y-4">
       <h3 className="font-semibold">Share Your Theme</h3>
-      
+
       <div className="flex gap-2">
         <button onClick={exportTheme} className="theme-button-primary flex-1">
           Download JSON
         </button>
-        <button onClick={handleGenerateCode} className="theme-button-secondary flex-1">
+        <button
+          onClick={handleGenerateCode}
+          className="theme-button-secondary flex-1"
+        >
           Generate Code
         </button>
       </div>
@@ -206,7 +242,10 @@ export function ThemeShareWidget() {
               readOnly
               className="theme-input flex-1 font-mono text-xs"
             />
-            <button onClick={handleCopy} className="px-3 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg">
+            <button
+              onClick={handleCopy}
+              className="px-3 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg"
+            >
               Copy
             </button>
           </div>
@@ -216,7 +255,7 @@ export function ThemeShareWidget() {
         </div>
       )}
     </div>
-  )
+  );
 }
 
 // ============================================================================
@@ -224,37 +263,47 @@ export function ThemeShareWidget() {
 // ============================================================================
 
 export function ProgrammaticThemeExample() {
-  const { updateColors, updateDensity, updateAnimations } = useThemeCustomization()
+  const { updateColors, updateDensity, updateAnimations } =
+    useThemeCustomization();
 
   const applyBrandColors = () => {
     updateColors({
       primary: '#ff6b6b',
       secondary: '#4ecdc4',
       accent: '#ffe66d',
-    })
-  }
+    });
+  };
 
   const toggleCompactMode = () => {
-    updateDensity('compact')
-  }
+    updateDensity('compact');
+  };
 
   const disableAnimations = () => {
-    updateAnimations({ enabled: false })
-  }
+    updateAnimations({ enabled: false });
+  };
 
   return (
     <div className="space-y-2">
-      <button onClick={applyBrandColors} className="theme-button-primary w-full">
+      <button
+        onClick={applyBrandColors}
+        className="theme-button-primary w-full"
+      >
         Apply Brand Colors
       </button>
-      <button onClick={toggleCompactMode} className="theme-button-secondary w-full">
+      <button
+        onClick={toggleCompactMode}
+        className="theme-button-secondary w-full"
+      >
         Enable Compact Mode
       </button>
-      <button onClick={disableAnimations} className="theme-button-secondary w-full">
+      <button
+        onClick={disableAnimations}
+        className="theme-button-secondary w-full"
+      >
         Disable Animations
       </button>
     </div>
-  )
+  );
 }
 
 // ============================================================================
@@ -262,7 +311,7 @@ export function ProgrammaticThemeExample() {
 // ============================================================================
 
 export function useThemeChartColors() {
-  const { currentTheme } = useThemeCustomization()
+  const { currentTheme } = useThemeCustomization();
 
   return {
     primary: currentTheme.colors.primary,
@@ -272,11 +321,11 @@ export function useThemeChartColors() {
     warning: currentTheme.colors.warning,
     error: currentTheme.colors.error,
     info: currentTheme.colors.info,
-  }
+  };
 }
 
 export function ThemedChart() {
-  const colors = useThemeChartColors()
+  const colors = useThemeChartColors();
 
   // Use these colors in your chart library
   const chartData = {
@@ -294,7 +343,7 @@ export function ThemedChart() {
         data: [15, 25, 35, 45, 55],
       },
     ],
-  }
+  };
 
   return (
     <div className="theme-card">
@@ -302,7 +351,7 @@ export function ThemedChart() {
       {/* Your chart component here */}
       <pre className="text-xs">{JSON.stringify(chartData, null, 2)}</pre>
     </div>
-  )
+  );
 }
 
 // ============================================================================
@@ -350,5 +399,5 @@ export function CompleteThemeSettings() {
         </div>
       </ThemedCard>
     </div>
-  )
+  );
 }

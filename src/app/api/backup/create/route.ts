@@ -1,17 +1,17 @@
-import { NextRequest } from 'next/server'
-import { checkAuth, checkRole } from '@/middleware/auth'
+import { NextRequest } from 'next/server';
+import { checkAuth, checkRole } from '@/middleware/auth';
 import {
   successResponse,
   handleApiError,
   validationError,
-} from '@/utils/api-response'
-import { BackupService, BackupCreateConfig } from '@/services/backup'
+} from '@/utils/api-response';
+import { BackupService, BackupCreateConfig } from '@/services/backup';
 
 /**
  * POST /api/backup/create
- * 
+ *
  * Create a manual backup with comprehensive options
- * 
+ *
  * Request Body:
  * - name: string (backup name)
  * - includeAuditLogs: boolean (default: false)
@@ -22,46 +22,51 @@ import { BackupService, BackupCreateConfig } from '@/services/backup'
  * - notes: string (optional)
  * - encrypted: boolean (default: false)
  * - password: string (required if encrypted)
- * 
+ *
  * Requirements: 15
  */
 export async function POST(request: NextRequest) {
   try {
     // Check authentication
-    const authResult = await checkAuth()
+    const authResult = await checkAuth();
     if ('error' in authResult) {
-      return authResult.error
+      return authResult.error;
     }
 
-    const { context } = authResult
+    const { context } = authResult;
 
     // Check role (ADMIN only for manual backups)
-    const roleCheck = checkRole('ADMIN', context)
+    const roleCheck = checkRole('ADMIN', context);
     if ('error' in roleCheck) {
-      return roleCheck.error
+      return roleCheck.error;
     }
 
     // Parse and validate request body
-    const body = await request.json()
+    const body = await request.json();
 
     // Validate required fields
     if (!body.name || typeof body.name !== 'string') {
-      return validationError('Backup name is required')
+      return validationError('Backup name is required');
     }
 
-    if (!body.format || !['csv', 'json', 'sql', 'all'].includes(body.format.toLowerCase())) {
-      return validationError('Invalid format. Must be csv, json, sql, or all')
+    if (
+      !body.format ||
+      !['csv', 'json', 'sql', 'all'].includes(body.format.toLowerCase())
+    ) {
+      return validationError('Invalid format. Must be csv, json, sql, or all');
     }
 
     // Validate encryption
     if (body.encrypted && !body.password) {
-      return validationError('Password is required for encrypted backups')
+      return validationError('Password is required for encrypted backups');
     }
 
     // Validate date range if provided
     if (body.dateRange) {
       if (!body.dateRange.from || !body.dateRange.to) {
-        return validationError('Date range must include both from and to dates')
+        return validationError(
+          'Date range must include both from and to dates'
+        );
       }
     }
 
@@ -72,19 +77,21 @@ export async function POST(request: NextRequest) {
       includeUserData: body.includeUserData || false,
       includeSettings: body.includeSettings || false,
       format: body.format.toUpperCase(),
-      dateRange: body.dateRange ? {
-        from: new Date(body.dateRange.from),
-        to: new Date(body.dateRange.to),
-      } : undefined,
+      dateRange: body.dateRange
+        ? {
+            from: new Date(body.dateRange.from),
+            to: new Date(body.dateRange.to),
+          }
+        : undefined,
       notes: body.notes,
       encrypted: body.encrypted || false,
       password: body.password,
       userId: context.user.id,
       type: 'MANUAL',
-    }
+    };
 
     // Create backup using BackupService
-    const backup = await BackupService.createBackup(config)
+    const backup = await BackupService.createBackup(config);
 
     // Return backup record
     return successResponse(
@@ -105,12 +112,14 @@ export async function POST(request: NextRequest) {
       },
       'Backup created successfully',
       201
-    )
+    );
   } catch (error: any) {
     // Handle BackupError specifically
     if (error.name === 'BackupError') {
-      return validationError(error.message, [{ code: error.code, recoverable: error.recoverable }])
+      return validationError(error.message, [
+        { code: error.code, recoverable: error.recoverable },
+      ]);
     }
-    return handleApiError(error)
+    return handleApiError(error);
   }
 }

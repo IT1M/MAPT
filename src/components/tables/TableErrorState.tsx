@@ -1,13 +1,13 @@
-'use client'
+'use client';
 
-import React from 'react'
+import React from 'react';
 
 export interface TableErrorStateProps {
-  title?: string
-  message?: string
-  error?: Error | null
-  onRetry?: () => void
-  className?: string
+  title?: string;
+  message?: string;
+  error?: Error | null;
+  onRetry?: () => void;
+  className?: string;
 }
 
 export const TableErrorState: React.FC<TableErrorStateProps> = ({
@@ -17,7 +17,10 @@ export const TableErrorState: React.FC<TableErrorStateProps> = ({
   onRetry,
   className = '',
 }) => {
-  const errorMessage = message || error?.message || 'An unexpected error occurred while loading the data.'
+  const errorMessage =
+    message ||
+    error?.message ||
+    'An unexpected error occurred while loading the data.';
 
   return (
     <div className={`text-center py-12 px-4 ${className}`}>
@@ -62,5 +65,5 @@ export const TableErrorState: React.FC<TableErrorStateProps> = ({
         </button>
       )}
     </div>
-  )
-}
+  );
+};

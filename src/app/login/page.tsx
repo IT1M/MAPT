@@ -1,9 +1,13 @@
-import { BrandingPanel } from '@/components/auth/BrandingPanel'
-import { LoginForm } from '@/components/auth/LoginForm'
-import { useTranslations } from '@/hooks/useTranslations'
+import { BrandingPanel } from '@/components/auth/BrandingPanel';
+import { LoginForm } from '@/components/auth/LoginForm';
+import { useTranslations } from '@/hooks/useTranslations';
 
-export default async function LoginPage({ params }: { params: Promise<{ locale: string }> }) {
-  const { locale } = await params
+export default async function LoginPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
 
   return (
     <div className="flex min-h-screen">
@@ -37,18 +41,18 @@ export default async function LoginPage({ params }: { params: Promise<{ locale: 
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 // Client components for translations
 function LoginPageTitle() {
-  'use client'
-  const t = useTranslations()
-  return <>{t('auth.welcomeBack')}</>
+  'use client';
+  const t = useTranslations();
+  return <>{t('auth.welcomeBack')}</>;
 }
 
 function LoginPageSubtitle() {
-  'use client'
-  const t = useTranslations()
-  return <>{t('auth.signInToContinue')}</>
+  'use client';
+  const t = useTranslations();
+  return <>{t('auth.signInToContinue')}</>;
 }

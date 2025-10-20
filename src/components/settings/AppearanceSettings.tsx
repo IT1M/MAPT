@@ -1,63 +1,79 @@
-'use client'
+'use client';
 
-import React, { useEffect } from 'react'
-import { ThemeSelector } from './ThemeSelector'
-import { UIDensitySelector } from './UIDensitySelector'
-import { ColorSchemeCustomizer } from './ColorSchemeCustomizer'
-import { useUserPreferences } from '@/hooks/useUserPreferences'
-import type { ThemeMode, UIDensity, ColorScheme } from '@/types/settings'
+import React, { useEffect } from 'react';
+import { ThemeSelector } from './ThemeSelector';
+import { UIDensitySelector } from './UIDensitySelector';
+import { ColorSchemeCustomizer } from './ColorSchemeCustomizer';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
+import type { ThemeMode, UIDensity, ColorScheme } from '@/types/settings';
 
 export function AppearanceSettings() {
-  const { preferences, updatePreferences, isLoading, error } = useUserPreferences()
+  const { preferences, updatePreferences, isLoading, error } =
+    useUserPreferences();
 
   // Apply CSS variables when preferences change
   useEffect(() => {
-    if (!preferences) return
+    if (!preferences) return;
 
     // Apply font size
-    document.documentElement.style.setProperty('--font-size-base', `${preferences.fontSize}px`)
+    document.documentElement.style.setProperty(
+      '--font-size-base',
+      `${preferences.fontSize}px`
+    );
 
     // Apply UI density
     const spacingMap = {
       compact: '4px',
       comfortable: '8px',
       spacious: '12px',
-    }
-    document.documentElement.style.setProperty('--spacing-unit', spacingMap[preferences.uiDensity])
+    };
+    document.documentElement.style.setProperty(
+      '--spacing-unit',
+      spacingMap[preferences.uiDensity]
+    );
 
     // Apply color scheme if custom colors are set
     if (preferences.colorScheme) {
-      document.documentElement.style.setProperty('--color-primary', preferences.colorScheme.primary)
-      document.documentElement.style.setProperty('--color-accent', preferences.colorScheme.accent)
+      document.documentElement.style.setProperty(
+        '--color-primary',
+        preferences.colorScheme.primary
+      );
+      document.documentElement.style.setProperty(
+        '--color-accent',
+        preferences.colorScheme.accent
+      );
     }
-  }, [preferences])
+  }, [preferences]);
 
   const handleThemeChange = async (theme: ThemeMode) => {
     try {
-      await updatePreferences({ theme })
+      await updatePreferences({ theme });
     } catch (err) {
-      console.error('Failed to update theme:', err)
+      console.error('Failed to update theme:', err);
     }
-  }
+  };
 
-  const handleUISettingsChange = async (settings: { density: UIDensity; fontSize: number }) => {
+  const handleUISettingsChange = async (settings: {
+    density: UIDensity;
+    fontSize: number;
+  }) => {
     try {
       await updatePreferences({
         uiDensity: settings.density,
         fontSize: settings.fontSize,
-      })
+      });
     } catch (err) {
-      console.error('Failed to update UI settings:', err)
+      console.error('Failed to update UI settings:', err);
     }
-  }
+  };
 
   const handleColorSchemeChange = async (colors: ColorScheme) => {
     try {
-      await updatePreferences({ colorScheme: colors })
+      await updatePreferences({ colorScheme: colors });
     } catch (err) {
-      console.error('Failed to update color scheme:', err)
+      console.error('Failed to update color scheme:', err);
     }
-  }
+  };
 
   const handleColorSchemeReset = async () => {
     try {
@@ -66,11 +82,11 @@ export function AppearanceSettings() {
           primary: '#3B82F6',
           accent: '#8B5CF6',
         },
-      })
+      });
     } catch (err) {
-      console.error('Failed to reset color scheme:', err)
+      console.error('Failed to reset color scheme:', err);
     }
-  }
+  };
 
   if (isLoading) {
     return (
@@ -79,7 +95,7 @@ export function AppearanceSettings() {
         <div className="h-64 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
         <div className="h-80 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
       </div>
-    )
+    );
   }
 
   if (error) {
@@ -99,23 +115,29 @@ export function AppearanceSettings() {
             />
           </svg>
           <div>
-            <h3 className="text-sm font-medium text-red-800 dark:text-red-200">Failed to load appearance settings</h3>
-            <p className="text-sm text-red-700 dark:text-red-300 mt-1">{error}</p>
+            <h3 className="text-sm font-medium text-red-800 dark:text-red-200">
+              Failed to load appearance settings
+            </h3>
+            <p className="text-sm text-red-700 dark:text-red-300 mt-1">
+              {error}
+            </p>
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   if (!preferences) {
-    return null
+    return null;
   }
 
   return (
     <div className="space-y-8">
       {/* Header */}
       <div>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Appearance</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+          Appearance
+        </h2>
         <p className="text-gray-600 dark:text-gray-400 mt-1">
           Customize how the interface looks and feels to match your preferences
         </p>
@@ -123,7 +145,10 @@ export function AppearanceSettings() {
 
       {/* Theme Selector */}
       <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-        <ThemeSelector currentTheme={preferences.theme} onChange={handleThemeChange} />
+        <ThemeSelector
+          currentTheme={preferences.theme}
+          onChange={handleThemeChange}
+        />
       </div>
 
       {/* UI Density and Font Size */}
@@ -162,5 +187,5 @@ export function AppearanceSettings() {
         <span>All changes are saved automatically</span>
       </div>
     </div>
-  )
+  );
 }

@@ -4,9 +4,9 @@
  * Kept for future reference if multi-language support is needed again.
  */
 
-'use client'
+'use client';
 
 export function LocaleSwitcher() {
   // Return null - no locale switcher needed for single language
-  return null
+  return null;
 }

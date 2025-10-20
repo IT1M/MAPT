@@ -1,9 +1,12 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import { useSession } from 'next-auth/react'
-import type { NotificationPreferences, NotificationFrequency } from '@/types/settings'
-import { toast } from '@/utils/toast'
+import { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
+import type {
+  NotificationPreferences,
+  NotificationFrequency,
+} from '@/types/settings';
+import { toast } from '@/utils/toast';
 
 const DEFAULT_PREFERENCES: NotificationPreferences = {
   email: {
@@ -20,46 +23,49 @@ const DEFAULT_PREFERENCES: NotificationPreferences = {
     desktop: false,
   },
   frequency: 'realtime',
-}
+};
 
 export function NotificationSettings() {
-  const { data: session } = useSession()
-  const [preferences, setPreferences] = useState<NotificationPreferences>(DEFAULT_PREFERENCES)
-  const [isLoading, setIsLoading] = useState(true)
-  const [isSaving, setIsSaving] = useState(false)
-  const [isTesting, setIsTesting] = useState(false)
+  const { data: session } = useSession();
+  const [preferences, setPreferences] =
+    useState<NotificationPreferences>(DEFAULT_PREFERENCES);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isTesting, setIsTesting] = useState(false);
 
-  const isAdmin = session?.user?.role === 'ADMIN'
+  const isAdmin = session?.user?.role === 'ADMIN';
 
   // Fetch notification preferences
   useEffect(() => {
-    fetchPreferences()
-  }, [])
+    fetchPreferences();
+  }, []);
 
   const fetchPreferences = async () => {
     try {
-      setIsLoading(true)
-      const response = await fetch('/api/users/notifications')
+      setIsLoading(true);
+      const response = await fetch('/api/users/notifications');
 
       if (!response.ok) {
-        throw new Error('Failed to fetch notification preferences')
+        throw new Error('Failed to fetch notification preferences');
       }
 
-      const data = await response.json()
+      const data = await response.json();
       if (data.success && data.data) {
-        setPreferences(data.data)
+        setPreferences(data.data);
       }
     } catch (error) {
-      console.error('Error fetching notification preferences:', error)
-      toast.error('Failed to load notification preferences')
+      console.error('Error fetching notification preferences:', error);
+      toast.error('Failed to load notification preferences');
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
-  const updatePreferences = async (updates: Partial<NotificationPreferences>) => {
+  const updatePreferences = async (
+    updates: Partial<NotificationPreferences>
+  ) => {
     try {
-      setIsSaving(true)
+      setIsSaving(true);
 
       const response = await fetch('/api/users/notifications', {
         method: 'PATCH',
@@ -67,90 +73,90 @@ export function NotificationSettings() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(updates),
-      })
+      });
 
       if (!response.ok) {
-        throw new Error('Failed to update notification preferences')
+        throw new Error('Failed to update notification preferences');
       }
 
-      const data = await response.json()
+      const data = await response.json();
       if (data.success && data.data) {
-        setPreferences(data.data)
-        toast.success('Notification preferences updated')
+        setPreferences(data.data);
+        toast.success('Notification preferences updated');
       }
     } catch (error) {
-      console.error('Error updating notification preferences:', error)
-      toast.error('Failed to update notification preferences')
+      console.error('Error updating notification preferences:', error);
+      toast.error('Failed to update notification preferences');
     } finally {
-      setIsSaving(false)
+      setIsSaving(false);
     }
-  }
+  };
 
   const handleEmailToggle = (key: keyof typeof preferences.email) => {
     const updatedEmail = {
       ...preferences.email,
       [key]: !preferences.email[key],
-    }
+    };
     const updatedPreferences = {
       ...preferences,
       email: updatedEmail,
-    }
-    setPreferences(updatedPreferences)
-    updatePreferences({ email: updatedEmail })
-  }
+    };
+    setPreferences(updatedPreferences);
+    updatePreferences({ email: updatedEmail });
+  };
 
   const handleInAppToggle = (key: keyof typeof preferences.inApp) => {
     const updatedInApp = {
       ...preferences.inApp,
       [key]: !preferences.inApp[key],
-    }
+    };
     const updatedPreferences = {
       ...preferences,
       inApp: updatedInApp,
-    }
-    setPreferences(updatedPreferences)
-    updatePreferences({ inApp: updatedInApp })
-  }
+    };
+    setPreferences(updatedPreferences);
+    updatePreferences({ inApp: updatedInApp });
+  };
 
   const handleFrequencyChange = (frequency: NotificationFrequency) => {
     const updatedPreferences = {
       ...preferences,
       frequency,
-    }
-    setPreferences(updatedPreferences)
-    updatePreferences({ frequency })
-  }
+    };
+    setPreferences(updatedPreferences);
+    updatePreferences({ frequency });
+  };
 
   const handleTestNotification = async () => {
     try {
-      setIsTesting(true)
+      setIsTesting(true);
 
       const response = await fetch('/api/users/notifications/test', {
         method: 'POST',
-      })
+      });
 
       if (!response.ok) {
-        throw new Error('Failed to send test notification')
+        throw new Error('Failed to send test notification');
       }
 
-      const data = await response.json()
+      const data = await response.json();
       if (data.success) {
-        toast.success('Test notification sent! Check your email and browser.')
+        toast.success('Test notification sent! Check your email and browser.');
       }
     } catch (error) {
-      console.error('Error sending test notification:', error)
-      toast.error('Failed to send test notification')
+      console.error('Error sending test notification:', error);
+      toast.error('Failed to send test notification');
     } finally {
-      setIsTesting(false)
+      setIsTesting(false);
     }
-  }
+  };
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
       </div>
-    )
+    );
   }
 
   return (
@@ -319,17 +325,17 @@ export function NotificationSettings() {
         </button>
       </div>
     </div>
-  )
+  );
 }
 
 // Helper Components
 
 interface NotificationToggleProps {
-  label: string
-  description: string
-  checked: boolean
-  onChange: () => void
-  disabled?: boolean
+  label: string;
+  description: string;
+  checked: boolean;
+  onChange: () => void;
+  disabled?: boolean;
 }
 
 function NotificationToggle({
@@ -345,7 +351,9 @@ function NotificationToggle({
         <label className="text-sm font-medium text-gray-900 dark:text-white">
           {label}
         </label>
-        <p className="text-sm text-gray-600 dark:text-gray-400">{description}</p>
+        <p className="text-sm text-gray-600 dark:text-gray-400">
+          {description}
+        </p>
       </div>
       <button
         type="button"
@@ -369,16 +377,16 @@ function NotificationToggle({
         />
       </button>
     </div>
-  )
+  );
 }
 
 interface FrequencyOptionProps {
-  value: NotificationFrequency
-  label: string
-  description: string
-  selected: boolean
-  onChange: (value: NotificationFrequency) => void
-  disabled?: boolean
+  value: NotificationFrequency;
+  label: string;
+  description: string;
+  selected: boolean;
+  onChange: (value: NotificationFrequency) => void;
+  disabled?: boolean;
 }
 
 function FrequencyOption({
@@ -419,5 +427,5 @@ function FrequencyOption({
         </div>
       </div>
     </label>
-  )
+  );
 }

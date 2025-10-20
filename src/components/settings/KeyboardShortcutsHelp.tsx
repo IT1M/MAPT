@@ -1,11 +1,11 @@
-'use client'
+'use client';
 
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 
 interface KeyboardShortcut {
-  keys: string[]
-  description: string
-  category: string
+  keys: string[];
+  description: string;
+  category: string;
 }
 
 const SHORTCUTS: KeyboardShortcut[] = [
@@ -49,25 +49,27 @@ const SHORTCUTS: KeyboardShortcut[] = [
     description: 'Toggle checkbox or button',
     category: 'Actions',
   },
-]
+];
 
 export function KeyboardShortcutsHelp() {
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(false);
 
-  const categories = Array.from(new Set(SHORTCUTS.map((s) => s.category)))
+  const categories = Array.from(new Set(SHORTCUTS.map((s) => s.category)));
 
-  const isMac = typeof window !== 'undefined' && navigator.platform.toUpperCase().indexOf('MAC') >= 0
+  const isMac =
+    typeof window !== 'undefined' &&
+    navigator.platform.toUpperCase().indexOf('MAC') >= 0;
 
   const formatKey = (key: string) => {
-    if (key === 'Ctrl' && isMac) return '⌘'
-    if (key === 'Alt' && isMac) return '⌥'
-    if (key === 'Shift') return '⇧'
-    if (key === '↑') return '↑'
-    if (key === '↓') return '↓'
-    if (key === '←') return '←'
-    if (key === '→') return '→'
-    return key
-  }
+    if (key === 'Ctrl' && isMac) return '⌘';
+    if (key === 'Alt' && isMac) return '⌥';
+    if (key === 'Shift') return '⇧';
+    if (key === '↑') return '↑';
+    if (key === '↓') return '↓';
+    if (key === '←') return '←';
+    if (key === '→') return '→';
+    return key;
+  };
 
   return (
     <>
@@ -184,7 +186,11 @@ export function KeyboardShortcutsHelp() {
               {/* Footer */}
               <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Press <kbd className="px-2 py-1 text-xs font-semibold text-gray-800 bg-gray-100 border border-gray-300 rounded dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600">?</kbd> anytime to view this help
+                  Press{' '}
+                  <kbd className="px-2 py-1 text-xs font-semibold text-gray-800 bg-gray-100 border border-gray-300 rounded dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600">
+                    ?
+                  </kbd>{' '}
+                  anytime to view this help
                 </p>
               </div>
             </div>
@@ -192,5 +198,5 @@ export function KeyboardShortcutsHelp() {
         </div>
       )}
     </>
-  )
+  );
 }

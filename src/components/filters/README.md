@@ -18,9 +18,9 @@ A comprehensive filter panel component for the Data Log Viewer that provides adv
 ## Usage
 
 ```tsx
-import { InventoryFilters } from '@/components/filters/InventoryFilters'
-import type { FilterState } from '@/types'
-import { UserRole } from '@prisma/client'
+import { InventoryFilters } from '@/components/filters/InventoryFilters';
+import type { FilterState } from '@/types';
+import { UserRole } from '@prisma/client';
 
 function MyComponent() {
   const [filters, setFilters] = useState<FilterState>({
@@ -33,16 +33,16 @@ function MyComponent() {
     enteredByIds: [],
     sortBy: 'createdAt',
     sortOrder: 'desc',
-  })
+  });
 
   const handleFilterChange = (newFilters: Partial<FilterState>) => {
-    setFilters(prev => ({ ...prev, ...newFilters }))
-  }
+    setFilters((prev) => ({ ...prev, ...newFilters }));
+  };
 
   const handleApply = () => {
     // Fetch data with filters
-    console.log('Applying filters:', filters)
-  }
+    console.log('Applying filters:', filters);
+  };
 
   const handleReset = () => {
     setFilters({
@@ -55,8 +55,8 @@ function MyComponent() {
       enteredByIds: [],
       sortBy: 'createdAt',
       sortOrder: 'desc',
-    })
-  }
+    });
+  };
 
   return (
     <InventoryFilters
@@ -69,30 +69,28 @@ function MyComponent() {
       onToggle={() => {}}
       userRole={UserRole.ADMIN}
       availableCategories={['Category 1', 'Category 2']}
-      availableUsers={[
-        { id: '1', name: 'User 1', email: 'user1@example.com' }
-      ]}
+      availableUsers={[{ id: '1', name: 'User 1', email: 'user1@example.com' }]}
       isLoading={false}
     />
-  )
+  );
 }
 ```
 
 ## Props
 
-| Prop | Type | Required | Description |
-|------|------|----------|-------------|
-| `filters` | `FilterState` | Yes | Current filter state |
-| `onFilterChange` | `(filters: Partial<FilterState>) => void` | Yes | Callback when filters change |
-| `onApply` | `() => void` | Yes | Callback when Apply Filters button is clicked |
-| `onReset` | `() => void` | Yes | Callback when Reset All button is clicked |
-| `activeFilterCount` | `number` | Yes | Number of active filters for badge display |
-| `isOpen` | `boolean` | Yes | Whether the filter panel is open |
-| `onToggle` | `() => void` | Yes | Callback to toggle filter panel visibility |
-| `userRole` | `UserRole` | Yes | Current user's role for role-based filtering |
-| `availableCategories` | `string[]` | No | List of available categories (default: []) |
-| `availableUsers` | `FilterUser[]` | No | List of users for Entered By filter (default: []) |
-| `isLoading` | `boolean` | No | Loading state indicator (default: false) |
+| Prop                  | Type                                      | Required | Description                                       |
+| --------------------- | ----------------------------------------- | -------- | ------------------------------------------------- |
+| `filters`             | `FilterState`                             | Yes      | Current filter state                              |
+| `onFilterChange`      | `(filters: Partial<FilterState>) => void` | Yes      | Callback when filters change                      |
+| `onApply`             | `() => void`                              | Yes      | Callback when Apply Filters button is clicked     |
+| `onReset`             | `() => void`                              | Yes      | Callback when Reset All button is clicked         |
+| `activeFilterCount`   | `number`                                  | Yes      | Number of active filters for badge display        |
+| `isOpen`              | `boolean`                                 | Yes      | Whether the filter panel is open                  |
+| `onToggle`            | `() => void`                              | Yes      | Callback to toggle filter panel visibility        |
+| `userRole`            | `UserRole`                                | Yes      | Current user's role for role-based filtering      |
+| `availableCategories` | `string[]`                                | No       | List of available categories (default: [])        |
+| `availableUsers`      | `FilterUser[]`                            | No       | List of users for Entered By filter (default: []) |
+| `isLoading`           | `boolean`                                 | No       | Loading state indicator (default: false)          |
 
 ## Types
 
@@ -100,15 +98,15 @@ function MyComponent() {
 
 ```typescript
 interface FilterState {
-  search: string
-  startDate: Date | null
-  endDate: Date | null
-  destinations: Destination[]
-  categories: string[]
-  rejectFilter: 'all' | 'none' | 'has' | 'high'
-  enteredByIds: string[]
-  sortBy: string
-  sortOrder: 'asc' | 'desc'
+  search: string;
+  startDate: Date | null;
+  endDate: Date | null;
+  destinations: Destination[];
+  categories: string[];
+  rejectFilter: 'all' | 'none' | 'has' | 'high';
+  enteredByIds: string[];
+  sortBy: string;
+  sortOrder: 'asc' | 'desc';
 }
 ```
 
@@ -116,35 +114,43 @@ interface FilterState {
 
 ```typescript
 interface FilterUser {
-  id: string
-  name: string
-  email: string
+  id: string;
+  name: string;
+  email: string;
 }
 ```
 
 ## Behavior
 
 ### Debounced Search
+
 The search input is debounced with a 300ms delay to prevent excessive API calls while typing.
 
 ### Date Presets
+
 Clicking a date preset automatically populates the start and end date fields. Selecting "Custom" or manually changing dates switches to custom mode.
 
 ### Multi-Select Filters
+
 Destination, Category, and Entered By filters support multiple selections. Clicking a checkbox toggles the selection.
 
 ### Role-Based Visibility
+
 The "Entered By" filter is only visible to users with ADMIN or SUPERVISOR roles.
 
 ### Mobile Responsiveness
+
 On mobile devices (< 768px), the filter panel:
+
 - Becomes a fixed overlay
 - Shows a backdrop overlay when open
 - Can be closed by clicking the backdrop
 - Transforms into a bottom sheet layout
 
 ### Active Filter Count
+
 The badge displays the number of active filters:
+
 - Search text is not empty
 - Date range is set
 - Destinations are selected
@@ -165,6 +171,7 @@ The badge displays the number of active filters:
 The component uses `next-intl` for translations. All text is translatable through the `dataLog.filters` namespace.
 
 Translation keys:
+
 - `dataLog.filters.title`
 - `dataLog.filters.search`
 - `dataLog.filters.dateRange`
@@ -181,6 +188,7 @@ Translation keys:
 ## Styling
 
 The component uses Tailwind CSS for styling with support for:
+
 - Light and dark themes
 - RTL (Right-to-Left) layouts for Arabic
 - Responsive breakpoints

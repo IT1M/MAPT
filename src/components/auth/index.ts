@@ -1,6 +1,9 @@
-export { BrandingPanel } from './BrandingPanel'
-export { LoginForm } from './LoginForm'
-export { RegistrationForm } from './RegistrationForm'
-export { PasswordStrengthMeter, calculatePasswordStrength } from './PasswordStrengthMeter'
-export { PasswordRequirementsChecklist } from './PasswordRequirementsChecklist'
-export { SimpleCaptcha } from './SimpleCaptcha'
+export { BrandingPanel } from './BrandingPanel';
+export { LoginForm } from './LoginForm';
+export { RegistrationForm } from './RegistrationForm';
+export {
+  PasswordStrengthMeter,
+  calculatePasswordStrength,
+} from './PasswordStrengthMeter';
+export { PasswordRequirementsChecklist } from './PasswordRequirementsChecklist';
+export { SimpleCaptcha } from './SimpleCaptcha';

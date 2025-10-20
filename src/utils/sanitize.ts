@@ -9,15 +9,17 @@
  */
 export function sanitizeString(input: string): string {
   if (typeof input !== 'string') {
-    return ''
+    return '';
   }
 
-  return input
-    .trim()
-    // Remove null bytes
-    .replace(/\0/g, '')
-    // Remove control characters except newlines and tabs
-    .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '')
+  return (
+    input
+      .trim()
+      // Remove null bytes
+      .replace(/\0/g, '')
+      // Remove control characters except newlines and tabs
+      .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '')
+  );
 }
 
 /**
@@ -27,30 +29,32 @@ export function sanitizeString(input: string): string {
  */
 export function sanitizeHtml(input: string): string {
   if (typeof input !== 'string') {
-    return ''
+    return '';
   }
 
-  return input
-    .trim()
-    // Remove HTML tags
-    .replace(/<[^>]*>/g, '')
-    // Remove script tags and content
-    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-    // Remove event handlers
-    .replace(/on\w+\s*=\s*["'][^"']*["']/gi, '')
-    .replace(/on\w+\s*=\s*[^\s>]*/gi, '')
-    // Remove javascript: protocol
-    .replace(/javascript:/gi, '')
-    // Remove data: protocol
-    .replace(/data:text\/html/gi, '')
-    // Decode HTML entities to prevent double encoding attacks
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/&#x27;/g, "'")
-    .replace(/&amp;/g, '&')
-    // Remove the decoded tags again
-    .replace(/<[^>]*>/g, '')
+  return (
+    input
+      .trim()
+      // Remove HTML tags
+      .replace(/<[^>]*>/g, '')
+      // Remove script tags and content
+      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+      // Remove event handlers
+      .replace(/on\w+\s*=\s*["'][^"']*["']/gi, '')
+      .replace(/on\w+\s*=\s*[^\s>]*/gi, '')
+      // Remove javascript: protocol
+      .replace(/javascript:/gi, '')
+      // Remove data: protocol
+      .replace(/data:text\/html/gi, '')
+      // Decode HTML entities to prevent double encoding attacks
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      .replace(/&#x27;/g, "'")
+      .replace(/&amp;/g, '&')
+      // Remove the decoded tags again
+      .replace(/<[^>]*>/g, '')
+  );
 }
 
 /**
@@ -60,34 +64,36 @@ export function sanitizeHtml(input: string): string {
  */
 export function sanitizeObject<T extends Record<string, any>>(obj: T): T {
   if (obj === null || obj === undefined) {
-    return obj
+    return obj;
   }
 
   if (typeof obj !== 'object') {
-    return obj
+    return obj;
   }
 
   if (Array.isArray(obj)) {
-    return obj.map(item => 
-      typeof item === 'string' ? sanitizeString(item) : 
-      typeof item === 'object' ? sanitizeObject(item) : 
-      item
-    ) as any
+    return obj.map((item) =>
+      typeof item === 'string'
+        ? sanitizeString(item)
+        : typeof item === 'object'
+          ? sanitizeObject(item)
+          : item
+    ) as any;
   }
 
-  const sanitized: any = {}
+  const sanitized: any = {};
 
   for (const [key, value] of Object.entries(obj)) {
     if (typeof value === 'string') {
-      sanitized[key] = sanitizeString(value)
+      sanitized[key] = sanitizeString(value);
     } else if (typeof value === 'object' && value !== null) {
-      sanitized[key] = sanitizeObject(value)
+      sanitized[key] = sanitizeObject(value);
     } else {
-      sanitized[key] = value
+      sanitized[key] = value;
     }
   }
 
-  return sanitized
+  return sanitized;
 }
 
 /**
@@ -97,14 +103,16 @@ export function sanitizeObject<T extends Record<string, any>>(obj: T): T {
  */
 export function sanitizeEmail(email: string): string {
   if (typeof email !== 'string') {
-    return ''
+    return '';
   }
 
-  return email
-    .trim()
-    .toLowerCase()
-    // Remove any characters that aren't valid in email addresses
-    .replace(/[^a-z0-9@._+-]/g, '')
+  return (
+    email
+      .trim()
+      .toLowerCase()
+      // Remove any characters that aren't valid in email addresses
+      .replace(/[^a-z0-9@._+-]/g, '')
+  );
 }
 
 /**
@@ -114,18 +122,20 @@ export function sanitizeEmail(email: string): string {
  */
 export function sanitizeFilename(filename: string): string {
   if (typeof filename !== 'string') {
-    return ''
+    return '';
   }
 
-  return filename
-    .trim()
-    // Remove directory traversal attempts
-    .replace(/\.\./g, '')
-    .replace(/[\/\\]/g, '')
-    // Remove null bytes
-    .replace(/\0/g, '')
-    // Only allow alphanumeric, dash, underscore, and dot
-    .replace(/[^a-zA-Z0-9._-]/g, '_')
+  return (
+    filename
+      .trim()
+      // Remove directory traversal attempts
+      .replace(/\.\./g, '')
+      .replace(/[\/\\]/g, '')
+      // Remove null bytes
+      .replace(/\0/g, '')
+      // Only allow alphanumeric, dash, underscore, and dot
+      .replace(/[^a-zA-Z0-9._-]/g, '_')
+  );
 }
 
 /**
@@ -135,17 +145,19 @@ export function sanitizeFilename(filename: string): string {
  */
 export function sanitizeSearchQuery(input: string): string {
   if (typeof input !== 'string') {
-    return ''
+    return '';
   }
 
-  return input
-    .trim()
-    // Remove SQL wildcards that could be used maliciously
-    .replace(/[%;]/g, '')
-    // Remove SQL comments
-    .replace(/--/g, '')
-    .replace(/\/\*/g, '')
-    .replace(/\*\//g, '')
+  return (
+    input
+      .trim()
+      // Remove SQL wildcards that could be used maliciously
+      .replace(/[%;]/g, '')
+      // Remove SQL comments
+      .replace(/--/g, '')
+      .replace(/\/\*/g, '')
+      .replace(/\*\//g, '')
+  );
 }
 
 /**
@@ -155,8 +167,8 @@ export function sanitizeSearchQuery(input: string): string {
  */
 export function escapeRegex(input: string): string {
   if (typeof input !== 'string') {
-    return ''
+    return '';
   }
 
-  return input.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  return input.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }

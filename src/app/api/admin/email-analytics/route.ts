@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@/services/auth'
-import { prisma } from '@/services/prisma'
+import { NextRequest, NextResponse } from 'next/server';
+import { auth } from '@/services/auth';
+import { prisma } from '@/services/prisma';
 
 /**
  * GET /api/admin/email-analytics
@@ -9,20 +9,26 @@ import { prisma } from '@/services/prisma'
  */
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth()
+    const session = await auth();
 
     if (!session?.user) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      );
     }
 
     if (session.user.role !== 'ADMIN') {
-      return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
+      return NextResponse.json(
+        { error: 'Admin access required' },
+        { status: 403 }
+      );
     }
 
-    const { searchParams } = new URL(request.url)
-    const days = parseInt(searchParams.get('days') || '30')
-    const startDate = new Date()
-    startDate.setDate(startDate.getDate() - days)
+    const { searchParams } = new URL(request.url);
+    const days = parseInt(searchParams.get('days') || '30');
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - days);
 
     // Get email statistics
     const [
@@ -116,11 +122,11 @@ export async function GET(request: NextRequest) {
         GROUP BY DATE(created_at)
         ORDER BY date DESC
       `,
-    ])
+    ]);
 
     // Calculate success rate
     const successRate =
-      totalEmails > 0 ? ((sentEmails / totalEmails) * 100).toFixed(2) : '0'
+      totalEmails > 0 ? ((sentEmails / totalEmails) * 100).toFixed(2) : '0';
 
     // Calculate average delivery time
     const avgDeliveryTime = await prisma.$queryRaw<
@@ -131,9 +137,9 @@ export async function GET(request: NextRequest) {
       WHERE status = 'SENT' 
         AND sent_at IS NOT NULL
         AND created_at >= ${startDate}
-    `
+    `;
 
-    const avgDeliverySeconds = avgDeliveryTime[0]?.avg_seconds || 0
+    const avgDeliverySeconds = avgDeliveryTime[0]?.avg_seconds || 0;
 
     // Format delivery rate data
     const deliveryRateFormatted = deliveryRate.map((day) => ({
@@ -145,13 +151,13 @@ export async function GET(request: NextRequest) {
         Number(day.total) > 0
           ? ((Number(day.sent) / Number(day.total)) * 100).toFixed(2)
           : '0',
-    }))
+    }));
 
     // Format template statistics
     const templateStats = emailsByTemplate.map((item) => ({
       template: item.template,
       count: item._count.id,
-    }))
+    }));
 
     return NextResponse.json({
       success: true,
@@ -173,17 +179,17 @@ export async function GET(request: NextRequest) {
           endDate: new Date(),
         },
       },
-    })
+    });
   } catch (error) {
-    console.error('[Email Analytics] Error:', error)
+    console.error('[Email Analytics] Error:', error);
     return NextResponse.json(
-      { 
+      {
         success: false,
         error: 'Failed to fetch email analytics',
-        details: error instanceof Error ? error.message : 'Unknown error'
+        details: error instanceof Error ? error.message : 'Unknown error',
       },
       { status: 500 }
-    )
+    );
   }
 }
 
@@ -194,21 +200,30 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth()
+    const session = await auth();
 
     if (!session?.user) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      );
     }
 
     if (session.user.role !== 'ADMIN') {
-      return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
+      return NextResponse.json(
+        { error: 'Admin access required' },
+        { status: 403 }
+      );
     }
 
-    const body = await request.json()
-    const { emailIds } = body
+    const body = await request.json();
+    const { emailIds } = body;
 
     if (!Array.isArray(emailIds) || emailIds.length === 0) {
-      return NextResponse.json({ error: 'Email IDs are required' }, { status: 400 })
+      return NextResponse.json(
+        { error: 'Email IDs are required' },
+        { status: 400 }
+      );
     }
 
     // Reset failed emails to pending for retry
@@ -222,7 +237,7 @@ export async function POST(request: NextRequest) {
         errorMessage: null,
         failedAt: null,
       },
-    })
+    });
 
     return NextResponse.json({
       success: true,
@@ -230,16 +245,16 @@ export async function POST(request: NextRequest) {
         message: `${result.count} emails queued for retry`,
         count: result.count,
       },
-    })
+    });
   } catch (error) {
-    console.error('[Email Analytics] Retry error:', error)
+    console.error('[Email Analytics] Retry error:', error);
     return NextResponse.json(
-      { 
+      {
         success: false,
         error: 'Failed to retry emails',
-        details: error instanceof Error ? error.message : 'Unknown error'
+        details: error instanceof Error ? error.message : 'Unknown error',
       },
       { status: 500 }
-    )
+    );
   }
 }

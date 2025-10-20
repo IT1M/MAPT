@@ -14,24 +14,22 @@ A comprehensive multi-step wizard for importing inventory data from CSV and Exce
 ## Usage
 
 ```tsx
-import { ImportWizard } from '@/components/import'
-import { useState } from 'react'
+import { ImportWizard } from '@/components/import';
+import { useState } from 'react';
 
 function MyComponent() {
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleComplete = (result) => {
-    console.log(`Imported ${result.successCount} items`)
-    console.log(`Failed: ${result.failedCount}`)
-    setIsOpen(false)
+    console.log(`Imported ${result.successCount} items`);
+    console.log(`Failed: ${result.failedCount}`);
+    setIsOpen(false);
     // Refresh your data here
-  }
+  };
 
   return (
     <>
-      <button onClick={() => setIsOpen(true)}>
-        Import Data
-      </button>
+      <button onClick={() => setIsOpen(true)}>Import Data</button>
 
       <ImportWizard
         isOpen={isOpen}
@@ -39,19 +37,21 @@ function MyComponent() {
         onComplete={handleComplete}
       />
     </>
-  )
+  );
 }
 ```
 
 ## File Format Requirements
 
 ### Required Columns
+
 - **Item Name**: Name of the inventory item (2-100 characters)
 - **Batch**: Batch number (alphanumeric with hyphens, 3-50 characters)
 - **Quantity**: Number of items (positive integer)
 - **Destination**: Either "MAIS" or "FOZAN"
 
 ### Optional Columns
+
 - **Reject**: Number of rejected items (default: 0)
 - **Category**: Item category
 - **Notes**: Additional notes (max 5000 characters)
@@ -71,24 +71,28 @@ The system supports both `.xlsx` and `.xls` formats. The first sheet will be use
 ## Import Steps
 
 ### 1. Upload
+
 - Drag and drop or browse for your file
 - Supports CSV, XLSX, and XLS formats
 - Maximum file size: 10 MB
 - Maximum rows: 10,000
 
 ### 2. Column Mapping
+
 - System automatically detects column mappings
 - Manual adjustment available for all fields
 - Shows example values from your file
 - Validates that all required fields are mapped
 
 ### 3. Validation
+
 - Validates all data against schema rules
 - Shows detailed error messages with row numbers
 - Provides suggestions for fixing common errors
 - Displays summary of valid vs invalid rows
 
 ### 4. Import Options
+
 - **Duplicate Handling**:
   - Skip: Ignore items that already exist
   - Update: Update existing items with new values
@@ -96,11 +100,13 @@ The system supports both `.xlsx` and `.xls` formats. The first sheet will be use
 - **Default Values**: Set defaults for optional fields
 
 ### 5. Review
+
 - Review all settings before import
 - See summary of what will be imported
 - Final confirmation before proceeding
 
 ### 6. Progress
+
 - Real-time progress indicator
 - Shows success and failure counts
 - Displays detailed error list if any failures occur
@@ -138,6 +144,7 @@ Response:
 ## Error Handling
 
 The system provides detailed error messages with:
+
 - Row number where the error occurred
 - Field name that has the error
 - Current value
@@ -145,6 +152,7 @@ The system provides detailed error messages with:
 - Suggestion for fixing (when applicable)
 
 Common errors and suggestions:
+
 - Non-numeric quantity → "Remove non-numeric characters"
 - Invalid destination → "Use 'MAIS' or 'FOZAN' (all caps)"
 - Invalid batch format → "Remove special characters"
@@ -156,6 +164,7 @@ Users must have the `inventory:write` permission to import data.
 ## Audit Trail
 
 All import operations are logged with:
+
 - User ID
 - Timestamp
 - Success/failure counts

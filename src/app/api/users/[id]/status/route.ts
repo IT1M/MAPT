@@ -1,16 +1,16 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@/services/auth'
-import { prisma } from '@/services/prisma'
-import { API_ERROR_CODES } from '@/utils/constants'
-import { z } from 'zod'
-import { createAuditLog } from '@/utils/audit'
+import { NextRequest, NextResponse } from 'next/server';
+import { auth } from '@/services/auth';
+import { prisma } from '@/services/prisma';
+import { API_ERROR_CODES } from '@/utils/constants';
+import { z } from 'zod';
+import { createAuditLog } from '@/utils/audit';
 
 /**
  * Validation schema for status update
  */
 const statusSchema = z.object({
   isActive: z.boolean(),
-})
+});
 
 /**
  * PATCH /api/users/[id]/status
@@ -20,10 +20,10 @@ export async function PATCH(
   request: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
-  const params = await context.params
+  const params = await context.params;
   try {
     // Check authentication
-    const session = await auth()
+    const session = await auth();
     if (!session?.user) {
       return NextResponse.json(
         {
@@ -34,7 +34,7 @@ export async function PATCH(
           },
         },
         { status: 401 }
-      )
+      );
     }
 
     // Check permissions - only Admin can manage users
@@ -48,10 +48,10 @@ export async function PATCH(
           },
         },
         { status: 403 }
-      )
+      );
     }
 
-    const { id } = params
+    const { id } = params;
 
     // Prevent user from deactivating themselves
     if (session.user.id === id) {
@@ -64,13 +64,13 @@ export async function PATCH(
           },
         },
         { status: 400 }
-      )
+      );
     }
 
     // Check if user exists
     const existingUser = await prisma.user.findUnique({
       where: { id },
-    })
+    });
 
     if (!existingUser) {
       return NextResponse.json(
@@ -82,12 +82,12 @@ export async function PATCH(
           },
         },
         { status: 404 }
-      )
+      );
     }
 
     // Parse and validate request body
-    const body = await request.json()
-    const validation = statusSchema.safeParse(body)
+    const body = await request.json();
+    const validation = statusSchema.safeParse(body);
 
     if (!validation.success) {
       return NextResponse.json(
@@ -100,10 +100,10 @@ export async function PATCH(
           },
         },
         { status: 400 }
-      )
+      );
     }
 
-    const { isActive } = validation.data
+    const { isActive } = validation.data;
 
     // Update user status
     const user = await prisma.user.update({
@@ -118,13 +118,13 @@ export async function PATCH(
         createdAt: true,
         updatedAt: true,
       },
-    })
+    });
 
     // If deactivating, terminate all user sessions
     if (!isActive) {
       await prisma.session.deleteMany({
         where: { userId: id },
-      })
+      });
     }
 
     // Create audit log
@@ -138,18 +138,21 @@ export async function PATCH(
         after: { isActive: user.isActive },
       },
       metadata: {
-        ipAddress: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || undefined,
+        ipAddress:
+          request.headers.get('x-forwarded-for') ||
+          request.headers.get('x-real-ip') ||
+          undefined,
         userAgent: request.headers.get('user-agent') || undefined,
         action: isActive ? 'activated' : 'deactivated',
       },
-    })
+    });
 
     return NextResponse.json({
       success: true,
       data: user,
-    })
+    });
   } catch (error) {
-    console.error('Error updating user status:', error)
+    console.error('Error updating user status:', error);
     return NextResponse.json(
       {
         success: false,
@@ -159,6 +162,6 @@ export async function PATCH(
         },
       },
       { status: 500 }
-    )
+    );
   }
 }

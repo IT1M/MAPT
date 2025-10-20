@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@/services/auth'
-import { prisma } from '@/services/prisma'
-import { FilterGroup } from '@/types/filters'
+import { NextRequest, NextResponse } from 'next/server';
+import { auth } from '@/services/auth';
+import { prisma } from '@/services/prisma';
+import { FilterGroup } from '@/types/filters';
 
 /**
  * GET /api/filters
@@ -9,46 +9,40 @@ import { FilterGroup } from '@/types/filters'
  */
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth()
+    const session = await auth();
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { searchParams } = new URL(request.url)
-    const page = searchParams.get('page')
+    const { searchParams } = new URL(request.url);
+    const page = searchParams.get('page');
 
     const where: any = {
       userId: session.user.id,
-    }
+    };
 
     if (page) {
-      where.page = page
+      where.page = page;
     }
 
     const filters = await prisma.savedFilter.findMany({
       where,
-      orderBy: [
-        { isDefault: 'desc' },
-        { createdAt: 'desc' },
-      ],
-    })
+      orderBy: [{ isDefault: 'desc' }, { createdAt: 'desc' }],
+    });
 
     return NextResponse.json({
       success: true,
-      filters: filters.map(f => ({
+      filters: filters.map((f) => ({
         ...f,
         filters: f.filters as FilterGroup,
       })),
-    })
+    });
   } catch (error) {
-    console.error('Error fetching saved filters:', error)
+    console.error('Error fetching saved filters:', error);
     return NextResponse.json(
       { error: 'Failed to fetch saved filters' },
       { status: 500 }
-    )
+    );
   }
 }
 
@@ -58,22 +52,19 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth()
+    const session = await auth();
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const body = await request.json()
-    const { name, filters, page, isDefault } = body
+    const body = await request.json();
+    const { name, filters, page, isDefault } = body;
 
     if (!name || !filters || !page) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
-      )
+      );
     }
 
     // If setting as default, unset other defaults for this page
@@ -87,7 +78,7 @@ export async function POST(request: NextRequest) {
         data: {
           isDefault: false,
         },
-      })
+      });
     }
 
     const savedFilter = await prisma.savedFilter.create({
@@ -100,7 +91,7 @@ export async function POST(request: NextRequest) {
         isDefault: isDefault || false,
         updatedAt: new Date(),
       },
-    })
+    });
 
     return NextResponse.json({
       success: true,
@@ -108,12 +99,12 @@ export async function POST(request: NextRequest) {
         ...savedFilter,
         filters: savedFilter.filters as FilterGroup,
       },
-    })
+    });
   } catch (error) {
-    console.error('Error creating saved filter:', error)
+    console.error('Error creating saved filter:', error);
     return NextResponse.json(
       { error: 'Failed to create saved filter' },
       { status: 500 }
-    )
+    );
   }
 }

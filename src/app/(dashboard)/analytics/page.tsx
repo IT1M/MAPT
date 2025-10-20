@@ -1,19 +1,19 @@
-import { auth } from '@/services/auth'
-import { redirect } from 'next/navigation'
-import { AnalyticsDashboard } from '@/components/analytics/AnalyticsDashboard'
+import { auth } from '@/services/auth';
+import { redirect } from 'next/navigation';
+import { AnalyticsDashboard } from '@/components/analytics/AnalyticsDashboard';
 
 export default async function AnalyticsPage() {
   // Check authentication and role
-  const session = await auth()
-  
+  const session = await auth();
+
   if (!session) {
-    redirect(`/login`)
+    redirect(`/login`);
   }
 
   // Check if user has SUPERVISOR or higher role
-  const allowedRoles = ['SUPERVISOR', 'MANAGER', 'ADMIN']
+  const allowedRoles = ['SUPERVISOR', 'MANAGER', 'ADMIN'];
   if (!allowedRoles.includes(session.user.role)) {
-    redirect('/dashboard')
+    redirect('/dashboard');
   }
 
   return (
@@ -25,8 +25,8 @@ export default async function AnalyticsPage() {
       >
         Skip to main content
       </a>
-      
+
       <AnalyticsDashboard />
     </>
-  )
+  );
 }

@@ -1,17 +1,17 @@
-'use client'
+'use client';
 
-import React, { useState } from 'react'
-import { useTranslations } from '@/hooks/useTranslations'
-import { Button } from '@/components/ui/button'
+import React, { useState } from 'react';
+import { useTranslations } from '@/hooks/useTranslations';
+import { Button } from '@/components/ui/button';
 
 interface BulkActionsToolbarProps {
-  selectedCount: number
-  onBulkDelete: () => void
-  onBulkExport: () => void
-  onBulkEdit: () => void
-  onBulkEditDestination: () => void
-  onClearSelection: () => void
-  userPermissions: string[]
+  selectedCount: number;
+  onBulkDelete: () => void;
+  onBulkExport: () => void;
+  onBulkEdit: () => void;
+  onBulkEditDestination: () => void;
+  onClearSelection: () => void;
+  userPermissions: string[];
 }
 
 export const BulkActionsToolbar: React.FC<BulkActionsToolbarProps> = ({
@@ -23,14 +23,14 @@ export const BulkActionsToolbar: React.FC<BulkActionsToolbarProps> = ({
   onClearSelection,
   userPermissions,
 }) => {
-  const t = useTranslations()
-  const [showActions, setShowActions] = useState(false)
+  const t = useTranslations();
+  const [showActions, setShowActions] = useState(false);
 
   // Check if user can delete
-  const canDelete = userPermissions.includes('inventory:delete')
+  const canDelete = userPermissions.includes('inventory:delete');
 
   if (selectedCount === 0) {
-    return null
+    return null;
   }
 
   return (
@@ -175,12 +175,17 @@ export const BulkActionsToolbar: React.FC<BulkActionsToolbarProps> = ({
                   {/* Bulk Export */}
                   <button
                     onClick={() => {
-                      onBulkExport()
-                      setShowActions(false)
+                      onBulkExport();
+                      setShowActions(false);
                     }}
                     className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-3"
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -194,12 +199,17 @@ export const BulkActionsToolbar: React.FC<BulkActionsToolbarProps> = ({
                   {/* Bulk Edit */}
                   <button
                     onClick={() => {
-                      onBulkEdit()
-                      setShowActions(false)
+                      onBulkEdit();
+                      setShowActions(false);
                     }}
                     className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-3"
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -216,12 +226,17 @@ export const BulkActionsToolbar: React.FC<BulkActionsToolbarProps> = ({
                       <div className="border-t border-gray-200 dark:border-gray-700 my-1"></div>
                       <button
                         onClick={() => {
-                          onBulkDelete()
-                          setShowActions(false)
+                          onBulkDelete();
+                          setShowActions(false);
                         }}
                         className="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-3"
                       >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
                           <path
                             strokeLinecap="round"
                             strokeLinejoin="round"
@@ -240,5 +255,5 @@ export const BulkActionsToolbar: React.FC<BulkActionsToolbarProps> = ({
         </div>
       </div>
     </div>
-  )
-}
+  );
+};

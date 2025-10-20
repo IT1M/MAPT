@@ -3,8 +3,24 @@ import { createHmac } from 'crypto';
 import ExcelJS from 'exceljs';
 
 // Define types to match Prisma enums
-export type ActionType = 'CREATE' | 'UPDATE' | 'DELETE' | 'LOGIN' | 'LOGOUT' | 'EXPORT' | 'VIEW' | 'REVERT' | 'BACKUP' | 'RESTORE';
-export type EntityType = 'InventoryItem' | 'User' | 'Report' | 'Backup' | 'Settings' | 'AuditLog';
+export type ActionType =
+  | 'CREATE'
+  | 'UPDATE'
+  | 'DELETE'
+  | 'LOGIN'
+  | 'LOGOUT'
+  | 'EXPORT'
+  | 'VIEW'
+  | 'REVERT'
+  | 'BACKUP'
+  | 'RESTORE';
+export type EntityType =
+  | 'InventoryItem'
+  | 'User'
+  | 'Report'
+  | 'Backup'
+  | 'Settings'
+  | 'AuditLog';
 
 // AuditLog type from database
 export interface AuditLog {
@@ -70,7 +86,10 @@ export interface DateRange {
 
 // Error class
 export class AuditError extends Error {
-  constructor(message: string, public code: string) {
+  constructor(
+    message: string,
+    public code: string
+  ) {
     super(message);
     this.name = 'AuditError';
   }
@@ -90,9 +109,9 @@ class AuditQueue {
 
   private async processQueue(): Promise<void> {
     if (this.processing || this.queue.length === 0) return;
-    
+
     this.processing = true;
-    
+
     while (this.queue.length > 0) {
       const params = this.queue.shift();
       if (params) {
@@ -107,13 +126,13 @@ class AuditQueue {
         }
       }
     }
-    
+
     this.processing = false;
   }
 
   private async processEntry(params: LogActionParams): Promise<void> {
     const signature = AuditService.signEntry(params);
-    
+
     await prisma.auditLog.create({
       data: {
         userId: params.userId,
@@ -134,7 +153,7 @@ const auditQueue = new AuditQueue();
 
 /**
  * AuditService - Comprehensive audit trail management
- * 
+ *
  * Features:
  * - Non-blocking audit logging with queue
  * - Cryptographic signing with HMAC-SHA256
@@ -144,7 +163,8 @@ const auditQueue = new AuditQueue();
  * - Change reversion for admins
  */
 export class AuditService {
-  private static readonly SIGNING_SECRET = process.env.AUDIT_SIGNING_SECRET || 'default-secret-change-in-production';
+  private static readonly SIGNING_SECRET =
+    process.env.AUDIT_SIGNING_SECRET || 'default-secret-change-in-production';
 
   /**
    * Log an action (non-blocking, queued)
@@ -166,9 +186,7 @@ export class AuditService {
       timestamp: new Date().toISOString(),
     });
 
-    return createHmac('sha256', this.SIGNING_SECRET)
-      .update(data)
-      .digest('hex');
+    return createHmac('sha256', this.SIGNING_SECRET).update(data).digest('hex');
   }
 
   /**
@@ -234,7 +252,7 @@ export class AuditService {
     const total = await prisma.auditLog.count({ where });
 
     // Get paginated entries with user data
-    const entries = await prisma.auditLog.findMany({
+    const entries = (await prisma.auditLog.findMany({
       where,
       include: {
         user: {
@@ -249,7 +267,7 @@ export class AuditService {
       orderBy: { timestamp: 'desc' },
       skip: (pagination.page - 1) * pagination.limit,
       take: pagination.limit,
-    }) as any;
+    })) as any;
 
     return { entries, total };
   }
@@ -301,9 +319,10 @@ export class AuditService {
       take: 1,
     });
 
-    const mostCommonAction = actionCounts.length > 0
-      ? { type: actionCounts[0].action, count: actionCounts[0]._count.action }
-      : null;
+    const mostCommonAction =
+      actionCounts.length > 0
+        ? { type: actionCounts[0].action, count: actionCounts[0]._count.action }
+        : null;
 
     // Critical actions (DELETE, REVERT, BACKUP, RESTORE)
     const criticalActions = await prisma.auditLog.count({
@@ -332,7 +351,9 @@ export class AuditService {
   /**
    * Get activity chart data
    */
-  private static async getActivityChart(dateRange: DateRange): Promise<{ date: string; counts: Record<string, number> }[]> {
+  private static async getActivityChart(
+    dateRange: DateRange
+  ): Promise<{ date: string; counts: Record<string, number> }[]> {
     const entries = await prisma.auditLog.findMany({
       where: {
         timestamp: {
@@ -348,8 +369,8 @@ export class AuditService {
 
     // Group by date and action
     const chartData: Record<string, Record<string, number>> = {};
-    
-    entries.forEach(entry => {
+
+    entries.forEach((entry) => {
       const date = entry.timestamp.toISOString().split('T')[0];
       if (!chartData[date]) {
         chartData[date] = {};
@@ -369,7 +390,9 @@ export class AuditService {
   /**
    * Get user leaderboard
    */
-  private static async getUserLeaderboard(dateRange: DateRange): Promise<{ userId: string; name: string; count: number }[]> {
+  private static async getUserLeaderboard(
+    dateRange: DateRange
+  ): Promise<{ userId: string; name: string; count: number }[]> {
     const userCounts = await prisma.auditLog.groupBy({
       by: ['userId'],
       where: {
@@ -407,7 +430,7 @@ export class AuditService {
     entry: AuditEntryWithUser;
     relatedEntries: AuditEntryWithUser[];
   }> {
-    const entry = await prisma.auditLog.findUnique({
+    const entry = (await prisma.auditLog.findUnique({
       where: { id: entryId },
       include: {
         user: {
@@ -419,7 +442,7 @@ export class AuditService {
           },
         },
       },
-    }) as any;
+    })) as any;
 
     if (!entry) {
       throw new AuditError('Audit entry not found', 'AUDIT_ENTRY_NOT_FOUND');
@@ -429,7 +452,7 @@ export class AuditService {
     const oneHourBefore = new Date(entry.timestamp.getTime() - 60 * 60 * 1000);
     const oneHourAfter = new Date(entry.timestamp.getTime() + 60 * 60 * 1000);
 
-    const relatedEntries = await prisma.auditLog.findMany({
+    const relatedEntries = (await prisma.auditLog.findMany({
       where: {
         entityType: entry.entityType as any,
         entityId: entry.entityId,
@@ -451,7 +474,7 @@ export class AuditService {
       },
       orderBy: { timestamp: 'desc' },
       take: 10,
-    }) as any;
+    })) as any;
 
     return { entry, relatedEntries };
   }
@@ -459,20 +482,26 @@ export class AuditService {
   /**
    * Revert a change (ADMIN only)
    */
-  static async revertChange(entryId: string, adminUserId: string): Promise<AuditLog> {
+  static async revertChange(
+    entryId: string,
+    adminUserId: string
+  ): Promise<AuditLog> {
     // Verify admin user
     const admin = await prisma.user.findUnique({
       where: { id: adminUserId },
     });
 
     if (!admin || admin.role !== 'ADMIN') {
-      throw new AuditError('Unauthorized: Only admins can revert changes', 'AUDIT_UNAUTHORIZED');
+      throw new AuditError(
+        'Unauthorized: Only admins can revert changes',
+        'AUDIT_UNAUTHORIZED'
+      );
     }
 
     // Get the entry to revert
-    const entry = await prisma.auditLog.findUnique({
+    const entry = (await prisma.auditLog.findUnique({
       where: { id: entryId },
-    }) as any;
+    })) as any;
 
     if (!entry) {
       throw new AuditError('Audit entry not found', 'AUDIT_ENTRY_NOT_FOUND');
@@ -480,7 +509,10 @@ export class AuditService {
 
     // Only UPDATE actions on InventoryItem can be reverted
     if (entry.action !== 'UPDATE' || entry.entityType !== 'InventoryItem') {
-      throw new AuditError('Only UPDATE actions on InventoryItem can be reverted', 'AUDIT_REVERT_FAILED');
+      throw new AuditError(
+        'Only UPDATE actions on InventoryItem can be reverted',
+        'AUDIT_REVERT_FAILED'
+      );
     }
 
     const changes = entry.changes as any;
@@ -504,7 +536,7 @@ export class AuditService {
       });
 
       // Create audit entry for the revert
-      const revertEntry = await prisma.auditLog.create({
+      const revertEntry = (await prisma.auditLog.create({
         data: {
           userId: adminUserId,
           action: 'REVERT' as any,
@@ -526,7 +558,7 @@ export class AuditService {
             userAgent: 'system',
           }),
         } as any,
-      }) as any;
+      })) as any;
 
       return revertEntry;
     } catch (error) {
@@ -538,10 +570,22 @@ export class AuditService {
    * Export audit logs to CSV
    */
   static async exportToCSV(filters: AuditFilters): Promise<string> {
-    const { entries } = await this.queryLogs(filters, { page: 1, limit: 10000 });
+    const { entries } = await this.queryLogs(filters, {
+      page: 1,
+      limit: 10000,
+    });
 
-    const headers = ['Timestamp', 'User', 'Action', 'Entity Type', 'Entity ID', 'Changes', 'IP Address', 'User Agent'];
-    const rows = entries.map(entry => [
+    const headers = [
+      'Timestamp',
+      'User',
+      'Action',
+      'Entity Type',
+      'Entity ID',
+      'Changes',
+      'IP Address',
+      'User Agent',
+    ];
+    const rows = entries.map((entry) => [
       entry.timestamp.toISOString(),
       entry.user.name,
       entry.action,
@@ -554,7 +598,7 @@ export class AuditService {
 
     const csv = [
       headers.join(','),
-      ...rows.map(row => row.map(cell => `"${String(cell)}"`).join(',')),
+      ...rows.map((row) => row.map((cell) => `"${String(cell)}"`).join(',')),
     ].join('\n');
 
     return csv;
@@ -564,7 +608,10 @@ export class AuditService {
    * Export audit logs to Excel
    */
   static async exportToExcel(filters: AuditFilters): Promise<Buffer> {
-    const { entries } = await this.queryLogs(filters, { page: 1, limit: 10000 });
+    const { entries } = await this.queryLogs(filters, {
+      page: 1,
+      limit: 10000,
+    });
 
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Audit Log');
@@ -582,7 +629,7 @@ export class AuditService {
     ];
 
     // Add data
-    entries.forEach(entry => {
+    entries.forEach((entry) => {
       worksheet.addRow({
         timestamp: entry.timestamp.toISOString(),
         user: entry.user.name,
@@ -631,7 +678,10 @@ export class AuditService {
         break;
       case 'pdf':
         // PDF export will be implemented with react-pdf in the API route
-        throw new AuditError('PDF export not yet implemented in service', 'AUDIT_EXPORT_FAILED');
+        throw new AuditError(
+          'PDF export not yet implemented in service',
+          'AUDIT_EXPORT_FAILED'
+        );
       default:
         throw new AuditError('Invalid export format', 'AUDIT_EXPORT_FAILED');
     }

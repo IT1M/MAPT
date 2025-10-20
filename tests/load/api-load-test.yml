@@ -1,0 +1,81 @@
+config:
+  target: "http://localhost:3000"
+  phases:
+    # Warm-up phase
+    - duration: 60
+      arrivalRate: 10
+      name: "Warm-up"
+    # Sustained load
+    - duration: 120
+      arrivalRate: 50
+      name: "Sustained load"
+    # Spike test
+    - duration: 60
+      arrivalRate: 100
+      name: "Spike test"
+  processor: "./load-test-processor.js"
+  variables:
+    testEmail: "test@example.com"
+    testPassword: "Test123!@#"
+
+scenarios:
+  - name: "Authentication Flow"
+    weight: 20
+    flow:
+      - post:
+          url: "/api/auth/callback/credentials"
+          json:
+            email: "{{ testEmail }}"
+            password: "{{ testPassword }}"
+          capture:
+            - json: "$.token"
+              as: "authToken"
+      - think: 2
+
+  - name: "Inventory List"
+    weight: 30
+    flow:
+      - get:
+          url: "/api/inventory"
+          qs:
+            page: 1
+            limit: 20
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+      - think: 1
+
+  - name: "Analytics Dashboard"
+    weight: 25
+    flow:
+      - get:
+          url: "/api/analytics/summary"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+      - think: 2
+
+  - name: "Create Inventory Item"
+    weight: 15
+    flow:
+      - post:
+          url: "/api/inventory"
+          json:
+            itemName: "Test Item {{ $randomString() }}"
+            batch: "BATCH-{{ $randomNumber(1000, 9999) }}"
+            quantity: "{{ $randomNumber(10, 100) }}"
+            reject: "{{ $randomNumber(0, 5) }}"
+            destination: "WAREHOUSE_A"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+      - think: 1
+
+  - name: "Search Inventory"
+    weight: 10
+    flow:
+      - get:
+          url: "/api/search"
+          qs:
+            q: "test"
+            type: "inventory"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+      - think: 1

@@ -72,7 +72,9 @@
 
   body {
     @apply bg-background text-foreground;
-    font-feature-settings: "rlig" 1, "calt" 1;
+    font-feature-settings:
+      'rlig' 1,
+      'calt' 1;
   }
 
   /* Smooth transitions for theme switching */
@@ -83,40 +85,40 @@
 }
 
 /* RTL Support */
-[dir="rtl"] {
+[dir='rtl'] {
   direction: rtl;
 }
 
-[dir="ltr"] {
+[dir='ltr'] {
   direction: ltr;
 }
 
 /* RTL-specific adjustments */
-[dir="rtl"] .rtl\:rotate-180 {
+[dir='rtl'] .rtl\:rotate-180 {
   transform: rotate(180deg);
 }
 
-[dir="rtl"] .rtl\:space-x-reverse > :not([hidden]) ~ :not([hidden]) {
+[dir='rtl'] .rtl\:space-x-reverse > :not([hidden]) ~ :not([hidden]) {
   --tw-space-x-reverse: 1;
 }
 
 /* Text alignment for RTL */
-[dir="rtl"] {
+[dir='rtl'] {
   text-align: right;
 }
 
-[dir="rtl"] input,
-[dir="rtl"] textarea {
+[dir='rtl'] input,
+[dir='rtl'] textarea {
   text-align: right;
 }
 
 /* Flip margins and paddings for RTL */
-[dir="rtl"] .ml-auto {
+[dir='rtl'] .ml-auto {
   margin-left: 0;
   margin-right: auto;
 }
 
-[dir="rtl"] .mr-auto {
+[dir='rtl'] .mr-auto {
   margin-right: 0;
   margin-left: auto;
 }
@@ -141,7 +143,10 @@
 
 /* Smooth transitions for theme switching */
 .theme-transition {
-  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease,
+    border-color 0.3s ease;
 }
 
 /* Focus visible styles for accessibility */
@@ -201,13 +206,21 @@
 
 /* Error Handling Animations */
 @keyframes shake {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateX(0);
   }
-  10%, 30%, 50%, 70%, 90% {
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
     transform: translateX(-4px);
   }
-  20%, 40%, 60%, 80% {
+  20%,
+  40%,
+  60%,
+  80% {
     transform: translateX(4px);
   }
 }
@@ -218,7 +231,8 @@
 
 /* Pulse animation for offline indicator */
 @keyframes pulse-slow {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {

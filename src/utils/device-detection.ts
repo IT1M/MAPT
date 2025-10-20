@@ -3,85 +3,89 @@
  */
 
 export interface DeviceInfo {
-  deviceType: string
-  browser: string
-  os: string
-  userAgent: string
+  deviceType: string;
+  browser: string;
+  os: string;
+  userAgent: string;
 }
 
 /**
  * Parse user agent string to extract device information
  */
 export function parseUserAgent(userAgent: string): DeviceInfo {
-  const ua = userAgent.toLowerCase()
-  
+  const ua = userAgent.toLowerCase();
+
   // Detect device type
-  let deviceType = 'Desktop'
+  let deviceType = 'Desktop';
   if (/(tablet|ipad|playbook|silk)|(android(?!.*mobi))/i.test(userAgent)) {
-    deviceType = 'Tablet'
-  } else if (/Mobile|Android|iP(hone|od)|IEMobile|BlackBerry|Kindle|Silk-Accelerated|(hpw|web)OS|Opera M(obi|ini)/.test(userAgent)) {
-    deviceType = 'Mobile'
+    deviceType = 'Tablet';
+  } else if (
+    /Mobile|Android|iP(hone|od)|IEMobile|BlackBerry|Kindle|Silk-Accelerated|(hpw|web)OS|Opera M(obi|ini)/.test(
+      userAgent
+    )
+  ) {
+    deviceType = 'Mobile';
   }
-  
+
   // Detect browser
-  let browser = 'Unknown'
+  let browser = 'Unknown';
   if (ua.includes('edg/')) {
-    browser = 'Edge'
+    browser = 'Edge';
   } else if (ua.includes('chrome/') && !ua.includes('edg/')) {
-    browser = 'Chrome'
+    browser = 'Chrome';
   } else if (ua.includes('safari/') && !ua.includes('chrome/')) {
-    browser = 'Safari'
+    browser = 'Safari';
   } else if (ua.includes('firefox/')) {
-    browser = 'Firefox'
+    browser = 'Firefox';
   } else if (ua.includes('opera/') || ua.includes('opr/')) {
-    browser = 'Opera'
+    browser = 'Opera';
   } else if (ua.includes('trident/') || ua.includes('msie')) {
-    browser = 'Internet Explorer'
+    browser = 'Internet Explorer';
   }
-  
+
   // Detect OS
-  let os = 'Unknown'
+  let os = 'Unknown';
   if (ua.includes('windows nt 10.0')) {
-    os = 'Windows 10'
+    os = 'Windows 10';
   } else if (ua.includes('windows nt 6.3')) {
-    os = 'Windows 8.1'
+    os = 'Windows 8.1';
   } else if (ua.includes('windows nt 6.2')) {
-    os = 'Windows 8'
+    os = 'Windows 8';
   } else if (ua.includes('windows nt 6.1')) {
-    os = 'Windows 7'
+    os = 'Windows 7';
   } else if (ua.includes('windows')) {
-    os = 'Windows'
+    os = 'Windows';
   } else if (ua.includes('mac os x')) {
-    const match = ua.match(/mac os x (\d+)[._](\d+)/)
+    const match = ua.match(/mac os x (\d+)[._](\d+)/);
     if (match) {
-      os = `macOS ${match[1]}.${match[2]}`
+      os = `macOS ${match[1]}.${match[2]}`;
     } else {
-      os = 'macOS'
+      os = 'macOS';
     }
   } else if (ua.includes('android')) {
-    const match = ua.match(/android (\d+\.?\d*)/)
+    const match = ua.match(/android (\d+\.?\d*)/);
     if (match) {
-      os = `Android ${match[1]}`
+      os = `Android ${match[1]}`;
     } else {
-      os = 'Android'
+      os = 'Android';
     }
   } else if (ua.includes('iphone') || ua.includes('ipad')) {
-    const match = ua.match(/os (\d+)[._](\d+)/)
+    const match = ua.match(/os (\d+)[._](\d+)/);
     if (match) {
-      os = `iOS ${match[1]}.${match[2]}`
+      os = `iOS ${match[1]}.${match[2]}`;
     } else {
-      os = 'iOS'
+      os = 'iOS';
     }
   } else if (ua.includes('linux')) {
-    os = 'Linux'
+    os = 'Linux';
   }
-  
+
   return {
     deviceType,
     browser,
     os,
     userAgent,
-  }
+  };
 }
 
 /**
@@ -92,7 +96,7 @@ export function getIpAddress(headers: Headers): string {
     headers.get('x-forwarded-for')?.split(',')[0].trim() ||
     headers.get('x-real-ip') ||
     'unknown'
-  )
+  );
 }
 
 /**
@@ -105,10 +109,14 @@ export function getIpAddress(headers: Headers): string {
 export async function getLocationFromIp(ipAddress: string): Promise<string> {
   // For now, return a placeholder
   // In production, implement actual geolocation lookup
-  if (ipAddress === 'unknown' || ipAddress === '127.0.0.1' || ipAddress === '::1') {
-    return 'Local'
+  if (
+    ipAddress === 'unknown' ||
+    ipAddress === '127.0.0.1' ||
+    ipAddress === '::1'
+  ) {
+    return 'Local';
   }
-  
+
   // TODO: Implement actual geolocation service
   // Example with ipapi.co (free tier):
   // try {
@@ -119,6 +127,6 @@ export async function getLocationFromIp(ipAddress: string): Promise<string> {
   //   console.error('Failed to get location:', error)
   //   return 'Unknown'
   // }
-  
-  return 'Unknown'
+
+  return 'Unknown';
 }

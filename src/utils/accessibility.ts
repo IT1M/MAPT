@@ -15,7 +15,7 @@ export function getChartAriaLabel(
   const dateInfo = dateRange
     ? ` from ${dateRange.start} to ${dateRange.end}`
     : '';
-  
+
   return `${chartType} chart with ${dataPoints} data points${dateInfo}. Use arrow keys to navigate data points, Tab to move between controls, and Escape to exit chart focus.`;
 }
 
@@ -27,7 +27,7 @@ export function getKPIAriaLabel(
   const trendInfo = trend
     ? ` Trend: ${trend.direction} by ${trend.percentage.toFixed(1)} percent`
     : '';
-  
+
   return `${title}: ${value}${trendInfo}. Press Enter or Space to filter dashboard by this metric.`;
 }
 
@@ -158,10 +158,7 @@ export class ScreenReaderAnnouncer {
   }
 
   announceFilterChange(filterType: string, value: string): void {
-    this.announce(
-      `Filter applied: ${filterType} set to ${value}`,
-      'polite'
-    );
+    this.announce(`Filter applied: ${filterType} set to ${value}`, 'polite');
   }
 
   announceError(message: string): void {
@@ -262,10 +259,7 @@ export interface TableColumn {
   format?: (value: any) => string;
 }
 
-export function generateDataTable(
-  data: any[],
-  columns: TableColumn[]
-): string {
+export function generateDataTable(data: any[], columns: TableColumn[]): string {
   const headers = columns.map((col) => col.label).join('\t');
   const rows = data.map((row) =>
     columns

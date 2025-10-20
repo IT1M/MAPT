@@ -29,15 +29,18 @@ export async function GET(request: NextRequest) {
 
     // Parse query parameters
     const searchParams = request.nextUrl.searchParams;
-    const dateFrom = searchParams.get('dateFrom') 
-      ? new Date(searchParams.get('dateFrom')!) 
+    const dateFrom = searchParams.get('dateFrom')
+      ? new Date(searchParams.get('dateFrom')!)
       : new Date(Date.now() - 7 * 24 * 60 * 60 * 1000); // Default: last 7 days
-    const dateTo = searchParams.get('dateTo') 
-      ? new Date(searchParams.get('dateTo')!) 
+    const dateTo = searchParams.get('dateTo')
+      ? new Date(searchParams.get('dateTo')!)
       : new Date(); // Default: now
 
     // Get statistics
-    const stats = await AuditService.getStatistics({ from: dateFrom, to: dateTo });
+    const stats = await AuditService.getStatistics({
+      from: dateFrom,
+      to: dateTo,
+    });
 
     return successResponse(stats);
   } catch (error) {

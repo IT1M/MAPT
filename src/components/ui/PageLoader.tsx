@@ -60,11 +60,14 @@ export const PageLoader: React.FC<PageLoaderProps> = ({
               className="h-full bg-primary-600 dark:bg-primary-500 transition-all duration-300 ease-out"
               style={{
                 width: progress !== undefined ? `${progress}%` : '0%',
-                animation: progress === undefined ? 'indeterminate 1.5s ease-in-out infinite' : 'none',
+                animation:
+                  progress === undefined
+                    ? 'indeterminate 1.5s ease-in-out infinite'
+                    : 'none',
               }}
             />
           </div>
-          
+
           {/* Message */}
           {message && (
             <p className="text-sm text-center text-gray-600 dark:text-gray-400">
@@ -129,7 +132,9 @@ export const InlineLoader: React.FC<InlineLoaderProps> = ({
   };
 
   return (
-    <div className={`flex flex-col items-center justify-center space-y-2 ${className}`}>
+    <div
+      className={`flex flex-col items-center justify-center space-y-2 ${className}`}
+    >
       <svg
         className={`${sizeClasses[size]} animate-spin text-primary-600 dark:text-primary-400`}
         xmlns="http://www.w3.org/2000/svg"

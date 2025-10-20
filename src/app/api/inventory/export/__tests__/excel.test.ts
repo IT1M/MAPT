@@ -1,10 +1,10 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { NextRequest } from 'next/server'
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { NextRequest } from 'next/server';
 
 // Mock dependencies
 vi.mock('@/services/auth', () => ({
   auth: vi.fn(),
-}))
+}));
 
 vi.mock('@/services/prisma', () => ({
   prisma: {
@@ -15,7 +15,7 @@ vi.mock('@/services/prisma', () => ({
       create: vi.fn(),
     },
   },
-}))
+}));
 
 vi.mock('xlsx', () => ({
   utils: {
@@ -26,18 +26,18 @@ vi.mock('xlsx', () => ({
     book_append_sheet: vi.fn(),
   },
   write: vi.fn(() => Buffer.from('mock-excel-data')),
-}))
+}));
 
-import { auth } from '@/services/auth'
-import { prisma } from '@/services/prisma'
-import { POST } from '../excel/route'
+import { auth } from '@/services/auth';
+import { prisma } from '@/services/prisma';
+import { POST } from '../excel/route';
 
 describe('Excel Export API', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
+    vi.clearAllMocks();
     // Reset rate limiter between tests
-    vi.resetModules()
-  })
+    vi.resetModules();
+  });
 
   it('should export inventory items as Excel', async () => {
     const mockSession = {
@@ -47,7 +47,7 @@ describe('Excel Export API', () => {
         role: 'MANAGER',
         permissions: ['inventory:read'],
       },
-    }
+    };
 
     const mockItems = [
       {
@@ -66,28 +66,35 @@ describe('Excel Export API', () => {
           email: 'test@example.com',
         },
       },
-    ]
+    ];
 
-    vi.mocked(auth).mockResolvedValue(mockSession as any)
-    vi.mocked(prisma.inventoryItem.findMany).mockResolvedValue(mockItems as any)
-    vi.mocked(prisma.auditLog.create).mockResolvedValue({} as any)
+    vi.mocked(auth).mockResolvedValue(mockSession as any);
+    vi.mocked(prisma.inventoryItem.findMany).mockResolvedValue(
+      mockItems as any
+    );
+    vi.mocked(prisma.auditLog.create).mockResolvedValue({} as any);
 
-    const request = new NextRequest('http://localhost:3000/api/inventory/export/excel', {
-      method: 'POST',
-      body: JSON.stringify({
-        filters: {
-          search: 'medical',
-        },
-      }),
-    })
+    const request = new NextRequest(
+      'http://localhost:3000/api/inventory/export/excel',
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          filters: {
+            search: 'medical',
+          },
+        }),
+      }
+    );
 
-    const response = await POST(request)
+    const response = await POST(request);
 
-    expect(response.status).toBe(200)
-    expect(response.headers.get('Content-Type')).toContain('spreadsheetml.sheet')
-    expect(response.headers.get('Content-Disposition')).toContain('attachment')
-    expect(prisma.auditLog.create).toHaveBeenCalled()
-  })
+    expect(response.status).toBe(200);
+    expect(response.headers.get('Content-Type')).toContain(
+      'spreadsheetml.sheet'
+    );
+    expect(response.headers.get('Content-Disposition')).toContain('attachment');
+    expect(prisma.auditLog.create).toHaveBeenCalled();
+  });
 
   it('should apply filters correctly', async () => {
     const mockSession = {
@@ -96,24 +103,27 @@ describe('Excel Export API', () => {
         role: 'MANAGER',
         permissions: ['inventory:read'],
       },
-    }
+    };
 
-    vi.mocked(auth).mockResolvedValue(mockSession as any)
-    vi.mocked(prisma.inventoryItem.findMany).mockResolvedValue([])
-    vi.mocked(prisma.auditLog.create).mockResolvedValue({} as any)
+    vi.mocked(auth).mockResolvedValue(mockSession as any);
+    vi.mocked(prisma.inventoryItem.findMany).mockResolvedValue([]);
+    vi.mocked(prisma.auditLog.create).mockResolvedValue({} as any);
 
-    const request = new NextRequest('http://localhost:3000/api/inventory/export/excel', {
-      method: 'POST',
-      body: JSON.stringify({
-        filters: {
-          destinations: ['MAIS'],
-          categories: ['Supplies'],
-          rejectFilter: 'has',
-        },
-      }),
-    })
+    const request = new NextRequest(
+      'http://localhost:3000/api/inventory/export/excel',
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          filters: {
+            destinations: ['MAIS'],
+            categories: ['Supplies'],
+            rejectFilter: 'has',
+          },
+        }),
+      }
+    );
 
-    await POST(request)
+    await POST(request);
 
     expect(prisma.inventoryItem.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -123,8 +133,8 @@ describe('Excel Export API', () => {
           reject: { gt: 0 },
         }),
       })
-    )
-  })
+    );
+  });
 
   it('should export selected items only', async () => {
     const mockSession = {
@@ -133,20 +143,23 @@ describe('Excel Export API', () => {
         role: 'MANAGER',
         permissions: ['inventory:read'],
       },
-    }
+    };
 
-    vi.mocked(auth).mockResolvedValue(mockSession as any)
-    vi.mocked(prisma.inventoryItem.findMany).mockResolvedValue([])
-    vi.mocked(prisma.auditLog.create).mockResolvedValue({} as any)
+    vi.mocked(auth).mockResolvedValue(mockSession as any);
+    vi.mocked(prisma.inventoryItem.findMany).mockResolvedValue([]);
+    vi.mocked(prisma.auditLog.create).mockResolvedValue({} as any);
 
-    const request = new NextRequest('http://localhost:3000/api/inventory/export/excel', {
-      method: 'POST',
-      body: JSON.stringify({
-        ids: ['item-1', 'item-2'],
-      }),
-    })
+    const request = new NextRequest(
+      'http://localhost:3000/api/inventory/export/excel',
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          ids: ['item-1', 'item-2'],
+        }),
+      }
+    );
 
-    await POST(request)
+    await POST(request);
 
     expect(prisma.inventoryItem.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -154,8 +167,8 @@ describe('Excel Export API', () => {
           id: { in: ['item-1', 'item-2'] },
         }),
       })
-    )
-  })
+    );
+  });
 
   it('should enforce rate limiting', async () => {
     const mockSession = {
@@ -164,44 +177,50 @@ describe('Excel Export API', () => {
         role: 'MANAGER',
         permissions: ['inventory:read'],
       },
-    }
+    };
 
-    vi.mocked(auth).mockResolvedValue(mockSession as any)
-    vi.mocked(prisma.inventoryItem.findMany).mockResolvedValue([])
-    vi.mocked(prisma.auditLog.create).mockResolvedValue({} as any)
+    vi.mocked(auth).mockResolvedValue(mockSession as any);
+    vi.mocked(prisma.inventoryItem.findMany).mockResolvedValue([]);
+    vi.mocked(prisma.auditLog.create).mockResolvedValue({} as any);
 
     // Make 11 requests (rate limit is 10 per 15 minutes)
-    const requests = []
+    const requests = [];
     for (let i = 0; i < 11; i++) {
-      const request = new NextRequest('http://localhost:3000/api/inventory/export/excel', {
-        method: 'POST',
-        body: JSON.stringify({ filters: {} }),
-      })
-      requests.push(POST(request))
+      const request = new NextRequest(
+        'http://localhost:3000/api/inventory/export/excel',
+        {
+          method: 'POST',
+          body: JSON.stringify({ filters: {} }),
+        }
+      );
+      requests.push(POST(request));
     }
 
-    const responses = await Promise.all(requests)
-    const lastResponse = responses[responses.length - 1]
+    const responses = await Promise.all(requests);
+    const lastResponse = responses[responses.length - 1];
 
-    expect(lastResponse.status).toBe(429)
-    const data = await lastResponse.json()
-    expect(data.error.code).toBe('RATE_LIMIT_EXCEEDED')
-  })
+    expect(lastResponse.status).toBe(429);
+    const data = await lastResponse.json();
+    expect(data.error.code).toBe('RATE_LIMIT_EXCEEDED');
+  });
 
   it('should reject unauthenticated requests', async () => {
-    vi.mocked(auth).mockResolvedValue(null as any)
+    vi.mocked(auth).mockResolvedValue(null as any);
 
-    const request = new NextRequest('http://localhost:3000/api/inventory/export/excel', {
-      method: 'POST',
-      body: JSON.stringify({ filters: {} }),
-    })
+    const request = new NextRequest(
+      'http://localhost:3000/api/inventory/export/excel',
+      {
+        method: 'POST',
+        body: JSON.stringify({ filters: {} }),
+      }
+    );
 
-    const response = await POST(request)
-    const data = await response.json()
+    const response = await POST(request);
+    const data = await response.json();
 
-    expect(response.status).toBe(401)
-    expect(data.success).toBe(false)
-  })
+    expect(response.status).toBe(401);
+    expect(data.success).toBe(false);
+  });
 
   it('should reject requests without permissions', async () => {
     const mockSession = {
@@ -209,21 +228,24 @@ describe('Excel Export API', () => {
         id: 'user-123',
         permissions: [],
       },
-    }
+    };
 
-    vi.mocked(auth).mockResolvedValue(mockSession as any)
+    vi.mocked(auth).mockResolvedValue(mockSession as any);
 
-    const request = new NextRequest('http://localhost:3000/api/inventory/export/excel', {
-      method: 'POST',
-      body: JSON.stringify({ filters: {} }),
-    })
+    const request = new NextRequest(
+      'http://localhost:3000/api/inventory/export/excel',
+      {
+        method: 'POST',
+        body: JSON.stringify({ filters: {} }),
+      }
+    );
 
-    const response = await POST(request)
-    const data = await response.json()
+    const response = await POST(request);
+    const data = await response.json();
 
-    expect(response.status).toBe(403)
-    expect(data.success).toBe(false)
-  })
+    expect(response.status).toBe(403);
+    expect(data.success).toBe(false);
+  });
 
   it('should apply role-based filtering for DATA_ENTRY users', async () => {
     const mockSession = {
@@ -232,18 +254,21 @@ describe('Excel Export API', () => {
         role: 'DATA_ENTRY',
         permissions: ['inventory:read'],
       },
-    }
+    };
 
-    vi.mocked(auth).mockResolvedValue(mockSession as any)
-    vi.mocked(prisma.inventoryItem.findMany).mockResolvedValue([])
-    vi.mocked(prisma.auditLog.create).mockResolvedValue({} as any)
+    vi.mocked(auth).mockResolvedValue(mockSession as any);
+    vi.mocked(prisma.inventoryItem.findMany).mockResolvedValue([]);
+    vi.mocked(prisma.auditLog.create).mockResolvedValue({} as any);
 
-    const request = new NextRequest('http://localhost:3000/api/inventory/export/excel', {
-      method: 'POST',
-      body: JSON.stringify({ filters: {} }),
-    })
+    const request = new NextRequest(
+      'http://localhost:3000/api/inventory/export/excel',
+      {
+        method: 'POST',
+        body: JSON.stringify({ filters: {} }),
+      }
+    );
 
-    await POST(request)
+    await POST(request);
 
     expect(prisma.inventoryItem.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -251,6 +276,6 @@ describe('Excel Export API', () => {
           enteredById: 'data-entry-user-456',
         }),
       })
-    )
-  })
-})
+    );
+  });
+});

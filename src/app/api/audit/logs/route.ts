@@ -29,17 +29,27 @@ export async function GET(request: NextRequest) {
 
     // Parse query parameters
     const searchParams = request.nextUrl.searchParams;
-    
+
     // Pagination
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '50');
 
     // Filters
-    const dateFrom = searchParams.get('dateFrom') ? new Date(searchParams.get('dateFrom')!) : undefined;
-    const dateTo = searchParams.get('dateTo') ? new Date(searchParams.get('dateTo')!) : undefined;
+    const dateFrom = searchParams.get('dateFrom')
+      ? new Date(searchParams.get('dateFrom')!)
+      : undefined;
+    const dateTo = searchParams.get('dateTo')
+      ? new Date(searchParams.get('dateTo')!)
+      : undefined;
     const userIds = searchParams.get('userIds')?.split(',').filter(Boolean);
-    const actions = searchParams.get('actions')?.split(',').filter(Boolean) as any[];
-    const entityTypes = searchParams.get('entityTypes')?.split(',').filter(Boolean) as any[];
+    const actions = searchParams
+      .get('actions')
+      ?.split(',')
+      .filter(Boolean) as any[];
+    const entityTypes = searchParams
+      .get('entityTypes')
+      ?.split(',')
+      .filter(Boolean) as any[];
     const search = searchParams.get('search') || undefined;
 
     // Query logs

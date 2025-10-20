@@ -18,28 +18,34 @@ export function registerServiceWorker() {
   window.addEventListener('load', async () => {
     try {
       const registration = await navigator.serviceWorker.register('/sw.js', {
-        scope: '/'
+        scope: '/',
       });
 
       console.log('[PWA] Service worker registered:', registration.scope);
 
       // Check for updates every hour
-      setInterval(() => {
-        registration.update();
-      }, 60 * 60 * 1000);
+      setInterval(
+        () => {
+          registration.update();
+        },
+        60 * 60 * 1000
+      );
 
       // Handle updates
       registration.addEventListener('updatefound', () => {
         const newWorker = registration.installing;
-        
+
         if (!newWorker) return;
 
         console.log('[PWA] New service worker found');
 
         newWorker.addEventListener('statechange', () => {
-          if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+          if (
+            newWorker.state === 'installed' &&
+            navigator.serviceWorker.controller
+          ) {
             console.log('[PWA] New service worker installed, update available');
-            
+
             // Notify user about update
             if (confirm('A new version is available. Reload to update?')) {
               newWorker.postMessage({ type: 'SKIP_WAITING' });
@@ -58,12 +64,11 @@ export function registerServiceWorker() {
       // Handle messages from service worker
       navigator.serviceWorker.addEventListener('message', (event) => {
         console.log('[PWA] Message from service worker:', event.data);
-        
+
         if (event.data && event.data.type === 'CACHE_UPDATED') {
           console.log('[PWA] Cache updated');
         }
       });
-
     } catch (error) {
       console.error('[PWA] Service worker registration failed:', error);
     }
@@ -88,11 +93,11 @@ export async function unregisterServiceWorker() {
  */
 export function isPWA(): boolean {
   if (typeof window === 'undefined') return false;
-  
+
   const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
   const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
   const isIOSStandalone = (window.navigator as any).standalone === true;
-  
+
   return isStandalone || (isIOS && isIOSStandalone);
 }
 
@@ -106,7 +111,7 @@ export async function requestPersistentStorage(): Promise<boolean> {
 
   try {
     const isPersisted = await navigator.storage.persisted();
-    
+
     if (isPersisted) {
       console.log('[PWA] Storage is already persistent');
       return true;
@@ -142,7 +147,7 @@ export async function getStorageEstimate(): Promise<{
     return {
       usage,
       quota,
-      percentage
+      percentage,
     };
   } catch (error) {
     console.error('[PWA] Failed to get storage estimate:', error);
@@ -160,9 +165,7 @@ export async function clearAllCaches(): Promise<void> {
 
   try {
     const cacheNames = await caches.keys();
-    await Promise.all(
-      cacheNames.map(cacheName => caches.delete(cacheName))
-    );
+    await Promise.all(cacheNames.map((cacheName) => caches.delete(cacheName)));
     console.log('[PWA] All caches cleared');
   } catch (error) {
     console.error('[PWA] Failed to clear caches:', error);

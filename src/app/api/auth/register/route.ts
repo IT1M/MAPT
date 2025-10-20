@@ -1,15 +1,15 @@
-import { NextRequest } from 'next/server'
-import { hash } from 'bcrypt'
-import { prisma } from '@/services/prisma'
-import { registrationSchema } from '@/utils/validators'
-import { sanitizeObject } from '@/utils/sanitize'
-import { createAuditLog, extractRequestMetadata } from '@/utils/audit'
+import { NextRequest } from 'next/server';
+import { hash } from 'bcrypt';
+import { prisma } from '@/services/prisma';
+import { registrationSchema } from '@/utils/validators';
+import { sanitizeObject } from '@/utils/sanitize';
+import { createAuditLog, extractRequestMetadata } from '@/utils/audit';
 import {
   successResponse,
   handleApiError,
   conflictError,
   validationError,
-} from '@/utils/api-response'
+} from '@/utils/api-response';
 
 /**
  * POST /api/auth/register
@@ -18,34 +18,39 @@ import {
 export async function POST(request: NextRequest) {
   try {
     // Parse request body
-    const body = await request.json()
+    const body = await request.json();
 
     // Validate input with Zod schema
-    const validationResult = registrationSchema.safeParse(body)
-    
+    const validationResult = registrationSchema.safeParse(body);
+
     if (!validationResult.success) {
-      return validationError('Validation failed', validationResult.error.errors.map(err => ({
-        field: err.path.join('.'),
-        message: err.message,
-      })))
+      return validationError(
+        'Validation failed',
+        validationResult.error.errors.map((err) => ({
+          field: err.path.join('.'),
+          message: err.message,
+        }))
+      );
     }
 
-    const { email, name, password, role } = validationResult.data
+    const { email, name, password, role } = validationResult.data;
 
     // Sanitize string inputs
-    const sanitizedData = sanitizeObject({ email, name })
+    const sanitizedData = sanitizeObject({ email, name });
 
     // Check for duplicate email
     const existingUser = await prisma.user.findUnique({
       where: { email: sanitizedData.email },
-    })
+    });
 
     if (existingUser) {
-      return conflictError('A user with this email already exists', { field: 'email' })
+      return conflictError('A user with this email already exists', {
+        field: 'email',
+      });
     }
 
     // Hash password with bcrypt (12 rounds)
-    const passwordHash = await hash(password, 12)
+    const passwordHash = await hash(password, 12);
 
     // Create user with DATA_ENTRY role default
     const user = await prisma.user.create({
@@ -64,10 +69,10 @@ export async function POST(request: NextRequest) {
         isActive: true,
         createdAt: true,
       },
-    })
+    });
 
     // Extract request metadata for audit log
-    const metadata = extractRequestMetadata(request)
+    const metadata = extractRequestMetadata(request);
 
     // Create audit log entry
     await createAuditLog({
@@ -83,15 +88,11 @@ export async function POST(request: NextRequest) {
         },
       },
       metadata,
-    })
+    });
 
     // Return sanitized user object (passwordHash excluded by select)
-    return successResponse(
-      user,
-      'User registered successfully',
-      201
-    )
+    return successResponse(user, 'User registered successfully', 201);
   } catch (error) {
-    return handleApiError(error)
+    return handleApiError(error);
   }
 }

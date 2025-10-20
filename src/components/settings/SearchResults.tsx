@@ -1,16 +1,16 @@
-'use client'
+'use client';
 
-import React from 'react'
-import { useTranslations } from '@/hooks/useTranslations'
-import { useLocale } from '@/hooks/useLocale'
-import { highlightMatches, type SearchResult } from '@/utils/settings-search'
+import React from 'react';
+import { useTranslations } from '@/hooks/useTranslations';
+import { useLocale } from '@/hooks/useLocale';
+import { highlightMatches, type SearchResult } from '@/utils/settings-search';
 
 interface SearchResultsProps {
-  results: SearchResult[]
-  resultsBySection?: Record<string, SearchResult[]>
-  onResultClick: (result: SearchResult) => void
-  isSearching?: boolean
-  query: string
+  results: SearchResult[];
+  resultsBySection?: Record<string, SearchResult[]>;
+  onResultClick: (result: SearchResult) => void;
+  isSearching?: boolean;
+  query: string;
 }
 
 export function SearchResults({
@@ -20,9 +20,9 @@ export function SearchResults({
   isSearching = false,
   query,
 }: SearchResultsProps) {
-  const t = useTranslations('settings')
-  const locale = useLocale()
-  const isRTL = locale === 'ar'
+  const t = useTranslations('settings');
+  const locale = useLocale();
+  const isRTL = locale === 'ar';
 
   if (isSearching) {
     return (
@@ -30,11 +30,11 @@ export function SearchResults({
         <div className="animate-spin h-6 w-6 border-2 border-primary-500 border-t-transparent rounded-full mx-auto mb-2" />
         <p>{t('searching')}</p>
       </div>
-    )
+    );
   }
 
   if (!query.trim()) {
-    return null
+    return null;
   }
 
   if (results.length === 0) {
@@ -61,7 +61,7 @@ export function SearchResults({
           {t('noResultsDescription')}
         </p>
       </div>
-    )
+    );
   }
 
   // Render grouped by section if provided
@@ -70,7 +70,7 @@ export function SearchResults({
       <div className="divide-y divide-gray-200 dark:divide-gray-700">
         {Object.entries(resultsBySection).map(([section, sectionResults]) => (
           <div key={section} className="py-4">
-            <h3 
+            <h3
               className={`text-sm font-semibold text-gray-500 dark:text-gray-400 mb-3 px-4 ${
                 isRTL ? 'text-right' : 'text-left'
               }`}
@@ -78,7 +78,7 @@ export function SearchResults({
               {section}
             </h3>
             <div className="space-y-1">
-              {sectionResults.map(result => (
+              {sectionResults.map((result) => (
                 <SearchResultItem
                   key={result.id}
                   result={result}
@@ -90,13 +90,13 @@ export function SearchResults({
           </div>
         ))}
       </div>
-    )
+    );
   }
 
   // Render flat list
   return (
     <div className="divide-y divide-gray-200 dark:divide-gray-700">
-      {results.map(result => (
+      {results.map((result) => (
         <SearchResultItem
           key={result.id}
           result={result}
@@ -105,19 +105,19 @@ export function SearchResults({
         />
       ))}
     </div>
-  )
+  );
 }
 
 interface SearchResultItemProps {
-  result: SearchResult
-  onClick: () => void
-  isRTL: boolean
+  result: SearchResult;
+  onClick: () => void;
+  isRTL: boolean;
 }
 
 function SearchResultItem({ result, onClick, isRTL }: SearchResultItemProps) {
   // Find the best match to display
-  const titleMatch = result.matches.find(m => m.field === 'title')
-  const descMatch = result.matches.find(m => m.field === 'description')
+  const titleMatch = result.matches.find((m) => m.field === 'title');
+  const descMatch = result.matches.find((m) => m.field === 'description');
 
   return (
     <button
@@ -134,7 +134,7 @@ function SearchResultItem({ result, onClick, isRTL }: SearchResultItemProps) {
     >
       <div className="flex items-start gap-3">
         {/* Icon */}
-        <div 
+        <div
           className={`
             flex-shrink-0 w-10 h-10 rounded-lg bg-primary-100 dark:bg-primary-900 
             flex items-center justify-center group-hover:bg-primary-200 
@@ -203,7 +203,7 @@ function SearchResultItem({ result, onClick, isRTL }: SearchResultItemProps) {
         </div>
 
         {/* Arrow icon */}
-        <div 
+        <div
           className={`
             flex-shrink-0 text-gray-400 group-hover:text-gray-600 
             dark:group-hover:text-gray-300 transition-colors
@@ -227,5 +227,5 @@ function SearchResultItem({ result, onClick, isRTL }: SearchResultItemProps) {
         </div>
       </div>
     </button>
-  )
+  );
 }

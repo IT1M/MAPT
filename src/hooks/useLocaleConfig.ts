@@ -4,7 +4,7 @@
  * Since we're using English only, this returns static values
  */
 
-import { enUS } from 'date-fns/locale'
+import { enUS } from 'date-fns/locale';
 
 export function useLocaleConfig() {
   return {
@@ -13,5 +13,5 @@ export function useLocaleConfig() {
     direction: 'ltr' as const,
     dateLocale: enUS,
     dateFormat: 'en-US',
-  }
+  };
 }

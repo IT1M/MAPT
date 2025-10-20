@@ -1,20 +1,20 @@
-'use client'
+'use client';
 
-import { ReactNode } from 'react'
-import Link from 'next/link'
-import { useTranslations } from '@/hooks/useTranslations'
-import { 
-  BookOpenIcon, 
-  QuestionMarkCircleIcon, 
-  ChatBubbleLeftRightIcon 
-} from '@heroicons/react/24/outline'
+import { ReactNode } from 'react';
+import Link from 'next/link';
+import { useTranslations } from '@/hooks/useTranslations';
+import {
+  BookOpenIcon,
+  QuestionMarkCircleIcon,
+  ChatBubbleLeftRightIcon,
+} from '@heroicons/react/24/outline';
 
 interface HelpCenterLayoutProps {
-  children: ReactNode
+  children: ReactNode;
 }
 
 export default function HelpCenterLayout({ children }: HelpCenterLayoutProps) {
-  const t = useTranslations('help')
+  const t = useTranslations('help');
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -23,7 +23,7 @@ export default function HelpCenterLayout({ children }: HelpCenterLayoutProps) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-8">
-              <Link 
+              <Link
                 href="/help"
                 className="flex items-center space-x-2 text-gray-900 dark:text-white font-semibold"
               >
@@ -63,5 +63,5 @@ export default function HelpCenterLayout({ children }: HelpCenterLayoutProps) {
       {/* Main Content */}
       {children}
     </div>
-  )
+  );
 }

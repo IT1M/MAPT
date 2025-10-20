@@ -4,12 +4,12 @@
  */
 
 /* RTL Layout Adjustments */
-[dir="rtl"] {
+[dir='rtl'] {
   /* Flip flex directions */
   .flex-row-reverse {
     flex-direction: row;
   }
-  
+
   .flex-row {
     flex-direction: row-reverse;
   }
@@ -68,188 +68,188 @@
 }
 
 /* Audit Log Table RTL */
-[dir="rtl"] .audit-table {
+[dir='rtl'] .audit-table {
   direction: rtl;
   text-align: right;
 }
 
-[dir="rtl"] .audit-table th,
-[dir="rtl"] .audit-table td {
+[dir='rtl'] .audit-table th,
+[dir='rtl'] .audit-table td {
   text-align: right;
 }
 
-[dir="rtl"] .audit-table .action-column {
+[dir='rtl'] .audit-table .action-column {
   text-align: left;
 }
 
 /* Backup Table RTL */
-[dir="rtl"] .backup-table {
+[dir='rtl'] .backup-table {
   direction: rtl;
   text-align: right;
 }
 
-[dir="rtl"] .backup-table th,
-[dir="rtl"] .backup-table td {
+[dir='rtl'] .backup-table th,
+[dir='rtl'] .backup-table td {
   text-align: right;
 }
 
 /* Report Table RTL */
-[dir="rtl"] .report-table {
+[dir='rtl'] .report-table {
   direction: rtl;
   text-align: right;
 }
 
-[dir="rtl"] .report-table th,
-[dir="rtl"] .report-table td {
+[dir='rtl'] .report-table th,
+[dir='rtl'] .report-table td {
   text-align: right;
 }
 
 /* Filter Drawer RTL */
-[dir="rtl"] .filter-drawer {
+[dir='rtl'] .filter-drawer {
   right: auto;
   left: 0;
 }
 
-[dir="rtl"] .filter-drawer.open {
+[dir='rtl'] .filter-drawer.open {
   transform: translateX(0);
 }
 
-[dir="rtl"] .filter-drawer.closed {
+[dir='rtl'] .filter-drawer.closed {
   transform: translateX(-100%);
 }
 
 /* Mobile Card View RTL */
-[dir="rtl"] .mobile-card {
+[dir='rtl'] .mobile-card {
   direction: rtl;
   text-align: right;
 }
 
-[dir="rtl"] .mobile-card .card-header {
+[dir='rtl'] .mobile-card .card-header {
   flex-direction: row-reverse;
 }
 
-[dir="rtl"] .mobile-card .card-actions {
+[dir='rtl'] .mobile-card .card-actions {
   flex-direction: row-reverse;
 }
 
 /* Progress Bar RTL */
-[dir="rtl"] .progress-bar {
+[dir='rtl'] .progress-bar {
   direction: ltr; /* Keep progress bar LTR for consistency */
 }
 
-[dir="rtl"] .progress-steps {
+[dir='rtl'] .progress-steps {
   direction: rtl;
 }
 
-[dir="rtl"] .progress-steps .step-icon {
+[dir='rtl'] .progress-steps .step-icon {
   margin-right: 0;
   margin-left: 0.75rem;
 }
 
 /* Confirmation Dialog RTL */
-[dir="rtl"] .confirmation-dialog {
+[dir='rtl'] .confirmation-dialog {
   direction: rtl;
   text-align: right;
 }
 
-[dir="rtl"] .confirmation-dialog .dialog-actions {
+[dir='rtl'] .confirmation-dialog .dialog-actions {
   flex-direction: row-reverse;
 }
 
 /* Badge RTL */
-[dir="rtl"] .badge {
+[dir='rtl'] .badge {
   margin-right: 0;
   margin-left: 0.5rem;
 }
 
 /* Icon RTL - Flip certain icons */
-[dir="rtl"] .icon-arrow-right {
+[dir='rtl'] .icon-arrow-right {
   transform: scaleX(-1);
 }
 
-[dir="rtl"] .icon-arrow-left {
+[dir='rtl'] .icon-arrow-left {
   transform: scaleX(-1);
 }
 
 /* Dropdown RTL */
-[dir="rtl"] .dropdown-menu {
+[dir='rtl'] .dropdown-menu {
   right: auto;
   left: 0;
 }
 
 /* Tooltip RTL */
-[dir="rtl"] .tooltip {
+[dir='rtl'] .tooltip {
   direction: rtl;
   text-align: right;
 }
 
 /* Chart RTL Adjustments */
-[dir="rtl"] .recharts-wrapper {
+[dir='rtl'] .recharts-wrapper {
   direction: ltr; /* Keep charts LTR for consistency */
 }
 
-[dir="rtl"] .chart-legend {
+[dir='rtl'] .chart-legend {
   direction: rtl;
   text-align: right;
 }
 
 /* Form RTL */
-[dir="rtl"] .form-label {
+[dir='rtl'] .form-label {
   text-align: right;
 }
 
-[dir="rtl"] .form-input {
+[dir='rtl'] .form-input {
   text-align: right;
 }
 
-[dir="rtl"] .form-checkbox {
+[dir='rtl'] .form-checkbox {
   margin-right: 0;
   margin-left: 0.5rem;
 }
 
 /* Tabs RTL */
-[dir="rtl"] .tabs {
+[dir='rtl'] .tabs {
   direction: rtl;
 }
 
-[dir="rtl"] .tab-list {
+[dir='rtl'] .tab-list {
   flex-direction: row-reverse;
 }
 
 /* Breadcrumb RTL */
-[dir="rtl"] .breadcrumb {
+[dir='rtl'] .breadcrumb {
   direction: rtl;
 }
 
-[dir="rtl"] .breadcrumb-separator {
+[dir='rtl'] .breadcrumb-separator {
   transform: scaleX(-1);
 }
 
 /* Pagination RTL */
-[dir="rtl"] .pagination {
+[dir='rtl'] .pagination {
   direction: rtl;
   flex-direction: row-reverse;
 }
 
 /* Search Input RTL */
-[dir="rtl"] .search-input {
+[dir='rtl'] .search-input {
   padding-right: 2.5rem;
   padding-left: 1rem;
 }
 
-[dir="rtl"] .search-icon {
+[dir='rtl'] .search-icon {
   right: auto;
   left: 0.75rem;
 }
 
 /* Status Indicator RTL */
-[dir="rtl"] .status-indicator {
+[dir='rtl'] .status-indicator {
   margin-right: 0;
   margin-left: 0.5rem;
 }
 
 /* Sidebar RTL */
-[dir="rtl"] .sidebar {
+[dir='rtl'] .sidebar {
   right: auto;
   left: 0;
   border-right: none;
@@ -257,94 +257,94 @@
 }
 
 /* Modal RTL */
-[dir="rtl"] .modal-header {
+[dir='rtl'] .modal-header {
   flex-direction: row-reverse;
 }
 
-[dir="rtl"] .modal-close {
+[dir='rtl'] .modal-close {
   right: auto;
   left: 1rem;
 }
 
 /* Alert RTL */
-[dir="rtl"] .alert {
+[dir='rtl'] .alert {
   direction: rtl;
   text-align: right;
 }
 
-[dir="rtl"] .alert-icon {
+[dir='rtl'] .alert-icon {
   margin-right: 0;
   margin-left: 0.75rem;
 }
 
 /* Loading Spinner RTL */
-[dir="rtl"] .loading-spinner {
+[dir='rtl'] .loading-spinner {
   /* Spinner animation should remain the same */
 }
 
 /* Empty State RTL */
-[dir="rtl"] .empty-state {
+[dir='rtl'] .empty-state {
   direction: rtl;
   text-align: center;
 }
 
 /* Stats Card RTL */
-[dir="rtl"] .stats-card {
+[dir='rtl'] .stats-card {
   direction: rtl;
   text-align: right;
 }
 
-[dir="rtl"] .stats-card-icon {
+[dir='rtl'] .stats-card-icon {
   margin-right: 0;
   margin-left: 1rem;
 }
 
 /* Timeline RTL */
-[dir="rtl"] .timeline {
+[dir='rtl'] .timeline {
   direction: rtl;
 }
 
-[dir="rtl"] .timeline-item::before {
+[dir='rtl'] .timeline-item::before {
   right: auto;
   left: 0;
 }
 
 /* Code Block RTL */
-[dir="rtl"] .code-block {
+[dir='rtl'] .code-block {
   direction: ltr; /* Keep code LTR */
   text-align: left;
 }
 
 /* JSON Viewer RTL */
-[dir="rtl"] .json-viewer {
+[dir='rtl'] .json-viewer {
   direction: ltr; /* Keep JSON LTR */
   text-align: left;
 }
 
 /* Accessibility: Focus Indicators */
-[dir="rtl"] *:focus {
+[dir='rtl'] *:focus {
   outline-offset: 2px;
 }
 
 /* Print Styles RTL */
 @media print {
-  [dir="rtl"] {
+  [dir='rtl'] {
     direction: rtl;
   }
-  
-  [dir="rtl"] .no-print {
+
+  [dir='rtl'] .no-print {
     display: none;
   }
 }
 
 /* Responsive RTL Adjustments */
 @media (max-width: 640px) {
-  [dir="rtl"] .mobile-menu {
+  [dir='rtl'] .mobile-menu {
     right: auto;
     left: 0;
   }
-  
-  [dir="rtl"] .mobile-drawer {
+
+  [dir='rtl'] .mobile-drawer {
     right: auto;
     left: 0;
   }

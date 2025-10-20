@@ -1,15 +1,15 @@
-'use client'
+'use client';
 
-import { useState, useRef, useCallback } from 'react'
-import ReactCrop, { Crop, PixelCrop } from 'react-image-crop'
-import 'react-image-crop/dist/ReactCrop.css'
-import { toast } from 'react-hot-toast'
+import { useState, useRef, useCallback } from 'react';
+import ReactCrop, { Crop, PixelCrop } from 'react-image-crop';
+import 'react-image-crop/dist/ReactCrop.css';
+import { toast } from 'react-hot-toast';
 
 interface AvatarUploadProps {
-  currentAvatar?: string
-  userName: string
-  onUpload: (file: File) => Promise<string>
-  onRemove: () => Promise<void>
+  currentAvatar?: string;
+  userName: string;
+  onUpload: (file: File) => Promise<string>;
+  onRemove: () => Promise<void>;
 }
 
 export function AvatarUpload({
@@ -18,19 +18,19 @@ export function AvatarUpload({
   onUpload,
   onRemove,
 }: AvatarUploadProps) {
-  const [isUploading, setIsUploading] = useState(false)
-  const [showCropModal, setShowCropModal] = useState(false)
-  const [imageSrc, setImageSrc] = useState<string>('')
+  const [isUploading, setIsUploading] = useState(false);
+  const [showCropModal, setShowCropModal] = useState(false);
+  const [imageSrc, setImageSrc] = useState<string>('');
   const [crop, setCrop] = useState<Crop>({
     unit: '%',
     width: 100,
     height: 100,
     x: 0,
     y: 0,
-  })
-  const [completedCrop, setCompletedCrop] = useState<PixelCrop>()
-  const imgRef = useRef<HTMLImageElement>(null)
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  });
+  const [completedCrop, setCompletedCrop] = useState<PixelCrop>();
+  const imgRef = useRef<HTMLImageElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Generate initials from name
   const getInitials = (name: string) => {
@@ -39,51 +39,51 @@ export function AvatarUpload({
       .map((n) => n[0])
       .join('')
       .toUpperCase()
-      .slice(0, 2)
-  }
+      .slice(0, 2);
+  };
 
   // Handle file selection
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
+    const file = e.target.files?.[0];
+    if (!file) return;
 
     // Validate file type
     if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
-      toast.error('Please upload a JPEG, PNG, or WebP image')
-      return
+      toast.error('Please upload a JPEG, PNG, or WebP image');
+      return;
     }
 
     // Validate file size (5MB)
     if (file.size > 5 * 1024 * 1024) {
-      toast.error('File size must be less than 5MB')
-      return
+      toast.error('File size must be less than 5MB');
+      return;
     }
 
     // Read file and show crop modal
-    const reader = new FileReader()
+    const reader = new FileReader();
     reader.onload = () => {
-      setImageSrc(reader.result as string)
-      setShowCropModal(true)
-    }
-    reader.readAsDataURL(file)
-  }
+      setImageSrc(reader.result as string);
+      setShowCropModal(true);
+    };
+    reader.readAsDataURL(file);
+  };
 
   // Create cropped image blob
   const getCroppedImg = useCallback(
     async (image: HTMLImageElement, crop: PixelCrop): Promise<Blob> => {
-      const canvas = document.createElement('canvas')
-      const ctx = canvas.getContext('2d')
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
 
       if (!ctx) {
-        throw new Error('No 2d context')
+        throw new Error('No 2d context');
       }
 
-      const scaleX = image.naturalWidth / image.width
-      const scaleY = image.naturalHeight / image.height
+      const scaleX = image.naturalWidth / image.width;
+      const scaleY = image.naturalHeight / image.height;
 
       // Set canvas size to 200x200 (target avatar size)
-      canvas.width = 200
-      canvas.height = 200
+      canvas.width = 200;
+      canvas.height = 200;
 
       ctx.drawImage(
         image,
@@ -95,66 +95,66 @@ export function AvatarUpload({
         0,
         200,
         200
-      )
+      );
 
       return new Promise((resolve, reject) => {
         canvas.toBlob(
           (blob) => {
             if (!blob) {
-              reject(new Error('Canvas is empty'))
-              return
+              reject(new Error('Canvas is empty'));
+              return;
             }
-            resolve(blob)
+            resolve(blob);
           },
           'image/jpeg',
           0.95
-        )
-      })
+        );
+      });
     },
     []
-  )
+  );
 
   // Handle crop and upload
   const handleCropComplete = async () => {
     if (!imgRef.current || !completedCrop) {
-      toast.error('Please select an area to crop')
-      return
+      toast.error('Please select an area to crop');
+      return;
     }
 
     try {
-      setIsUploading(true)
-      const croppedBlob = await getCroppedImg(imgRef.current, completedCrop)
+      setIsUploading(true);
+      const croppedBlob = await getCroppedImg(imgRef.current, completedCrop);
       const croppedFile = new File([croppedBlob], 'avatar.jpg', {
         type: 'image/jpeg',
-      })
+      });
 
-      await onUpload(croppedFile)
-      setShowCropModal(false)
-      setImageSrc('')
-      toast.success('Avatar updated successfully')
+      await onUpload(croppedFile);
+      setShowCropModal(false);
+      setImageSrc('');
+      toast.success('Avatar updated successfully');
     } catch (error) {
-      console.error('Error uploading avatar:', error)
-      toast.error('Failed to upload avatar')
+      console.error('Error uploading avatar:', error);
+      toast.error('Failed to upload avatar');
     } finally {
-      setIsUploading(false)
+      setIsUploading(false);
     }
-  }
+  };
 
   // Handle remove avatar
   const handleRemove = async () => {
-    if (!currentAvatar) return
+    if (!currentAvatar) return;
 
     try {
-      setIsUploading(true)
-      await onRemove()
-      toast.success('Avatar removed successfully')
+      setIsUploading(true);
+      await onRemove();
+      toast.success('Avatar removed successfully');
     } catch (error) {
-      console.error('Error removing avatar:', error)
-      toast.error('Failed to remove avatar')
+      console.error('Error removing avatar:', error);
+      toast.error('Failed to remove avatar');
     } finally {
-      setIsUploading(false)
+      setIsUploading(false);
     }
-  }
+  };
 
   return (
     <div className="space-y-4">
@@ -234,8 +234,8 @@ export function AvatarUpload({
               <button
                 type="button"
                 onClick={() => {
-                  setShowCropModal(false)
-                  setImageSrc('')
+                  setShowCropModal(false);
+                  setImageSrc('');
                 }}
                 disabled={isUploading}
                 className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50 transition-colors"
@@ -255,5 +255,5 @@ export function AvatarUpload({
         </div>
       )}
     </div>
-  )
+  );
 }

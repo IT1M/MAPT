@@ -58,12 +58,20 @@ export const CategoryChart: React.FC<CategoryChartProps> = ({
     } else if (format === 'csv') {
       const csv = [
         ['Category', 'Mais Quantity', 'Fozan Quantity', 'Total Quantity'],
-        ...sortedData.map((d) => [d.category, d.maisQuantity, d.fozanQuantity, d.totalQuantity]),
+        ...sortedData.map((d) => [
+          d.category,
+          d.maisQuantity,
+          d.fozanQuantity,
+          d.totalQuantity,
+        ]),
       ]
         .map((row) => row.join(','))
         .join('\n');
 
-      downloadCSV(csv, `category-performance-${new Date().toISOString().split('T')[0]}.csv`);
+      downloadCSV(
+        csv,
+        `category-performance-${new Date().toISOString().split('T')[0]}.csv`
+      );
     }
   };
 
@@ -134,12 +142,25 @@ export const CategoryChart: React.FC<CategoryChartProps> = ({
           <BarChart
             data={sortedData}
             layout={isHorizontal ? 'horizontal' : 'vertical'}
-            margin={{ top: 5, right: 30, left: isHorizontal ? 100 : 20, bottom: 5 }}
+            margin={{
+              top: 5,
+              right: 30,
+              left: isHorizontal ? 100 : 20,
+              bottom: 5,
+            }}
           >
-            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" className="dark:stroke-gray-700" />
+            <CartesianGrid
+              strokeDasharray="3 3"
+              stroke="#e5e7eb"
+              className="dark:stroke-gray-700"
+            />
             {isHorizontal ? (
               <>
-                <XAxis type="number" stroke="#6b7280" className="dark:stroke-gray-400" />
+                <XAxis
+                  type="number"
+                  stroke="#6b7280"
+                  className="dark:stroke-gray-400"
+                />
                 <YAxis
                   type="category"
                   dataKey="category"
@@ -161,7 +182,11 @@ export const CategoryChart: React.FC<CategoryChartProps> = ({
                   textAnchor="end"
                   height={80}
                 />
-                <YAxis type="number" stroke="#6b7280" className="dark:stroke-gray-400" />
+                <YAxis
+                  type="number"
+                  stroke="#6b7280"
+                  className="dark:stroke-gray-400"
+                />
               </>
             )}
             <Tooltip

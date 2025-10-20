@@ -1,51 +1,55 @@
-'use client'
+'use client';
 
-import React, { useState, useEffect } from 'react'
-import { useTranslations } from '@/hooks/useTranslations'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Select } from '@/components/ui/select'
-import { inventoryItemSchema } from '@/utils/validators'
-import { Destination, InventoryItem } from '@prisma/client'
-import toast from 'react-hot-toast'
-import { z } from 'zod'
+import React, { useState, useEffect } from 'react';
+import { useTranslations } from '@/hooks/useTranslations';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Select } from '@/components/ui/select';
+import { inventoryItemSchema } from '@/utils/validators';
+import { Destination, InventoryItem } from '@prisma/client';
+import toast from 'react-hot-toast';
+import { z } from 'zod';
 
 interface InventoryFormProps {
   item?: InventoryItem & {
     enteredBy: {
-      id: string
-      name: string
-      email: string
-    }
-  }
-  onSuccess?: () => void
-  onCancel?: () => void
+      id: string;
+      name: string;
+      email: string;
+    };
+  };
+  onSuccess?: () => void;
+  onCancel?: () => void;
 }
 
 interface FormData {
-  itemName: string
-  batch: string
-  quantity: string
-  reject: string
-  destination: Destination
-  category: string
-  notes: string
+  itemName: string;
+  batch: string;
+  quantity: string;
+  reject: string;
+  destination: Destination;
+  category: string;
+  notes: string;
 }
 
 interface FormErrors {
-  itemName?: string
-  batch?: string
-  quantity?: string
-  reject?: string
-  destination?: string
-  category?: string
-  notes?: string
+  itemName?: string;
+  batch?: string;
+  quantity?: string;
+  reject?: string;
+  destination?: string;
+  category?: string;
+  notes?: string;
 }
 
-export function InventoryForm({ item, onSuccess, onCancel }: InventoryFormProps) {
-  const t = useTranslations()
-  const [loading, setLoading] = useState(false)
-  
+export function InventoryForm({
+  item,
+  onSuccess,
+  onCancel,
+}: InventoryFormProps) {
+  const t = useTranslations();
+  const [loading, setLoading] = useState(false);
+
   const [formData, setFormData] = useState<FormData>({
     itemName: item?.itemName || '',
     batch: item?.batch || '',
@@ -54,25 +58,25 @@ export function InventoryForm({ item, onSuccess, onCancel }: InventoryFormProps)
     destination: item?.destination || 'MAIS',
     category: item?.category || '',
     notes: item?.notes || '',
-  })
-  
-  const [errors, setErrors] = useState<FormErrors>({})
+  });
+
+  const [errors, setErrors] = useState<FormErrors>({});
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
     // Clear error for this field
     if (errors[name as keyof FormErrors]) {
-      setErrors((prev) => ({ ...prev, [name]: undefined }))
+      setErrors((prev) => ({ ...prev, [name]: undefined }));
     }
-  }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setErrors({})
-    setLoading(true)
+    e.preventDefault();
+    setErrors({});
+    setLoading(true);
 
     try {
       // Prepare data for validation
@@ -84,60 +88,61 @@ export function InventoryForm({ item, onSuccess, onCancel }: InventoryFormProps)
         destination: formData.destination,
         category: formData.category || undefined,
         notes: formData.notes || undefined,
-      }
+      };
 
       // Validate with Zod
-      const validationResult = inventoryItemSchema.safeParse(dataToValidate)
-      
+      const validationResult = inventoryItemSchema.safeParse(dataToValidate);
+
       if (!validationResult.success) {
-        const fieldErrors: FormErrors = {}
+        const fieldErrors: FormErrors = {};
         validationResult.error.errors.forEach((err) => {
-          const field = err.path[0] as keyof FormErrors
-          fieldErrors[field] = err.message
-        })
-        setErrors(fieldErrors)
-        setLoading(false)
-        return
+          const field = err.path[0] as keyof FormErrors;
+          fieldErrors[field] = err.message;
+        });
+        setErrors(fieldErrors);
+        setLoading(false);
+        return;
       }
 
       // Submit to API
-      const url = item ? `/api/inventory/${item.id}` : '/api/inventory'
-      const method = item ? 'PATCH' : 'POST'
-      
+      const url = item ? `/api/inventory/${item.id}` : '/api/inventory';
+      const method = item ? 'PATCH' : 'POST';
+
       const response = await fetch(url, {
         method,
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(validationResult.data),
-      })
+      });
 
-      const result = await response.json()
+      const result = await response.json();
 
       if (result.success) {
-        toast.success(
-          item ? t('success.updated') : t('success.created')
-        )
-        onSuccess?.()
+        toast.success(item ? t('success.updated') : t('success.created'));
+        onSuccess?.();
       } else {
-        if (result.error?.code === 'VALIDATION_ERROR' && result.error?.details) {
-          const fieldErrors: FormErrors = {}
+        if (
+          result.error?.code === 'VALIDATION_ERROR' &&
+          result.error?.details
+        ) {
+          const fieldErrors: FormErrors = {};
           result.error.details.forEach((err: any) => {
-            const field = err.path[0] as keyof FormErrors
-            fieldErrors[field] = err.message
-          })
-          setErrors(fieldErrors)
+            const field = err.path[0] as keyof FormErrors;
+            fieldErrors[field] = err.message;
+          });
+          setErrors(fieldErrors);
         } else {
-          toast.error(result.error?.message || t('errors.serverError'))
+          toast.error(result.error?.message || t('errors.serverError'));
         }
       }
     } catch (error) {
-      console.error('Error submitting form:', error)
-      toast.error(t('errors.networkError'))
+      console.error('Error submitting form:', error);
+      toast.error(t('errors.networkError'));
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -241,5 +246,5 @@ export function InventoryForm({ item, onSuccess, onCancel }: InventoryFormProps)
         </Button>
       </div>
     </form>
-  )
+  );
 }

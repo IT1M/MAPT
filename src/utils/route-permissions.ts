@@ -4,7 +4,12 @@
  */
 
 // User role type (compatible with Edge Runtime and Prisma)
-export type UserRole = 'ADMIN' | 'DATA_ENTRY' | 'SUPERVISOR' | 'MANAGER' | 'AUDITOR'
+export type UserRole =
+  | 'ADMIN'
+  | 'DATA_ENTRY'
+  | 'SUPERVISOR'
+  | 'MANAGER'
+  | 'AUDITOR';
 
 /**
  * Route permissions mapping
@@ -21,12 +26,12 @@ export const ROUTE_PERMISSIONS: Record<string, UserRole[]> = {
   '/backup': ['ADMIN', 'MANAGER'],
   '/audit': ['ADMIN', 'AUDITOR'],
   '/settings': ['ADMIN', 'MANAGER', 'SUPERVISOR', 'DATA_ENTRY', 'AUDITOR'],
-}
+};
 
 /**
  * Public routes that don't require authentication
  */
-export const PUBLIC_ROUTES = ['/login', '/']
+export const PUBLIC_ROUTES = ['/login', '/'];
 
 /**
  * Check if a route is public
@@ -36,15 +41,17 @@ export const PUBLIC_ROUTES = ['/login', '/']
 export function isPublicRoute(pathname: string): boolean {
   // Root path is public
   if (pathname === '/') {
-    return true
+    return true;
   }
-  
+
   // Check if pathname matches any public route
-  return PUBLIC_ROUTES.some(route => {
+  return PUBLIC_ROUTES.some((route) => {
     // Remove locale prefix for comparison
-    const pathWithoutLocale = pathname.replace(/^\/(en|ar)/, '')
-    return pathWithoutLocale === route || pathWithoutLocale.startsWith(route + '/')
-  })
+    const pathWithoutLocale = pathname.replace(/^\/(en|ar)/, '');
+    return (
+      pathWithoutLocale === route || pathWithoutLocale.startsWith(route + '/')
+    );
+  });
 }
 
 /**
@@ -55,11 +62,11 @@ export function isPublicRoute(pathname: string): boolean {
  */
 export function getBaseRoute(pathname: string): string {
   // Remove locale prefix (e.g., /en, /ar)
-  const withoutLocale = pathname.replace(/^\/(en|ar)/, '')
-  
+  const withoutLocale = pathname.replace(/^\/(en|ar)/, '');
+
   // Get the first segment after locale
-  const segments = withoutLocale.split('/').filter(Boolean)
-  return segments.length > 0 ? `/${segments[0]}` : '/'
+  const segments = withoutLocale.split('/').filter(Boolean);
+  return segments.length > 0 ? `/${segments[0]}` : '/';
 }
 
 /**
@@ -69,14 +76,14 @@ export function getBaseRoute(pathname: string): string {
  * @returns True if the user has permission
  */
 export function hasRoutePermission(userRole: UserRole, route: string): boolean {
-  const allowedRoles = ROUTE_PERMISSIONS[route]
-  
+  const allowedRoles = ROUTE_PERMISSIONS[route];
+
   // If route is not in permissions map, allow access (default behavior)
   if (!allowedRoles) {
-    return true
+    return true;
   }
-  
-  return allowedRoles.includes(userRole)
+
+  return allowedRoles.includes(userRole);
 }
 
 /**
@@ -85,7 +92,7 @@ export function hasRoutePermission(userRole: UserRole, route: string): boolean {
  * @returns Array of allowed roles or undefined if route is not restricted
  */
 export function getAllowedRoles(route: string): UserRole[] | undefined {
-  return ROUTE_PERMISSIONS[route]
+  return ROUTE_PERMISSIONS[route];
 }
 
 /**
@@ -94,8 +101,11 @@ export function getAllowedRoles(route: string): UserRole[] | undefined {
  * @param routes - Array of routes to check
  * @returns True if the user can access at least one route
  */
-export function canAccessAnyRoute(userRole: UserRole, routes: string[]): boolean {
-  return routes.some(route => hasRoutePermission(userRole, route))
+export function canAccessAnyRoute(
+  userRole: UserRole,
+  routes: string[]
+): boolean {
+  return routes.some((route) => hasRoutePermission(userRole, route));
 }
 
 /**
@@ -104,9 +114,9 @@ export function canAccessAnyRoute(userRole: UserRole, routes: string[]): boolean
  * @returns Array of routes the user can access
  */
 export function getAccessibleRoutes(userRole: UserRole): string[] {
-  return Object.keys(ROUTE_PERMISSIONS).filter(route => 
+  return Object.keys(ROUTE_PERMISSIONS).filter((route) =>
     hasRoutePermission(userRole, route)
-  )
+  );
 }
 
 /**
@@ -115,15 +125,15 @@ export function getAccessibleRoutes(userRole: UserRole): string[] {
  * @returns Object with validation results
  */
 export function validateRoutePermissions(): {
-  valid: boolean
-  missingRoutes: string[]
-  extraRoutes: string[]
+  valid: boolean;
+  missingRoutes: string[];
+  extraRoutes: string[];
 } {
   // This would need to import navigationConfig, but we'll keep it simple
   // for now to avoid circular dependencies
   return {
     valid: true,
     missingRoutes: [],
-    extraRoutes: []
-  }
+    extraRoutes: [],
+  };
 }

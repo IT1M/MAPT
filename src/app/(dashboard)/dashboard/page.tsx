@@ -1,22 +1,24 @@
-import { auth } from '@/services/auth'
-import { redirect } from 'next/navigation'
-import { getTranslations } from 'next-intl/server'
-import { RoleBasedDashboard } from '@/components/dashboard/RoleBasedDashboard'
-import { DashboardGreeting, WelcomeModal } from '@/components/dashboard'
+import { auth } from '@/services/auth';
+import { redirect } from 'next/navigation';
+import { RoleBasedDashboard } from '@/components/dashboard/RoleBasedDashboard';
+import { DashboardGreeting, WelcomeModal } from '@/components/dashboard';
 
 async function getDashboardData() {
   try {
-    const response = await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/dashboard`, {
-      cache: 'no-store'
-    })
-    
+    const response = await fetch(
+      `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/dashboard`,
+      {
+        cache: 'no-store',
+      }
+    );
+
     if (!response.ok) {
-      throw new Error('Failed to fetch dashboard data')
+      throw new Error('Failed to fetch dashboard data');
     }
-    
-    return await response.json()
+
+    return await response.json();
   } catch (error) {
-    console.error('Error fetching dashboard data:', error)
+    console.error('Error fetching dashboard data:', error);
     // Return default values on error
     return {
       todayCount: 0,
@@ -28,29 +30,31 @@ async function getDashboardData() {
       maisPercentage: 0,
       fozanPercentage: 0,
       trendData: [],
-      recentItems: []
-    }
+      recentItems: [],
+    };
   }
 }
 
-export default async function DashboardPage({ params }: { params: Promise<{ locale: string }> }) {
-  const { locale } = await params
+export default async function DashboardPage() {
   // Check authentication
-  const session = await auth()
-  
+  const session = await auth();
+
   if (!session) {
-    redirect(`/${locale}/login`)
+    redirect('/login');
   }
 
-  // Get translations
-  const t = await getTranslations()
-
   // Fetch dashboard data
-  const dashboardData = await getDashboardData()
+  const dashboardData = await getDashboardData();
 
   // Format role for display
-  const roleKey = session.user.role.toLowerCase().replace('_', '') as 'admin' | 'dataEntry' | 'supervisor' | 'manager' | 'auditor'
-  const roleDisplay = t(`roles.${roleKey}`)
+  const roleMap: Record<string, string> = {
+    ADMIN: 'Administrator',
+    DATA_ENTRY: 'Data Entry',
+    SUPERVISOR: 'Supervisor',
+    MANAGER: 'Manager',
+    AUDITOR: 'Auditor',
+  };
+  const roleDisplay = roleMap[session.user.role] || session.user.role;
 
   // Prepare data for RoleBasedDashboard
   const data = {
@@ -66,11 +70,11 @@ export default async function DashboardPage({ params }: { params: Promise<{ loca
     maisPercentage: dashboardData.maisPercentage,
     fozanPercentage: dashboardData.fozanPercentage,
     trendData: dashboardData.trendData,
-    recentActivities: dashboardData.recentItems
-  }
+    recentActivities: dashboardData.recentItems,
+  };
 
   // Check if this is first login (no lastLogin means first time)
-  const isFirstLogin = !session.user.lastLogin
+  const isFirstLogin = !session.user.lastLogin;
 
   return (
     <>
@@ -86,5 +90,5 @@ export default async function DashboardPage({ params }: { params: Promise<{ loca
       />
       <RoleBasedDashboard data={data} />
     </>
-  )
+  );
 }

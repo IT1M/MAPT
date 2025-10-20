@@ -1,15 +1,15 @@
-'use client'
+'use client';
 
-import React from 'react'
-import { Destination } from '@prisma/client'
+import React from 'react';
+import { Destination } from '@prisma/client';
 
 interface DestinationSelectProps {
-  value: Destination
-  onChange: (value: Destination) => void
-  label?: string
-  error?: string
-  lastUsed?: Destination
-  required?: boolean
+  value: Destination;
+  onChange: (value: Destination) => void;
+  label?: string;
+  error?: string;
+  lastUsed?: Destination;
+  required?: boolean;
 }
 
 export function DestinationSelect({
@@ -20,12 +20,16 @@ export function DestinationSelect({
   lastUsed,
   required = false,
 }: DestinationSelectProps) {
-  const groupId = `destination-group-${Math.random().toString(36).substr(2, 9)}`
-  const errorId = `${groupId}-error`
-  const destinations: Array<{ value: Destination; label: string; icon: string }> = [
+  const groupId = `destination-group-${Math.random().toString(36).substr(2, 9)}`;
+  const errorId = `${groupId}-error`;
+  const destinations: Array<{
+    value: Destination;
+    label: string;
+    icon: string;
+  }> = [
     { value: 'MAIS', label: 'Mais', icon: '🏢' },
     { value: 'FOZAN', label: 'Fozan', icon: '🏭' },
-  ]
+  ];
 
   return (
     <div className="w-full">
@@ -50,8 +54,8 @@ export function DestinationSelect({
         className="grid grid-cols-1 sm:grid-cols-2 gap-3"
       >
         {destinations.map((destination) => {
-          const isSelected = value === destination.value
-          const isLastUsed = lastUsed === destination.value
+          const isSelected = value === destination.value;
+          const isLastUsed = lastUsed === destination.value;
 
           return (
             <button
@@ -107,7 +111,7 @@ export function DestinationSelect({
                 </span>
               )}
             </button>
-          )
+          );
         })}
       </div>
 
@@ -136,5 +140,5 @@ export function DestinationSelect({
         </p>
       )}
     </div>
-  )
+  );
 }

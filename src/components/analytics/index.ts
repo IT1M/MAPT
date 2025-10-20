@@ -1,29 +1,33 @@
 // AI Components
-export { AIInsightsPanel } from './AIInsightsPanel'
-export { AIQuestionInput } from './AIQuestionInput'
-export { AIInsightsSectionWrapper } from './AIInsightsSectionWrapper'
-export type { AIInsight, DashboardContext } from './AIInsightsPanel'
-export type { QuestionAnswer, InventoryContext } from './AIQuestionInput'
+export { AIInsightsPanel } from './AIInsightsPanel';
+export { AIQuestionInput } from './AIQuestionInput';
+export { AIInsightsSectionWrapper } from './AIInsightsSectionWrapper';
+export type { AIInsight, DashboardContext } from './AIInsightsPanel';
+export type { QuestionAnswer, InventoryContext } from './AIQuestionInput';
 
 // KPI Components
-export { KPICard } from './KPICard'
-export { KPICardsSection } from './KPICardsSection'
-export { KPICardsSectionWrapper } from './KPICardsSectionWrapper'
+export { KPICard } from './KPICard';
+export { KPICardsSection } from './KPICardsSection';
+export { KPICardsSectionWrapper } from './KPICardsSectionWrapper';
 
 // Filter Components
-export { GlobalFilters } from './GlobalFilters'
-export { GlobalFiltersWrapper } from './GlobalFiltersWrapper'
-export type { AnalyticsFilterState, FilterUser } from './GlobalFilters'
+export { GlobalFilters } from './GlobalFilters';
+export { GlobalFiltersWrapper } from './GlobalFiltersWrapper';
+export type { AnalyticsFilterState, FilterUser } from './GlobalFilters';
 
 // Export Components
-export { DashboardExporter } from './DashboardExporter'
-export { DashboardExporterWrapper } from './DashboardExporterWrapper'
-export type { DashboardSnapshot, ChartSnapshot } from './DashboardExporter'
+export { DashboardExporter } from './DashboardExporter';
+export { DashboardExporterWrapper } from './DashboardExporterWrapper';
+export type { DashboardSnapshot, ChartSnapshot } from './DashboardExporter';
 
 // Accessibility and Performance Components
-export { AccessibleChartWrapper } from './AccessibleChartWrapper'
-export { ChartErrorBoundary, useErrorHandler } from './ChartErrorBoundary'
-export { ChartSkeleton, KPICardSkeleton, DashboardSkeleton } from './ChartSkeleton'
+export { AccessibleChartWrapper } from './AccessibleChartWrapper';
+export { ChartErrorBoundary, useErrorHandler } from './ChartErrorBoundary';
+export {
+  ChartSkeleton,
+  KPICardSkeleton,
+  DashboardSkeleton,
+} from './ChartSkeleton';
 export {
   LazyChart,
   LazyInventoryTrendChart,
@@ -32,10 +36,10 @@ export {
   LazyRejectAnalysisChart,
   LazyUserActivityHeatmap,
   LazyMonthlyComparisonChart,
-} from './LazyChart'
+} from './LazyChart';
 
 // Chart exports
-export * from './charts'
+export * from './charts';
 
 // Main Dashboard Component
-export { AnalyticsDashboard } from './AnalyticsDashboard'
+export { AnalyticsDashboard } from './AnalyticsDashboard';

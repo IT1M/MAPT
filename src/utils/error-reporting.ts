@@ -1,6 +1,6 @@
 /**
  * Error Reporting Utility
- * 
+ *
  * Provides utilities for reporting and tracking errors across the application
  */
 
@@ -57,7 +57,6 @@ function sendToErrorTrackingService(report: ErrorReport): void {
   // - Datadog
   // - Rollbar
   // - Bugsnag
-  
   // Example for future Sentry integration:
   // if (typeof window !== 'undefined' && window.Sentry) {
   //   window.Sentry.captureException(report.error, {
@@ -81,28 +80,20 @@ export function setupGlobalErrorHandlers(): void {
 
   // Handle unhandled promise rejections
   window.addEventListener('unhandledrejection', (event) => {
-    reportError(
-      'Unhandled Promise Rejection',
-      event.reason,
-      {
-        promise: event.promise,
-        type: 'unhandledrejection',
-      }
-    );
+    reportError('Unhandled Promise Rejection', event.reason, {
+      promise: event.promise,
+      type: 'unhandledrejection',
+    });
   });
 
   // Handle global errors
   window.addEventListener('error', (event) => {
-    reportError(
-      'Global Error',
-      event.error || new Error(event.message),
-      {
-        filename: event.filename,
-        lineno: event.lineno,
-        colno: event.colno,
-        type: 'error',
-      }
-    );
+    reportError('Global Error', event.error || new Error(event.message), {
+      filename: event.filename,
+      lineno: event.lineno,
+      colno: event.colno,
+      type: 'error',
+    });
   });
 
   // Log when handlers are set up
@@ -142,13 +133,16 @@ export function reportErrorWithSeverity(
 /**
  * Trigger alert for critical errors
  */
-function triggerCriticalErrorAlert(message: string, error: Error | unknown): void {
+function triggerCriticalErrorAlert(
+  message: string,
+  error: Error | unknown
+): void {
   // This could send notifications via:
   // - Email
   // - Slack
   // - PagerDuty
   // - SMS
-  
+
   logger.error('CRITICAL ERROR ALERT', error, {
     message,
     alert: true,

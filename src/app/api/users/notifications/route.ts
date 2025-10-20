@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@/services/auth'
-import { prisma } from '@/services/prisma'
-import { z } from 'zod'
-import { createAuditLog } from '@/utils/audit'
+import { NextRequest, NextResponse } from 'next/server';
+import { auth } from '@/services/auth';
+import { prisma } from '@/services/prisma';
+import { z } from 'zod';
+import { createAuditLog } from '@/utils/audit';
 
 // Validation schema for notification preferences
 const notificationPreferencesSchema = z.object({
@@ -24,7 +24,7 @@ const notificationPreferencesSchema = z.object({
     })
     .optional(),
   frequency: z.enum(['realtime', 'hourly', 'daily', 'custom']).optional(),
-})
+});
 
 const DEFAULT_NOTIFICATION_PREFERENCES = {
   email: {
@@ -41,7 +41,7 @@ const DEFAULT_NOTIFICATION_PREFERENCES = {
     desktop: false,
   },
   frequency: 'realtime' as const,
-}
+};
 
 /**
  * GET /api/users/notifications
@@ -49,7 +49,7 @@ const DEFAULT_NOTIFICATION_PREFERENCES = {
  */
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth()
+    const session = await auth();
 
     if (!session?.user?.id) {
       return NextResponse.json(
@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
           error: { code: 'AUTH_REQUIRED', message: 'Authentication required' },
         },
         { status: 401 }
-      )
+      );
     }
 
     const user = await prisma.user.findUnique({
@@ -66,7 +66,7 @@ export async function GET(request: NextRequest) {
       select: {
         preferences: true,
       },
-    })
+    });
 
     if (!user) {
       return NextResponse.json(
@@ -75,37 +75,37 @@ export async function GET(request: NextRequest) {
           error: { code: 'NOT_FOUND', message: 'User not found' },
         },
         { status: 404 }
-      )
+      );
     }
 
     // Extract notification preferences from user preferences
-    const userPreferences = (user.preferences as any) || {}
+    const userPreferences = (user.preferences as any) || {};
     const notificationPreferences = {
       ...DEFAULT_NOTIFICATION_PREFERENCES,
       ...(userPreferences.notifications || {}),
-    }
+    };
 
     // Merge nested objects properly
     if (userPreferences.notifications?.email) {
       notificationPreferences.email = {
         ...DEFAULT_NOTIFICATION_PREFERENCES.email,
         ...userPreferences.notifications.email,
-      }
+      };
     }
 
     if (userPreferences.notifications?.inApp) {
       notificationPreferences.inApp = {
         ...DEFAULT_NOTIFICATION_PREFERENCES.inApp,
         ...userPreferences.notifications.inApp,
-      }
+      };
     }
 
     return NextResponse.json({
       success: true,
       data: notificationPreferences,
-    })
+    });
   } catch (error) {
-    console.error('Error fetching notification preferences:', error)
+    console.error('Error fetching notification preferences:', error);
     return NextResponse.json(
       {
         success: false,
@@ -115,7 +115,7 @@ export async function GET(request: NextRequest) {
         },
       },
       { status: 500 }
-    )
+    );
   }
 }
 
@@ -125,7 +125,7 @@ export async function GET(request: NextRequest) {
  */
 export async function PATCH(request: NextRequest) {
   try {
-    const session = await auth()
+    const session = await auth();
 
     if (!session?.user?.id) {
       return NextResponse.json(
@@ -134,13 +134,13 @@ export async function PATCH(request: NextRequest) {
           error: { code: 'AUTH_REQUIRED', message: 'Authentication required' },
         },
         { status: 401 }
-      )
+      );
     }
 
-    const body = await request.json()
+    const body = await request.json();
 
     // Validate input
-    const validation = notificationPreferencesSchema.safeParse(body)
+    const validation = notificationPreferencesSchema.safeParse(body);
     if (!validation.success) {
       return NextResponse.json(
         {
@@ -156,7 +156,7 @@ export async function PATCH(request: NextRequest) {
           },
         },
         { status: 400 }
-      )
+      );
     }
 
     // Get current user data
@@ -166,7 +166,7 @@ export async function PATCH(request: NextRequest) {
         preferences: true,
         role: true,
       },
-    })
+    });
 
     if (!currentUser) {
       return NextResponse.json(
@@ -175,28 +175,31 @@ export async function PATCH(request: NextRequest) {
           error: { code: 'NOT_FOUND', message: 'User not found' },
         },
         { status: 404 }
-      )
+      );
     }
 
-    const currentPreferences = (currentUser.preferences as any) || {}
-    const currentNotifications = currentPreferences.notifications || {}
+    const currentPreferences = (currentUser.preferences as any) || {};
+    const currentNotifications = currentPreferences.notifications || {};
 
     // Build updated notification preferences
     const updatedNotifications = {
       ...currentNotifications,
       ...validation.data,
-    }
+    };
 
     // Handle nested email object
     if (validation.data.email) {
       updatedNotifications.email = {
         ...currentNotifications.email,
         ...validation.data.email,
-      }
+      };
 
       // Non-admin users cannot enable newUserRegistration
-      if (currentUser.role !== 'ADMIN' && validation.data.email.newUserRegistration) {
-        updatedNotifications.email.newUserRegistration = false
+      if (
+        currentUser.role !== 'ADMIN' &&
+        validation.data.email.newUserRegistration
+      ) {
+        updatedNotifications.email.newUserRegistration = false;
       }
     }
 
@@ -205,14 +208,14 @@ export async function PATCH(request: NextRequest) {
       updatedNotifications.inApp = {
         ...currentNotifications.inApp,
         ...validation.data.inApp,
-      }
+      };
     }
 
     // Update user preferences with new notification settings
     const updatedPreferences = {
       ...currentPreferences,
       notifications: updatedNotifications,
-    }
+    };
 
     const updatedUser = await prisma.user.update({
       where: { id: session.user.id },
@@ -222,7 +225,7 @@ export async function PATCH(request: NextRequest) {
       select: {
         preferences: true,
       },
-    })
+    });
 
     // Create audit log
     await createAuditLog({
@@ -241,10 +244,11 @@ export async function PATCH(request: NextRequest) {
           undefined,
         userAgent: request.headers.get('user-agent') || undefined,
       },
-    })
+    });
 
     // Extract and return notification preferences
-    const returnedPreferences = (updatedUser.preferences as any)?.notifications || {}
+    const returnedPreferences =
+      (updatedUser.preferences as any)?.notifications || {};
 
     return NextResponse.json({
       success: true,
@@ -261,9 +265,9 @@ export async function PATCH(request: NextRequest) {
         },
       },
       message: 'Notification preferences updated successfully',
-    })
+    });
   } catch (error) {
-    console.error('Error updating notification preferences:', error)
+    console.error('Error updating notification preferences:', error);
     return NextResponse.json(
       {
         success: false,
@@ -273,6 +277,6 @@ export async function PATCH(request: NextRequest) {
         },
       },
       { status: 500 }
-    )
+    );
   }
 }

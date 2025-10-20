@@ -5,7 +5,11 @@ import { useLocale } from '@/hooks/useLocale';
 import { Card } from '@/components/ui/card';
 import { LineChart, Line, ResponsiveContainer } from 'recharts';
 import { getKPICardLayoutClass, getIconTransform } from '@/utils/analytics-rtl';
-import { getKPIAriaLabel, handleKeyboardNavigation, ScreenReaderAnnouncer } from '@/utils/accessibility';
+import {
+  getKPIAriaLabel,
+  handleKeyboardNavigation,
+  ScreenReaderAnnouncer,
+} from '@/utils/accessibility';
 
 export interface KPICardProps {
   title: string;
@@ -137,7 +141,12 @@ export const KPICard: React.FC<KPICardProps> = ({
           {sparklineData && sparklineData.length > 0 && (
             <div className="h-16 w-24">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={sparklineData.map((val, idx) => ({ value: val, index: idx }))}>
+                <LineChart
+                  data={sparklineData.map((val, idx) => ({
+                    value: val,
+                    index: idx,
+                  }))}
+                >
                   <Line
                     type="monotone"
                     dataKey="value"
@@ -176,8 +185,8 @@ export const KPICard: React.FC<KPICardProps> = ({
                 trend.direction === 'up'
                   ? 'text-green-600 dark:text-green-400'
                   : trend.direction === 'down'
-                  ? 'text-red-600 dark:text-red-400'
-                  : 'text-gray-600 dark:text-gray-400'
+                    ? 'text-red-600 dark:text-red-400'
+                    : 'text-gray-600 dark:text-gray-400'
               }`}
               style={{ transform: getIconTransform(locale, 'trend') }}
             >

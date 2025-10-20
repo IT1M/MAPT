@@ -1,35 +1,37 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { useTranslations } from '@/hooks/useTranslations'
-import { MagnifyingGlassIcon } from '@heroicons/react/24/outline'
-import { useDebounce } from '@/hooks/useDebounce'
+import { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useTranslations } from '@/hooks/useTranslations';
+import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import { useDebounce } from '@/hooks/useDebounce';
 
 interface HelpSearchBarProps {
-  initialQuery?: string
+  initialQuery?: string;
 }
 
-export default function HelpSearchBar({ initialQuery = '' }: HelpSearchBarProps) {
-  const t = useTranslations('help')
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const [query, setQuery] = useState(initialQuery)
-  const debouncedQuery = useDebounce(query, 300)
+export default function HelpSearchBar({
+  initialQuery = '',
+}: HelpSearchBarProps) {
+  const t = useTranslations('help');
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [query, setQuery] = useState(initialQuery);
+  const debouncedQuery = useDebounce(query, 300);
 
   useEffect(() => {
     if (debouncedQuery !== initialQuery) {
-      const params = new URLSearchParams(searchParams.toString())
-      
+      const params = new URLSearchParams(searchParams.toString());
+
       if (debouncedQuery) {
-        params.set('q', debouncedQuery)
+        params.set('q', debouncedQuery);
       } else {
-        params.delete('q')
+        params.delete('q');
       }
-      
-      router.push(`/help?${params.toString()}`)
+
+      router.push(`/help?${params.toString()}`);
     }
-  }, [debouncedQuery])
+  }, [debouncedQuery]);
 
   return (
     <div className="relative">
@@ -44,5 +46,5 @@ export default function HelpSearchBar({ initialQuery = '' }: HelpSearchBarProps)
         className="block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
       />
     </div>
-  )
+  );
 }

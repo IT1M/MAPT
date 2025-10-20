@@ -3,9 +3,9 @@
  * Returns null since we're using English only now
  */
 
-'use client'
+'use client';
 
 export function LocaleSwitcher() {
   // Disabled - English only mode
-  return null
+  return null;
 }

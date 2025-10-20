@@ -202,15 +202,20 @@ export interface UseCachedDataOptions<T> {
 
 const globalCache = new Cache<any>();
 
-export function useCachedData<T>(
-  options: UseCachedDataOptions<T>
-): {
+export function useCachedData<T>(options: UseCachedDataOptions<T>): {
   data: T | null;
   loading: boolean;
   error: Error | null;
   refetch: () => Promise<void>;
 } {
-  const { cacheKey, fetcher, ttl, enabled = true, onSuccess, onError } = options;
+  const {
+    cacheKey,
+    fetcher,
+    ttl,
+    enabled = true,
+    onSuccess,
+    onError,
+  } = options;
 
   const [data, setData] = useState<T | null>(() => globalCache.get(cacheKey));
   const [loading, setLoading] = useState<boolean>(!data && enabled);
@@ -262,9 +267,7 @@ export function memoize<T extends (...args: any[]) => any>(
   const cache = new Map<string, ReturnType<T>>();
 
   return ((...args: Parameters<T>) => {
-    const key = getCacheKey
-      ? getCacheKey(...args)
-      : JSON.stringify(args);
+    const key = getCacheKey ? getCacheKey(...args) : JSON.stringify(args);
 
     if (cache.has(key)) {
       return cache.get(key);

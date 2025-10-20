@@ -1,19 +1,19 @@
-'use client'
+'use client';
 
-import React, { useState } from 'react'
-import { useTranslations } from '@/hooks/useTranslations'
-import { FilterGroup } from '@/types/filters'
-import { exportFilterGroup, importFilterGroup } from '@/utils/filter-builder'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { toast } from '@/utils/toast'
-import { downloadJSON } from '@/utils/download-helper'
+import React, { useState } from 'react';
+import { useTranslations } from '@/hooks/useTranslations';
+import { FilterGroup } from '@/types/filters';
+import { exportFilterGroup, importFilterGroup } from '@/utils/filter-builder';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { toast } from '@/utils/toast';
+import { downloadJSON } from '@/utils/download-helper';
 
 interface FilterSharingProps {
-  filterGroup: FilterGroup
-  filterName: string
-  currentPage: string
-  onImport: (filterGroup: FilterGroup, name: string) => void
+  filterGroup: FilterGroup;
+  filterName: string;
+  currentPage: string;
+  onImport: (filterGroup: FilterGroup, name: string) => void;
 }
 
 export function FilterSharing({
@@ -22,55 +22,55 @@ export function FilterSharing({
   currentPage,
   onImport,
 }: FilterSharingProps) {
-  const t = useTranslations('filters')
-  const [showExportModal, setShowExportModal] = useState(false)
-  const [showImportModal, setShowImportModal] = useState(false)
-  const [importCode, setImportCode] = useState('')
-  const [shareableUrl, setShareableUrl] = useState('')
+  const t = useTranslations('filters');
+  const [showExportModal, setShowExportModal] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
+  const [importCode, setImportCode] = useState('');
+  const [shareableUrl, setShareableUrl] = useState('');
 
   const handleExport = () => {
-    const encoded = exportFilterGroup(filterGroup, filterName, currentPage)
-    const url = `${window.location.origin}${window.location.pathname}?filter=${encoded}`
-    setShareableUrl(url)
-    setShowExportModal(true)
-  }
+    const encoded = exportFilterGroup(filterGroup, filterName, currentPage);
+    const url = `${window.location.origin}${window.location.pathname}?filter=${encoded}`;
+    setShareableUrl(url);
+    setShowExportModal(true);
+  };
 
   const handleCopyUrl = async () => {
     try {
-      await navigator.clipboard.writeText(shareableUrl)
-      toast.success(t('success.urlCopied'))
+      await navigator.clipboard.writeText(shareableUrl);
+      toast.success(t('success.urlCopied'));
     } catch (error) {
-      toast.error(t('errors.copyFailed'))
+      toast.error(t('errors.copyFailed'));
     }
-  }
+  };
 
   const handleCopyCode = async () => {
-    const encoded = exportFilterGroup(filterGroup, filterName, currentPage)
+    const encoded = exportFilterGroup(filterGroup, filterName, currentPage);
     try {
-      await navigator.clipboard.writeText(encoded)
-      toast.success(t('success.codeCopied'))
+      await navigator.clipboard.writeText(encoded);
+      toast.success(t('success.codeCopied'));
     } catch (error) {
-      toast.error(t('errors.copyFailed'))
+      toast.error(t('errors.copyFailed'));
     }
-  }
+  };
 
   const handleImport = () => {
     if (!importCode.trim()) {
-      toast.error(t('errors.codeRequired'))
-      return
+      toast.error(t('errors.codeRequired'));
+      return;
     }
 
-    const imported = importFilterGroup(importCode.trim())
+    const imported = importFilterGroup(importCode.trim());
     if (!imported) {
-      toast.error(t('errors.invalidCode'))
-      return
+      toast.error(t('errors.invalidCode'));
+      return;
     }
 
-    onImport(imported.filters, imported.name)
-    toast.success(t('success.filterImported'))
-    setShowImportModal(false)
-    setImportCode('')
-  }
+    onImport(imported.filters, imported.name);
+    toast.success(t('success.filterImported'));
+    setShowImportModal(false);
+    setImportCode('');
+  };
 
   const handleDownloadJson = () => {
     const data = {
@@ -79,11 +79,14 @@ export function FilterSharing({
       page: currentPage,
       version: '1.0',
       exportedAt: new Date().toISOString(),
-    }
+    };
 
-    downloadJSON(data, `filter-${filterName.replace(/\s+/g, '-').toLowerCase()}.json`)
-    toast.success(t('success.filterExported'))
-  }
+    downloadJSON(
+      data,
+      `filter-${filterName.replace(/\s+/g, '-').toLowerCase()}.json`
+    );
+    toast.success(t('success.filterExported'));
+  };
 
   return (
     <div className="space-y-2">
@@ -96,8 +99,18 @@ export function FilterSharing({
           disabled={filterGroup.filters.length === 0}
           className="flex-1"
         >
-          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+          <svg
+            className="w-4 h-4 mr-1"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
+            />
           </svg>
           {t('shareFilter')}
         </Button>
@@ -109,8 +122,18 @@ export function FilterSharing({
           onClick={() => setShowImportModal(true)}
           className="flex-1"
         >
-          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+          <svg
+            className="w-4 h-4 mr-1"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+            />
           </svg>
           {t('importFilter')}
         </Button>
@@ -129,8 +152,18 @@ export function FilterSharing({
                 onClick={() => setShowExportModal(false)}
                 className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
@@ -142,18 +175,24 @@ export function FilterSharing({
                   {t('shareableUrl')}
                 </label>
                 <div className="flex gap-2">
-                  <Input
-                    value={shareableUrl}
-                    readOnly
-                    className="flex-1"
-                  />
+                  <Input value={shareableUrl} readOnly className="flex-1" />
                   <Button
                     type="button"
                     variant="secondary"
                     onClick={handleCopyUrl}
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                      />
                     </svg>
                   </Button>
                 </div>
@@ -169,7 +208,11 @@ export function FilterSharing({
                 </label>
                 <div className="flex gap-2">
                   <Input
-                    value={exportFilterGroup(filterGroup, filterName, currentPage)}
+                    value={exportFilterGroup(
+                      filterGroup,
+                      filterName,
+                      currentPage
+                    )}
                     readOnly
                     className="flex-1 font-mono text-xs"
                   />
@@ -178,8 +221,18 @@ export function FilterSharing({
                     variant="secondary"
                     onClick={handleCopyCode}
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                      />
                     </svg>
                   </Button>
                 </div>
@@ -196,8 +249,18 @@ export function FilterSharing({
                   onClick={handleDownloadJson}
                   className="w-full"
                 >
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  <svg
+                    className="w-4 h-4 mr-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                    />
                   </svg>
                   {t('downloadJson')}
                 </Button>
@@ -231,13 +294,23 @@ export function FilterSharing({
               <button
                 type="button"
                 onClick={() => {
-                  setShowImportModal(false)
-                  setImportCode('')
+                  setShowImportModal(false);
+                  setImportCode('');
                 }}
                 className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
@@ -265,8 +338,8 @@ export function FilterSharing({
                 type="button"
                 variant="secondary"
                 onClick={() => {
-                  setShowImportModal(false)
-                  setImportCode('')
+                  setShowImportModal(false);
+                  setImportCode('');
                 }}
                 className="flex-1"
               >
@@ -286,5 +359,5 @@ export function FilterSharing({
         </div>
       )}
     </div>
-  )
+  );
 }

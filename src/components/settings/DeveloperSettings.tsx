@@ -1,22 +1,22 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import { useSession } from 'next-auth/react'
-import { developerSettingsSchema } from '@/utils/settings-validation'
-import type { DeveloperConfiguration, LogLevel } from '@/types/settings'
-import { downloadBlob } from '@/utils/download-helper'
+import { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
+import { developerSettingsSchema } from '@/utils/settings-validation';
+import type { DeveloperConfiguration, LogLevel } from '@/types/settings';
+import { downloadBlob } from '@/utils/download-helper';
 
 interface DeveloperSettingsProps {
-  onSave?: (data: DeveloperConfiguration) => void
+  onSave?: (data: DeveloperConfiguration) => void;
 }
 
 export function DeveloperSettings({ onSave }: DeveloperSettingsProps) {
-  const { data: session } = useSession()
-  const [isLoading, setIsLoading] = useState(true)
-  const [isSaving, setIsSaving] = useState(false)
-  const [isExporting, setIsExporting] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [successMessage, setSuccessMessage] = useState<string | null>(null)
+  const { data: session } = useSession();
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const [formData, setFormData] = useState<DeveloperConfiguration>({
     debugMode: false,
@@ -25,103 +25,124 @@ export function DeveloperSettings({ onSave }: DeveloperSettingsProps) {
       perMinute: 60,
       perHour: 1000,
     },
-  })
+  });
 
-  const [errors, setErrors] = useState<Record<string, string>>({})
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   // Fetch current settings
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        setIsLoading(true)
-        const response = await fetch('/api/settings')
-        
+        setIsLoading(true);
+        const response = await fetch('/api/settings');
+
         if (!response.ok) {
-          throw new Error('Failed to fetch settings')
+          throw new Error('Failed to fetch settings');
         }
 
-        const data = await response.json()
-        
+        const data = await response.json();
+
         if (data.success && data.data.settings) {
-          const settings = data.data.settings
-          
+          const settings = data.data.settings;
+
           // Extract developer settings
           const devSettings: DeveloperConfiguration = {
-            debugMode: settings.api?.find((s: any) => s.key === 'debug_mode')?.value || false,
-            logLevel: settings.api?.find((s: any) => s.key === 'log_level')?.value || 'info',
+            debugMode:
+              settings.api?.find((s: any) => s.key === 'debug_mode')?.value ||
+              false,
+            logLevel:
+              settings.api?.find((s: any) => s.key === 'log_level')?.value ||
+              'info',
             apiRateLimits: {
-              perMinute: settings.api?.find((s: any) => s.key === 'api_rate_limit_per_minute')?.value || 60,
-              perHour: settings.api?.find((s: any) => s.key === 'api_rate_limit_per_hour')?.value || 1000,
+              perMinute:
+                settings.api?.find(
+                  (s: any) => s.key === 'api_rate_limit_per_minute'
+                )?.value || 60,
+              perHour:
+                settings.api?.find(
+                  (s: any) => s.key === 'api_rate_limit_per_hour'
+                )?.value || 1000,
             },
-          }
-          
-          setFormData(devSettings)
+          };
+
+          setFormData(devSettings);
         }
       } catch (err) {
-        console.error('Error fetching settings:', err)
-        setError(err instanceof Error ? err.message : 'Failed to load settings')
+        console.error('Error fetching settings:', err);
+        setError(
+          err instanceof Error ? err.message : 'Failed to load settings'
+        );
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
-    fetchSettings()
-  }, [])
+    fetchSettings();
+  }, []);
 
-  const handleChange = (field: keyof DeveloperConfiguration | string, value: any) => {
+  const handleChange = (
+    field: keyof DeveloperConfiguration | string,
+    value: any
+  ) => {
     if (field.startsWith('apiRateLimits.')) {
-      const subField = field.split('.')[1] as 'perMinute' | 'perHour'
+      const subField = field.split('.')[1] as 'perMinute' | 'perHour';
       setFormData((prev) => ({
         ...prev,
         apiRateLimits: {
           ...prev.apiRateLimits,
           [subField]: value,
         },
-      }))
+      }));
     } else {
-      setFormData((prev) => ({ ...prev, [field]: value }))
+      setFormData((prev) => ({ ...prev, [field]: value }));
     }
-    
+
     // Clear field error when user starts typing
     if (errors[field]) {
       setErrors((prev) => {
-        const newErrors = { ...prev }
-        delete newErrors[field]
-        return newErrors
-      })
+        const newErrors = { ...prev };
+        delete newErrors[field];
+        return newErrors;
+      });
     }
-    setSuccessMessage(null)
-  }
+    setSuccessMessage(null);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
+    e.preventDefault();
+
     // Validate form data
-    const validation = developerSettingsSchema.safeParse(formData)
-    
+    const validation = developerSettingsSchema.safeParse(formData);
+
     if (!validation.success) {
-      const fieldErrors: Record<string, string> = {}
+      const fieldErrors: Record<string, string> = {};
       validation.error.errors.forEach((err) => {
         if (err.path[0]) {
-          fieldErrors[err.path.join('.')] = err.message
+          fieldErrors[err.path.join('.')] = err.message;
         }
-      })
-      setErrors(fieldErrors)
-      return
+      });
+      setErrors(fieldErrors);
+      return;
     }
 
     try {
-      setIsSaving(true)
-      setError(null)
-      setSuccessMessage(null)
+      setIsSaving(true);
+      setError(null);
+      setSuccessMessage(null);
 
       // Convert to settings format
       const settingsToUpdate = [
         { key: 'debug_mode', value: formData.debugMode },
         { key: 'log_level', value: formData.logLevel },
-        { key: 'api_rate_limit_per_minute', value: formData.apiRateLimits.perMinute },
-        { key: 'api_rate_limit_per_hour', value: formData.apiRateLimits.perHour },
-      ]
+        {
+          key: 'api_rate_limit_per_minute',
+          value: formData.apiRateLimits.perMinute,
+        },
+        {
+          key: 'api_rate_limit_per_hour',
+          value: formData.apiRateLimits.perHour,
+        },
+      ];
 
       const response = await fetch('/api/settings', {
         method: 'PATCH',
@@ -129,53 +150,58 @@ export function DeveloperSettings({ onSave }: DeveloperSettingsProps) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ settings: settingsToUpdate }),
-      })
+      });
 
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error?.message || 'Failed to update settings')
+        const errorData = await response.json();
+        throw new Error(
+          errorData.error?.message || 'Failed to update settings'
+        );
       }
 
-      setSuccessMessage('Developer settings updated successfully')
-      onSave?.(formData)
+      setSuccessMessage('Developer settings updated successfully');
+      onSave?.(formData);
     } catch (err) {
-      console.error('Error saving settings:', err)
-      setError(err instanceof Error ? err.message : 'Failed to save settings')
+      console.error('Error saving settings:', err);
+      setError(err instanceof Error ? err.message : 'Failed to save settings');
     } finally {
-      setIsSaving(false)
+      setIsSaving(false);
     }
-  }
+  };
 
   const handleExportLogs = async () => {
     try {
-      setIsExporting(true)
-      setError(null)
+      setIsExporting(true);
+      setError(null);
 
-      const response = await fetch('/api/settings/logs/export')
-      
+      const response = await fetch('/api/settings/logs/export');
+
       if (!response.ok) {
-        throw new Error('Failed to export logs')
+        throw new Error('Failed to export logs');
       }
 
       // Download the file
-      const blob = await response.blob()
-      downloadBlob(blob, `system-logs-${new Date().toISOString().split('T')[0]}.txt`)
+      const blob = await response.blob();
+      downloadBlob(
+        blob,
+        `system-logs-${new Date().toISOString().split('T')[0]}.txt`
+      );
 
-      setSuccessMessage('System logs exported successfully')
+      setSuccessMessage('System logs exported successfully');
     } catch (err) {
-      console.error('Error exporting logs:', err)
-      setError(err instanceof Error ? err.message : 'Failed to export logs')
+      console.error('Error exporting logs:', err);
+      setError(err instanceof Error ? err.message : 'Failed to export logs');
     } finally {
-      setIsExporting(false)
+      setIsExporting(false);
     }
-  }
+  };
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center p-8">
         <div className="text-gray-500">Loading developer settings...</div>
       </div>
-    )
+    );
   }
 
   // Only show to ADMIN users
@@ -186,7 +212,7 @@ export function DeveloperSettings({ onSave }: DeveloperSettingsProps) {
           Developer settings are only available to administrators.
         </p>
       </div>
-    )
+    );
   }
 
   return (
@@ -203,13 +229,22 @@ export function DeveloperSettings({ onSave }: DeveloperSettingsProps) {
       <div className="rounded-md bg-yellow-50 dark:bg-yellow-900/20 p-4">
         <div className="flex">
           <div className="flex-shrink-0">
-            <svg className="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+            <svg
+              className="h-5 w-5 text-yellow-400"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fillRule="evenodd"
+                d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                clipRule="evenodd"
+              />
             </svg>
           </div>
           <div className="ml-3">
             <p className="text-sm text-yellow-700 dark:text-yellow-400">
-              These settings are for advanced users only. Changing these values may affect system performance and security.
+              These settings are for advanced users only. Changing these values
+              may affect system performance and security.
             </p>
           </div>
         </div>
@@ -228,7 +263,10 @@ export function DeveloperSettings({ onSave }: DeveloperSettingsProps) {
             />
           </div>
           <div className="ml-3 text-sm">
-            <label htmlFor="debug-mode" className="font-medium text-gray-700 dark:text-gray-300">
+            <label
+              htmlFor="debug-mode"
+              className="font-medium text-gray-700 dark:text-gray-300"
+            >
               Enable Debug Mode
             </label>
             <p className="text-gray-500 dark:text-gray-400">
@@ -239,19 +277,28 @@ export function DeveloperSettings({ onSave }: DeveloperSettingsProps) {
 
         {/* Log Level */}
         <div>
-          <label htmlFor="log-level" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          <label
+            htmlFor="log-level"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
             Log Level
           </label>
           <select
             id="log-level"
             value={formData.logLevel}
-            onChange={(e) => handleChange('logLevel', e.target.value as LogLevel)}
+            onChange={(e) =>
+              handleChange('logLevel', e.target.value as LogLevel)
+            }
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm"
           >
             <option value="error">Error - Only critical errors</option>
             <option value="warning">Warning - Errors and warnings</option>
-            <option value="info">Info - General information (recommended)</option>
-            <option value="debug">Debug - Detailed debugging information</option>
+            <option value="info">
+              Info - General information (recommended)
+            </option>
+            <option value="debug">
+              Debug - Detailed debugging information
+            </option>
           </select>
           <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
             Controls the verbosity of system logs
@@ -263,16 +310,24 @@ export function DeveloperSettings({ onSave }: DeveloperSettingsProps) {
           <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100">
             API Rate Limits
           </h4>
-          
+
           <div>
-            <label htmlFor="rate-per-minute" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            <label
+              htmlFor="rate-per-minute"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
               Requests Per Minute
             </label>
             <input
               type="number"
               id="rate-per-minute"
               value={formData.apiRateLimits.perMinute}
-              onChange={(e) => handleChange('apiRateLimits.perMinute', parseInt(e.target.value) || 1)}
+              onChange={(e) =>
+                handleChange(
+                  'apiRateLimits.perMinute',
+                  parseInt(e.target.value) || 1
+                )
+              }
               min="1"
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm"
             />
@@ -280,19 +335,29 @@ export function DeveloperSettings({ onSave }: DeveloperSettingsProps) {
               Maximum API requests per minute per user
             </p>
             {errors['apiRateLimits.perMinute'] && (
-              <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors['apiRateLimits.perMinute']}</p>
+              <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                {errors['apiRateLimits.perMinute']}
+              </p>
             )}
           </div>
 
           <div>
-            <label htmlFor="rate-per-hour" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            <label
+              htmlFor="rate-per-hour"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
               Requests Per Hour
             </label>
             <input
               type="number"
               id="rate-per-hour"
               value={formData.apiRateLimits.perHour}
-              onChange={(e) => handleChange('apiRateLimits.perHour', parseInt(e.target.value) || 1)}
+              onChange={(e) =>
+                handleChange(
+                  'apiRateLimits.perHour',
+                  parseInt(e.target.value) || 1
+                )
+              }
               min="1"
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm"
             />
@@ -300,7 +365,9 @@ export function DeveloperSettings({ onSave }: DeveloperSettingsProps) {
               Maximum API requests per hour per user
             </p>
             {errors['apiRateLimits.perHour'] && (
-              <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors['apiRateLimits.perHour']}</p>
+              <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                {errors['apiRateLimits.perHour']}
+              </p>
             )}
           </div>
         </div>
@@ -316,8 +383,18 @@ export function DeveloperSettings({ onSave }: DeveloperSettingsProps) {
             disabled={isExporting}
             className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <svg className="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            <svg
+              className="mr-2 h-4 w-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+              />
             </svg>
             {isExporting ? 'Exporting...' : 'Export System Logs'}
           </button>
@@ -335,7 +412,9 @@ export function DeveloperSettings({ onSave }: DeveloperSettingsProps) {
 
         {successMessage && (
           <div className="rounded-md bg-green-50 dark:bg-green-900/20 p-4">
-            <p className="text-sm text-green-800 dark:text-green-400">{successMessage}</p>
+            <p className="text-sm text-green-800 dark:text-green-400">
+              {successMessage}
+            </p>
           </div>
         )}
 
@@ -351,5 +430,5 @@ export function DeveloperSettings({ onSave }: DeveloperSettingsProps) {
         </div>
       </form>
     </div>
-  )
+  );
 }

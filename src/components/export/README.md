@@ -31,12 +31,12 @@ A component to view export history with details about past exports including for
 ### Usage
 
 ```tsx
-import { ExportButton } from '@/components/export'
+import { ExportButton } from '@/components/export';
 
 function MyComponent() {
-  const [data, setData] = useState([])
-  const [selectedIds, setSelectedIds] = useState(new Set())
-  const [filters, setFilters] = useState({})
+  const [data, setData] = useState([]);
+  const [selectedIds, setSelectedIds] = useState(new Set());
+  const [filters, setFilters] = useState({});
 
   return (
     <ExportButton
@@ -46,31 +46,34 @@ function MyComponent() {
       filters={filters}
       onExport={(format, success, fileSize) => {
         if (success) {
-          console.log(`${format} export successful (${fileSize?.toFixed(2)} KB)`)
+          console.log(
+            `${format} export successful (${fileSize?.toFixed(2)} KB)`
+          );
         } else {
-          console.error(`${format} export failed`)
+          console.error(`${format} export failed`);
         }
       }}
     />
-  )
+  );
 }
 ```
 
 ### Props
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `data` | `any[]` | Required | Array of data to export |
-| `filename` | `string` | `'inventory-export'` | Base filename for exported files |
-| `selectedIds` | `Set<string>` | `undefined` | Set of selected item IDs (exports only selected if provided) |
-| `filters` | `Record<string, any>` | `undefined` | Current filter state (included in JSON metadata) |
-| `onExport` | `(format, success, fileSize?) => void` | `undefined` | Callback fired after export attempt with optional file size in KB |
-| `className` | `string` | `''` | Additional CSS classes |
-| `disabled` | `boolean` | `false` | Disable the export button |
+| Prop          | Type                                   | Default              | Description                                                       |
+| ------------- | -------------------------------------- | -------------------- | ----------------------------------------------------------------- |
+| `data`        | `any[]`                                | Required             | Array of data to export                                           |
+| `filename`    | `string`                               | `'inventory-export'` | Base filename for exported files                                  |
+| `selectedIds` | `Set<string>`                          | `undefined`          | Set of selected item IDs (exports only selected if provided)      |
+| `filters`     | `Record<string, any>`                  | `undefined`          | Current filter state (included in JSON metadata)                  |
+| `onExport`    | `(format, success, fileSize?) => void` | `undefined`          | Callback fired after export attempt with optional file size in KB |
+| `className`   | `string`                               | `''`                 | Additional CSS classes                                            |
+| `disabled`    | `boolean`                              | `false`              | Disable the export button                                         |
 
 ### Export Formats
 
 #### CSV Format (Client-side)
+
 - UTF-8 with BOM encoding for Excel compatibility
 - All object keys as headers
 - Nested objects flattened (e.g., user.name)
@@ -78,6 +81,7 @@ function MyComponent() {
 - Date-stamped filename
 
 #### JSON Format (Client-side)
+
 - Includes metadata object with:
   - Export date (ISO format)
   - Total record count
@@ -87,6 +91,7 @@ function MyComponent() {
 - Date-stamped filename
 
 #### Excel Format (Server-side)
+
 - Formatted spreadsheet with bold headers and colored backgrounds
 - Auto-column width based on content
 - Summary section with totals and statistics
@@ -96,6 +101,7 @@ function MyComponent() {
 - Requires API endpoint: `POST /api/inventory/export/excel`
 
 #### PDF Format (Server-side)
+
 - Professional report layout with company header
 - Page numbers and footer
 - Filter information display
@@ -131,17 +137,23 @@ For Excel and PDF exports to work, the following API endpoints must be available
 - `POST /api/inventory/export/pdf` - PDF export endpoint
 
 Both endpoints expect a JSON payload with:
+
 ```json
 {
-  "filters": { /* filter state */ },
+  "filters": {
+    /* filter state */
+  },
   "ids": ["id1", "id2"], // optional, for selected items
-  "options": { /* format-specific options */ }
+  "options": {
+    /* format-specific options */
+  }
 }
 ```
 
 ### Error Handling
 
 The component handles various error scenarios:
+
 - Network failures
 - Rate limit exceeded (429 status)
 - Server errors (5xx status)
@@ -150,7 +162,6 @@ The component handles various error scenarios:
 
 Errors are displayed inline in the dropdown with a dismiss button.
 
-
 ## Universal Export API
 
 ### POST /api/export
@@ -158,6 +169,7 @@ Errors are displayed inline in the dropdown with a dismiss button.
 Universal export endpoint supporting multiple entities and formats.
 
 **Request Body:**
+
 ```json
 {
   "format": "csv" | "excel" | "json" | "pdf",
@@ -172,10 +184,12 @@ Universal export endpoint supporting multiple entities and formats.
 ```
 
 **Response:**
+
 - For small exports (<5000 records): File download
 - For large exports (>5000 records): Email delivery confirmation
 
 **Features:**
+
 - Rate limiting: 10 exports per 15 minutes
 - Automatic email delivery for large datasets
 - Audit logging for all exports
@@ -188,9 +202,11 @@ Universal export endpoint supporting multiple entities and formats.
 Get export history for the current user.
 
 **Query Parameters:**
+
 - `limit`: Number of records to return (default: 50)
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -200,7 +216,9 @@ Get export history for the current user.
       "format": "excel",
       "recordCount": 1500,
       "fileSize": 245760,
-      "filters": { /* applied filters */ },
+      "filters": {
+        /* applied filters */
+      },
       "createdAt": "2024-01-15T10:30:00Z"
     }
   ],
@@ -215,24 +233,31 @@ The export service (`src/services/export.ts`) provides utility functions for gen
 ### Functions
 
 #### `exportToCSV(options: ExportOptions): Promise<Buffer>`
+
 Generates a CSV file with UTF-8 BOM for Excel compatibility.
 
 #### `exportToExcel(options: ExportOptions): Promise<Buffer>`
+
 Generates an Excel file with formatting, summary section, and auto-sized columns.
 
 #### `exportToJSON(options: ExportOptions): Promise<Buffer>`
+
 Generates a JSON file with metadata including export date, filters, and record count.
 
 #### `logExport(params): Promise<void>`
+
 Logs export activity to the audit trail.
 
 #### `getExportHistory(userId: string, limit?: number): Promise<ExportHistoryEntry[]>`
+
 Retrieves export history for a user.
 
 #### `emailExport(params): Promise<void>`
+
 Sends an export file via email with the file attached.
 
 #### `shouldEmailExport(recordCount: number, threshold?: number): boolean`
+
 Determines if an export should be emailed based on record count (default threshold: 5000).
 
 ## Usage Examples
@@ -240,18 +265,16 @@ Determines if an export should be emailed based on record count (default thresho
 ### Using ExportModal
 
 ```tsx
-import { ExportModal } from '@/components/export'
+import { ExportModal } from '@/components/export';
 
 function MyComponent() {
-  const [showExportModal, setShowExportModal] = useState(false)
-  const [selectedIds, setSelectedIds] = useState<string[]>([])
-  const [filters, setFilters] = useState({})
+  const [showExportModal, setShowExportModal] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [filters, setFilters] = useState({});
 
   return (
     <>
-      <button onClick={() => setShowExportModal(true)}>
-        Export Data
-      </button>
+      <button onClick={() => setShowExportModal(true)}>Export Data</button>
 
       <ExportModal
         isOpen={showExportModal}
@@ -261,19 +284,19 @@ function MyComponent() {
         selectedIds={selectedIds}
         onExportComplete={(success, format) => {
           if (success) {
-            console.log(`Export completed: ${format}`)
+            console.log(`Export completed: ${format}`);
           }
         }}
       />
     </>
-  )
+  );
 }
 ```
 
 ### Using ExportHistory
 
 ```tsx
-import { ExportHistory } from '@/components/export'
+import { ExportHistory } from '@/components/export';
 
 function SettingsPage() {
   return (
@@ -281,7 +304,7 @@ function SettingsPage() {
       <h2>Export History</h2>
       <ExportHistory />
     </div>
-  )
+  );
 }
 ```
 
@@ -298,16 +321,16 @@ const response = await fetch('/api/export', {
     filters: {
       startDate: '2024-01-01',
       endDate: '2024-01-31',
-      destination: 'MAIS'
+      destination: 'MAIS',
     },
     columns: ['itemName', 'batch', 'quantity', 'reject'],
     filename: 'january-inventory',
-    includeFilters: true
-  })
-})
+    includeFilters: true,
+  }),
+});
 
 if (response.ok) {
-  const blob = await response.blob()
+  const blob = await response.blob();
   // Handle download
 }
 ```
@@ -323,6 +346,7 @@ For exports exceeding 5000 records, the system automatically sends the export fi
 5. User receives notification
 
 The email includes:
+
 - Export filename
 - Format
 - Record count
@@ -332,6 +356,7 @@ The email includes:
 ## Audit Logging
 
 All exports are logged to the audit trail with:
+
 - User ID
 - Timestamp
 - Format
@@ -341,6 +366,7 @@ All exports are logged to the audit trail with:
 - Entity type
 
 View export history:
+
 - In the UI: Use the `ExportHistory` component
 - Via API: `GET /api/export/history`
 

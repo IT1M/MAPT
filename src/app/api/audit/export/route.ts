@@ -59,14 +59,18 @@ export async function POST(request: NextRequest) {
       entityType: 'AuditLog',
       entityId: 'export',
       changes: { format, filters },
-      ipAddress: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown',
+      ipAddress:
+        request.headers.get('x-forwarded-for') ||
+        request.headers.get('x-real-ip') ||
+        'unknown',
       userAgent: request.headers.get('user-agent') || 'unknown',
     });
 
     // Determine content type
     let contentType = 'text/csv';
     if (format === 'excel') {
-      contentType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+      contentType =
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
     } else if (format === 'pdf') {
       contentType = 'application/pdf';
     }

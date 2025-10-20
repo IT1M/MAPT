@@ -9,7 +9,7 @@ export {
   defaultRateLimiter,
   geminiRateLimiter,
   checkRateLimit,
-} from './rate-limiter'
+} from './rate-limiter';
 
 // Authentication
 export {
@@ -23,7 +23,7 @@ export {
   checkAuth,
   checkRole,
   checkPermission,
-} from './auth'
+} from './auth';
 
 // CSRF protection
 export {
@@ -31,11 +31,11 @@ export {
   verifyCsrfToken,
   checkCsrf,
   addCsrfHeaders,
-} from './csrf'
+} from './csrf';
 
 // Security headers
 export {
   SECURITY_HEADERS,
   addSecurityHeaders,
   createSecureResponse,
-} from './security-headers'
+} from './security-headers';
